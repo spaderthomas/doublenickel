@@ -15,13 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\thirdparty\tdengine\src\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\thirdparty\tdengine\src\imgui\imgui_compilation_unit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\thirdparty\tdengine\src\glad.c">
+    <ClCompile Include="..\..\source\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

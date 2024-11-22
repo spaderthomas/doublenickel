@@ -79,11 +79,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'">
-    <IncludePath>../../thirdparty;../../thirdparty/imgui;../../thirdparty/freetype;../../thirdparty/lua;$(IncludePath)</IncludePath>
+    <IncludePath>../../thirdparty/tdengine;$(IncludePath)</IncludePath>
     <TargetName>tdengine</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='EditorRelease|x64'">
-    <IncludePath>../../include;../../include/imgui;../../include/freetype;../../include/lua;$(IncludePath)</IncludePath>
+    <IncludePath>../../;$(IncludePath)</IncludePath>
     <TargetName>tdengine</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='PackagedRelease|x64'">
@@ -143,6 +143,7 @@ xcopy /y "$(SolutionDir)..\..\asset\steam\steam_appid.txt" "$(TargetDir)"</Comma
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalOptions>/showIncludes %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -216,9 +217,7 @@ xcopy /y "$(SolutionDir)..\..\asset\steam\steam_appid.txt" "$(TargetDir)"</Comma
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\thirdparty\tdengine\src\glad.c" />
-    <ClCompile Include="..\..\thirdparty\tdengine\src\imgui\imgui_compilation_unit.cpp" />
-    <ClCompile Include="..\..\thirdparty\tdengine\src\main.cpp" />
+    <ClCompile Include="..\..\source\main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

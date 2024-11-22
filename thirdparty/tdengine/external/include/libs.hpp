@@ -3,6 +3,8 @@
 #include "windows.h"
 #include "shlobj.h"
 
+#include "KHR/khrplatform.h"
+
 // Library includes
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"

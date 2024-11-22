@@ -1,2 +1,0 @@
-1. [ ] Make two buffers as part of your G buffer; one is a color buffer, and one is a normal buffer. Render a basic circle to the G buffer (including automatically generated UVs)
-2. [ ] Make a buffer for the light map. Render the intensity of a simple point light to it, with intensity, radial falloff, and angular falloff.
