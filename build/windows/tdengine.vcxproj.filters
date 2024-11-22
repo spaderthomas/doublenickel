@@ -13,17 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\freetype">
-      <UniqueIdentifier>{e896d9e2-3037-404f-ae9a-2c17a6bb9823}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\glad">
-      <UniqueIdentifier>{dc7fe564-2422-41c3-845c-8096f44fcb40}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\include\glad\glad.h">
-      <Filter>Header Files\glad</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\thirdparty\tdengine\src\main.cpp">

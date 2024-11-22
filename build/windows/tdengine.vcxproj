@@ -216,9 +216,6 @@ xcopy /y "$(SolutionDir)..\..\asset\steam\steam_appid.txt" "$(TargetDir)"</Comma
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\glad\glad.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="..\..\thirdparty\tdengine\src\glad.c" />
     <ClCompile Include="..\..\thirdparty\tdengine\src\imgui\imgui_compilation_unit.cpp" />
     <ClCompile Include="..\..\thirdparty\tdengine\src\main.cpp" />
