@@ -25,5 +25,6 @@ void set_exit_game() {
 }
 
 const char* get_game_hash() {
-	return GIT_HASH;
+	return "hehe";
+	// return GIT_HASH;
 }

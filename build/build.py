@@ -80,4 +80,5 @@ def main():
         update_hash_file(output_path, git_hash)
 
 if __name__ == "__main__":
+    exit()
     main()

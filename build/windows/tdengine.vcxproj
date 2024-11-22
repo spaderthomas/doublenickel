@@ -79,7 +79,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'">
-    <IncludePath>../../include;../../include/imgui;../../include/freetype;../../include/lua;$(IncludePath)</IncludePath>
+    <IncludePath>../../thirdparty;../../thirdparty/imgui;../../thirdparty/freetype;../../thirdparty/lua;$(IncludePath)</IncludePath>
     <TargetName>tdengine</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='EditorRelease|x64'">
@@ -219,16 +219,9 @@ xcopy /y "$(SolutionDir)..\..\asset\steam\steam_appid.txt" "$(TargetDir)"</Comma
     <ClInclude Include="..\..\include\glad\glad.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\glad.c" />
-    <ClCompile Include="..\..\src\imgui\cimgui.cpp" />
-    <ClCompile Include="..\..\src\imgui\imgui.cpp" />
-    <ClCompile Include="..\..\src\imgui\imgui_demo.cpp" />
-    <ClCompile Include="..\..\src\imgui\imgui_draw.cpp" />
-    <ClCompile Include="..\..\src\imgui\imgui_impl_glfw.cpp" />
-    <ClCompile Include="..\..\src\imgui\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="..\..\src\imgui\imgui_tables.cpp" />
-    <ClCompile Include="..\..\src\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="..\..\src\main.cpp" />
+    <ClCompile Include="..\..\thirdparty\tdengine\src\glad.c" />
+    <ClCompile Include="..\..\thirdparty\tdengine\src\imgui\imgui_compilation_unit.cpp" />
+    <ClCompile Include="..\..\thirdparty\tdengine\src\main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,6 +1,5 @@
 #include "libs.hpp"
 
-#include "build_info.hpp"
 #include "utils/types.hpp"
 #include "utils/assert.hpp"
 #include "utils/error.hpp"
@@ -50,6 +49,7 @@
 #include "asset.hpp"
 #include "named_path.hpp"
 #include "graphics.hpp"
+#include "sdf.hpp"
 
 #include "action.cpp" // HALF
 #include "api.cpp"
@@ -67,6 +67,8 @@
 #include "lua.cpp"
 #include "named_path.cpp"
 #include "particle.cpp"
+#define SDF_IMPLEMENTATION
+#include "sdf.hpp"
 #include "shader.cpp"
 #include "steam.cpp"
 #include "text.cpp"
@@ -87,8 +89,6 @@
 #include "utils/string.cpp"
 #include "test.hpp"
 
-#include "user/user_includes.hpp"
-
 int main() {
 	init_allocators();
 	run_tests();
@@ -104,8 +104,6 @@ int main() {
 	init_actions();
 	init_audio();
 	init_scripts();
-	// Everything else that needs to be initialized must be done after we create a window and GL context,
-	// which is driven by Lua code.
 
 	while(!is_game_done()) {
 		update_frame();
@@ -116,8 +114,6 @@ int main() {
 		update_imgui();
 		update_input();
 		update_actions();
-
-		UserCallbacks::on_update();
 		update_game();
 		update_time();
 	}
