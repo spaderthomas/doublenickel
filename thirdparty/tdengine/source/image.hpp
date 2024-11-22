@@ -14,7 +14,7 @@ Texture* find_texture(hash_t hash);
 FM_LUA_EXPORT u32 find_texture_handle(const char* name);
 
 struct Sprite {
-	char file_path [MAX_PATH_LEN];
+	char file_path [TD_MAX_PATH_LEN];
 	hash_t hash;
 	hash_t texture;
 	Vector2* uv;
@@ -25,7 +25,7 @@ Sprite* find_sprite_no_default(const char* name);
 
 
 struct Path {
-	char path [MAX_PATH_LEN];
+	char path [TD_MAX_PATH_LEN];
 };
 
 struct RectPackId {

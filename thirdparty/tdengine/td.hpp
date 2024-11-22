@@ -52,6 +52,7 @@
 #include "source/named_path.hpp"
 #include "source/graphics.hpp"
 #include "source/sdf.hpp"
+#include "source/app.hpp"
 #endif
 
 #ifdef TD_IMPLEMENTATION
@@ -60,6 +61,8 @@
 
 #include "source/action.cpp" // HALF
 #include "source/api.cpp"
+#define APP_IMPLEMENTATION
+#include "source/app.hpp"
 #include "source/asset.cpp"
 #include "source/audio.cpp"
 #include "source/background.cpp" // INVERT (I need something to load large images though, in general)
@@ -96,9 +99,10 @@
 #include "source/utils/string.cpp"
 
 
-int td_main() {
+int td_main(TdAppDescriptor app) {
 	init_allocators();
 	init_random();
+	init_app(app);
 	init_paths();
 	init_log();
 	init_time();

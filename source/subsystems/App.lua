@@ -10,6 +10,7 @@ function App:init()
 		tdengine.enums.WindowFlags.Windowed,
 		tdengine.enums.WindowFlags.Border
 	)
+
 end
 
 function App:on_init_game()

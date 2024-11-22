@@ -40,7 +40,7 @@ void MemoryAllocator::free_array(Array<T>* array) {
 }
 
 char* MemoryAllocator::alloc_path() {
-	return alloc<char>(MAX_PATH_LEN);
+	return alloc<char>(TD_MAX_PATH_LEN);
 }
 
 

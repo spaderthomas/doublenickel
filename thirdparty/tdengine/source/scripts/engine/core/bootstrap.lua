@@ -368,7 +368,9 @@ typedef struct {
 NamedPathResult find_all_named_paths();
 
 void add_install_path(const char* name, const char* relative_path);
+void add_engine_path(const char* name, const char* relative_path);
 void add_write_path(const char* name, const char* relative_path);
+void add_named_subpath(const char* name, const char* parent_name, const char* relative_path);
 tstring resolve_named_path(const char* name);
 tstring resolve_format_path(const char* name, const char* file_name);
 
@@ -1299,7 +1301,7 @@ function tdengine.init_phase_0()
   -- Bootstrap the FFI, so that we can resolve paths
   tdengine.ffi = {}
   ffi.cdef(ffi_header)
-
+  
   -- Bootstrap the engine paths, so we can load the rest of the scripts
   local function collect_paths(paths, full_parent)
     full_parent = full_parent or ''
@@ -1334,7 +1336,12 @@ function tdengine.init_phase_0()
   local file_path = ffi.string(ffi.C.resolve_named_path('engine_paths').data)
 	local path_info = dofile(file_path)
 
-	local install_paths = collect_paths(path_info.install_paths)
+	local engine_paths = collect_paths(path_info.engine_paths)
+	for index, path in pairs(engine_paths) do
+		ffi.C.add_engine_path(path.name, path.path)
+	end
+
+  local install_paths = collect_paths(path_info.install_paths)
 	for index, path in pairs(install_paths) do
 		ffi.C.add_install_path(path.name, path.path)
 	end

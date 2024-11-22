@@ -2,5 +2,11 @@
 #include "td.hpp"
 
 int main(int num_args, char** args) {
-  td_main();  
+  TdAppDescriptor app = {
+    .install_path = "../../../..",
+    .engine_path = "../../../../thirdparty/tdengine",
+    .write_path = "../../../../source/data",
+    .app_path = "../../../../source",
+  };
+  td_main(app);  
 }

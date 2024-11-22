@@ -145,7 +145,7 @@ void TextureAtlas::build_from_config() {
 				auto sprite = alloc_sprite();
 				sprite->texture = this->texture->hash;
 				sprite->hash = hash_label(file_name.c_str());
-				strncpy(sprite->file_path, file_name.c_str(), MAX_PATH_LEN);
+				strncpy(sprite->file_path, file_name.c_str(), TD_MAX_PATH_LEN);
 
 				lua_pushstring(l, file_name.c_str());
 				lua_gettable(l, -2);
@@ -229,7 +229,7 @@ void TextureAtlas::build_from_source() {
 				if (!sprite) sprite = alloc_sprite();
 				sprite->texture = this->texture->hash;
 				sprite->hash = hash_label(file_name.c_str());
-				strncpy(sprite->file_path, file_name.c_str(), MAX_PATH_LEN);
+				strncpy(sprite->file_path, file_name.c_str(), TD_MAX_PATH_LEN);
 
 				auto id = arr_push(&ids);
 				id->sprite = sprite;
@@ -629,7 +629,7 @@ void create_sprite_ex(Sprite* sprite, const char* id, u8* data, i32 width, i32 h
 	sprite->hash = hash_label(id);
 	sprite->texture = texture->hash;
 	sprite->size = Vector2I(width, height);
-	strncpy(sprite->file_path, id, MAX_PATH_LEN);
+	strncpy(sprite->file_path, id, TD_MAX_PATH_LEN);
 
 	Vector2 uv [6] = TD_MAKE_QUAD(0, 1, 0, 1);
 	memcpy(sprite->uv, uv, sizeof(Vector2) * 6);

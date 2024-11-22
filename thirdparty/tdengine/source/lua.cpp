@@ -393,7 +393,7 @@ void LuaState::parse_string(i32 index, const char** value) {
 void LuaState::parse_string(i32 index, char** value) {
 	if (!lua_isstring(state, index)) return;
 	const char* cvalue = lua_tostring(state, index);
-	strncpy(*value, cvalue, MAX_PATH_LEN);
+	strncpy(*value, cvalue, TD_MAX_PATH_LEN);
 }
 
 void LuaState::parse_string(const char* key, const char** value) {

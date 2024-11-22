@@ -78,7 +78,7 @@ function EngineStats:init(params)
 	for name, path in tdengine.paths.iterate() do
 		table.insert(self.named_paths, tdengine.paths.NamedPath:new(name, path:gsub('%%', '%%%%')))
 	end
-	table.sort(self.named_paths, function(a, b) return a.path < b.path end)
+	table.sort(self.named_paths, function(a, b) return a.full_path < b.full_path end)
 end
 
 function EngineStats:update(dt)

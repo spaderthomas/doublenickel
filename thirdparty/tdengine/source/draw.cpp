@@ -637,7 +637,7 @@ GpuShader* gpu_shader_create(GpuShaderDescriptor descriptor) {
 
 GpuShader* gpu_shader_find(const char* name) {
 	arr_for(render.shaders, shader) {
-		if (!strncmp(shader->name, name, MAX_PATH_LEN)) return shader;
+		if (!strncmp(shader->name, name, TD_MAX_PATH_LEN)) return shader;
 	}
 
 	return nullptr;
