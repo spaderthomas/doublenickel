@@ -40,6 +40,7 @@ extern "C" {
 	#include "lua/lauxlib.h"
 }
 
+#define IMGUI_IMPL_OPENGL_LOADER_CUSTOM
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"

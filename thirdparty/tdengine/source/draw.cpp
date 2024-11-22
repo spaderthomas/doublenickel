@@ -514,7 +514,7 @@ void log_gl_errors() {
 	}
 }
 
-void APIENTRY on_opengl_message(
+void on_opengl_message(
 	GLenum source, 
 	GLenum type, 
 	GLuint id,

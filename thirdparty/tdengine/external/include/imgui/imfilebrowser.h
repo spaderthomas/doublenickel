@@ -265,7 +265,6 @@ inline void ImGui::FileBrowser::SetWindowPos(int posx, int posy) noexcept
 
 inline void ImGui::FileBrowser::SetWindowSize(int width, int height) noexcept
 {
-    assert(width > 0 && height > 0);
     width_  = width;
     height_ = height;
 }

@@ -79,7 +79,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'">
-    <IncludePath>../../thirdparty/tdengine;$(IncludePath)</IncludePath>
+    <IncludePath>../../thirdparty/tdengine;../../thirdparty/tdengine/external/include;../../thirdparty/tdengine/external/include/freetype;../../thirdparty/tdengine/external/include/imgui;$(IncludePath)</IncludePath>
     <TargetName>tdengine</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='EditorRelease|x64'">
@@ -116,11 +116,10 @@
       <AdditionalDependencies>freetype-2.10.4-windows-x64.lib;glfw-3.3.8-windows-x64.lib;luajit-2.1.0.3-windows-x64.lib;steam_api64.lib;user32.lib;opengl32.lib;gdi32.lib;Shell32.lib;Kernel32.lib;Advapi32.lib;Ole32.lib;OleAut32.lib</AdditionalDependencies>
       <AdditionalOptions>
       </AdditionalOptions>
-      <AdditionalLibraryDirectories>../../lib/debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../thirdparty/tdengine/external/lib/debug</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y "$(SolutionDir)..\..\lib\release\steam_api64.dll" "$(TargetDir)"
-xcopy /y "$(SolutionDir)..\..\asset\steam\steam_appid.txt" "$(TargetDir)"</Command>
+      <Command>xcopy /y "$(SolutionDir)..\..\thirdparty\tdengine\external\lib\release\steam_api64.dll" "$(TargetDir)"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>python $(SolutionDir)..\build.py</Command>
