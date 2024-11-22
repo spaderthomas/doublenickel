@@ -164,8 +164,6 @@ function EngineStats:engine_viewer()
 
 		if self.display_cursor then
 			local world = tdengine.vec2(tdengine.cursor(tdengine.coordinate.world))
-			tdengine.ffi.set_layer(100)
-			tdengine.ffi.set_world_space(true)()
 			tdengine.draw_circle_l(world, 5, tdengine.colors.red)
 		end
 

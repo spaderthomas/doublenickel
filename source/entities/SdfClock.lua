@@ -15,11 +15,9 @@ function SdfClockBubble:init(params)
     start = self.sdf.radius * tdengine.math.random_float(0.5, 1.0),
     target = self.sdf.radius * tdengine.math.random_float(1.0, 1.5),
     velocity = 0.05
-    -- exponent = 3,
-    -- time = tdengine.math.random_float(1.0, 2.0)
   })
-
 end
+
 
 SdfClock = tdengine.entity.define('SdfClock')
 function SdfClock:init()
@@ -75,7 +73,7 @@ function SdfClock:draw()
   --   time = 0.4
   -- })
   self.sizes = {}
-  self.sizes.face = 90
+  self.sizes.face = 80
   self.sizes.border_scale = self.sizes.face * 1.1
   self.sizes.hand = {
     second = Vector2:new(2, self.sizes.face * .9),
@@ -109,7 +107,7 @@ function SdfClock:draw()
 
   end
 
-  local renderer = tdengine.subsystem.find('DeferredRenderer').sdf_renderer
+  local renderer = tdengine.app.sdf_renderer
 
   tdengine.ffi.sdf_circle_ex(renderer, 
     0, 0, 
@@ -119,23 +117,23 @@ function SdfClock:draw()
     self.sizes.face
   )
 
-  local num_ticks = 5 * 12
-  for i = 0, num_ticks - 1 do
-    local angle = -tdengine.math.turns_to_rads(i / 60.0
+  -- local num_ticks = 5 * 12
+  -- for i = 0, num_ticks - 1 do
+  --   local angle = -tdengine.math.turns_to_rads(i / 60.0
   
-  )
-    local hand_angle = angle + tdengine.math.pi / 2
-    local hand_direction = Vector2:new(math.cos(hand_angle), math.sin(hand_angle))
-    local hand_center = hand_direction:scale(hand_size.y / 2)
+  -- )
+  --   local hand_angle = angle + tdengine.math.pi / 2
+  --   local hand_direction = Vector2:new(math.cos(hand_angle), math.sin(hand_angle))
+  --   local hand_center = hand_direction:scale(hand_size.y / 2)
   
-    tdengine.ffi.sdf_oriented_box_ex(renderer,
-      hand_center.x, hand_center.y,
-      color.r, color.g, color.b,
-      angle,
-      1.5,
-      hand_size.x, hand_size.y
-    )
-  end
+  --   tdengine.ffi.sdf_oriented_box_ex(renderer,
+  --     hand_center.x, hand_center.y,
+  --     color.r, color.g, color.b,
+  --     angle,
+  --     1.5,
+  --     hand_size.x, hand_size.y
+  --   )
+  -- end
 
   self.header = tdengine.ffi.sdf_combination_begin(renderer)
 
@@ -177,7 +175,7 @@ function SdfClock:draw()
 end
 
 function SdfClock:draw_hand(turns, hand_size, color)
-  local renderer = tdengine.subsystem.find('DeferredRenderer').sdf_renderer
+  local renderer = tdengine.app.sdf_renderer
 
   local angle = -tdengine.math.turns_to_rads(turns)
   local hand_angle = angle + tdengine.math.pi / 2
@@ -216,7 +214,7 @@ function SdfClock:update_bubbles()
 end
 
 function SdfClock:draw_bubbles()
-  local renderer = tdengine.subsystem.find('DeferredRenderer').sdf_renderer
+  local renderer = tdengine.app.sdf_renderer
 
   for bubble in self.bubbles:iterate_values() do
     ffi.C.sdf_combination_append(

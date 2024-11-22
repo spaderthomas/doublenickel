@@ -144,17 +144,17 @@ end
 function CircleEditor:draw_resize_hover()
 	local circle = self.resize.collider.impl
 
-	tdengine.ffi.set_world_space(true)
-	tdengine.ffi.set_layer(tdengine.editor.layers.collider_overlay)
-	tdengine.ffi.draw_ring_sdf(circle.position.x, circle.position.y, circle.radius, circle.radius + self.resize.select_epsilon, tdengine.colors.spring_green:alpha(self.resize.hover_alpha):to_vec4(), 1)
+	-- tdengine.ffi.set_world_space(true)
+	-- tdengine.ffi.set_layer(tdengine.editor.layers.collider_overlay)
+	-- tdengine.ffi.draw_ring_sdf(circle.position.x, circle.position.y, circle.radius, circle.radius + self.resize.select_epsilon, tdengine.colors.spring_green:alpha(self.resize.hover_alpha):to_vec4(), 1)
 end
 
 function CircleEditor:draw_resize_preview()
 	local circle = self.resize.collider.impl
 
-	tdengine.ffi.set_world_space(true)
-	tdengine.ffi.set_layer(tdengine.editor.layers.collider_overlay)
-	tdengine.ffi.draw_circle_sdf(circle.position.x, circle.position.y, self.resize.new_radius, tdengine.colors.spring_green:alpha(self.resize.preview_alpha):to_vec4(), 1)
+	-- tdengine.ffi.set_world_space(true)
+	-- tdengine.ffi.set_layer(tdengine.editor.layers.collider_overlay)
+	-- tdengine.ffi.draw_circle_sdf(circle.position.x, circle.position.y, self.resize.new_radius, tdengine.colors.spring_green:alpha(self.resize.preview_alpha):to_vec4(), 1)
 end
 
 function CircleEditor:iterate_colliders()
@@ -378,21 +378,21 @@ end
 function BoxEditor:draw_resize_preview()
 	local preview_alpha = self.resize.interpolation.preview_alpha:get_value()
 
-	tdengine.ffi.set_world_space(true)
-	tdengine.ffi.set_layer(tdengine.editor.layers.collider_overlay)
+	-- tdengine.ffi.set_world_space(true)
+	-- tdengine.ffi.set_layer(tdengine.editor.layers.collider_overlay)
 
-	local p = self.resize.collider:get_position()
-	tdengine.ffi.draw_quad(p.x, p.y, self.resize.new_size.x, self.resize.new_size.y, tdengine.colors.spring_green:alpha(preview_alpha):to_vec4())
+	-- local p = self.resize.collider:get_position()
+	-- tdengine.ffi.draw_quad(p.x, p.y, self.resize.new_size.x, self.resize.new_size.y, tdengine.colors.spring_green:alpha(preview_alpha):to_vec4())
 end
 
 function BoxEditor:draw_corners()
 	local hover_alpha = self.resize.interpolation.hover:get_value()
 
-	tdengine.ffi.set_world_space(true)
-	tdengine.ffi.set_layer(tdengine.editor.layers.collider_overlay)
-	for _, corner in pairs(self.resize.corners) do
-		tdengine.ffi.draw_circle_sdf(corner.x, corner.y, self.resize.corner_radius, tdengine.colors.spring_green:alpha(hover_alpha):to_vec4(), 1)
-	end
+	-- tdengine.ffi.set_world_space(true)
+	-- tdengine.ffi.set_layer(tdengine.editor.layers.collider_overlay)
+	-- for _, corner in pairs(self.resize.corners) do
+		-- tdengine.ffi.draw_circle_sdf(corner.x, corner.y, self.resize.corner_radius, tdengine.colors.spring_green:alpha(hover_alpha):to_vec4(), 1)
+	-- end
 end
 
 
@@ -539,13 +539,13 @@ end
 
 
 function ColliderEditor:draw()
-	tdengine.ffi.set_world_space(true)
-	tdengine.ffi.set_layer(tdengine.editor.layers.colliders)
+	-- tdengine.ffi.set_world_space(true)
+	-- tdengine.ffi.set_layer(tdengine.editor.layers.colliders)
 
-	for collider in tdengine.component.iterate('Collider') do
-		local color = self:on_color(collider)
-		collider:show(color)
-	end
+	-- for collider in tdengine.component.iterate('Collider') do
+		-- local color = self:on_color(collider)
+		-- collider:show(color)
+	-- end
 end
 
 function ColliderEditor:update_shape_editors() 

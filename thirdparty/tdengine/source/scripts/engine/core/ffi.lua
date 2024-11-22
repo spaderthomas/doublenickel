@@ -41,7 +41,6 @@ function tdengine.ffi.init()
 	ffi.metatype('tstring', string_metatable)
 	ffi.metatype('string', string_metatable)
 
-	tdengine.gpu = tdengine.ffi.namespace('_gpu')
 
 	tdengine.enum.define(
 		'CoordinateSystem',
@@ -847,4 +846,8 @@ end
 
 function tdengine.ffi.set_uniform_enum(name, value)
 	tdengine.ffi.set_uniform_i32(name, value:to_number())
+end
+
+function tdengine.ffi.set_world_space(b)
+	dbg()
 end

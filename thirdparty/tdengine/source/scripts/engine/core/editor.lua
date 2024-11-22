@@ -183,15 +183,10 @@ function tdengine.editor.init()
 end
 
 function tdengine.editor.update()
-  local pipeline = tdengine.gpus.find(GraphicsPipeline.Editor)
-  tdengine.ffi.gpu_graphics_pipeline_bind(pipeline)
-
   for editor in tdengine.iterator.values(tdengine.editor.entities) do
     editor:update()
     editor:draw()
   end
-
-  tdengine.ffi.gpu_graphics_pipeline_submit(pipeline)
 end
 
 function EditorImpl:init()
@@ -215,7 +210,6 @@ end
 
 function EditorImpl:begin_child(name, x, y, flags)
   imgui.BeginChild(name, imgui.ImVec2(x, y), true, flags)
-
 
   -- If a child window is focused (or hovered), it will mark the parent (i.e. the part of the parent window
   -- that is *not* inside the child) as unfocused. Since I'm using this for only allowing a window's hotkeys
