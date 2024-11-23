@@ -86,8 +86,6 @@ end
 function LagrangianFluidSystem:draw()
   if not self.__editor_controls.draw_bounding_volumes then return end
 
-  --tdengine.set_blend_enabled(true)
-  --tdengine.set_blend_mode(tdengine.enums.BlendMode.ONE, tdengine.enums.BlendMode.ONE_MINUS_SRC_ALPHA)
 
   local color = self.colors.bounding_volume:alpha(.2):premultiply():to_vec4()
 
@@ -104,5 +102,4 @@ function LagrangianFluidSystem:draw()
     self.bounding_volume.radius * 2,
     color)
 
-  --tdengine.set_blend_mode(tdengine.enums.BlendMode.SRC_ALPHA, tdengine.enums.BlendMode.ONE_MINUS_SRC_ALPHA)
 end

@@ -25,12 +25,17 @@ return {
 				engine_libs = 'third_party',
 			}
 		},
+	},
+	install_paths = {
 		asset = {
 			path = 'asset',
 			children = {
-				steam = 'steam',
-				fonts = 'fonts',
-				font = 'fonts/%s.ttf',
+				fonts = {
+					path = 'fonts',
+					children = {
+						font = '%s.ttf'
+					}
+				},
 				images = {
 					path = 'images',
 					children = {
@@ -42,6 +47,7 @@ return {
 				shaders = {
 					path = 'shaders',
 					children = {
+						shader_includes = 'include',
 						vertex_shader = '%s',
 						fragment_shader = '%s',
 						compute_shader = '%s',
@@ -52,6 +58,7 @@ return {
 		},
 	},
 	app_paths = {
+		app_entry_point = 'App.lua',
 		components = 'components',
 		core = 'core',
 		data = {
@@ -87,7 +94,4 @@ return {
 		entities = 'entities',
 		subsystems = 'subsystems',
 	},
-	install_paths = {
-
-	}
 }

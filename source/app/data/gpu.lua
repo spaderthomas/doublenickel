@@ -37,17 +37,8 @@ return {
 			descriptor = {
 				kind = tdengine.enums.GpuShaderKind.Graphics,
 				name = 'shape',
-				vertex_shader = 'shape.vertex',
-				fragment_shader = 'shape.fragment'
-			}
-		},
-		{
-			id = Shader.SdfNormal,
-			descriptor = {
-				kind = tdengine.enums.GpuShaderKind.Graphics,
-				name = 'sdf_normal',
-				vertex_shader = 'sdf_normal.vertex',
-				fragment_shader = 'sdf_normal.fragment'
+				vertex_shader = 'sdf/shape.vertex',
+				fragment_shader = 'sdf/shape.fragment'
 			}
 		},
 		{
@@ -55,8 +46,8 @@ return {
 			descriptor = {
 				kind = tdengine.enums.GpuShaderKind.Graphics,
 				name = 'solid',
-				vertex_shader = 'solid.vertex',
-				fragment_shader = 'solid.fragment'
+				vertex_shader = 'solid/solid.vertex',
+				fragment_shader = 'solid/solid.fragment'
 			}
 		},
 		{
@@ -64,8 +55,8 @@ return {
 			descriptor = {
 				kind = tdengine.enums.GpuShaderKind.Graphics,
 				name = 'sprite',
-				vertex_shader = 'sprite.vertex',
-				fragment_shader = 'sprite.fragment'
+				vertex_shader = 'sprite/sprite.vertex',
+				fragment_shader = 'sprite/sprite.fragment'
 			}
 		},
 		{
@@ -73,8 +64,8 @@ return {
 			descriptor = {
 				kind = tdengine.enums.GpuShaderKind.Graphics,
 				name = 'text',
-				vertex_shader = 'text.vertex',
-				fragment_shader = 'text.fragment'
+				vertex_shader = 'text/text.vertex',
+				fragment_shader = 'text/text.fragment'
 			}
 		},
 		{
@@ -82,8 +73,8 @@ return {
 			descriptor = {
 				kind = tdengine.enums.GpuShaderKind.Graphics,
 				name = 'blit',
-				vertex_shader = 'blit.vertex',
-				fragment_shader = 'blit.fragment'
+				vertex_shader = 'blit/blit.vertex',
+				fragment_shader = 'blit/blit.fragment'
 			}
 		},
 	}

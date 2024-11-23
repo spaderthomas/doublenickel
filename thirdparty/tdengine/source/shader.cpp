@@ -9,7 +9,7 @@ tstring build_shader_source(const char* file_path) {
 	IncludeContext context = {
 		.file_path = file_path,
 		.include_dirs = {
-			.data = { shader_directory, resolve_named_path("audio") },
+			.data = { resolve_named_path("shaders"), resolve_named_path("shader_includes") },
 			.count = 2
 		}
 	};

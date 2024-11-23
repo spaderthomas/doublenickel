@@ -250,26 +250,6 @@ void set_draw_mode(DrawMode mode) {
 	draw_call->mode = mode;
 }
 
-void set_blend_enabled(bool enabled) {
-	auto draw_call = gpu_command_buffer_find_draw_call(render.pipeline->command_buffer);
-	if (draw_call->state.blend_enabled != enabled) return;
-	
-	draw_call = gpu_command_buffer_flush_draw_call(render.pipeline->command_buffer);
-	draw_call->state.blend_enabled = enabled;
-}
-
-void set_blend_mode(i32 source, i32 dest) {
-	auto blend_source = convert_blend_mode(static_cast<BlendMode>(source));
-	auto blend_dest = convert_blend_mode(static_cast<BlendMode>(dest));
-	auto draw_call = gpu_command_buffer_find_draw_call(render.pipeline->command_buffer);
-	if ((draw_call->state.blend_source == blend_source) && (draw_call->state.blend_dest == blend_dest)) return;
-	
-	draw_call = gpu_command_buffer_flush_draw_call(render.pipeline->command_buffer);
-	draw_call->state.blend_source = blend_source;
-	draw_call->state.blend_dest = blend_dest;
-}
-
-
 void set_active_shader(const char* name) {
 	auto shader = gpu_shader_find(name);
 	set_active_shader_ex(shader);
@@ -1124,69 +1104,6 @@ bool GlState::has_uniform(const char* name) {
 void GlState::add_uniform(Uniform& uniform) {
 	uniforms.push(uniform);
 }
-
-i32 convert_blend_mode(BlendMode blend_mode) {
-	if (blend_mode == BlendMode::ZERO) {
-		return GL_ZERO;
-	}
-	else if (blend_mode == BlendMode::ONE) {
-		return GL_ONE;
-	}
-	else if (blend_mode == BlendMode::SRC_COLOR) {
-		return GL_SRC_COLOR;
-	}
-	else if (blend_mode == BlendMode::ONE_MINUS_SRC_COLOR) {
-		return GL_ONE_MINUS_SRC_COLOR;
-	}
-	else if (blend_mode == BlendMode::DST_COLOR) {
-		return GL_DST_COLOR;
-	}
-	else if (blend_mode == BlendMode::ONE_MINUS_DST_COLOR) {
-		return GL_ONE_MINUS_DST_COLOR;
-	}
-	else if (blend_mode == BlendMode::SRC_ALPHA) {
-		return GL_SRC_ALPHA;
-	}
-	else if (blend_mode == BlendMode::ONE_MINUS_SRC_ALPHA) {
-		return GL_ONE_MINUS_SRC_ALPHA;
-	}
-	else if (blend_mode == BlendMode::DST_ALPHA) {
-		return GL_DST_ALPHA;
-	}
-	else if (blend_mode == BlendMode::ONE_MINUS_DST_ALPHA) {
-		return GL_ONE_MINUS_DST_ALPHA;
-	}
-	else if (blend_mode == BlendMode::CONSTANT_COLOR) {
-		return GL_CONSTANT_COLOR;
-	}
-	else if (blend_mode == BlendMode::ONE_MINUS_CONSTANT_COLOR) {
-		return GL_ONE_MINUS_CONSTANT_COLOR;
-	}
-	else if (blend_mode == BlendMode::CONSTANT_ALPHA) {
-		return GL_CONSTANT_ALPHA;
-	}
-	else if (blend_mode == BlendMode::ONE_MINUS_CONSTANT_ALPHA) {
-		return GL_ONE_MINUS_CONSTANT_ALPHA;
-	}
-	else if (blend_mode == BlendMode::SRC_ALPHA_SATURATE) {
-		return GL_SRC_ALPHA_SATURATE;
-	}
-	else if (blend_mode == BlendMode::SRC1_COLOR) {
-		return GL_SRC1_COLOR;
-	}
-	else if (blend_mode == BlendMode::ONE_MINUS_SRC1_COLOR) {
-		return GL_ONE_MINUS_SRC1_COLOR;
-	}
-	else if (blend_mode == BlendMode::SRC1_ALPHA) {
-		return GL_SRC1_ALPHA;
-	}
-	else if (blend_mode == BlendMode::ONE_MINUS_SRC1_ALPHA) {
-		return GL_ONE_MINUS_SRC1_ALPHA;
-	}
-
-	assert(false);
-	return GL_SRC_ALPHA;
-};
 
 u32 convert_draw_mode(DrawMode mode) {
 	if (mode == DrawMode::Triangles) {

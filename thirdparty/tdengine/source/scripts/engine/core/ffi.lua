@@ -74,31 +74,6 @@ function tdengine.ffi.init()
 		}
 	)
 	tdengine.enum.define(
-		'BlendMode',
-		{
-			ZERO = tdengine.ffi.GPU_BLEND_MODE_ZERO,
-			ONE = tdengine.ffi.GPU_BLEND_MODE_ONE,
-			SRC_COLOR = tdengine.ffi.GPU_BLEND_MODE_SRC_COLOR,
-			ONE_MINUS_SRC_COLOR = tdengine.ffi.GPU_BLEND_MODE_ONE_MINUS_SRC_COLOR,
-			DST_COLOR = tdengine.ffi.GPU_BLEND_MODE_DST_COLOR,
-			ONE_MINUS_DST_COLOR = tdengine.ffi.GPU_BLEND_MODE_ONE_MINUS_DST_COLOR,
-			SRC_ALPHA = tdengine.ffi.GPU_BLEND_MODE_SRC_ALPHA,
-			ONE_MINUS_SRC_ALPHA = tdengine.ffi.GPU_BLEND_MODE_ONE_MINUS_SRC_ALPHA,
-			DST_ALPHA = tdengine.ffi.GPU_BLEND_MODE_DST_ALPHA,
-			ONE_MINUS_DST_ALPHA = tdengine.ffi.GPU_BLEND_MODE_ONE_MINUS_DST_ALPHA,
-			CONSTANT_COLOR = tdengine.ffi.GPU_BLEND_MODE_CONSTANT_COLOR,
-			ONE_MINUS_CONSTANT_COLOR = tdengine.ffi.GPU_BLEND_MODE_ONE_MINUS_CONSTANT_COLOR,
-			CONSTANT_ALPHA = tdengine.ffi.GPU_BLEND_MODE_CONSTANT_ALPHA,
-			ONE_MINUS_CONSTANT_ALPHA = tdengine.ffi.GPU_BLEND_MODE_ONE_MINUS_CONSTANT_ALPHA,
-			SRC_ALPHA_SATURATE = tdengine.ffi.GPU_BLEND_MODE_SRC_ALPHA_SATURATE,
-			SRC1_COLOR = tdengine.ffi.GPU_BLEND_MODE_SRC1_COLOR,
-			ONE_MINUS_SRC1_COLOR = tdengine.ffi.GPU_BLEND_MODE_ONE_MINUS_SRC1_COLOR,
-			SRC1_ALPHA = tdengine.ffi.GPU_BLEND_MODE_SRC1_ALPHA,
-			ONE_MINUS_SRC1_ALPHA = tdengine.ffi.GPU_BLEND_MODE_ONE_MINUS_SRC1_ALPHA
-		}
-	)
-
-	tdengine.enum.define(
 		'WindowFlags',
 		{
 			None = 0,
@@ -846,8 +821,4 @@ end
 
 function tdengine.ffi.set_uniform_enum(name, value)
 	tdengine.ffi.set_uniform_i32(name, value:to_number())
-end
-
-function tdengine.ffi.set_world_space(b)
-	dbg()
 end

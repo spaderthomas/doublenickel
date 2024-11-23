@@ -24,10 +24,10 @@ void td_include_free_context(IncludeContext* context);
 
 void td_include(IncludeContext* context) {
   context->result = nullptr;
-  
+
   context->file = fopen(context->file_path, "rb");
   if (!context->file) {
-    copy_string("Failed to load file", context->error, 256);
+    snprintf(context->error, 256, "Failed to open file for preprocessing; file = %s", context->file_path);
     return;
   }
 
@@ -78,6 +78,7 @@ void td_include(IncludeContext* context) {
       }
 
       if (!included_file_data) {
+        snprintf(context->error, 256, "Failed to find include; file = %s", inc_list[i].filename);
         stb_include_free_includes(inc_list, num_includes);
         return;
       }

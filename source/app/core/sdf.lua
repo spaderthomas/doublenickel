@@ -26,6 +26,10 @@ SdfSmoothingKernel = tdengine.enum.define(
 	}
 )
 
+SdfRenderer = tdengine.class.metatype('SdfRenderer', 'sdf')
+function SdfRenderer:init(params)
+	self = tdengine.ffi.sdf_renderer_create(params.buffer_size)
+end
 
 SdfInstance = tdengine.class.metatype('SdfInstance')
 function SdfInstance:init(params)

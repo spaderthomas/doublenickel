@@ -326,19 +326,6 @@ void register_enums() {
 	lua_pushstring(l, "coordinate");
 	lua_insert(l, -2);
 	lua_settable(l, -3);
-
-	// FillMode
-	lua_newtable(l);
-	lua_pushstring(l, "fill");
-	lua_pushnumber(l, (int)FillMode::Fill);
-	lua_settable(l, -3);
-	lua_pushstring(l, "outline");
-	lua_pushnumber(l, (int)FillMode::Outline);
-	lua_settable(l, -3);
-	lua_pushstring(l, "fill_mode");
-	lua_insert(l, -2);
-	lua_settable(l, -3);
-
 }
 
 void register_constants() {

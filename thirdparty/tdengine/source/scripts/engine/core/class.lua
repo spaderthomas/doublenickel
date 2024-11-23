@@ -148,13 +148,17 @@ function tdengine.class.define(name)
   return tdengine.types[name]
 end
 
-function tdengine.class.metatype(ctype)
+function tdengine.class.metatype(ctype, namespace)
   -- Because LuaJIT (bafflingly and ostensibly for some optimization) makes metatypes immutable, we create the metatype once
   -- with a layer of indirection that looks up metamethods rather than calling them directly. Ultimately, we'd like all of the
   -- LuaJIT metatype's metamethods to point to the Lua class that we make
   if not tdengine.types[ctype] then
     local metatype_indirection = {
       __index = function(t, k)
+        if namespace then
+          local namespaced_fn = tdengine.ffi[namespace .. '_' .. k]
+          if namespaced_fn then return namespaced_fn end
+        end
         return getmetatable(tdengine.types[ctype]).__index(t, k)
       end
     }
