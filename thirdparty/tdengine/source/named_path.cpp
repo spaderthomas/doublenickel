@@ -104,8 +104,10 @@ tstring build_path(const char* relative_path) {
 	auto executable_file = bump_allocator.alloc_path();
 	GetModuleFileNameA(NULL, executable_file, TD_MAX_PATH_LEN);
 
-	std::filesystem::path executable_path = std::filesystem::path(executable_file).parent_path();
-	auto canonical_dir = std::filesystem::canonical(executable_path / relative_path).string();
+	std::filesystem::path executable_filepath = std::filesystem::path(executable_file);
+	auto executable_dir = executable_filepath.parent_path() / relative_path;
+	auto canonical_path = std::filesystem::canonical(executable_dir);
+	auto canonical_dir = canonical_path.string();
 
 	auto normalized_dir = copy_string(canonical_dir, &bump_allocator);
 	for (u32 i = 0; i < canonical_dir.size(); i++) {

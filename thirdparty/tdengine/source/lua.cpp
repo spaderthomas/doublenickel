@@ -169,6 +169,7 @@ void LuaState::script_named_dir(const_string name) {
 }
 
 void LuaState::script_dir(string path) {
+	if (!std::filesystem::exists(path)) return;
 	tdns_log.write(Log_Flags::File, "Loading scripts from directory; path = %s", path);
 
 	this->file_monitor->add_directory(path);

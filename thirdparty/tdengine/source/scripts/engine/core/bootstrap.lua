@@ -1304,9 +1304,11 @@ function tdengine.init_phase_0()
   
   -- Bootstrap the engine paths, so we can load the rest of the scripts
   local function collect_paths(paths, full_parent)
+    local collected_paths = {}
+    if not paths then return collected_paths end
+    
     full_parent = full_parent or ''
 
-    local collected_paths = {}
     for name, data in pairs(paths) do
       local full_path = ''
       if type(data) == 'string' then
@@ -1344,6 +1346,11 @@ function tdengine.init_phase_0()
   local install_paths = collect_paths(path_info.install_paths)
 	for index, path in pairs(install_paths) do
 		ffi.C.add_install_path(path.name, path.path)
+	end
+
+  local app_paths = collect_paths(path_info.app_paths)
+	for index, path in pairs(app_paths) do
+		ffi.C.add_named_subpath(path.name, 'app', path.path)
 	end
 
 	local write_paths = collect_paths(path_info.write_paths)

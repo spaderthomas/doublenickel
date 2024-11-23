@@ -3,18 +3,24 @@
 ////////////////////
 tstring build_shader_source(const char* file_path) {
 	auto shader_file = copy_string(file_path, &bump_allocator);
-	auto shader_directory = resolve_named_path("shaders");
+	auto shader_directory =  resolve_named_path("shaders");
 	auto error = bump_allocator.alloc<char>(256);
 	
-	auto preprocessed_source = stb_include_file(shader_file, nullptr, shader_directory, error);
-	if (!preprocessed_source) {
-		tdns_log.write("shader preprocessor error; shader = %s, err = %s", shader_file, error);
+	IncludeContext context = {
+		.file_path = file_path,
+		.include_dirs = {
+			.data = { shader_directory, resolve_named_path("audio") },
+			.count = 2
+		}
+	};
+	td_include(&context);
+
+	if (!context.result) {
+		tdns_log.write("shader preprocessor error; shader = %s, err = %s", shader_file, context.error);
 		return copy_string("YOUR_SHADER_FAILED_TO_COMPILE", &bump_allocator);
 	}
 	
-	auto source = copy_string(preprocessed_source, &bump_allocator);
-	
-	free(preprocessed_source);
+	auto source = copy_string(context.result, &bump_allocator);
 	
 	return source;
 }

@@ -18,8 +18,9 @@ return {
 			}
 		}
 	},
-	install_paths = {
-		skeletal_animations = {
+	install_paths = {},
+	app_paths = {
+			skeletal_animations = {
 			named_parent = 'data',
 			path = 'skeletal_animations',
 			children = {

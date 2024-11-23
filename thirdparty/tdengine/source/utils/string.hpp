@@ -7,9 +7,28 @@ typedef struct {
 	u32 len;
 } String;
 
+typedef struct {
+	struct {
+		u8* data;
+		u32 count;
+		u32 capacity;
+	} buffer;
+
+	MemoryAllocator* allocator;
+} StringBuilder;
+
+void   string_builder_grow(StringBuilder* builder);
+void   string_builder_append_cstr(StringBuilder* builder, const char* str);
+String string_builder_write(StringBuilder* builder);
+char*  string_builder_write_cstr(StringBuilder* builder);
+
+#define STRING_LITERAL(s) (String) { .data = (u8*)(s), .len = sizeof(s) - 1}
+#define AS_CSTR(s) (char*)((s).data)
+
 char* copy_string(const_string str, u32 length, MemoryAllocator* allocator = nullptr);
 char* copy_string(const_string str, MemoryAllocator* allocator = nullptr);
 char* copy_string(const std::string& str, MemoryAllocator* allocator = nullptr);
+char* copy_string_u8(const u8* str, u32 length, MemoryAllocator* allocator = nullptr);
 
 FM_LUA_EXPORT void copy_string(const_string str, string buffer, u32 buffer_length);
 FM_LUA_EXPORT void copy_string_n(const_string str, u32 length, string buffer, u32 buffer_length);
@@ -19,7 +38,7 @@ bool is_memory_equal(void* a, void* b, size_t len) {
     return 0 == memcmp(a, b, len);
 }
 
-inline void copy_memory(void* source, void* dest, u32 num_bytes) {
+inline void copy_memory(const void* source, void* dest, u32 num_bytes) {
     std::memcpy(dest, source, num_bytes);
 }
 

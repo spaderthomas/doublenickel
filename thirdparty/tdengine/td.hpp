@@ -28,6 +28,7 @@
 #include "source/utils/noise.hpp"
 #include "source/utils/dyn_array.hpp"
 #include "source/utils/hash.hpp"
+#include "source/utils/preprocessor.hpp"
 #include "source/imgui/imgui_extensions.hpp"
 #include "source/lua.hpp"
 #include "source/engine.hpp"
@@ -95,6 +96,8 @@
 #include "source/utils/log.cpp"
 #include "source/utils/memory.cpp"
 #include "source/utils/path.cpp"
+#define PREPROCESSOR_IMPLEMENTATION
+#include "source/utils/preprocessor.hpp"
 #include "source/utils/noise.cpp"
 #include "source/utils/string.cpp"
 

@@ -40,7 +40,7 @@ end
 function App:on_start_game()
   tdengine.editor.find('SceneEditor'):load('sdf_clock')
 
-	tdengine.ffi.use_editor_layout('gbuffer')
+	tdengine.ffi.use_editor_layout('sdf_clock')
 
 	tdengine.editor.find('EditorUtility').style.grid.size = 12
 	tdengine.editor.find('EditorUtility').enabled.grid = false

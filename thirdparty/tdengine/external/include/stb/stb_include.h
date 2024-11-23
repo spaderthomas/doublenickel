@@ -285,11 +285,5 @@ char *stb_include_file(char *filename, char *inject, char *path_to_includes, cha
    return result;
 }
 
-#if 0 // @TODO, GL_ARB_shader_language_include-style system that doesn't touch filesystem
-char *stb_include_preloaded(char *str, char *inject, char *includes[][2], char error[256])
-{
 
-}
 #endif
-
-#endif // STB_INCLUDE_IMPLEMENTATION

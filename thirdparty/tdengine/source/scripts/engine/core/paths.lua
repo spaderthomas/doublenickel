@@ -27,6 +27,7 @@ end
 
 local function collect_paths(paths, full_parent)
 	local collected_paths = tdengine.data_types.Array:new()
+	if not paths then return collected_paths end
 
 	for name, data in pairs(paths) do
 		local path = NamedPath:new(name)
@@ -56,20 +57,26 @@ function tdengine.paths.init(path_info)
 
 	local install_paths = collect_paths(path_info.install_paths)
 	for path in install_paths:iterate_values() do
-		if path.named_parent then
-			tdengine.ffi.add_named_subpath(path.name, path.named_parent, path.full_path)
-		else
-			tdengine.ffi.add_install_path(path.name, path.full_path)
-		end
+		path.named_parent = path.named_parent or 'install'
+		tdengine.ffi.add_named_subpath(path.name, path.named_parent, path.full_path)
 	end
 
 	local write_paths = collect_paths(path_info.write_paths)
-	for index, path in write_paths:iterate() do
-		tdengine.ffi.add_write_path(path.name, path.full_path)
+	for path in write_paths:iterate_values() do
+		path.named_parent = path.named_parent or 'write'
+		tdengine.ffi.add_named_subpath(path.name, path.named_parent, path.full_path)
 	end
+
+	local app_paths = collect_paths(path_info.app_paths)
+	for path in app_paths:iterate_values() do
+		path.named_parent = path.named_parent or 'app'
+		tdengine.ffi.add_named_subpath(path.name, path.named_parent, path.full_path)
+	end
+
 
 	self.paths:concatenate(install_paths)
 	self.paths:concatenate(write_paths)
+	self.paths:concatenate(app_paths)
 end
 
 function tdengine.paths.iterate()
