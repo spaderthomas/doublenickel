@@ -86,15 +86,15 @@ void draw_particles(ParticleSystemHandle handle) {
 		color.a *= particle_system->master_opacity;
 		if (particle->kind == ParticleKind::Quad) {
 			auto& quad = particle->data.quad;
-			draw_quad(particle->position, quad.size, color);
+			//draw_quad(particle->position, quad.size, color);
 		}
 		else if (particle->kind == ParticleKind::Circle) {
 			auto& circle = particle->data.circle;
-			draw_circle(particle->position.x, particle->position.y, circle.radius, color);
+			//draw_circle(particle->position.x, particle->position.y, circle.radius, color);
 		}
 		else if (particle->kind == ParticleKind::Image) {
 			auto& image = particle->data.image;
-			draw_image(image.sprite, particle->position.x, particle->position.y, image.size.x, image.size.y, color.a);
+			//draw_image(image.sprite, particle->position.x, particle->position.y, image.size.x, image.size.y, color.a);
 		}
 	}
 }

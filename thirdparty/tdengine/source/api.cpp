@@ -31,37 +31,6 @@ int API::sprite_size(lua_State* lua) {
 	return 2;
 }
 
-// [float, float] cursor(optional coord::t)
-int API::cursor(lua_State* lua) {
-	auto coordinate = Coord::T::Window;
-
-	if (lua_gettop(lua) == 1) {
-		coordinate = (Coord::T)lua_tonumber(lua, -1);
-	}
-	
-	auto& manager = get_input_manager();
-	auto output = Coord::convert(manager.mouse, Coord::T::Screen, coordinate);
-	lua_pushnumber(lua, output.x);
-	lua_pushnumber(lua, output.y);
-	
-	return 2;
-} 
-
-int API::cursor_delta(lua_State* lua) {
-	auto coordinate = Coord::T::Window;
-
-	if (lua_gettop(lua) == 1) {
-		coordinate = (Coord::T)lua_tonumber(lua, -1);
-	}
-
-	auto& manager = get_input_manager();
-	auto output = Coord::convert_mag(manager.mouse_delta, Coord::T::Screen, coordinate);
-	lua_pushnumber(lua, output.x);
-	lua_pushnumber(lua, output.y);
-	
-	return 2;
-} 
-
 int API::log(lua_State* lua) {
 	fm_assert(lua_gettop(lua) == 1);
 
@@ -214,28 +183,6 @@ int API::get_game_texture(lua_State* l) {
 	return 1;
 }
 
-// float convert(float, float, Coord, Coord)
-int API::convert(lua_State* l) {
-	fm_assert(lua_gettop(l) == 4);
-	Vector2 input;
-	Coord::T from;
-	Coord::T to;
-	Coord::Dim dim = Coord::Dim::Any;
-
-	input.x = lua_tonumber(l, 1);
-	input.y = lua_tonumber(l, 2);
-	from  = (Coord::T)((int32)lua_tonumber(l, 3));
-	to    = (Coord::T)((int32)lua_tonumber(l, 4));
-
-	Vector2 output = Coord::convert(input, from, to);
-	lua_pushnumber(l, output.x);
-	lua_pushnumber(l, output.y);
-		
-	return 2;
-}
-
-
-
 bool does_path_exist(const char* path) {
 	return std::filesystem::exists(path);
 }
@@ -300,46 +247,3 @@ void register_api() {
 	luaL_register(l, 0, api);
 	lua_pop(l, 1);
 }
-
-void register_enums() {
-	tdns_log.write(Log_Flags::File, "registering lua enums");
-	
-	auto l = get_lua().state;
-	
-	lua_getglobal(l, "tdengine");
-	DEFER_POP(l);
-
-	// Coordinate
-	lua_newtable(l);
-	lua_pushstring(l, "world");
-	lua_pushnumber(l, (int)Coord::T::World);
-	lua_settable(l, -3);
-	lua_pushstring(l, "screen");
-	lua_pushnumber(l, (int)Coord::T::Screen);
-	lua_settable(l, -3);
-	lua_pushstring(l, "window");
-	lua_pushnumber(l, (int)Coord::T::Window);
-	lua_settable(l, -3);
-	lua_pushstring(l, "game");
-	lua_pushnumber(l, (int) Coord::T::Game);
-	lua_settable(l, -3);
-	lua_pushstring(l, "coordinate");
-	lua_insert(l, -2);
-	lua_settable(l, -3);
-}
-
-void register_constants() {
-	tdns_log.write(Log_Flags::File, "registering lua constants");
-	
-	auto l = get_lua().state;
-	lua_getglobal(l, "tdengine");
-	DEFER_POP(l);
-	lua_pushstring(l, "constants");
-	lua_gettable(l, -2);
-	DEFER_POP(l);
-	
-	lua_pushstring(l, "tile_size");
-	lua_pushnumber(l, Background::TILE_SIZE);
-	lua_settable(l, -3);
-}
-

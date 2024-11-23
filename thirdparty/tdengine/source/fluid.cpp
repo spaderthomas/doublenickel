@@ -25,7 +25,7 @@ void zero_gpu_buffer(u32 handle, u32 size) {
 //////////////////////////
 namespace LagrangianFluidSim {
 	void inspect(LagrangianFluidSim::System& system) {
-		clear_gl_error();
+		gpu_error_clear();
 		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, system.particles);
@@ -56,7 +56,7 @@ namespace LagrangianFluidSim {
 		gpu_system.next_unprocessed_index = 0;
 		sync_gpu_buffer(system.system, &gpu_system, sizeof(LagrangianFluidSim::GpuSystem));
 	
-		set_uniform_immediate_i32("fluid_kernel", kernel);
+		// set_uniform_immediate_i32("fluid_kernel", kernel);
 		bind_ssbos(system);
 		glDispatchCompute(system.num_workgroups, 1, 1);
 		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
@@ -68,7 +68,7 @@ namespace LagrangianFluidSim {
 }
 
 ArenaHandle lf_create(u32 num_particles) {
-	clear_gl_error();
+	gpu_error_clear();
 	auto handle = LagrangianFluidSim::systems.insert();
 	auto system = LagrangianFluidSim::systems[handle];
 	
@@ -120,7 +120,7 @@ void lf_init(ArenaHandle handle) {
 	auto system = LagrangianFluidSim::systems[handle];
 	if (!system) return;
 
-	set_shader_immediate("fluid_init");
+	// set_shader_immediate("fluid_init");
 	LagrangianFluidSim::run_kernel(*system, LagrangianFluidSim::Kernel::init_base);
 	LagrangianFluidSim::run_kernel(*system, LagrangianFluidSim::Kernel::init_density);
 }
@@ -203,9 +203,9 @@ void lf_draw(ArenaHandle handle) {
 	if (!system) return;
 
 	// Render the particles
-	set_shader_immediate("particle");
-	set_uniform_immediate_mat4("projection", render.projection);
-	set_uniform_immediate_mat4("view", HMM_Translate(HMM_V3(-render.camera.x, -render.camera.y, 0.f)));
+	// set_shader_immediate("particle");
+	// set_uniform_immediate_mat4("projection", render.projection);
+	// set_uniform_immediate_mat4("view", HMM_Translate(HMM_V3(-render.camera.x, -render.camera.y, 0.f)));
 
 	LagrangianFluidSim::bind_ssbos(*system);
 		
@@ -217,7 +217,7 @@ void lf_update(ArenaHandle handle) {
 	auto system = LagrangianFluidSim::systems[handle];
 	if (!system) return;
 
-	set_shader_immediate("fluid_update");
+	// set_shader_immediate("fluid_update");
 	LagrangianFluidSim::run_kernel(*system, LagrangianFluidSim::Kernel::update_predicted_position);
 	LagrangianFluidSim::run_kernel(*system, LagrangianFluidSim::Kernel::update_density);
 	LagrangianFluidSim::run_kernel(*system, LagrangianFluidSim::Kernel::update_viscosity);
@@ -231,7 +231,7 @@ void lf_update(ArenaHandle handle) {
 ////////////////////////
 namespace EulerianFluidSim {	
 	void inspect(EulerianFluidSim::System& system) {
-		clear_gl_error();
+		gpu_error_clear();
 		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, system.fluid);
@@ -256,7 +256,7 @@ namespace EulerianFluidSim {
 		gpu_system.next_unprocessed_index = 0;
 		sync_gpu_buffer(system.system, &gpu_system, sizeof(EulerianFluidSim::GpuSystem));
 	
-		set_uniform_immediate_i32("fluid_kernel", kernel);
+		// set_uniform_immediate_i32("fluid_kernel", kernel);
 		bind_ssbos(system);
 		glDispatchCompute(num_workgroups, 1, 1);
 		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
@@ -315,7 +315,7 @@ void ef_init(ArenaHandle handle) {
 	auto system = EulerianFluidSim::systems[handle];
 	if (!system) return;
 
-	set_shader_immediate("fluid_eulerian_init");
+	// set_shader_immediate("fluid_eulerian_init");
 	EulerianFluidSim::run_kernel(*system, EulerianFluidSim::Kernel::init);
 }
 
@@ -383,7 +383,7 @@ void ef_update(ArenaHandle handle) {
 	if (!system) return;
 
 	sync_gpu_buffer(system->source, system->sources.data, sizeof(EulerianFluidSim::Source) * system->num_cells);
-	set_shader_immediate("fluid_eulerian_update");
+	// set_shader_immediate("fluid_eulerian_update");
 
 	EulerianFluidSim::run_kernel(*system, EulerianFluidSim::Kernel::update_sources);
 	
@@ -399,20 +399,5 @@ void ef_update(ArenaHandle handle) {
 }
 
 void ef_draw(ArenaHandle handle) {
-	auto system = EulerianFluidSim::systems[handle];
-	if (!system) return;
 
-	// Render the fluid simulation
-	set_active_shader("fluid_eulerian");
-	set_draw_mode(DrawMode::Triangles);
-	set_world_space(true);
-
-	ef_bind(handle);
-
-	Vector2 uv [6] = TD_MAKE_QUAD(1.0, 0.0, 0.0, 1.0);
-	float px = 0;
-	float py = system->render_size;
-	float dx = system->render_size;
-	float dy = system->render_size;
-	push_quad(px, py, dx, dy, uv, 1.f);
 }

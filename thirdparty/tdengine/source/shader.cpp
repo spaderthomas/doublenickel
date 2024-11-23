@@ -57,11 +57,11 @@ void check_shader_linkage(u32 program, const char* file_path) {
 // GPU SHADER //
 ////////////////
 void GpuShader::init(GpuShaderDescriptor descriptor) {
-	if (descriptor.kind == GpuShaderKind::Compute) {
+	if (descriptor.kind == GPU_SHADER_COMPUTE) {
 		auto compute_path = resolve_format_path_ex("compute_shader", descriptor.compute_shader, &bump_allocator);
 		init_compute_ex(descriptor.name, compute_path);
 	}
-	else if (descriptor.kind == GpuShaderKind::Graphics) {
+	else if (descriptor.kind == GPU_SHADER_GRAPHICS) {
 		auto vertex_path = resolve_format_path_ex("vertex_shader", descriptor.vertex_shader, &bump_allocator);
 		auto fragment_path = resolve_format_path_ex("fragment_shader", descriptor.fragment_shader, &bump_allocator);
 		init_graphics_ex(descriptor.name, vertex_path, fragment_path);
@@ -119,7 +119,7 @@ void GpuShader::init_graphics_ex(const char* name, const char* vertex_shader, co
 	program = shader_program;
 	glGetProgramiv(shader_program, GL_ACTIVE_UNIFORMS, (int*)&num_uniforms);
 
-	set_gl_name(static_cast<u32>(GlId::Program), program, strlen(name), name);
+	gpu_set_resource_name(GPU_RESOURCE_PROGRAM, program, strlen(name), name);
 }
 
 void GpuShader::init_compute(const char* name) {

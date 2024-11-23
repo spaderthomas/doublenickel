@@ -661,49 +661,6 @@ void init_screenshots() {
 	}
 }
 
-// Fill the screenshot buffer with the last frame.
-void take_screenshot() {
-	#if 0
-	i32 width = window.native_resolution.x;
-	i32 height = window.native_resolution.y;
-	i32 bytes_per_pixel = 4;
-	i32 bytes_per_row = bytes_per_pixel * width;
-	
-	auto data = bump_allocator.alloc<u8>(width * height * bytes_per_pixel);
-	glBindFramebuffer(GL_FRAMEBUFFER, scene_target->color_buffer);
-    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
-	// OpenGL reads it in vertically flipped; we could keep it like this and reverse the UVs and
-	// ask STB to flip on write, but it's simpler for me to know that the image is right side up
-	// from the moment we load it in.
-    for (int row = 0; row < height; row++) {
-		auto data_ptr = data + (row * bytes_per_row);
-		auto screenshot_ptr = render.screenshot + (height - row - 1) * bytes_per_row;
-        memcpy(screenshot_ptr, data_ptr, bytes_per_row);
-    }
-	#endif
-}
-
-// Take the current contents of the screenshot buffer and dump them to the screenshot directory underf
-// the given filename. Since this is just used for save file previews, this is *not* an arbitrary file.
-// It's somewhere in the predetermined directory where we keep preview screenshots.
-void write_screenshot_to_png(const char* file_name) {
-	i32 width = window.native_resolution.x;
-	i32 height = window.native_resolution.y;
-	i32 bytes_per_pixel = 4;
-	i32 bytes_per_row = bytes_per_pixel * width;
-
-	auto file_path = resolve_format_path("screenshot", file_name);
-
-	// We'd like to use the preview in the current game session, so we need to create a texture for it
-	// that is identifiable by the file name (i.e. a Sprite)
-	create_sprite(file_name, render.screenshot, width, height, bytes_per_pixel);
-
-	// Then, save it out so we can use it next time
-	stbi_flip_vertically_on_write(false);
-	stbi_write_png(file_path, width, height, bytes_per_pixel, render.screenshot, bytes_per_row);
-}
-
 
 /////////////
 // BUFFERS //

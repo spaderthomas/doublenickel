@@ -235,18 +235,35 @@ bool was_chord_pressed(int mod, int key) {
 	return is_mod_down(mod) && was_key_pressed(key);
 }
 
+Vector2 get_mouse(CoordinateUnit unit) {
+	auto& input = get_input_manager();
+	switch (unit) {
+		case COORD_UNIT_SCREEN: return input.mouse; break;
+		case COORD_UNIT_WINDOW: return coord_screen_to_window(input.mouse.x, input.mouse.y); break;
+		case COORD_UNIT_GAME:   return coord_screen_to_game(input.mouse.x, input.mouse.y); break;
+		case COORD_UNIT_WORLD:  return coord_screen_to_world(input.mouse.x, input.mouse.y); break;
+	}
+
+	TD_ASSERT(false);
+	return {0};
+}
+
+Vector2 get_mouse_delta(CoordinateUnit unit) {
+	auto& input = get_input_manager();
+	switch (unit) {
+		case COORD_UNIT_SCREEN: return input.mouse; break;
+		case COORD_UNIT_WINDOW: return coord_screen_to_window_mag(input.mouse.x, input.mouse.y); break;
+		case COORD_UNIT_GAME:   return coord_screen_to_game_mag(input.mouse.x, input.mouse.y); break;
+		case COORD_UNIT_WORLD:  return coord_screen_to_world_mag(input.mouse.x, input.mouse.y); break;
+	}
+
+	TD_ASSERT(false);
+	return {0};
+}
+
 Vector2 get_scroll() {
 	auto& input = get_input_manager();
 	return input.scroll;
-}
-
-Vector2 get_mouse_delta() {
-	return get_mouse_delta_converted(static_cast<uint32>(Coord::T::Game));
-}
-
-Vector2 get_mouse_delta_converted(uint32 coordinate) {
-	auto& input = get_input_manager();
-	return Coord::convert_mag(input.mouse_delta, Coord::T::Screen, static_cast<Coord::T>(coordinate));
 }
 
 u32 shift_key(u32 key) {

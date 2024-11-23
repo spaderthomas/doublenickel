@@ -63,16 +63,16 @@ function tdengine.input.scroll()
 end
 
 function tdengine.input.mouse(coordinate)
-	return tdengine.vec2(tdengine.cursor(coordinate or tdengine.coordinate.game))
+	return tdengine.vec2(tdengine.ffi.get_mouse(coordinate or ffi.C.COORD_UNIT_GAME))
 end
 
 function tdengine.input.mouse_delta()
-	local delta = tdengine.ffi.get_mouse_delta_converted(tdengine.coordinate.game)
+	local delta = tdengine.ffi.get_mouse_delta(ffi.C.COORD_UNIT_GAME)
 	return tdengine.vec2(delta.x, delta.y)
 end
 
 function tdengine.input.mouse_delta_world()
-	local delta = tdengine.ffi.get_mouse_delta_converted(tdengine.coordinate.world)
+	local delta = tdengine.ffi.get_mouse_delta(ffi.C.COORD_UNIT_WORLD)
 	return tdengine.vec2(delta.x, delta.y)
 end
 
@@ -175,10 +175,6 @@ function tdengine.input.was_digital_pressed(name)
 	return tdengine.ffi.was_digital_pressed(name)
 end
 
-function tdengine.input.get_screen_cursor()
-	return tdengine.vec2(tdengine.cursor(tdengine.coordinate.game))
-end
-
 ContextualInput = tdengine.class.define('ContextualInput')
 
 function ContextualInput:init(context, coordinate)
@@ -236,12 +232,12 @@ end
 
 function ContextualInput:mouse(coordinate)
 	coordinate = coordinate or self.coordinate
-	return tdengine.vec2(tdengine.cursor(coordinate:to_number()))
+	return tdengine.vec2(tdengine.ffi.get_mouse(coordinate:to_number()))
 end
 
 function ContextualInput:mouse_delta(coordinate)
 	coordinate = coordinate or self.coordinate
-	return tdengine.vec2(tdengine.ffi.get_mouse_delta_converted(coordinate:to_number()))
+	return tdengine.vec2(tdengine.ffi.get_mouse_delta(coordinate:to_number()))
 end
 
 function ContextualInput:left_click()

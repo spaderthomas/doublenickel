@@ -87,7 +87,8 @@
 #include "source/window.cpp"
 #include "source/imgui/imgui_extensions.cpp"
 #include "source/utils/array.cpp"
-#include "source/utils/coordinate.cpp"
+#define COORDINATE_IMPLEMENTATION
+#include "source/utils/coordinate.hpp"
 #define DYNAMIC_ARRAY_IMPLEMENTATION
 #include "source/utils/dyn_array.hpp"
 #include "source/utils/file_monitor.cpp"

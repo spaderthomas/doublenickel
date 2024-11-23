@@ -11,5 +11,5 @@
 
 #define TD_ALIGN(n) __declspec(align(n))
 
-// #define TD_ASSERT(condition) assert(condition)
-#define TD_ASSERT(condition)
+ #define TD_ASSERT(condition) assert(condition)
+//#define TD_ASSERT(condition)

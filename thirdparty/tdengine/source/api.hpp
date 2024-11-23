@@ -59,8 +59,6 @@ FM_LUA_EXPORT void create_named_directory(const_string name);
 FM_LUA_EXPORT DateTime get_date_time();
 
 void register_api();
-void register_enums();
-void register_constants();
 
 const struct luaL_Reg api [] = {
 	{ "get_mouse_scroll",         &API::get_mouse_scroll },
@@ -68,12 +66,9 @@ const struct luaL_Reg api [] = {
 	{ "scandir_impl",             &API::scandir_impl },
 	{ "log",                      &API::log },
 	{ "calc_text_size",           &API::calc_text_size },
-	{ "cursor",                   &API::cursor },
-	{ "cursor_delta",             &API::cursor_delta },
 	{ "screen_dimensions",        &API::screen_dimensions },
 	{ "sprite_size",              &API::sprite_size },
 	{ "get_window_scale",         &API::get_window_scale },
 	{ "get_game_texture",         &API::get_game_texture },
-	{ "convert",                  &API::convert },
 	{  NULL,                      NULL }
 };

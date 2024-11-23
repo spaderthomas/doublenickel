@@ -45,19 +45,20 @@ struct Uniform {
 };
 bool are_uniforms_equal(Uniform& a, Uniform& b);
 
-enum class GpuShaderKind : u32 {
-	Graphics = 0,
-	Compute = 1
-};
+typedef enum {
+	GPU_SHADER_GRAPHICS = 0,
+	GPU_SHADER_COMPUTE = 1,
+} GpuShaderKind;
 
-struct GpuShaderDescriptor {
-	string name;
-	string vertex_shader;
-	string fragment_shader;
-	string compute_shader;
+typedef struct {
+	const char* name;
+	const char* vertex_shader;
+	const char* fragment_shader;
+	const char* compute_shader;
 
 	GpuShaderKind kind;
-};
+} GpuShaderDescriptor;
+
 
 struct GpuShader {
 	enum class Kind : i32 {

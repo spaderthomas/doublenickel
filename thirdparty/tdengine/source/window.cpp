@@ -59,7 +59,7 @@ void create_window(const char* title, u32 x, u32 y, WindowFlags flags) {
     }
 
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-	glDebugMessageCallback(on_opengl_message, 0);
+	glDebugMessageCallback(gl_error_callback, 0);
 
 	// This has to be done after context creation
 	if (enum_any(flags & WindowFlags::Vsync)) {
@@ -77,7 +77,7 @@ void create_window(const char* title, u32 x, u32 y, WindowFlags flags) {
 
 	init_noise();
 	init_imgui();
-	init_render();
+	gpu_init();
 	init_texture_atlas(); // Invert control
 	init_backgrounds(); // Invert control
 	init_screenshots(); // Use the asset loader
@@ -205,16 +205,3 @@ Vector2 get_content_area() {
 	return window.content_area;
 }
 
-Vector2 get_game_area_size() {
-	return Coord::game_area_size;
-}
-
-void set_game_area_size(float32 x, float32 y) {
-	Coord::game_area_size.x = x;
-	Coord::game_area_size.y = y;
-}
-
-void set_game_area_position(float32 x, float32 y) {
-	Coord::game_area_position.x = x;
-	Coord::game_area_position.y = y;
-}

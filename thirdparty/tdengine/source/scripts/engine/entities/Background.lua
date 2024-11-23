@@ -18,11 +18,11 @@ function BackgroundPoint:set_width(width)
 end
 
 function BackgroundPoint:advance()
-  self.position.x = self.position.x + tdengine.constants.tile_size * self.zoom
+  self.position.x = self.position.x + 1024 * self.zoom
   local dx = self.position.x - self.base_position.x
   if dx >= self.width * self.zoom then
     self.position.x = self.base_position.x
-    self.position.y = self.position.y - tdengine.constants.tile_size * self.zoom
+    self.position.y = self.position.y - 1024 * self.zoom
   end
 end
 

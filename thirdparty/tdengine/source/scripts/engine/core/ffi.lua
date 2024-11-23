@@ -45,10 +45,10 @@ function tdengine.ffi.init()
 	tdengine.enum.define(
 		'CoordinateSystem',
 		{
-			World = tdengine.ffi.CoordinateSystem_World,
-			Screen = tdengine.ffi.CoordinateSystem_Screen,
-			Window = tdengine.ffi.CoordinateSystem_Window,
-			Game = tdengine.ffi.CoordinateSystem_Game,
+			World = tdengine.ffi.COORD_UNIT_WORLD,
+			Screen = tdengine.ffi.COORD_UNIT_SCREEN,
+			Window = tdengine.ffi.COORD_UNIT_WINDOW,
+			Game = tdengine.ffi.COORD_UNIT_GAME,
 		}
 	)
 
@@ -63,17 +63,6 @@ function tdengine.ffi.init()
 	)
 
 	tdengine.enum.define(
-		'BlendFunction',
-		{
-			Add = tdengine.ffi.GPU_BLEND_FUNC_ADD,
-			Subtract = tdengine.ffi.GPU_BLEND_FUNC_SUBTRACT,
-			ReverseSubtract = tdengine.ffi.GPU_BLEND_FUNC_REVERSE_SUBTRACT,
-			Min = tdengine.ffi.GPU_BLEND_FUNC_MIN,
-			Max = tdengine.ffi.GPU_BLEND_FUNC_MAX,
-
-		}
-	)
-	tdengine.enum.define(
 		'WindowFlags',
 		{
 			None = 0,
@@ -84,26 +73,19 @@ function tdengine.ffi.init()
 	)
 
 	tdengine.enum.define(
-		'DrawMode',
+		'GpuResourceId',
 		{
-			Triangles = tdengine.ffi.DrawMode_Triangles,
-		}
-	)
-
-	tdengine.enum.define(
-		'GlId',
-		{
-			Framebuffer = tdengine.ffi.GlId_Framebuffer,
-			Shader = tdengine.ffi.GlId_Shader,
-			Program = tdengine.ffi.GlId_Program,
+			Framebuffer = tdengine.ffi.GPU_RESOURCE_FRAMEBUFFER,
+			Shader = tdengine.ffi.GPU_RESOURCE_SHADER,
+			Program = tdengine.ffi.GPU_RESOURCE_PROGRAM,
 		}
 	)
 
 	GpuShaderKind = tdengine.enum.define(
 		'GpuShaderKind',
 		{
-			Graphics = tdengine.ffi.GpuShaderKind_Graphics,
-			Compute = tdengine.ffi.GpuShaderKind_Compute,
+			Graphics = tdengine.ffi.GPU_SHADER_GRAPHICS,
+			Compute = tdengine.ffi.GPU_SHADER_COMPUTE,
 		}
 	)
 
@@ -130,6 +112,18 @@ function tdengine.ffi.init()
 		}
 	)
 
+	GpuBlendFunction = tdengine.enum.define(
+		'GpuBlendFunction',
+		{
+			Add = tdengine.ffi.GPU_BLEND_FUNC_ADD,
+			Subtract = tdengine.ffi.GPU_BLEND_FUNC_SUBTRACT,
+			ReverseSubtract = tdengine.ffi.GPU_BLEND_FUNC_REVERSE_SUBTRACT,
+			Min = tdengine.ffi.GPU_BLEND_FUNC_MIN,
+			Max = tdengine.ffi.GPU_BLEND_FUNC_MAX,
+
+		}
+	)
+
 	GpuUniformKind = tdengine.enum.define(
 		'GpuUniformKind',
 		{
@@ -147,8 +141,6 @@ function tdengine.ffi.init()
 		}
 	)
 
-
-	VertexAttributeKind = tdengine.enum.define_from_ctype('VertexAttributeKind')
 
 	GpuBufferUsage = tdengine.enum.define(
 		'GpuBufferUsage',
@@ -187,8 +179,8 @@ function tdengine.ffi.init()
 	tdengine.enum.define(
 		'GpuMemoryBarrier',
 		{
-			ShaderStorage = tdengine.ffi.GpuMemoryBarrier_ShaderStorage,
-			BufferUpdate = tdengine.ffi.GpuMemoryBarrier_BufferUpdate,
+			ShaderStorage = tdengine.ffi.GPU_MEMORY_BARRIER_STORAGE,
+			BufferUpdate = tdengine.ffi.GPU_MEMORY_BARRIER_BUFFER_UPDATE,
 		}
 	)
 
@@ -741,84 +733,21 @@ end
 ------------------
 -- FFI WRAPPERS --
 ------------------
-function tdengine.ffi.draw_line(ax, ay, bx, by, thickness, color)
-	ffi.C.draw_line(
-		ffi.new('Vector2', ax, ay),
-		ffi.new('Vector2', bx, by),
-		thickness,
-		color
-	)
-end
-
-function tdengine.draw_line(ax, ay, bx, by, thickness, color)
-	ffi.C.draw_line(
-		ffi.new('Vector2', ax, ay),
-		ffi.new('Vector2', bx, by),
-		thickness,
-		tdengine.color_to_vec4(color)
-	)
-end
-
-function tdengine.ffi.draw_image_l(image, position, size, opacity)
-	-- ffi.C.draw_image_ex(image, position.x, position.y, size.x, size.y, opacity or 1.0)
-end
-
-function tdengine.ffi.draw_line_l(a, b, thickness, color)
-	-- ffi.C.draw_line(a:to_ctype(), b:to_ctype(), thickness, tdengine.color_to_vec4(color))
-end
-
-function tdengine.ffi.draw_circle_l(position, radius, color, edge_thickness)
-	-- ffi.C.draw_circle_sdf(position.x, position.y, radius, color:to_vec4(), edge_thickness or 2)
-end
-
-function tdengine.ffi.draw_quad_l(position, size, color)
-	-- ffi.C.draw_quad(position:to_ctype(), size:to_ctype(), tdengine.color_to_vec4(color))
-end
-
-function tdengine.ffi.draw_quad_l_c(px, py, sx, sy, color)
-	-- ffi.C.draw_quad(ffi.new('Vector2', px, py), ffi.new('Vector2', sx, sy), tdengine.color_to_vec4(color))
-end
-
-function tdengine.set_blend_enabled(enabled)
-	tdengine.ffi.set_blend_enabled(enabled)
-end
-
-function tdengine.set_blend_mode(source, dest)
-	tdengine.ffi.set_blend_mode(source:to_number(), dest:to_number())
-end
-
-function tdengine.get_mouse(coordinate)
-	local coordinate = coordinate or tdengine.coordinate.world
-	return tdengine.vec2(tdengine.cursor(coordinate))
-end
-
-function tdengine.ffi.draw_quad(px, py, sx, sy, color)
-	-- ffi.C.draw_quad(ffi.new('Vector2', px, py), ffi.new('Vector2', sx, sy), color)
-end
-
 function tdengine.ffi.get_display_mode()
 	return tdengine.enums.DisplayMode(ffi.C.get_display_mode())
 end
 
-function tdengine.ffi.set_draw_mode(mode)
-	return ffi.C.set_draw_mode(mode:to_number())
+function tdengine.ffi.get_mouse()
+	return tdengine.vec2()
 end
 
-function tdengine.ffi.set_display_mode(display_mode)
-	return ffi.C.set_display_mode(display_mode:to_number())
+function tdengine.ffi.set_camera()
 end
 
-function tdengine.ffi.gpu_render_target_clear(target)
-	ffi.C.gpu_render_target_clear(target)
-end
 
 function tdengine.ffi.push_fullscreen_quad()
 	local n = ffi.C.get_native_resolution()
 	local uvs = nil
 	local opacity = 1.0
 	ffi.C.push_quad(0, n.y, n.x, n.y, uvs, opacity);
-end
-
-function tdengine.ffi.set_uniform_enum(name, value)
-	tdengine.ffi.set_uniform_i32(name, value:to_number())
 end

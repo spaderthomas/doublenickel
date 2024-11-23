@@ -1,13 +1,6 @@
 -------------
 -- STRUCTS --
 -------------
-VertexAttribute = tdengine.class.metatype('VertexAttribute')
-function VertexAttribute:init(params)
-  self.count = params.count
-  self.kind = tdengine.enum.load(params.kind):to_number()
-  self.divisor = params.divisor or 0
-end
-
 GpuShaderDescriptor = tdengine.class.metatype('GpuShaderDescriptor')
 function GpuShaderDescriptor:init(params)
   params.kind = tdengine.enum.load(params.kind)
@@ -48,14 +41,6 @@ end
 GpuCommandBufferDescriptor = tdengine.class.metatype('GpuCommandBufferDescriptor')
 function GpuCommandBufferDescriptor:init(params)
   self.max_commands = params.max_commands
-end
-
-GpuDrawCall = tdengine.class.metatype('GpuDrawCall')
-function GpuDrawCall:init(params)
-  self.mode = tdengine.enum.load(params.mode):to_number()
-  self.vertex_offset = params.vertex_offset or 0
-  self.num_vertices = params.num_vertices or 0
-  self.num_instances = params.num_instances or 0
 end
 
 GpuVertexAttribute = tdengine.class.metatype('GpuVertexAttribute')
