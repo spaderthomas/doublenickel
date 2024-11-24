@@ -42,7 +42,7 @@ function tdengine.ffi.init()
 	ffi.metatype('string', string_metatable)
 
 
-	tdengine.enum.define(
+	CoordinateSystem = tdengine.enum.define(
 		'CoordinateSystem',
 		{
 			World = tdengine.ffi.COORD_UNIT_WORLD,
@@ -735,10 +735,6 @@ end
 ------------------
 function tdengine.ffi.get_display_mode()
 	return tdengine.enums.DisplayMode(ffi.C.get_display_mode())
-end
-
-function tdengine.ffi.get_mouse()
-	return tdengine.vec2()
 end
 
 function tdengine.ffi.set_camera()

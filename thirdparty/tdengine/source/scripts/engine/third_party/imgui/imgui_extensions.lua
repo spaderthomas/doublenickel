@@ -836,15 +836,14 @@ imgui.extensions.VariableName = function(name)
 	end
 end
 
-imgui.extensions.Vec2 = function(name, v)
-	if not name or not v then
-		print(v)
-		print('vec2 missing a parameter')
-		return
-	end
+imgui.extensions.Vec2 = function(name, v, fmt)
 	imgui.extensions.VariableName(name)
 	imgui.SameLine()
-	imgui.Text('(' .. tostring(v.x) .. ', ' .. tostring(v.y) .. ')')
+
+	fmt = fmt or '%f'
+	local format_string = string.format('(%s, %s)', fmt, fmt)
+	local text = string.format(format_string, v.x, v.y)
+	imgui.Text(text)
 end
 
 imgui.extensions.WhitespaceSeparator = function(whitespace)

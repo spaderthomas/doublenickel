@@ -247,7 +247,10 @@ function SceneEditor:update_state()
     end
 
     local camera = tdengine.find_entity_editor('EditorCamera')
-    camera:move(self.input:mouse_delta():scale(-1))
+    local delta = self.input:mouse_delta():scale(-1)
+    print(delta.x, delta.y)
+    camera:move(delta)
+
   end
 end
 

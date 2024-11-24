@@ -168,9 +168,9 @@ Vector2 coord_screen_to_game_mag(float x, float y) {
 }
 
 Vector2 coord_screen_to_world_mag(float x, float y) {
-	auto win = coord_screen_to_window(x, y);
-	auto game = coord_window_to_game(win.x, win.y);
-	return coord_game_to_screen(game.x, game.y);
+	auto win = coord_screen_to_window_mag(x, y);
+	auto game = coord_window_to_game_mag(win.x, win.y);
+	return coord_game_to_world_mag(game.x, game.y);
 }
 
 Vector2 coord_window_to_screen_mag(float x, float y) {

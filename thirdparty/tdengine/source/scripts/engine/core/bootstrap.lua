@@ -126,6 +126,7 @@ bool is_mod_down(int mod);
 bool was_chord_pressed(int mod, int key);
 u32 shift_key(u32 key);
 Vector2 get_scroll();
+
 Vector2 get_mouse(CoordinateUnit unit);
 Vector2 get_mouse_delta(CoordinateUnit unit);
 void set_game_focus(bool focus);

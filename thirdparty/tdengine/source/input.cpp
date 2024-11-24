@@ -251,10 +251,10 @@ Vector2 get_mouse(CoordinateUnit unit) {
 Vector2 get_mouse_delta(CoordinateUnit unit) {
 	auto& input = get_input_manager();
 	switch (unit) {
-		case COORD_UNIT_SCREEN: return input.mouse; break;
-		case COORD_UNIT_WINDOW: return coord_screen_to_window_mag(input.mouse.x, input.mouse.y); break;
-		case COORD_UNIT_GAME:   return coord_screen_to_game_mag(input.mouse.x, input.mouse.y); break;
-		case COORD_UNIT_WORLD:  return coord_screen_to_world_mag(input.mouse.x, input.mouse.y); break;
+		case COORD_UNIT_SCREEN: return input.mouse_delta; break;
+		case COORD_UNIT_WINDOW: return coord_screen_to_window_mag(input.mouse_delta.x, input.mouse_delta.y); break;
+		case COORD_UNIT_GAME:   return coord_screen_to_game_mag(input.mouse_delta.x, input.mouse_delta.y); break;
+		case COORD_UNIT_WORLD:  return coord_screen_to_world_mag(input.mouse_delta.x, input.mouse_delta.y); break;
 	}
 
 	TD_ASSERT(false);

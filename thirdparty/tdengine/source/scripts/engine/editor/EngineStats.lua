@@ -180,27 +180,10 @@ function EngineStats:engine_viewer()
 
 
 		if imgui.TreeNode('Mouse') then
-			local output = tdengine.vec2(tdengine.window.get_content_area())
-			local screen = tdengine.vec2(tdengine.ffi.get_mouse(ffi.C.COORD_UNIT_SCREEN)):truncate(3)
-			local screen_px = tdengine.vec2()
-			screen_px.x = math.floor(screen.x * output.x)
-			screen_px.y = math.floor(screen.y * output.y)
-			imgui.extensions.Vec2('Screen        (Pixel)', screen_px)
-
-			imgui.extensions.Vec2('Screen      (Percent)', screen)
-
-			local window = tdengine.vec2(tdengine.ffi.get_mouse(ffi.C.COORD_UNIT_WINDOW)):truncate(3)
-			imgui.extensions.Vec2('Game Window (Percent)', window)
-
-			local game = tdengine.vec2(tdengine.ffi.get_mouse(ffi.C.COORD_UNIT_GAME)):truncate(3)
-			game.x = math.floor(game.x)
-			game.y = math.floor(game.y)
-			imgui.extensions.Vec2('Game Window   (Pixel)', game)
-
-			local world = tdengine.vec2(tdengine.ffi.get_mouse(ffi.C.COORD_UNIT_WORLD)):truncate(3)
-			world.x = math.floor(world.x)
-			world.y = math.floor(world.y)
-			imgui.extensions.Vec2('World         (Pixel)', world)
+			imgui.extensions.Vec2('Screen', tdengine.ffi.get_mouse(ffi.C.COORD_UNIT_SCREEN), '%.3f')
+			imgui.extensions.Vec2('Window', tdengine.ffi.get_mouse(ffi.C.COORD_UNIT_WINDOW), '%.3f')
+			imgui.extensions.Vec2('Game  ', tdengine.ffi.get_mouse(ffi.C.COORD_UNIT_GAME), '%d')
+			imgui.extensions.Vec2('World ', tdengine.ffi.get_mouse(ffi.C.COORD_UNIT_WORLD), '%d')
 
 			imgui.TreePop()
 		end

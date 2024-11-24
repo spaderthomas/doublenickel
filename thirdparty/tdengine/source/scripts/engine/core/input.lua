@@ -237,7 +237,7 @@ end
 
 function ContextualInput:mouse_delta(coordinate)
 	coordinate = coordinate or self.coordinate
-	return tdengine.vec2(tdengine.ffi.get_mouse_delta(coordinate:to_number()))
+	return tdengine.ffi.get_mouse_delta(coordinate:to_number())
 end
 
 function ContextualInput:left_click()
