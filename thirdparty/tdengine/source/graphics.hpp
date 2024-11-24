@@ -150,7 +150,7 @@ struct GpuBuffer {
 };
 
 typedef struct {
-  FixedArray buffer;
+  dn_fixed_array_t buffer;
   GpuBuffer* gpu_buffer;
 } GpuBackedBuffer;
 
@@ -744,7 +744,7 @@ void gpu_buffer_zero(GpuBuffer* buffer, u32 size) {
 GpuBackedBuffer gpu_backed_buffer_create(GpuBufferDescriptor descriptor) {
   GpuBackedBuffer backed_buffer;
   backed_buffer.gpu_buffer = gpu_buffer_create(descriptor);
-  fixed_array_init(&backed_buffer.buffer, descriptor.capacity, descriptor.element_size);
+  dn_fixed_array_init(&backed_buffer.buffer, descriptor.capacity, descriptor.element_size);
   return backed_buffer;
 }
 
@@ -757,7 +757,7 @@ u32 gpu_backed_buffer_size(GpuBackedBuffer* buffer) {
 }
 
 u8* gpu_backed_buffer_push(GpuBackedBuffer* buffer, void* data, u32 num_elements) {
-  return fixed_array_push(&buffer->buffer, data, num_elements);
+  return dn_fixed_array_push(&buffer->buffer, data, num_elements);
 }
 
 void gpu_backed_buffer_sync(GpuBackedBuffer* buffer) {

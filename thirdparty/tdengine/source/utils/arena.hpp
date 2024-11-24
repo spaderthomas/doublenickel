@@ -1,8 +1,21 @@
 // Defined outside of the struct so we can easily declare it in Lua
-struct ArenaHandle {
-	u32 index = 0;
-	u32 generation = 0;
+struct dn_gen_arena_handle_t {
+	u32 index;
+	u32 generation;
 };
+	dn_gen_arena_handle_t dn_gen_arena_invalid_handle() {
+		return {
+			.index = 0,
+			.generation = 0
+		};
+	}
+
+
+#define DN_GEN_ARENA_HANDLE(t) dn_gen_arena_handle_t
+
+bool dn_gen_arena_handle_valid(dn_gen_arena_handle_t handle) {
+	return handle.generation > 0;
+}
 
 template <typename T>
 struct GenerationalArena {	
@@ -15,7 +28,7 @@ struct GenerationalArena {
 			return next_free >= 0;
 		}
 
-		bool match(ArenaHandle handle) {
+		bool match(dn_gen_arena_handle_t handle) {
 			return generation == handle.generation;
 		}
 	};
@@ -59,7 +72,7 @@ struct GenerationalArena {
 		entries[capacity - 1].next_free = -1;
     }
 
-	ArenaHandle insert(const T& value) {
+	dn_gen_arena_handle_t insert(const T& value) {
 		assert(!entries[free_list].occupied);
 		
 		auto entry = entries + free_list;
@@ -68,7 +81,7 @@ struct GenerationalArena {
 
 		values[free_list] = value;
 
-		ArenaHandle handle;
+		dn_gen_arena_handle_t handle;
 		handle.index = free_list;
 		handle.generation = entry->generation;
 		
@@ -77,11 +90,11 @@ struct GenerationalArena {
 		return handle;
 	}
 
-	ArenaHandle insert() {
+	dn_gen_arena_handle_t insert() {
 		return insert(T());
 	}
 
-	void remove(ArenaHandle handle) {
+	void remove(dn_gen_arena_handle_t handle) {
 		if (handle.index >= capacity) return;
 		
 		auto entry = entries + handle.index;
@@ -95,7 +108,7 @@ struct GenerationalArena {
 	}
 
 
-	bool contains(ArenaHandle handle) {
+	bool contains(dn_gen_arena_handle_t handle) {
 		if (handle.index >= capacity) return false;
 
 		return entries[handle.index].match(handle);
@@ -113,16 +126,9 @@ struct GenerationalArena {
 		free_list = 0;
 	}
 
-	T* operator [](ArenaHandle handle) {
+	T* operator [](dn_gen_arena_handle_t handle) {
 		if (!contains(handle)) return nullptr;
 		return values + handle.index;
-	}
-
-	ArenaHandle invalid_handle() {
-		ArenaHandle handle;
-		handle.generation = 0;
-		
-		return handle;
 	}
 
 	Iterator begin() {

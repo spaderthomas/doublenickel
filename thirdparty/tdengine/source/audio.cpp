@@ -57,10 +57,10 @@ void init_audio() {
 	}
 
 	low_pass.enabled = true;
-	set_master_cutoff(low_pass.cutoff_frequency);
+	dn_audio_set_master_filter_cutoff(low_pass.cutoff_frequency);
 }
 
-void add_samples(ActiveSound* active_sound, int samples_requested, int offset) {
+void add_samples(dn_audio_instance_t* active_sound, int samples_requested, int offset) {
 	for (int32 i = 0; i < samples_requested; i++) {
 		auto info = sound_infos[active_sound->info.index];
 		auto index = active_sound->next_sample++;
@@ -70,7 +70,7 @@ void add_samples(ActiveSound* active_sound, int samples_requested, int offset) {
 				active_sound->next_sample = 0;
 				index = 0;
 			}
-			else if (active_sound->next) {
+			else if (dn_gen_arena_handle_valid(active_sound->next)) {
 				active_sound->sample_buffer_offset = i;
 				active_sound->samples_from_next = samples_requested - i;
 				break;
@@ -113,7 +113,7 @@ void update_audio(float* buffer, int frames_requested, int num_channels) {
 	arr_for(active_sounds, active_sound) {
 		if (!active_sound->occupied) continue;
 		if (active_sound->paused) continue;
-		if (!active_sound->info) continue;
+		if (!dn_gen_arena_handle_valid(active_sound->info)) continue;
 		
 		auto info = sound_infos[active_sound->info.index];
 		if (active_sound->info.generation != info->generation) {
@@ -183,15 +183,6 @@ void shutdown_audio() {
 	saudio_shutdown();
 }
 
-
-ActiveSoundHandle::operator bool() {
-	return index >= 0;
-}
-
-SoundInfoHandle::operator bool() {
-	return index >= 0;
-}
-
 bool is_any_sound_active() {
 	std::unique_lock lock(audio_mutex);
 	
@@ -202,7 +193,7 @@ bool is_any_sound_active() {
 	return false;
 }
 
-SoundInfo* find_sound_no_default(const char* name) {
+dn_audio_info_t* find_sound_no_default(const char* name) {
 	std::unique_lock lock(audio_mutex);
 
 	auto hash = hash_label(name);
@@ -213,30 +204,33 @@ SoundInfo* find_sound_no_default(const char* name) {
 	return nullptr;
 }
 
-SoundInfo* find_sound(const char* name) {
+dn_audio_info_t* find_sound(const char* name) {
 	auto sound = find_sound_no_default(name);
 	if (!sound) sound = find_sound_no_default("debug.wav");
 	return sound;
 }
 
-ActiveSoundHandle find_free_active_sound() {
+dn_audio_instance_handle_t find_free_active_sound() {
 	std::unique_lock lock(audio_mutex);
 	
-	for (int index = 0; index < active_sounds.size; index++) {
+	for (u32 index = 0; index < active_sounds.size; index++) {
 		auto active_sound = active_sounds[index];
 		if (!active_sound->occupied) {
 			active_sound->occupied = true;
-			return { index, active_sound->generation };
+			return { 
+				.index = index, 
+				.generation = active_sound->generation 
+			};
 		}
 	}
 
-	return { -1, -1 };
+	return dn_gen_arena_invalid_handle();
 }
 
-ActiveSound* find_active_sound(ActiveSoundHandle handle) {
+dn_audio_instance_t* find_active_sound(dn_audio_instance_handle_t handle) {
 	std::unique_lock lock(audio_mutex);
 
-	if (!handle) return nullptr;
+	if (!dn_gen_arena_handle_valid(handle)) return nullptr;
 	
 	auto active_sound = active_sounds[handle.index];
 	if (handle.generation != active_sound->generation) return nullptr;
@@ -244,11 +238,11 @@ ActiveSound* find_active_sound(ActiveSoundHandle handle) {
 	return active_sound;
 }
 
-ActiveSoundHandle play_sound_ex(SoundInfo* sound, bool loop) { 
+dn_audio_instance_handle_t play_sound_ex(dn_audio_info_t* sound, bool loop) { 
 	std::unique_lock lock(audio_mutex);
 	
 	auto handle = find_free_active_sound();
-	if (!handle) return handle;
+	if (!dn_gen_arena_handle_valid(handle)) return handle;
 
 	auto active_sound = find_active_sound(handle);
 	active_sound->info = { arr_indexof(&sound_infos, sound), sound->generation };
@@ -256,17 +250,17 @@ ActiveSoundHandle play_sound_ex(SoundInfo* sound, bool loop) {
 	active_sound->next_sample = 0;
 	active_sound->loop = loop;
 	active_sound->paused = false;
-	active_sound->next = { -1, -1 };
+	active_sound->next = dn_gen_arena_invalid_handle();
 	active_sound->samples_from_next = 0;
 	active_sound->sample_buffer_offset = 0;
 	active_sound->filter.enabled = false;
-	active_sound->filter.set_cutoff(get_master_cutoff());
-	active_sound->filter.butterworth = true;
+	active_sound->filter.set_cutoff(dn_audio_get_master_filter_cutoff());
+	active_sound->filter.mode = DN_AUDIO_FILTER_MODE_BUTTERWORTH;
 
 	return handle;
 }
 
-void stop_sound_ex(ActiveSound* active_sound) {
+void stop_sound_ex(dn_audio_instance_t* active_sound) {
 	std::unique_lock lock(audio_mutex);	
 
 	if (!active_sound) return;
@@ -277,7 +271,7 @@ void stop_sound_ex(ActiveSound* active_sound) {
 	stop_sound_ex(find_active_sound(active_sound->next));
 }
 
-SoundInfo* alloc_sound(const char* file_name) {
+dn_audio_info_t* alloc_sound(const char* file_name) {
 	auto sound = find_sound_no_default(file_name);
 	if (!sound) sound = arr_push(&sound_infos);
 	sound->generation++;
@@ -287,7 +281,7 @@ SoundInfo* alloc_sound(const char* file_name) {
 
 void load_audio_file(const char* file_path, const char* file_name) {
 	auto sound = alloc_sound(file_name);
-	strncpy(sound->name, file_name, SoundInfo::name_len);
+	strncpy(sound->name, file_name, dn_audio_info_t::name_len);
 	sound->hash = hash_label(sound->name);
 	
 	sound->samples = drwav_open_file_and_read_pcm_frames_f32(file_path, &sound->num_channels, &sound->sample_rate, &sound->num_frames, NULL);
@@ -308,23 +302,23 @@ void LowPassFilter::set_cutoff(float cutoff) {
 	cutoff_frequency = std::min(cutoff, nyquist);
 
 	// Butterworth filter
-    float omega = 2.0f * 3.14159 * cutoff_frequency / sample_frequency;
-    float cos_omega = cos(omega);
-    float sin_omega = sin(omega);
-    float alpha = sin_omega / sqrt(2.0f); // Butterworth filter (sqrt(2) damping factor)
+	float omega = 2.0f * 3.14159 * cutoff_frequency / sample_frequency;
+	float cos_omega = cos(omega);
+	float sin_omega = sin(omega);
+	float alpha = sin_omega / sqrt(2.0f); // Butterworth filter (sqrt(2) damping factor)
 
-    a0 = (1.0f - cos_omega) / 2.0f;
-    a1 = 1.0f - cos_omega;
-    a2 = (1.0f - cos_omega) / 2.0f;
-    b1 = -2.0f * cos_omega;
-    b2 = 1.0f - alpha;
+	a0 = (1.0f - cos_omega) / 2.0f;
+	a1 = 1.0f - cos_omega;
+	a2 = (1.0f - cos_omega) / 2.0f;
+	b1 = -2.0f * cos_omega;
+	b2 = 1.0f - alpha;
 
-    float a0_inv = 1.0f / (1.0f + alpha);
-    a0 *= a0_inv;
-    a1 *= a0_inv;
-    a2 *= a0_inv;
-    b1 *= a0_inv;
-    b2 *= a0_inv;
+	float a0_inv = 1.0f / (1.0f + alpha);
+	a0 *= a0_inv;
+	a1 *= a0_inv;
+	a2 *= a0_inv;
+	b1 *= a0_inv;
+	b2 *= a0_inv;
 
 	// Simple first order low pass filter
 	cutoff_alpha = 2.0f * 3.14159 * cutoff_frequency / (sample_frequency + 2.0f * 3.14159 * cutoff_frequency);
@@ -334,27 +328,35 @@ void LowPassFilter::set_cutoff(float cutoff) {
 float LowPassFilter::apply(float input) {
 	if (!enabled) return input;
 	
-	if (butterworth) {
-		float output = 0;
-		output += (a0 * input) + (a1 * input_history[0]) + (a2 * input_history[1]);
-		output -= (b1 * output_history[0]) + (b2 * output_history[1]);
+	switch (mode) {
+		case DN_AUDIO_FILTER_MODE_BUTTERWORTH: {
+			float output = 0;
+			output += (a0 * input) + (a1 * input_history[0]) + (a2 * input_history[1]);
+			output -= (b1 * output_history[0]) + (b2 * output_history[1]);
 
-		input_history[1] = input_history[0];
-		input_history[0] = input;
+			input_history[1] = input_history[0];
+			input_history[0] = input;
 
-		output_history[1] = output_history[0];
-		output_history[0] = output;
+			output_history[1] = output_history[0];
+			output_history[0] = output;
 
-		return output;
-	}
-	else {
-		float output = 0;
-		output += cutoff_alpha * input;
-		output += (1.0f - cutoff_alpha) * output_history[0];
-	
-		output_history[0] = output;
-	
-		return output;
+			return output;
+		} break;
+
+		case DN_AUDIO_FILTER_MODE_FIRST_ORDER: {
+			float output = 0;
+			output += cutoff_alpha * input;
+			output += (1.0f - cutoff_alpha) * output_history[0];
+		
+			output_history[0] = output;
+		
+			return output;
+		} break;
+
+		default: {
+			TD_ASSERT(false);
+			return input;
+		}
 	}
 }
 
@@ -362,17 +364,17 @@ float LowPassFilter::apply(float input) {
 /////////////
 // LUA API //
 /////////////
-ActiveSoundHandle play_sound(const char* name) {
+dn_audio_instance_handle_t play_sound(const char* name) {
 	auto info = find_sound(name);
 	return play_sound_ex(info, false);
 }
 
-ActiveSoundHandle play_sound_loop(const char* name) {
+dn_audio_instance_handle_t play_sound_loop(const char* name) {
 	auto info = find_sound(name);
 	return play_sound_ex(info, true);
 }
 
-void stop_sound(ActiveSoundHandle handle) {
+void stop_sound(dn_audio_instance_handle_t handle) {
 	auto active_sound = find_active_sound(handle);
 	stop_sound_ex(active_sound);
 }
@@ -383,7 +385,7 @@ void stop_all_sounds() {
 	}
 }
 
-void set_volume(ActiveSoundHandle handle, float volume) {
+void dn_audio_set_volume(dn_audio_instance_handle_t handle, float volume) {
 	auto active_sound = find_active_sound(handle);
 	if (!active_sound) return;
 
@@ -392,7 +394,7 @@ void set_volume(ActiveSoundHandle handle, float volume) {
 	active_sound->volume = clamp(volume, 0.f, 1.f);
 }
 
-void set_cutoff(ActiveSoundHandle handle, float cutoff) {
+void dn_audio_set_cutoff(dn_audio_instance_handle_t handle, float cutoff) {
 	auto active_sound = find_active_sound(handle);
 	if (!active_sound) return;
 
@@ -402,84 +404,90 @@ void set_cutoff(ActiveSoundHandle handle, float cutoff) {
 	active_sound->filter.set_cutoff(cutoff);
 }
 
-void set_threshold(float threshold) {
+void dn_audio_set_compressor_threshold(float threshold) {
 	std::unique_lock lock(audio_mutex);
 	threshold = threshold;
 }
 
-void set_ratio(float ratio) {
+void dn_audio_set_compressor_ratio(float ratio) {
 	std::unique_lock lock(audio_mutex);
 	ratio = ratio;
 }
 
-void set_attack_time(float attack) {
+void dn_audio_set_compressor_attack(float attack) {
 	std::unique_lock lock(audio_mutex);
 	attack_time = attack;
 }
 
-void set_release_time(float release) {
+void dn_audio_set_compressor_release(float release) {
 	std::unique_lock lock(audio_mutex);
 	release_time = release;
 }
 
-void set_sample_rate(float rate) {
+void dn_audio_set_sample_rate(float rate) {
 	std::unique_lock lock(audio_mutex);
 	sample_frequency = rate;
 }
 
-void set_master_volume(float volume) {
+void dn_audio_set_master_volume(float volume) {
 	std::unique_lock lock(audio_mutex);
 	master_volume = volume;
 }
 
-void set_master_volume_mod(float volume_mod) {
+void dn_audio_set_master_volume_mod(float volume_mod) {
 	std::unique_lock lock(audio_mutex);
 	master_volume_mod = volume_mod;
 }
 
-void set_master_cutoff(float frequency) {
+void dn_audio_set_master_filter_cutoff(float frequency) {
 	std::unique_lock lock(audio_mutex);
 	low_pass.set_cutoff(frequency);
 }
 
-void set_butterworth(bool butterworth) {
+void dn_audio_set_master_filter_cutoff_enabled(bool enabled) {
 	std::unique_lock lock(audio_mutex);
-	low_pass.butterworth = butterworth;
+	low_pass.enabled = enabled;
 }
 
-float get_master_cutoff() {
+void dn_audio_set_master_filter_mode(dn_audio_filter_mode_t mode) {
+	std::unique_lock lock(audio_mutex);
+	low_pass.mode = mode;
+}
+
+
+float dn_audio_get_master_filter_cutoff() {
 	return low_pass.cutoff_frequency;
 }
 
-float get_master_volume() {
+float dn_audio_get_master_volume() {
 	return master_volume;
 }
 
-float get_master_volume_mod() {
+float dn_audio_get_master_volume_mod() {
 	return master_volume_mod;
 }
 
-bool is_sound_playing(ActiveSoundHandle handle) {
+bool is_sound_playing(dn_audio_instance_handle_t handle) {
 	return find_active_sound(handle);
 }
 
-void pause_sound(ActiveSoundHandle handle) {
+void pause_sound(dn_audio_instance_handle_t handle) {
 	auto sound = find_active_sound(handle);
 	if (!sound) return;
 	
 	sound->paused = true;
 }
 
-void unpause_sound(ActiveSoundHandle handle) {
+void unpause_sound(dn_audio_instance_handle_t handle) {
 	auto sound = find_active_sound(handle);
 	if (!sound) return;
 	
 	sound->paused = false;
 }
 
-void play_sound_after(ActiveSoundHandle current, ActiveSoundHandle next) {
+void dn_audio_play_after(dn_audio_instance_handle_t current, dn_audio_instance_handle_t next) {
 	auto next_sound = find_active_sound(next);
-	if (!next) return;
+	if (!dn_gen_arena_handle_valid(next)) return;
 	
 	auto current_sound = find_active_sound(current);
 	if (!current_sound) {

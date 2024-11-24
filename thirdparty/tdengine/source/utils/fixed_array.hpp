@@ -1,32 +1,25 @@
 #ifndef FIXED_ARRAY_H
 #define FIXED_ARRAY_H
 
-////////////
-// HEADER //
-////////////
 typedef struct {
 	u8* data;
 	u32 size;
 	u32 capacity;
 
 	u32 vertex_size;
-} FixedArray;
+} dn_fixed_array_t;
 
-FM_LUA_EXPORT void fixed_array_init(FixedArray* vertex_buffer, u32 max_vertices, u32 vertex_size);
-FM_LUA_EXPORT u8*  fixed_array_push(FixedArray* vertex_buffer, void* data, u32 count);
-FM_LUA_EXPORT u8*  fixed_array_reserve(FixedArray* vertex_buffer, u32 count);
-FM_LUA_EXPORT void fixed_array_clear(FixedArray* vertex_buffer);
-FM_LUA_EXPORT u32  fixed_array_byte_size(FixedArray* vertex_buffer);
-FM_LUA_EXPORT u8*  fixed_array_at(FixedArray* vertex_buffer, u32 index);
+FM_LUA_EXPORT void dn_fixed_array_init(dn_fixed_array_t* vertex_buffer, u32 max_vertices, u32 vertex_size);
+FM_LUA_EXPORT u8*  dn_fixed_array_push(dn_fixed_array_t* vertex_buffer, void* data, u32 count);
+FM_LUA_EXPORT u8*  dn_fixed_array_reserve(dn_fixed_array_t* vertex_buffer, u32 count);
+FM_LUA_EXPORT void dn_fixed_array_clear(dn_fixed_array_t* vertex_buffer);
+FM_LUA_EXPORT u32  dn_fixed_array_byte_size(dn_fixed_array_t* vertex_buffer);
+FM_LUA_EXPORT u8*  dn_fixed_array_at(dn_fixed_array_t* vertex_buffer, u32 index);
 #endif
 
 
 #ifdef FIXED_ARRAY_IMPLEMENTATION
-////////////////////
-// IMPLEMENTATION //
-////////////////////
-
-void fixed_array_init(FixedArray* buffer, u32 max_vertices, u32 vertex_size) {
+void dn_fixed_array_init(dn_fixed_array_t* buffer, u32 max_vertices, u32 vertex_size) {
 	TD_ASSERT(buffer);
 
 	buffer->size = 0;
@@ -35,35 +28,35 @@ void fixed_array_init(FixedArray* buffer, u32 max_vertices, u32 vertex_size) {
 	buffer->data = (u8*)dn_allocator_alloc(&standard_allocator, max_vertices * vertex_size);
 }
 
-u8* fixed_array_at(FixedArray* buffer, u32 index) {
+u8* dn_fixed_array_at(dn_fixed_array_t* buffer, u32 index) {
 	TD_ASSERT(buffer);
 	return buffer->data + (index * buffer->vertex_size);
 }
 
-u8* fixed_array_push(FixedArray* buffer, void* data, u32 count) {
+u8* dn_fixed_array_push(dn_fixed_array_t* buffer, void* data, u32 count) {
 	TD_ASSERT(buffer);
 	TD_ASSERT(buffer->size < buffer->capacity);
 
-	auto vertices = fixed_array_reserve(buffer, count);
+	auto vertices = dn_fixed_array_reserve(buffer, count);
 	if (data) copy_memory(data, vertices, buffer->vertex_size * count);
 	return vertices;
 }
 
-u8* fixed_array_reserve(FixedArray* buffer, u32 count) {
+u8* dn_fixed_array_reserve(dn_fixed_array_t* buffer, u32 count) {
 	TD_ASSERT(buffer);
 	
-	auto vertex = fixed_array_at(buffer, buffer->size);
+	auto vertex = dn_fixed_array_at(buffer, buffer->size);
 	buffer->size += count;
 	return vertex;
 }
 
-void fixed_array_clear(FixedArray* buffer) {
+void dn_fixed_array_clear(dn_fixed_array_t* buffer) {
 	TD_ASSERT(buffer);
 
 	buffer->size = 0;
 }
 
-u32 fixed_array_byte_size(FixedArray* buffer) {
+u32 dn_fixed_array_byte_size(dn_fixed_array_t* buffer) {
 	TD_ASSERT(buffer);
 
 	return buffer->size * buffer->vertex_size;

@@ -65,7 +65,7 @@ template<typename T, u64 N>
 Array<T, N> arr_slice(T (&data)[N]);
 
 template<typename T, u64 N>
-i32 arr_indexof(Array<T, N>* array, T* element);
+u32 arr_indexof(Array<T, N>* array, T* element);
 
 template<typename T, u64 N>
 T* arr_at(Array<T, N>* array, u64 index);

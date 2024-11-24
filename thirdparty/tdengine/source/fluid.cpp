@@ -67,7 +67,7 @@ namespace LagrangianFluidSim {
 	}
 }
 
-ArenaHandle lf_create(u32 num_particles) {
+dn_gen_arena_handle_t lf_create(u32 num_particles) {
 	gpu_error_clear();
 	auto handle = LagrangianFluidSim::systems.insert();
 	auto system = LagrangianFluidSim::systems[handle];
@@ -99,7 +99,7 @@ ArenaHandle lf_create(u32 num_particles) {
 	return handle;
 }
 
-void lf_destroy(ArenaHandle handle) {
+void lf_destroy(dn_gen_arena_handle_t handle) {
 	auto system = LagrangianFluidSim::systems[handle];
 	if (!system) return;
 
@@ -116,7 +116,7 @@ void lf_destroy_all() {
 	LagrangianFluidSim::systems.clear();
 }
 
-void lf_init(ArenaHandle handle) {
+void lf_init(dn_gen_arena_handle_t handle) {
 	auto system = LagrangianFluidSim::systems[handle];
 	if (!system) return;
 
@@ -125,14 +125,14 @@ void lf_init(ArenaHandle handle) {
 	LagrangianFluidSim::run_kernel(*system, LagrangianFluidSim::Kernel::init_density);
 }
 
-void lf_inspect(ArenaHandle handle) {
+void lf_inspect(dn_gen_arena_handle_t handle) {
 	auto system = LagrangianFluidSim::systems[handle];
 	if (!system) return;
 
 	LagrangianFluidSim::inspect(*system);
 }
 
-void lf_set_volume(ArenaHandle handle, float ax, float ay, float bx, float by, float radius) {
+void lf_set_volume(dn_gen_arena_handle_t handle, float ax, float ay, float bx, float by, float radius) {
 	auto system = LagrangianFluidSim::systems[handle];
 	if (!system) return;
 
@@ -142,7 +142,7 @@ void lf_set_volume(ArenaHandle handle, float ax, float ay, float bx, float by, f
 	gpu_system.radius = radius;
 }
 
-void lf_set_velocity(ArenaHandle handle, float x, float y) {
+void lf_set_velocity(dn_gen_arena_handle_t handle, float x, float y) {
 	auto system = LagrangianFluidSim::systems[handle];
 	if (!system) return;
 
@@ -150,7 +150,7 @@ void lf_set_velocity(ArenaHandle handle, float x, float y) {
 	gpu_system.velocity = Vector2(x, y);
 }
 
-void lf_set_smoothing_radius(ArenaHandle handle, float radius) {
+void lf_set_smoothing_radius(dn_gen_arena_handle_t handle, float radius) {
 	auto system = LagrangianFluidSim::systems[handle];
 	if (!system) return;
 
@@ -158,7 +158,7 @@ void lf_set_smoothing_radius(ArenaHandle handle, float radius) {
 	gpu_system.smoothing_radius_px = radius;
 }
 
-void lf_set_particle_mass(ArenaHandle handle, float mass) {
+void lf_set_particle_mass(dn_gen_arena_handle_t handle, float mass) {
 	auto system = LagrangianFluidSim::systems[handle];
 	if (!system) return;
 
@@ -166,7 +166,7 @@ void lf_set_particle_mass(ArenaHandle handle, float mass) {
 	gpu_system.particle_mass = mass;
 }
 
-void lf_set_viscosity(ArenaHandle handle, float viscosity) {
+void lf_set_viscosity(dn_gen_arena_handle_t handle, float viscosity) {
 	auto system = LagrangianFluidSim::systems[handle];
 	if (!system) return;
 
@@ -174,7 +174,7 @@ void lf_set_viscosity(ArenaHandle handle, float viscosity) {
 	gpu_system.viscosity = viscosity;
 }
 
-void lf_set_pressure(ArenaHandle handle, float pressure) {
+void lf_set_pressure(dn_gen_arena_handle_t handle, float pressure) {
 	auto system = LagrangianFluidSim::systems[handle];
 	if (!system) return;
 
@@ -182,7 +182,7 @@ void lf_set_pressure(ArenaHandle handle, float pressure) {
 	gpu_system.pressure = pressure;
 }
 
-void lf_set_gravity(ArenaHandle handle, float gravity) {
+void lf_set_gravity(dn_gen_arena_handle_t handle, float gravity) {
 	auto system = LagrangianFluidSim::systems[handle];
 	if (!system) return;
 
@@ -190,7 +190,7 @@ void lf_set_gravity(ArenaHandle handle, float gravity) {
 	gpu_system.gravity = gravity;
 }
 
-void lf_set_timestep(ArenaHandle handle, float dt) {
+void lf_set_timestep(dn_gen_arena_handle_t handle, float dt) {
 	auto system = LagrangianFluidSim::systems[handle];
 	if (!system) return;
 
@@ -198,7 +198,7 @@ void lf_set_timestep(ArenaHandle handle, float dt) {
 	gpu_system.dt = dt;
 }
 
-void lf_draw(ArenaHandle handle) {
+void lf_draw(dn_gen_arena_handle_t handle) {
 	auto system = LagrangianFluidSim::systems[handle];
 	if (!system) return;
 
@@ -213,7 +213,7 @@ void lf_draw(ArenaHandle handle) {
 	glDrawArraysIndirect(GL_TRIANGLES, 0);
 }
 
-void lf_update(ArenaHandle handle) {
+void lf_update(dn_gen_arena_handle_t handle) {
 	auto system = LagrangianFluidSim::systems[handle];
 	if (!system) return;
 
@@ -267,7 +267,7 @@ namespace EulerianFluidSim {
 	}
 }
 
-ArenaHandle ef_create(u32 grid_size) {
+dn_gen_arena_handle_t ef_create(u32 grid_size) {
 	auto handle = EulerianFluidSim::systems.insert();
 	auto system = EulerianFluidSim::systems[handle];
 	
@@ -293,7 +293,7 @@ ArenaHandle ef_create(u32 grid_size) {
 	return handle;
 }
 
-void ef_destroy(ArenaHandle handle) {
+void ef_destroy(dn_gen_arena_handle_t handle) {
 	auto system = EulerianFluidSim::systems[handle];
 	if (!system) return;
 
@@ -311,7 +311,7 @@ void ef_destroy_all() {
 	EulerianFluidSim::systems.clear();
 }
 
-void ef_init(ArenaHandle handle) {
+void ef_init(dn_gen_arena_handle_t handle) {
 	auto system = EulerianFluidSim::systems[handle];
 	if (!system) return;
 
@@ -319,7 +319,7 @@ void ef_init(ArenaHandle handle) {
 	EulerianFluidSim::run_kernel(*system, EulerianFluidSim::Kernel::init);
 }
 
-void ef_inspect(ArenaHandle handle) {
+void ef_inspect(dn_gen_arena_handle_t handle) {
 	auto system = EulerianFluidSim::systems[handle];
 	if (!system) return;
 
@@ -332,14 +332,14 @@ u32 ef_pair_to_index(u32 grid_size, u32 x, u32 y) {
 	return ((grid_size + 2) * by) + bx;
 }
 
-void ef_set_render_size(ArenaHandle handle, u32 render_size) {
+void ef_set_render_size(dn_gen_arena_handle_t handle, u32 render_size) {
 	auto system = EulerianFluidSim::systems[handle];
 	if (!system) return;
 
 	system->render_size = render_size;
 }
 
-void ef_set_velocity(ArenaHandle handle, u32 x, u32 y, float vx, float vy) {
+void ef_set_velocity(dn_gen_arena_handle_t handle, u32 x, u32 y, float vx, float vy) {
 	auto system = EulerianFluidSim::systems[handle];
 	if (!system) return;
 
@@ -348,7 +348,7 @@ void ef_set_velocity(ArenaHandle handle, u32 x, u32 y, float vx, float vy) {
 	system->sources[index]->velocity.y = vy;
 }
 
-void ef_clear_density_source(ArenaHandle handle) {
+void ef_clear_density_source(dn_gen_arena_handle_t handle) {
 	auto system = EulerianFluidSim::systems[handle];
 	if (!system) return;
 
@@ -356,7 +356,7 @@ void ef_clear_density_source(ArenaHandle handle) {
 	system->sources.size = system->sources.capacity;
 }
 
-void ef_set_density_source(ArenaHandle handle, u32 x, u32 y, float amount) {
+void ef_set_density_source(dn_gen_arena_handle_t handle, u32 x, u32 y, float amount) {
 	auto system = EulerianFluidSim::systems[handle];
 	if (!system) return;
 	
@@ -364,21 +364,21 @@ void ef_set_density_source(ArenaHandle handle, u32 x, u32 y, float amount) {
 	system->sources[index]->density = amount;
 }
 
-void ef_set_gauss_seidel(ArenaHandle handle, u32 iterations) {
+void ef_set_gauss_seidel(dn_gen_arena_handle_t handle, u32 iterations) {
 	auto system = EulerianFluidSim::systems[handle];
 	if (!system) return;
 
 	system->gauss_seidel_iterations = iterations;
 }
 
-void ef_bind(ArenaHandle handle) {
+void ef_bind(dn_gen_arena_handle_t handle) {
 	auto system = EulerianFluidSim::systems[handle];
 	if (!system) return;
 
 	EulerianFluidSim::bind_ssbos(*system);
 }
 
-void ef_update(ArenaHandle handle) {
+void ef_update(dn_gen_arena_handle_t handle) {
 	auto system = EulerianFluidSim::systems[handle];
 	if (!system) return;
 
@@ -398,6 +398,6 @@ void ef_update(ArenaHandle handle) {
 	EulerianFluidSim::run_kernel(*system, EulerianFluidSim::Kernel::update_advect);
 }
 
-void ef_draw(ArenaHandle handle) {
+void ef_draw(dn_gen_arena_handle_t handle) {
 
 }

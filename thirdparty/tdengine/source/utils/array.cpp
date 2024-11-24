@@ -139,8 +139,8 @@ Array<T, N> arr_slice(T (&data)[N]) {
 }
 
 template<typename T, u64 N>
-i32 arr_indexof(Array<T, N>* array, T* element) {
-	i32 index = element - array->data;
+u32 arr_indexof(Array<T, N>* array, T* element) {
+	u32 index = element - array->data;
 	fm_assert(index >= 0);
 	fm_assert(index < array->size);
 	return index;

@@ -72,23 +72,23 @@ namespace LagrangianFluidSim {
 	void draw();
 }
 
-FM_LUA_EXPORT ArenaHandle lf_create(u32 num_particles);
-FM_LUA_EXPORT void lf_destroy(ArenaHandle handle);
+FM_LUA_EXPORT dn_gen_arena_handle_t lf_create(u32 num_particles);
+FM_LUA_EXPORT void lf_destroy(dn_gen_arena_handle_t handle);
 FM_LUA_EXPORT void lf_destroy_all();
-FM_LUA_EXPORT void lf_init(ArenaHandle handle);
-FM_LUA_EXPORT void lf_inspect(ArenaHandle handle);
-FM_LUA_EXPORT void lf_set_volume(ArenaHandle handle, float ax, float ay, float bx, float by, float radius);
-FM_LUA_EXPORT void lf_set_velocity(ArenaHandle handle, float x, float y);
-FM_LUA_EXPORT void lf_set_smoothing_radius(ArenaHandle handle, float r);
-FM_LUA_EXPORT void lf_set_particle_mass(ArenaHandle handle, float mass);
-FM_LUA_EXPORT void lf_set_viscosity(ArenaHandle handle, float viscosity);
-FM_LUA_EXPORT void lf_set_pressure(ArenaHandle handle, float pressure);
-FM_LUA_EXPORT void lf_set_gravity(ArenaHandle handle, float gravity);
-FM_LUA_EXPORT void lf_set_timestep(ArenaHandle handle, float dt);
+FM_LUA_EXPORT void lf_init(dn_gen_arena_handle_t handle);
+FM_LUA_EXPORT void lf_inspect(dn_gen_arena_handle_t handle);
+FM_LUA_EXPORT void lf_set_volume(dn_gen_arena_handle_t handle, float ax, float ay, float bx, float by, float radius);
+FM_LUA_EXPORT void lf_set_velocity(dn_gen_arena_handle_t handle, float x, float y);
+FM_LUA_EXPORT void lf_set_smoothing_radius(dn_gen_arena_handle_t handle, float r);
+FM_LUA_EXPORT void lf_set_particle_mass(dn_gen_arena_handle_t handle, float mass);
+FM_LUA_EXPORT void lf_set_viscosity(dn_gen_arena_handle_t handle, float viscosity);
+FM_LUA_EXPORT void lf_set_pressure(dn_gen_arena_handle_t handle, float pressure);
+FM_LUA_EXPORT void lf_set_gravity(dn_gen_arena_handle_t handle, float gravity);
+FM_LUA_EXPORT void lf_set_timestep(dn_gen_arena_handle_t handle, float dt);
 FM_LUA_EXPORT void lf_draw_all();
-FM_LUA_EXPORT void lf_bind(ArenaHandle handle);
-FM_LUA_EXPORT void lf_update(ArenaHandle handle);
-FM_LUA_EXPORT void lf_draw(ArenaHandle handle);
+FM_LUA_EXPORT void lf_bind(dn_gen_arena_handle_t handle);
+FM_LUA_EXPORT void lf_update(dn_gen_arena_handle_t handle);
+FM_LUA_EXPORT void lf_draw(dn_gen_arena_handle_t handle);
 
 ////////////////////////
 // EULERIAN FLUID SIM //
@@ -150,20 +150,20 @@ namespace EulerianFluidSim {
 	void draw();
 }
 
-FM_LUA_EXPORT ArenaHandle ef_create(u32 grid_size);
-FM_LUA_EXPORT void ef_destroy(ArenaHandle handle);
+FM_LUA_EXPORT dn_gen_arena_handle_t ef_create(u32 grid_size);
+FM_LUA_EXPORT void ef_destroy(dn_gen_arena_handle_t handle);
 FM_LUA_EXPORT void ef_destroy_all();
-FM_LUA_EXPORT void ef_init(ArenaHandle handle);
-FM_LUA_EXPORT void ef_inspect(ArenaHandle handle);
+FM_LUA_EXPORT void ef_init(dn_gen_arena_handle_t handle);
+FM_LUA_EXPORT void ef_inspect(dn_gen_arena_handle_t handle);
 FM_LUA_EXPORT u32 ef_pair_to_index(u32 grid_size, u32 x, u32 y);
-FM_LUA_EXPORT void ef_set_render_size(ArenaHandle handle, u32 render_size);
-FM_LUA_EXPORT void ef_clear_density_source(ArenaHandle handle);
-FM_LUA_EXPORT void ef_set_density_source(ArenaHandle handle, u32 x, u32 y, float amount);
-FM_LUA_EXPORT void ef_set_velocity(ArenaHandle handle, u32 x, u32 y, float vx, float vy);
-FM_LUA_EXPORT void ef_set_gauss_seidel(ArenaHandle handle, u32 iterations);
-FM_LUA_EXPORT void ef_bind(ArenaHandle handle);
-FM_LUA_EXPORT void ef_update(ArenaHandle handle);
-FM_LUA_EXPORT void ef_draw(ArenaHandle handle);
+FM_LUA_EXPORT void ef_set_render_size(dn_gen_arena_handle_t handle, u32 render_size);
+FM_LUA_EXPORT void ef_clear_density_source(dn_gen_arena_handle_t handle);
+FM_LUA_EXPORT void ef_set_density_source(dn_gen_arena_handle_t handle, u32 x, u32 y, float amount);
+FM_LUA_EXPORT void ef_set_velocity(dn_gen_arena_handle_t handle, u32 x, u32 y, float vx, float vy);
+FM_LUA_EXPORT void ef_set_gauss_seidel(dn_gen_arena_handle_t handle, u32 iterations);
+FM_LUA_EXPORT void ef_bind(dn_gen_arena_handle_t handle);
+FM_LUA_EXPORT void ef_update(dn_gen_arena_handle_t handle);
+FM_LUA_EXPORT void ef_draw(dn_gen_arena_handle_t handle);
 
 
 ///////////////

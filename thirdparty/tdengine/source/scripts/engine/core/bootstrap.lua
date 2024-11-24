@@ -184,19 +184,19 @@ typedef struct {
 	u32 capacity;
 
 	u32 vertex_size;
-} FixedArray;
+} dn_fixed_array_t;
 
-void fixed_array_init(FixedArray* vertex_buffer, u32 max_vertices, u32 vertex_size);
-u8*  fixed_array_push(FixedArray* vertex_buffer, void* data, u32 count);
-u8*  fixed_array_reserve(FixedArray* vertex_buffer, u32 count);
-void fixed_array_clear(FixedArray* vertex_buffer);
-u32  fixed_array_byte_size(FixedArray* vertex_buffer);
-u8*  fixed_array_at(FixedArray* vertex_buffer, u32 index);
+void dn_fixed_array_init(dn_fixed_array_t* vertex_buffer, u32 max_vertices, u32 vertex_size);
+u8*  dn_fixed_array_push(dn_fixed_array_t* vertex_buffer, void* data, u32 count);
+u8*  dn_fixed_array_reserve(dn_fixed_array_t* vertex_buffer, u32 count);
+void dn_fixed_array_clear(dn_fixed_array_t* vertex_buffer);
+u32  dn_fixed_array_byte_size(dn_fixed_array_t* vertex_buffer);
+u8*  dn_fixed_array_at(dn_fixed_array_t* vertex_buffer, u32 index);
 
 typedef struct {
-	u32 index;
-	u32 generation;
-} ArenaHandle;
+	i32 index;
+	i32 generation;
+} dn_gen_arena_handle_t;
 
 void copy_string(const char* str, char* buffer, u32 buffer_length);
 void copy_string_n(const char* str, u32 length, char* buffer, u32 buffer_length);
@@ -211,35 +211,38 @@ void copy_string_n(const char* str, u32 length, char* buffer, u32 buffer_length)
 // ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝ ╚═════╝  //
 ///////////////////////////////////////////
 
-typedef struct {
-  i32 index;
-  i32 generation;
-} ActiveSoundHandle;
+typedef enum {
+	DN_AUDIO_FILTER_MODE_FIRST_ORDER = 0,
+	DN_AUDIO_FILTER_MODE_BUTTERWORTH = 1,
+} dn_audio_filter_mode_t;
 
-ActiveSoundHandle play_sound(const char* name);
-ActiveSoundHandle play_sound_loop(const char* name);
+typedef dn_gen_arena_handle_t dn_audio_instance_handle_t;
+
+dn_audio_instance_handle_t play_sound(const char* name);
+dn_audio_instance_handle_t play_sound_loop(const char* name);
 void stop_all_sounds();
-void stop_sound(ActiveSoundHandle handle);
-void pause_sound(ActiveSoundHandle handle);
-void unpause_sound(ActiveSoundHandle handle);
-bool is_sound_playing(ActiveSoundHandle handle);
-void play_sound_after(ActiveSoundHandle current, ActiveSoundHandle next);
+void stop_sound(dn_audio_instance_handle_t handle);
+void pause_sound(dn_audio_instance_handle_t handle);
+void unpause_sound(dn_audio_instance_handle_t handle);
+bool is_sound_playing(dn_audio_instance_handle_t handle);
+void dn_audio_play_after(dn_audio_instance_handle_t current, dn_audio_instance_handle_t next);
 
-void set_volume(ActiveSoundHandle handle, float volume);
-void set_cutoff(ActiveSoundHandle handle, float cutoff);
+void dn_audio_set_volume(dn_audio_instance_handle_t handle, float volume);
+void dn_audio_set_cutoff(dn_audio_instance_handle_t handle, float cutoff);
 
-float get_master_cutoff();
-float get_master_volume();
-float get_master_volume_mod();
-void set_threshold(float t);
-void set_ratio(float v);
-void set_attack_time(float v);
-void set_release_time(float v);
-void set_sample_rate(float v);
-void set_master_volume(float v);
-void set_master_cutoff(float v);
-void set_butterworth(bool v);
-void set_master_volume_mod(float v);
+float dn_audio_get_master_filter_cutoff();
+float dn_audio_get_master_volume();
+float dn_audio_get_master_volume_mod();
+void dn_audio_set_compressor_threshold(float t);
+void dn_audio_set_compressor_ratio(float v);
+void dn_audio_set_compressor_attack(float v);
+void dn_audio_set_compressor_release(float v);
+void dn_audio_set_sample_rate(float v);
+void dn_audio_set_master_volume(float v);
+void dn_audio_set_master_filter_cutoff(float v);
+void dn_audio_set_master_filter_cutoff_enabled(bool enabled);
+void dn_audio_set_master_filter_mode(dn_audio_filter_mode_t mode);
+void dn_audio_set_master_volume_mod(float v);
 
 void set_window_size(int x, int y);
 
@@ -541,7 +544,7 @@ struct GpuBuffer {
 };
 
 typedef struct {
-  FixedArray buffer;
+  dn_fixed_array_t buffer;
   GpuBuffer* gpu_buffer;
 } GpuBackedBuffer;
 
@@ -894,37 +897,37 @@ f64 perlin(f64 x, f64 y, f64 vmin, f64 vmax);
 		u32 grid_size;
 	} EulerianFluidSystem;
 
-ArenaHandle lf_create(u32 num_particles);
-void lf_destroy(ArenaHandle handle);
+dn_gen_arena_handle_t lf_create(u32 num_particles);
+void lf_destroy(dn_gen_arena_handle_t handle);
 void lf_destroy_all();
-void lf_init(ArenaHandle handle);
-void lf_inspect(ArenaHandle handle);
-void lf_set_volume(ArenaHandle handle, float ax, float ay, float bx, float by, float radius);
-void lf_set_velocity(ArenaHandle handle, float x, float y);
-void lf_set_smoothing_radius(ArenaHandle handle, float r);
-void lf_set_particle_mass(ArenaHandle handle, float mass);
-void lf_set_viscosity(ArenaHandle handle, float viscosity);
-void lf_set_pressure(ArenaHandle handle, float pressure);
-void lf_set_gravity(ArenaHandle handle, float gravity);
-void lf_set_timestep(ArenaHandle handle, float dt);
-void lf_bind(ArenaHandle handle);
-void lf_update(ArenaHandle handle);
-void lf_draw(ArenaHandle handle);
+void lf_init(dn_gen_arena_handle_t handle);
+void lf_inspect(dn_gen_arena_handle_t handle);
+void lf_set_volume(dn_gen_arena_handle_t handle, float ax, float ay, float bx, float by, float radius);
+void lf_set_velocity(dn_gen_arena_handle_t handle, float x, float y);
+void lf_set_smoothing_radius(dn_gen_arena_handle_t handle, float r);
+void lf_set_particle_mass(dn_gen_arena_handle_t handle, float mass);
+void lf_set_viscosity(dn_gen_arena_handle_t handle, float viscosity);
+void lf_set_pressure(dn_gen_arena_handle_t handle, float pressure);
+void lf_set_gravity(dn_gen_arena_handle_t handle, float gravity);
+void lf_set_timestep(dn_gen_arena_handle_t handle, float dt);
+void lf_bind(dn_gen_arena_handle_t handle);
+void lf_update(dn_gen_arena_handle_t handle);
+void lf_draw(dn_gen_arena_handle_t handle);
 
-ArenaHandle ef_create(u32 grid_size);
-void ef_destroy(ArenaHandle handle);
+dn_gen_arena_handle_t ef_create(u32 grid_size);
+void ef_destroy(dn_gen_arena_handle_t handle);
 void ef_destroy_all();
-void ef_init(ArenaHandle handle);
-void ef_inspect(ArenaHandle handle);
+void ef_init(dn_gen_arena_handle_t handle);
+void ef_inspect(dn_gen_arena_handle_t handle);
 u32 ef_pair_to_index(u32 grid_size, u32 x, u32 y);
-void ef_set_render_size(ArenaHandle handle, u32 size);
-void ef_set_velocity(ArenaHandle handle, u32 x, u32 y, float vx, float vy);
-void ef_clear_density_source(ArenaHandle handle);
-void ef_set_density_source(ArenaHandle handle, u32 x, u32 y, float amount);
-void ef_set_gauss_seidel(ArenaHandle handle, u32 iterations);
-void ef_bind(ArenaHandle handle);
-void ef_update(ArenaHandle handle);
-void ef_draw(ArenaHandle handle);
+void ef_set_render_size(dn_gen_arena_handle_t handle, u32 size);
+void ef_set_velocity(dn_gen_arena_handle_t handle, u32 x, u32 y, float vx, float vy);
+void ef_clear_density_source(dn_gen_arena_handle_t handle);
+void ef_set_density_source(dn_gen_arena_handle_t handle, u32 x, u32 y, float amount);
+void ef_set_gauss_seidel(dn_gen_arena_handle_t handle, u32 iterations);
+void ef_bind(dn_gen_arena_handle_t handle);
+void ef_update(dn_gen_arena_handle_t handle);
+void ef_draw(dn_gen_arena_handle_t handle);
 
 
 // SCREENSHOTS

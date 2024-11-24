@@ -16,9 +16,9 @@ Array<Sprite> sprite_infos;
 #define ATLAS_INFO_SIZE 64
 Array<TextureAtlas> atlas_infos;
 #define SOUND_INFO_SIZE 1024
-Array<SoundInfo> sound_infos;
+Array<dn_audio_info_t> sound_infos;
 #define ACTIVE_SOUND_SIZE 64
-Array<ActiveSound> active_sounds;
+Array<dn_audio_instance_t> active_sounds;
 #define PARTICLE_SYSTEMS_SIZE 64
 Array<ParticleSystem> particle_systems;
 

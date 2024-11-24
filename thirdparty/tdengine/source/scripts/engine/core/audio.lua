@@ -31,7 +31,7 @@ end
 
 function tdengine.audio.play_after(after_handle, ...)
   local handle = tdengine.audio.play(...)
-  tdengine.ffi.play_sound_after(after_handle, handle);
+  tdengine.ffi.dn_audio_play_after(after_handle, handle);
 
   return handle
 end
@@ -99,14 +99,14 @@ function tdengine.audio.unpause(handle)
 end
 
 function tdengine.audio.set_volume(handle, volume)
-  if handle then tdengine.ffi.set_volume(handle, volume) end
+  if handle then tdengine.ffi.dn_audio_set_volume(handle, volume) end
 end
 
-function tdengine.audio.set_master_volume(volume)
-  tdengine.ffi.set_master_volume(volume)
+function tdengine.audio.dn_audio_set_master_volume(volume)
+  tdengine.ffi.dn_audio_set_master_volume(volume)
 end
 
-function tdengine.audio.set_master_volume_mod(volume_mod)
+function tdengine.audio.dn_audio_set_master_volume_mod(volume_mod)
   local interpolation = tdengine.audio.internal.interpolation.master_volume_mod
   interpolation:set_target(volume_mod)
   interpolation:set_start(tdengine.audio.get_master_volume_mod())
@@ -114,31 +114,31 @@ function tdengine.audio.set_master_volume_mod(volume_mod)
 end
 
 function tdengine.audio.set_cutoff(handle, cutoff)
-  if handle then tdengine.ffi.set_cutoff(handle, cutoff) end
+  if handle then tdengine.ffi.dn_audio_set_cutoff(handle, cutoff) end
 end
 
-function tdengine.audio.set_master_cutoff(cutoff)
-  tdengine.ffi.set_master_cutoff(cutoff)
+function tdengine.audio.dn_audio_set_master_filter_cutoff(cutoff)
+  tdengine.ffi.dn_audio_set_master_filter_cutoff(cutoff)
 end
 
 function tdengine.audio.get_master_cutoff()
-  return tdengine.ffi.get_master_cutoff()
+  return tdengine.ffi.dn_audio_get_master_filter_cutoff()
 end
 
 function tdengine.audio.get_master_volume()
-  return tdengine.ffi.get_master_volume()
+  return tdengine.ffi.dn_audio_get_master_volume()
 end
 
 function tdengine.audio.get_master_volume_mod()
-  return tdengine.ffi.get_master_volume_mod()
+  return tdengine.ffi.dn_audio_get_master_volume_mod()
 end
 
 function tdengine.audio.enable()
-  tdengine.audio.set_master_volume_mod(1)
+  tdengine.audio.dn_audio_set_master_volume_mod(1)
 end
 
 function tdengine.audio.disable()
-  tdengine.audio.set_master_volume_mod(0)
+  tdengine.audio.dn_audio_set_master_volume_mod(0)
 end
 
 ---------------
@@ -158,7 +158,7 @@ function tdengine.audio.init()
     tdengine.audio.disable()
   end
 
-  tdengine.audio.set_master_volume(3)
+  tdengine.audio.dn_audio_set_master_volume(3)
 end
 
 local function update_interpolation()
@@ -182,7 +182,7 @@ local function update_interpolation()
 
   local master_volume_mod = tdengine.audio.internal.interpolation.master_volume_mod
   master_volume_mod:update()
-  tdengine.ffi.set_master_volume_mod(master_volume_mod:get_value())
+  tdengine.ffi.dn_audio_set_master_volume_mod(master_volume_mod:get_value())
 end
 
 local function update_deferred_stop()
