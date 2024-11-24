@@ -248,19 +248,17 @@ function SceneEditor:update_state()
 
     local camera = tdengine.find_entity_editor('EditorCamera')
     local delta = self.input:mouse_delta():scale(-1)
-    print(delta.x, delta.y)
     camera:move(delta)
 
   end
 end
-
 
 -------------------
 -- SERIALIZATION --
 -------------------
 function SceneEditor:load(name)
   self.scene_name = name
-  self:disable_play_mode()
+self:disable_play_mode()
 end
 
 function SceneEditor:save()

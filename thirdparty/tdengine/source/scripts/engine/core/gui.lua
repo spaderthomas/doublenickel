@@ -995,7 +995,7 @@ function Gui:menu_item(label, button_info, font, sx, sy)
   local frame = self:build_button_frame(text.prepared.width, text.prepared.height, sx, sy)
 
   local state = self.mouse_state.idle
-  if tdengine.input.get_input_device() == tdengine.input.device_kinds.controller then
+  if tdengine.input.get_input_device() == InputDevice.Controller then
     local selected = menu.active and tdengine.input.was_digital_pressed('Action_MenuSelect')
     local hovered = menu.active and (item_index == menu.current)
 
@@ -1032,7 +1032,7 @@ function Gui:image_menu_item(label, button_info, font, sx, sy)
   image.position = frame.position
 
   local state = self.mouse_state.idle
-  if tdengine.input.get_input_device() == tdengine.input.device_kinds.controller then
+  if tdengine.input.get_input_device() == InputDevice.Controller then
     local selected = menu.active and tdengine.input.was_digital_pressed('Action_MenuSelect')
     local hovered = menu.active and (item_index == menu.current)
 

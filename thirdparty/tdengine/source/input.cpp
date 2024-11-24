@@ -292,3 +292,7 @@ void set_game_focus(bool focus) {
 	auto& input = get_input_manager();
 	input.game_focus = focus;
 }
+
+InputDevice get_input_device() {
+	return steam_input.last_input_device;
+}

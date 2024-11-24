@@ -1,30 +1,3 @@
-Sdf = tdengine.enum.define(
-	'Sdf',
-	{
-		Circle = tdengine.ffi.SDF_SHAPE_CIRCLE,
-		Ring = tdengine.ffi.SDF_SHAPE_RING,
-		Box = tdengine.ffi.SDF_SHAPE_BOX,
-		OrientedBox = tdengine.ffi.SDF_SHAPE_ORIENTED_BOX,
-		Combine = tdengine.ffi.SDF_SHAPE_COMBINE
-	}
-)
-
-SdfCombineOp = tdengine.enum.define(
-	'SdfCombineOp',
-	{
-		Union = tdengine.ffi.SDF_COMBINE_OP_UNION,
-		Intersection = tdengine.ffi.SDF_COMBINE_OP_INTERSECTION,
-		Subtraction = tdengine.ffi.SDF_COMBINE_OP_SUBTRACTION,
-	}
-)
-
-SdfSmoothingKernel = tdengine.enum.define(
-	'SdfSmoothingKernel',
-	{
-		None = tdengine.ffi.SDF_SMOOTH_KERNEL_NONE,
-		PolynomialQuadratic = tdengine.ffi.SDF_SMOOTH_KERNEL_POLYNOMIAL_QUADRATIC,
-	}
-)
 
 SdfRenderer = tdengine.class.metatype('SdfRenderer', 'sdf')
 function SdfRenderer:init(params)

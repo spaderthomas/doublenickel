@@ -1,3 +1,41 @@
+Resolution = tdengine.enum.define(
+	'Resolution', 
+	{
+		Native = 0,
+		Upscaled = 1
+	}
+)
+
+Shader = tdengine.enum.define(
+  'Shader',
+  {
+		Shape = 1,
+		Sdf = 2,
+		SdfNormal = 3,
+		Solid = 5,
+		Sprite = 6,
+		Text = 7,
+		Blit = 9,
+	}
+)
+
+
+RenderTarget = tdengine.enum.define(
+  'RenderTarget',
+  {
+    Native = 0,
+    Upscaled = 1,
+	}
+)
+
+Buffer = tdengine.enum.define(
+	'Buffer',
+	{
+		Lights = 0,
+	}
+)
+
+
 local App = tdengine.define_app()
 
 function App:init()
@@ -19,7 +57,7 @@ function App:on_init_game()
 	tdengine.ffi.set_window_icon(tdengine.ffi.resolve_format_path('image', 'logo/icon.png'):to_interned())
 	tdengine.ffi.set_target_fps(144)
 
-	tdengine.gpus.build(tdengine.module.read_from_named_path('gpu_info'))
+	tdengine.gpu.build(tdengine.module.read_from_named_path('gpu_info'))
 
 	self.sdf_renderer = ffi.new('SdfRenderer [1]');
   self.sdf_renderer = tdengine.ffi.sdf_renderer_create(1024 * 1024)
@@ -38,28 +76,27 @@ function App:on_init_game()
 end
 
 function App:on_start_game()
-  tdengine.editor.find('SceneEditor'):load('sdf_clock')
-
-	tdengine.ffi.use_editor_layout('sdf_clock')
-
-	tdengine.editor.find('EditorUtility').style.grid.size = 12
-	tdengine.editor.find('EditorUtility').enabled.grid = false
-
-	tdengine.editor.find('DialogueEditor').hidden = true
-
-	local game_views = tdengine.editor.find('GameViewManager')
-  game_views:add_view(GameView:new(
-		'Native View',
-		tdengine.gpus.find(RenderTarget.Native),
-		tdengine.enums.GameViewSize.ExactSize, self.native_resolution,
-		tdengine.enums.GameViewPriority.Main))
-
-  game_views:add_view(GameView:new(
-		'Upscaled View',
-		tdengine.gpus.find(RenderTarget.Upscaled),
-		tdengine.enums.GameViewSize.ExactSize, self.output_resolution,
-		tdengine.enums.GameViewPriority.Standard))
-
+	tdengine.editor.configure(EditorConfig:new({
+		grid_enabled = false,
+		grid_size = 12,
+		hide_dialogue_editor = true,
+		game_views = {
+			GameView:new(
+				'Native View',
+				tdengine.gpu.find(RenderTarget.Native),
+				tdengine.enums.GameViewSize.ExactSize, self.native_resolution,
+				tdengine.enums.GameViewPriority.Main),
+			GameView:new(
+				'Upscaled View',
+				tdengine.gpu.find(RenderTarget.Upscaled),
+				tdengine.enums.GameViewSize.ExactSize, self.output_resolution,
+				tdengine.enums.GameViewPriority.Standard)
+		},
+		scene = 'sdf_clock',
+		layout = 'sdf_clock',
+		render_pass = self.render_pass,
+		command_buffer = self.command_buffer
+	}))
 end
 
 function App:on_scene_rendered()
@@ -71,8 +108,8 @@ function App:on_scene_rendered()
   tdengine.ffi._gpu_command_buffer_submit(self.command_buffer)
 
 	tdengine.ffi.gpu_render_target_blit(
-    tdengine.gpus.find(RenderTarget.Native),
-    tdengine.gpus.find(RenderTarget.Upscaled)
+    tdengine.gpu.find(RenderTarget.Native),
+    tdengine.gpu.find(RenderTarget.Upscaled)
 	)
 end
 

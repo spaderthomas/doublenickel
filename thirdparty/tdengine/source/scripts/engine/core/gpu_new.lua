@@ -18,7 +18,7 @@ end
 GpuRenderTargetDescriptor = tdengine.class.metatype('GpuRenderTargetDescriptor')
 function GpuRenderTargetDescriptor:init(params)
   if params.resolution then
-    self.size = tdengine.gpus.find(params.resolution)
+    self.size = tdengine.gpu.find(params.resolution)
   else
     self.size = Vector2:new(params.size.x, params.size.y)
   end
@@ -63,7 +63,7 @@ end
 
 GpuRasterState = tdengine.class.metatype('GpuRasterState')
 function GpuRasterState:init(params)
-  self.shader = tdengine.gpus.find(params.shader)
+  self.shader = tdengine.gpu.find(params.shader)
   self.primitive = tdengine.enum.load(params.primitive):to_number()
 end
 
@@ -83,7 +83,7 @@ end
 GpuRenderPass = tdengine.class.metatype('GpuRenderPass')
 function GpuRenderPass:init(params)
   if params.color then
-    self.color.attachment = tdengine.gpus.find(params.color.attachment)
+    self.color.attachment = tdengine.gpu.find(params.color.attachment)
     self.color.load = tdengine.enum.load(params.color.load):to_number()
   end
 end
@@ -111,7 +111,7 @@ function GpuVertexBufferBinding:init(buffer)
   if type(buffer) == 'cdata' then
     self.buffer = buffer
   else
-    self.buffer = tdengine.gpus.find(buffer)
+    self.buffer = tdengine.gpu.find(buffer)
   end
 end
 
@@ -120,7 +120,7 @@ function GpuStorageBufferBinding:init(params)
   if type(params.buffer) == 'cdata' then
     self.buffer = params.buffer
   else
-    self.buffer = tdengine.gpus.find(params.buffer)
+    self.buffer = tdengine.gpu.find(params.buffer)
   end
 
   self.base = params.base
@@ -195,18 +195,16 @@ local done = [[
 ----------------
 -- GPU MODULE --
 ----------------
-local self = tdengine.gpus
-function tdengine.gpus.init()
+local self = tdengine.gpu
+function tdengine.gpu.init()
   self.render_targets = {}
-  self.graphics_pipelines = {}
-  self.command_buffers = {}
   self.buffers = {}
   self.shaders = {}
   self.resolutions = {}
-  self.draw_configurations = {}
+  self.assets = {}
 end
 
-function tdengine.gpus.render()
+function tdengine.gpu.render()
   tdengine.ffi.tm_begin('render')
 
   tdengine.lifecycle.run_callback(tdengine.lifecycle.callbacks.on_render_scene)
@@ -222,51 +220,29 @@ function tdengine.gpus.render()
 end
 
 
-function tdengine.gpus.build(gpu_info)
+function tdengine.gpu.build(gpu_info)
   self.add_resolutions(gpu_info.resolutions)
   self.add_render_targets(gpu_info.render_targets)
   self.add_buffers(gpu_info.buffers)
   self.add_shaders(gpu_info.shaders)
 end
 
-function tdengine.gpus.find(id)
-  if not tdengine.enum.is_enum(id) then 
-    dbg()
-    log.warn('Tried to find GPU resource, but ID passed in was not an enum; id = %s', tostring(id))
-    return nil
-  end
 
-  local resource_map
-  if tdengine.enums.RenderTarget:match(id) then
-    resource_map = self.render_targets
-  elseif tdengine.enums.Buffer:match(id) then
-    resource_map = self.buffers
-  elseif tdengine.enums.Shader:match(id) then
-    resource_map = self.shaders
-  elseif tdengine.enums.Resolution:match(id) then
-    resource_map = self.resolutions
-
-  end
-
-  local string_id = tdengine.enum.load(id):to_string()
-  local resource = resource_map[string_id]
-  if not resource then
-    dbg()
-    log.warn('Could not find GPU resource; id = %s', string_id)
-  end
-
-  return resource
+function tdengine.gpu.find(id)
+  return self.assets[id:to_qualified_string()]
 end
 
 
 -------------------
 -- RENDER TARGET -- 
 -------------------
-function tdengine.gpus.add_render_target(id, descriptor)
-  self.render_targets[id:to_string()] = tdengine.ffi.gpu_render_target_create(descriptor)
+function tdengine.gpu.add_render_target(id, descriptor)
+  local target = tdengine.ffi.gpu_render_target_create(descriptor)
+  self.render_targets[id:to_string()] = target
+  self.assets[id:to_qualified_string()] = target
 end
 
-function tdengine.gpus.add_render_targets(targets)
+function tdengine.gpu.add_render_targets(targets)
   for target in tdengine.iterator.values(targets) do
 		self.add_render_target(
 			target.id,
@@ -278,11 +254,13 @@ end
 ----------------
 -- GPU BUFFER --
 ----------------
-function tdengine.gpus.add_buffer(id, descriptor)
-  self.buffers[id:to_string()] = tdengine.ffi.gpu_buffer_create(descriptor)
+function tdengine.gpu.add_buffer(id, descriptor)
+  local buffer = tdengine.ffi.gpu_buffer_create(descriptor)
+  self.buffers[id:to_string()] = buffer
+  self.assets[id:to_qualified_string()] = buffer
 end
 
-function tdengine.gpus.add_buffers(buffers)
+function tdengine.gpu.add_buffers(buffers)
   for buffer in tdengine.iterator.values(buffers) do
 		self.add_buffer(buffer.id, GpuBufferDescriptor:new(buffer.descriptor))
 	end
@@ -291,11 +269,13 @@ end
 ------------
 -- SHADER --
 ------------
-function tdengine.gpus.add_shader(id, descriptor)
-  self.shaders[id:to_string()] = tdengine.ffi.gpu_shader_create(descriptor)
+function tdengine.gpu.add_shader(id, descriptor)
+  local shader = tdengine.ffi.gpu_shader_create(descriptor)
+  self.shaders[id:to_string()] = shader
+  self.assets[id:to_qualified_string()] = shader
 end
 
-function tdengine.gpus.add_shaders(shaders)
+function tdengine.gpu.add_shaders(shaders)
   for shader in tdengine.iterator.values(shaders) do
 		self.add_shader(
 			shader.id,
@@ -307,11 +287,13 @@ end
 ----------------
 -- RESOLUTION --
 ----------------
-function tdengine.gpus.add_resolution(id, size)
-  self.resolutions[id:to_string()] = Vector2:new(size.x, size.y)
+function tdengine.gpu.add_resolution(id, size)
+  local resolution = Vector2:new(size.x, size.y)
+  self.resolutions[id:to_string()] = resolution
+  self.assets[id:to_qualified_string()] = resolution
 end
 
-function tdengine.gpus.add_resolutions(resolutions)
+function tdengine.gpu.add_resolutions(resolutions)
   for resolution in tdengine.iterator.values(resolutions) do
     self.add_resolution(resolution.id, resolution.size)
 	end

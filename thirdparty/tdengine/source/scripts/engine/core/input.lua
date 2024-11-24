@@ -58,23 +58,19 @@ function tdengine.input.chord_pressed(mod, key, channel)
 end
 
 function tdengine.input.scroll()
-	local scroll = tdengine.ffi.get_scroll();
-	return tdengine.vec2(scroll.x, scroll.y)
+	return tdengine.ffi.get_scroll()
 end
 
 function tdengine.input.mouse(coordinate)
-	return tdengine.vec2(tdengine.ffi.get_mouse(coordinate or ffi.C.COORD_UNIT_GAME))
+	coordinate = coordinate or CoordinateSystem.World
+	return tdengine.ffi.get_mouse(coordinate:to_number())
 end
 
-function tdengine.input.mouse_delta()
-	local delta = tdengine.ffi.get_mouse_delta(ffi.C.COORD_UNIT_GAME)
-	return tdengine.vec2(delta.x, delta.y)
+function tdengine.input.mouse_delta(coordinate)
+	coordinate = coordinate or CoordinateSystem.World
+	return tdengine.ffi.get_mouse_delta(coordinate:to_number())
 end
 
-function tdengine.input.mouse_delta_world()
-	local delta = tdengine.ffi.get_mouse_delta(ffi.C.COORD_UNIT_WORLD)
-	return tdengine.vec2(delta.x, delta.y)
-end
 
 --------------
 -- CHANNELS --
@@ -151,15 +147,15 @@ function tdengine.input.is_context_active(context)
 end
 
 function tdengine.input.get_input_device()
-	return tonumber(tdengine.ffi.get_input_device())
+	return InputDevice:new(tdengine.ffi.get_input_device())
 end
 
 function tdengine.input.is_controller_mode()
-	return tdengine.input.get_input_device() == tdengine.input.device_kinds.controller
+	return tdengine.input.get_input_device() == InputDevice.Controller
 end
 
 function tdengine.input.is_mkb_mode()
-	return tdengine.input.get_input_device() == tdengine.input.device_kinds.mkb
+	return tdengine.input.get_input_device() == InputDevice.MouseAndKeyboard
 end
 
 -- @refactor: This is action specific. Maybe it's OK here...?

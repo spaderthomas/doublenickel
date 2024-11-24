@@ -149,9 +149,9 @@ function EngineStats:engine_viewer()
 		imgui.extensions.VariableName('Mode')
 		imgui.SameLine()
 		local device = tdengine.input.get_input_device()
-		if device == tdengine.input.device_kinds.mkb then
+		if device == InputDevice.MouseAndKeyboard then
 			imgui.Text('Mouse + Keyboard')
-		elseif device == tdengine.input.device_kinds.controller then
+		elseif device == InputDevice.Controller then
 			imgui.Text('Kontroller')
 		end
 
@@ -284,7 +284,7 @@ function EngineStats:engine_viewer()
 	end
 
 	if imgui.TreeNode('GPU') then
-		imgui.extensions.Table(tdengine.gpus)
+		imgui.extensions.Table(tdengine.gpu)
 		imgui.TreePop()
 	end
 

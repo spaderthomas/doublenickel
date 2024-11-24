@@ -3,6 +3,11 @@
 #define INPUT_MASK_PASSWORD 0x4
 #define INPUT_MASK_ALL      0xFF
 
+typedef enum {
+	INPUT_DEVICE_MOUSE_AND_KEYBOARD = 0,
+	INPUT_DEVICE_CONTROLLER = 1,
+} InputDevice;
+
 struct InputManager {
 	Vector2 framebuffer_position;
 	Vector2 framebuffer_size;
@@ -57,3 +62,4 @@ FM_LUA_EXPORT void hide_cursor();
 FM_LUA_EXPORT void show_cursor();
 FM_LUA_EXPORT u32 shift_key(u32 key);
 FM_LUA_EXPORT void set_game_focus(bool focus);
+FM_LUA_EXPORT InputDevice get_input_device();

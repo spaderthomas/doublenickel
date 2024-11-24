@@ -7,11 +7,6 @@ namespace Steam {
 	typedef SteamAPICall_t ApiCall;
 }
 
-enum class InputDevice : u32 {
-	MouseAndKeyboard = 0,
-	Controller = 1
-};
-
 enum class KeyEvent : u32 {
 	Press = 0,
 	Down = 1
@@ -94,6 +89,5 @@ FM_LUA_EXPORT void activate_action_set(const char* name);
 FM_LUA_EXPORT bool is_digital_active(const char* name);
 FM_LUA_EXPORT bool was_digital_active(const char* name);
 FM_LUA_EXPORT bool was_digital_pressed(const char* name);
-FM_LUA_EXPORT int32 get_input_device();
 FM_LUA_EXPORT int32 get_action_set_cooldown();
 FM_LUA_EXPORT const char* get_active_action_set(); 

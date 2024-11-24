@@ -96,7 +96,7 @@ function EditorUtility:draw_grid()
   local grid_size = self.style.grid.size
   local line_thickness = 1
 
-  local size = tdengine.gpus.find(RenderTarget.Editor).size
+  local size = tdengine.gpu.find(RenderTarget.Editor).size
   local camera = tdengine.editor.find('EditorCamera')
   if tdengine.tick then
     local game_camera = tdengine.entity.find('Camera')

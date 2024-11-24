@@ -9,12 +9,6 @@ typedef int32_t  i32;
 typedef float f32;
 typedef double f64;
 
-typedef enum {
-	COORD_UNIT_SCREEN = 0,
-	COORD_UNIT_WINDOW = 1,
-	COORD_UNIT_GAME = 2,
-	COORD_UNIT_WORLD = 3,
-} CoordinateUnit;
 
 typedef struct {
     char* data;
@@ -118,6 +112,18 @@ void set_window_size(int x, int y);
 //
 // INPUT
 //
+typedef enum {
+	COORD_UNIT_SCREEN = 0,
+	COORD_UNIT_WINDOW = 1,
+	COORD_UNIT_GAME = 2,
+	COORD_UNIT_WORLD = 3,
+} CoordinateUnit;
+
+typedef enum {
+	INPUT_DEVICE_MOUSE_AND_KEYBOARD = 0,
+	INPUT_DEVICE_CONTROLLER = 1,
+} InputDevice;
+
 bool is_editor_requesting_input();
 bool was_key_pressed(int key);
 bool was_key_released(int key);
@@ -126,6 +132,7 @@ bool is_mod_down(int mod);
 bool was_chord_pressed(int mod, int key);
 u32 shift_key(u32 key);
 Vector2 get_scroll();
+InputDevice get_input_device();
 
 Vector2 get_mouse(CoordinateUnit unit);
 Vector2 get_mouse_delta(CoordinateUnit unit);
@@ -805,7 +812,6 @@ void activate_action_set(const char* name);
 bool is_digital_active(const char* name);
 bool was_digital_active(const char* name);
 bool was_digital_pressed(const char* name);
-i32 get_input_device();
 i32 get_action_set_cooldown();
 const char* get_active_action_set();
 
@@ -1096,7 +1102,6 @@ function tdengine.init_phase_0()
   tdengine.shaders = {}
 
   tdengine.gpu = {}
-  tdengine.gpus = {}
 
   tdengine.app = {}
 
@@ -1209,7 +1214,7 @@ function tdengine.init_phase_1()
   tdengine.paths.init()
   tdengine.time_metric.init()
   tdengine.input.init()
-  tdengine.gpus.init()
+  tdengine.gpu.init()
   tdengine.state.init()
   tdengine.animation.load()
   tdengine.texture.load()

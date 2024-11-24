@@ -67,10 +67,10 @@ void update_actions() {
 	// + keyboard mode or controller mode
 	auto& input_manager = get_input_manager();
 	if (steam_input.got_controller_input) {
-		steam_input.last_input_device = InputDevice::Controller;
+		steam_input.last_input_device = INPUT_DEVICE_CONTROLLER;
 	}
 	else if (input_manager.got_keyboard_input || input_manager.got_mouse_input) {
-		steam_input.last_input_device = InputDevice::MouseAndKeyboard;
+		steam_input.last_input_device = INPUT_DEVICE_MOUSE_AND_KEYBOARD;
 	}
 }
 
@@ -313,10 +313,6 @@ bool was_digital_pressed(const char* name) {
 	if (!action) return false;
 
 	return action->state && !action->old_state;
-}
-
-int32 get_input_device() {
-	return static_cast<int32>(steam_input.last_input_device);
 }
 
 const char* get_active_action_set() {

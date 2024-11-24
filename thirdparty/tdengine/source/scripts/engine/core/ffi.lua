@@ -41,6 +41,34 @@ function tdengine.ffi.init()
 	ffi.metatype('tstring', string_metatable)
 	ffi.metatype('string', string_metatable)
 
+	Sdf = tdengine.enum.define(
+		'Sdf',
+		{
+			Circle = tdengine.ffi.SDF_SHAPE_CIRCLE,
+			Ring = tdengine.ffi.SDF_SHAPE_RING,
+			Box = tdengine.ffi.SDF_SHAPE_BOX,
+			OrientedBox = tdengine.ffi.SDF_SHAPE_ORIENTED_BOX,
+			Combine = tdengine.ffi.SDF_SHAPE_COMBINE
+		}
+	)
+
+	SdfCombineOp = tdengine.enum.define(
+		'SdfCombineOp',
+		{
+			Union = tdengine.ffi.SDF_COMBINE_OP_UNION,
+			Intersection = tdengine.ffi.SDF_COMBINE_OP_INTERSECTION,
+			Subtraction = tdengine.ffi.SDF_COMBINE_OP_SUBTRACTION,
+		}
+	)
+
+	SdfSmoothingKernel = tdengine.enum.define(
+		'SdfSmoothingKernel',
+		{
+			None = tdengine.ffi.SDF_SMOOTH_KERNEL_NONE,
+			PolynomialQuadratic = tdengine.ffi.SDF_SMOOTH_KERNEL_POLYNOMIAL_QUADRATIC,
+		}
+	)
+
 
 	CoordinateSystem = tdengine.enum.define(
 		'CoordinateSystem',
@@ -52,7 +80,15 @@ function tdengine.ffi.init()
 		}
 	)
 
-	tdengine.enum.define(
+	InputDevice = tdengine.enum.define(
+		'InputDevice',
+		{
+			MouseAndKeyboard = 0,
+			Controller = 1
+		}
+	)
+
+	ParticleKind = tdengine.enum.define(
 		'ParticleKind',
 		{
 			Quad = tdengine.ffi.ParticleKind_Quad,
@@ -62,7 +98,7 @@ function tdengine.ffi.init()
 		}
 	)
 
-	tdengine.enum.define(
+	WindowFlags = tdengine.enum.define(
 		'WindowFlags',
 		{
 			None = 0,
@@ -72,7 +108,7 @@ function tdengine.ffi.init()
 		}
 	)
 
-	tdengine.enum.define(
+	GpuResourceId = tdengine.enum.define(
 		'GpuResourceId',
 		{
 			Framebuffer = tdengine.ffi.GPU_RESOURCE_FRAMEBUFFER,
@@ -176,7 +212,7 @@ function tdengine.ffi.init()
 		}
 	)
 
-	tdengine.enum.define(
+	GpuMemoryBarrier = tdengine.enum.define(
 		'GpuMemoryBarrier',
 		{
 			ShaderStorage = tdengine.ffi.GPU_MEMORY_BARRIER_STORAGE,
@@ -184,7 +220,7 @@ function tdengine.ffi.init()
 		}
 	)
 
-	tdengine.enum.define(
+	DisplayMode = tdengine.enum.define(
 		'DisplayMode',
 		{
 			p480 = 0,
@@ -747,3 +783,12 @@ function tdengine.ffi.push_fullscreen_quad()
 	local opacity = 1.0
 	ffi.C.push_quad(0, n.y, n.x, n.y, uvs, opacity);
 end
+
+
+InputDevice = tdengine.enum.define(
+	'InputDevice',
+	{
+		MouseAndKeyboard = 0,
+		Controller = 1
+	}
+)

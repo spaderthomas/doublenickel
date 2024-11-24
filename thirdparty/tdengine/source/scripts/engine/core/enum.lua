@@ -65,6 +65,11 @@ function tdengine.enum.define(enum_name, values)
 			end
 
 			return tdengine.enums[other.__enum].name == enum_name
+		end,
+		new = function(self, value)
+			for enum in self:iterate() do
+				if enum:to_number() == value then return enum end
+			end
 		end
 	}
 	setmetatable(tdengine.enums[enum_name], tdengine.internal.enum_proxy_metatable)
