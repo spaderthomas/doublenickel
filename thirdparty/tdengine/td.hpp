@@ -8,6 +8,7 @@
 #include "source/utils/macros.hpp"
 #include "source/utils/log.hpp"
 #include "source/utils/enum.hpp"
+#include "source/utils/os.hpp"
 #include "source/utils/array.hpp"
 #include "source/utils/fixed_array.hpp"
 #include "source/utils/memory.hpp"
@@ -98,6 +99,8 @@
 #include "source/utils/fixed_array.hpp"
 #include "source/utils/log.cpp"
 #include "source/utils/memory.cpp"
+#define DN_OS_IMPLEMENTATION
+#include "source/utils/os.hpp"
 #include "source/utils/path.cpp"
 #define PREPROCESSOR_IMPLEMENTATION
 #include "source/utils/preprocessor.hpp"

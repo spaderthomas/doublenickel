@@ -86,12 +86,6 @@ tstring extract_file_name(const char* full_path) {
 	return copy_string(full_path + index, &bump_allocator);
 }
 
-bool is_directory(char* path) {
-	auto attribute = GetFileAttributesA(path);
-	if (attribute == INVALID_FILE_ATTRIBUTES) return false;
-	return attribute & FILE_ATTRIBUTE_DIRECTORY;
-}
-
 tstring wide_to_utf8(u16* string, u32 length) {
 	tstring utf8 = bump_allocator.alloc<char>(length + 1);
 	WideCharToMultiByte(CP_UTF8, 0, (LPCWCH)string, length, utf8, length, NULL, NULL);

@@ -575,15 +575,15 @@ function DialogueEditor:new(name)
 	self.gnodes = self.data.gnodes
 
 	local directory = tdengine.ffi.dn_paths_resolve_format('dialogue_folder', name):to_interned()
-	tdengine.ffi.remove_directory(directory)
-	tdengine.ffi.create_directory(directory)
+	tdengine.ffi.dn_os_remove_directory(directory)
+	tdengine.ffi.dn_os_create_directory(directory)
 	self:save(name)
 	self:load(name)
 end
 
 function DialogueEditor:delete(name)
 	local directory = tdengine.ffi.dn_paths_resolve_format('dialogue_folder', name):to_interned()
-	tdengine.ffi.remove_directory(directory)
+	tdengine.ffi.dn_os_remove_directory(directory)
 
 	self:new('default')
 end

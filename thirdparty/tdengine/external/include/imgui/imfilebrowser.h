@@ -463,37 +463,37 @@ inline void ImGui::FileBrowser::Display()
         }
     }
 
-    if(newDirNameBuf_)
-    {
-        SameLine();
-        if(SmallButton("+"))
-        {
-            OpenPopup(openNewDirLabel_.c_str());
-            (*newDirNameBuf_)[0] = '\0';
-        }
+    //if(newDirNameBuf_)
+    //{
+    //    SameLine();
+    //    if(SmallButton("+"))
+    //    {
+    //        OpenPopup(openNewDirLabel_.c_str());
+    //        (*newDirNameBuf_)[0] = '\0';
+    //    }
 
-        if(BeginPopup(openNewDirLabel_.c_str()))
-        {
-            ScopeGuard endNewDirPopup([] { EndPopup(); });
+    //    if(BeginPopup(openNewDirLabel_.c_str()))
+    //    {
+    //        ScopeGuard endNewDirPopup([] { EndPopup(); });
 
-            InputText("name", newDirNameBuf_->data(), newDirNameBuf_->size());
-            SameLine();
+    //        InputText("name", newDirNameBuf_->data(), newDirNameBuf_->size());
+    //        SameLine();
 
-            if(Button("ok") && (*newDirNameBuf_)[0] != '\0')
-            {
-                ScopeGuard closeNewDirPopup([] { CloseCurrentPopup(); });
-                if(create_directory(pwd_ / newDirNameBuf_->data()))
-                {
-                    UpdateFileRecords();
-                }
-                else
-                {
-                    statusStr_ = "failed to create " +
-                                 std::string(newDirNameBuf_->data());
-                }
-            }
-        }
-    }
+    //        if(Button("ok") && (*newDirNameBuf_)[0] != '\0')
+    //        {
+    //            ScopeGuard closeNewDirPopup([] { CloseCurrentPopup(); });
+    //            if(dn_os_create_directory(pwd_ / newDirNameBuf_->data()))
+    //            {
+    //                UpdateFileRecords();
+    //            }
+    //            else
+    //            {
+    //                statusStr_ = "failed to create " +
+    //                             std::string(newDirNameBuf_->data());
+    //            }
+    //        }
+    //    }
+    //}
 
     // browse files in a child window
 

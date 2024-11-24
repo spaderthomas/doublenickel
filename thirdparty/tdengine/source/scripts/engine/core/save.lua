@@ -2,8 +2,8 @@ function tdengine.save.init()
   local directory = tdengine.ffi.dn_paths_resolve('saves'):to_interned()
   log.info('Initializing save directory; directory = %s', directory)
 
-  tdengine.ffi.create_named_directory('saves')
-  tdengine.ffi.create_named_directory('screenshots')
+  tdengine.ffi.dn_os_create_directory(tdengine.ffi.dn_paths_resolve('saves'):to_interned())
+  tdengine.ffi.dn_os_create_directory(tdengine.ffi.dn_paths_resolve('screenshots'):to_interned())
 end
 
 function tdengine.save.create()

@@ -78,7 +78,7 @@ function TextureAtlasEditor:create_popup()
 			imgui.PopStyleColor()
 
 			imgui.SameLine()
-			if tdengine.does_path_exist(full_path) then
+			if tdengine.ffi.dn_os_does_path_exist(full_path) then
 				imgui.PushStyleColor(ffi.C.ImGuiCol_Text, tdengine.colors32.button_green)
 				imgui.Text('(OK)')
 				imgui.PopStyleColor()
@@ -100,7 +100,7 @@ function TextureAtlasEditor:create_popup()
 
 		local path = tdengine.ffi.dn_paths_resolve_format('image', self.folder):to_interned()
 		local folder_empty = #self.folder == 0
-		local folder_valid = tdengine.does_path_exist(path)
+		local folder_valid = tdengine.ffi.dn_os_does_path_exist(path)
 		imgui.SameLine()
 
 		if folder_valid and not folder_empty then

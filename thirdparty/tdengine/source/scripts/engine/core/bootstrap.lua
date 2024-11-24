@@ -94,8 +94,6 @@ double dn_time_metric_last(const char* name);
 double dn_time_metric_largest(const char* name);
 double dn_time_metric_smallest(const char* name);
 
-
-// NAMED PATHS
 typedef struct {
     const char* name;
     const char* path;
@@ -107,13 +105,14 @@ typedef struct {
 } dn_named_path_result_t;
 
 dn_named_path_result_t dn_paths_find_all();
+void                   dn_paths_add_install_subpath(const char* name, const char* relative_path);
+void                   dn_paths_add_engine_subpath(const char* name, const char* relative_path);
+void                   dn_paths_add_write_subpath(const char* name, const char* relative_path);
+void                   dn_paths_add_subpath(const char* name, const char* parent_name, const char* relative_path);
+tstring                dn_paths_resolve(const char* name);
+tstring                dn_paths_resolve_format(const char* name, const char* file_name);
 
-void dn_paths_add_install_subpath(const char* name, const char* relative_path);
-void dn_paths_add_engine_subpath(const char* name, const char* relative_path);
-void dn_paths_add_write_subpath(const char* name, const char* relative_path);
-void dn_paths_add_subpath(const char* name, const char* parent_name, const char* relative_path);
-tstring dn_paths_resolve(const char* name);
-tstring dn_paths_resolve_format(const char* name, const char* file_name);
+
 
 ///////////////////////
 //  ██████╗ ███████╗ //
@@ -124,14 +123,14 @@ tstring dn_paths_resolve_format(const char* name, const char* file_name);
 //  ╚═════╝ ╚══════╝ //
 ///////////////////////
  
-bool does_path_exist(const char* path);
-bool is_regular_file(const char* path);
-bool is_directory(const char* path);
-void create_directory(const char* path);
-void remove_directory(const char* path);
+bool dn_os_does_path_exist(const char* path);
+bool dn_os_is_regular_file(const char* path);
+bool dn_os_is_directory(const char* path);
+void dn_os_create_directory(const char* path);
+void dn_os_remove_directory(const char* path);
 void create_named_directory(const char* name);
 
-typedef struct DateTime {
+typedef struct dn_os_date_time_t {
 	int year;
 	int month;
 	int day;
@@ -139,9 +138,9 @@ typedef struct DateTime {
 	int minute;
 	int second;
 	int millisecond;
-} DateTime;
+} dn_os_date_time_t;
 
-DateTime get_date_time();
+dn_os_date_time_t dn_os_get_date_time();
 
 typedef struct MemoryAllocator MemoryAllocator;
 void ma_add(const char* name, MemoryAllocator* allocator);

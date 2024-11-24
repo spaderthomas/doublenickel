@@ -48,14 +48,14 @@ function tdengine.create_dir(dir)
   os.execute(command)
 end
 
-function tdengine.does_path_exist(path)
-  return tdengine.ffi.does_path_exist(path)
+function tdengine.ffi.dn_os_does_path_exist(path)
+  return tdengine.ffi.dn_os_does_path_exist(path)
 end
 
-function tdengine.is_regular_file(path)
-  return tdengine.ffi.is_regular_file(path)
+function tdengine.ffi.dn_os_is_regular_file(path)
+  return tdengine.ffi.dn_os_is_regular_file(path)
 end
 
 function tdengine.is_directory(path)
-  return tdengine.ffi.is_directory(path)
+  return tdengine.ffi.dn_os_is_regular_file(path)
 end

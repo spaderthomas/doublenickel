@@ -35,23 +35,8 @@ namespace API {
 }
 
 
-struct DateTime {
-	int year;
-	int month;
-	int day;
-	int hour;
-	int minute;
-	int second;
-	int millisecond;
-};
 
-FM_LUA_EXPORT bool does_path_exist(const char* path);
-FM_LUA_EXPORT bool is_regular_file(const char* path);
-FM_LUA_EXPORT bool is_directory(const char* path);
-FM_LUA_EXPORT void remove_directory(const char* path);
-FM_LUA_EXPORT void create_directory(const char* path);
-FM_LUA_EXPORT void create_named_directory(const_string name);
-FM_LUA_EXPORT DateTime get_date_time();
+
 
 void register_api();
 
