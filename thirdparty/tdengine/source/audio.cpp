@@ -32,7 +32,7 @@ void init_audio() {
 		}
 	};
 
-	auto audio_dir = resolve_named_path("audio");
+	auto audio_dir = dn_paths_resolve("audio");
 	check_directory(audio_dir);
 
 	// Initialize Sokol

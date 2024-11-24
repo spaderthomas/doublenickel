@@ -76,7 +76,7 @@ for i, x in ipairs(modes) do
     local stack_depth = log.read_stack_depth()
     local info = debug.getinfo(stack_depth, "Sl")
 
-    local install = tdengine.ffi.resolve_named_path('install'):to_interned()
+    local install = tdengine.ffi.dn_paths_resolve('install'):to_interned()
     local relative_path = info.source:gsub(install, '')
     relative_path = relative_path:sub(2, #relative_path)
 

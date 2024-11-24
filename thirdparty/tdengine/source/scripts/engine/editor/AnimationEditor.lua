@@ -151,7 +151,7 @@ function AnimationEditor:popup()
 		end
 
 		imgui.InputText(self.ids.import, self, 'import_dir')
-		local import_path = tdengine.ffi.resolve_format_path('image', self.import_dir):to_interned()
+		local import_path = tdengine.ffi.dn_paths_resolve_format('image', self.import_dir):to_interned()
 		local import_valid = tdengine.does_path_exist(import_path) and #self.import_dir > 0
 		imgui.SameLine()
 

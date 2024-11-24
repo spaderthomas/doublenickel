@@ -3,13 +3,13 @@
 ////////////////////
 tstring build_shader_source(const char* file_path) {
 	auto shader_file = copy_string(file_path, &bump_allocator);
-	auto shader_directory =  resolve_named_path("shaders");
+	auto shader_directory =  dn_paths_resolve("shaders");
 	auto error = bump_allocator.alloc<char>(256);
 	
 	IncludeContext context = {
 		.file_path = file_path,
 		.include_dirs = {
-			.data = { resolve_named_path("shaders"), resolve_named_path("shader_includes") },
+			.data = { dn_paths_resolve("shaders"), dn_paths_resolve("shader_includes") },
 			.count = 2
 		}
 	};
@@ -58,19 +58,19 @@ void check_shader_linkage(u32 program, const char* file_path) {
 ////////////////
 void GpuShader::init(GpuShaderDescriptor descriptor) {
 	if (descriptor.kind == GPU_SHADER_COMPUTE) {
-		auto compute_path = resolve_format_path_ex("compute_shader", descriptor.compute_shader, &bump_allocator);
+		auto compute_path = dn_paths_resolve_format_ex("compute_shader", descriptor.compute_shader, &bump_allocator);
 		init_compute_ex(descriptor.name, compute_path);
 	}
 	else if (descriptor.kind == GPU_SHADER_GRAPHICS) {
-		auto vertex_path = resolve_format_path_ex("vertex_shader", descriptor.vertex_shader, &bump_allocator);
-		auto fragment_path = resolve_format_path_ex("fragment_shader", descriptor.fragment_shader, &bump_allocator);
+		auto vertex_path = dn_paths_resolve_format_ex("vertex_shader", descriptor.vertex_shader, &bump_allocator);
+		auto fragment_path = dn_paths_resolve_format_ex("fragment_shader", descriptor.fragment_shader, &bump_allocator);
 		init_graphics_ex(descriptor.name, vertex_path, fragment_path);
 	}
 }
 
 void GpuShader::init_graphics(const char* name) {
-	auto vertex_path = resolve_format_path_ex("vertex_shader", name, &bump_allocator);
-	auto fragment_path = resolve_format_path_ex("fragment_shader", name, &bump_allocator);
+	auto vertex_path = dn_paths_resolve_format_ex("vertex_shader", name, &bump_allocator);
+	auto fragment_path = dn_paths_resolve_format_ex("fragment_shader", name, &bump_allocator);
 	init_graphics_ex(name, vertex_path, fragment_path);
 }
 
@@ -123,7 +123,7 @@ void GpuShader::init_graphics_ex(const char* name, const char* vertex_shader, co
 }
 
 void GpuShader::init_compute(const char* name) {
-	init_compute_ex(name, resolve_format_path_ex("compute_shader", name, &bump_allocator));
+	init_compute_ex(name, dn_paths_resolve_format_ex("compute_shader", name, &bump_allocator));
 }
 
 void GpuShader::init_compute_ex(const char* name, const char* compute_path) {

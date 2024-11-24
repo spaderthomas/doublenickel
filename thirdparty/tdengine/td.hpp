@@ -68,7 +68,8 @@
 #include "source/audio.cpp"
 #include "source/background.cpp" // INVERT (I need something to load large images though, in general)
 #include "source/draw.cpp"
-#include "source/engine.cpp"
+#define DN_ENGINE_IMPLEMENTATION
+#include "source/engine.hpp"
 #include "source/font.cpp"
 #include "source/image.cpp" // HALF (Screenshots should be reworked, probably? I'm referencing a named path when I initialize)
 #include "source/input.cpp"
@@ -83,7 +84,8 @@
 #include "source/shader.cpp"
 #include "source/steam.cpp"
 #include "source/text.cpp"
-#include "source/time_metrics.cpp"
+#define DN_TIME_METRICS_IMPLEMENTATION
+#include "source/time_metrics.hpp"
 #include "source/window.cpp"
 #include "source/imgui/imgui_extensions.cpp"
 #include "source/utils/array.cpp"
@@ -109,7 +111,8 @@ int td_main(TdAppDescriptor app) {
 	init_app(app);
 	init_paths();
 	init_log();
-	init_time();
+	dn_engine_init();
+	dn_time_metrics_init();
 	init_steam();
 	init_file_monitors();
 	init_assets();
@@ -119,8 +122,8 @@ int td_main(TdAppDescriptor app) {
 	init_audio();
 	init_scripts();
 
-	while(!is_game_done()) {
-		update_frame();
+	while(!dn_engine_should_exit()) {
+		dn_engine_update();
 		update_steam();
 		update_allocators();
 		update_file_monitors();
@@ -129,7 +132,7 @@ int td_main(TdAppDescriptor app) {
 		update_input();
 		update_actions();
 		update_game();
-		update_time();
+		dn_time_metrics_update();
 	}
 
 	shutdown_audio();

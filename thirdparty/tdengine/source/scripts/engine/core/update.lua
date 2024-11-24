@@ -1,5 +1,5 @@
 function tdengine.update_game(dt)
-  tdengine.ffi.tm_begin('update')
+  tdengine.ffi.dn_time_metric_begin('update')
   
   tdengine.dt = dt
   tdengine.elapsed_time = tdengine.elapsed_time + dt
@@ -18,7 +18,7 @@ function tdengine.update_game(dt)
 
   tdengine.lifecycle.run_callback(tdengine.lifecycle.callbacks.on_end_frame)
   
-  tdengine.ffi.tm_end('update')
+  tdengine.ffi.dn_time_metric_end('update')
 
   tdengine.gpu.render()
 end

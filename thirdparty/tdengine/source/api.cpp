@@ -206,7 +206,7 @@ void create_directory(const char* path) {
 }
 
 void create_named_directory(const_string name) {
-	auto path = resolve_named_path(name);
+	auto path = dn_paths_resolve(name);
 	create_directory(path);
 }
 

@@ -57,7 +57,9 @@ typedef struct {
   float data [4] [4];
 } Matrix4;
 
-// These are just in Lua, so I can add a metatype to returned strings for a nice interning API
+// These are just in Lua, so I can add a metatype to returned strings for a nice interning API.
+// tstring is a temporary string; i.e., one allocated with temporary storage. There's nothing different
+// about the underlying data, it's just a hint to the programmer to not hold onto this pointer.
 typedef struct {
   char* data;
 } tstring;
@@ -67,8 +69,85 @@ typedef struct {
 } string;
 
 
-typedef struct MemoryAllocator MemoryAllocator;
 
+
+//////////////////////////////////////////////////////
+// ███████╗███╗   ██╗ ██████╗ ██╗███╗   ██╗███████╗ //
+// ██╔════╝████╗  ██║██╔════╝ ██║████╗  ██║██╔════╝ //
+// █████╗  ██╔██╗ ██║██║  ███╗██║██╔██╗ ██║█████╗   //
+// ██╔══╝  ██║╚██╗██║██║   ██║██║██║╚██╗██║██╔══╝   //
+// ███████╗██║ ╚████║╚██████╔╝██║██║ ╚████║███████╗ //
+// ╚══════╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝╚═╝  ╚═══╝╚══════╝ //
+//////////////////////////////////////////////////////
+
+void        dn_engine_set_exit_game();
+const char* dn_engine_get_game_hash();
+void        dn_engine_set_target_fps(double fps);
+double      dn_engine_get_target_fps();
+
+
+void   dn_time_metric_add(const char* name);
+void   dn_time_metric_begin(const char* name);
+void   dn_time_metric_end(const char* name);
+double dn_time_metric_average(const char* name);
+double dn_time_metric_last(const char* name);
+double dn_time_metric_largest(const char* name);
+double dn_time_metric_smallest(const char* name);
+
+
+// NAMED PATHS
+typedef struct {
+    const char* name;
+    const char* path;
+} dn_named_path_t;
+
+typedef struct {
+	dn_named_path_t* named_paths;
+	u32 size;
+} dn_named_path_result_t;
+
+dn_named_path_result_t dn_paths_find_all();
+
+void dn_paths_add_install_subpath(const char* name, const char* relative_path);
+void dn_paths_add_engine_subpath(const char* name, const char* relative_path);
+void dn_paths_add_write_subpath(const char* name, const char* relative_path);
+void dn_paths_add_subpath(const char* name, const char* parent_name, const char* relative_path);
+tstring dn_paths_resolve(const char* name);
+tstring dn_paths_resolve_format(const char* name, const char* file_name);
+
+///////////////////////
+//  ██████╗ ███████╗ //
+// ██╔═══██╗██╔════╝ //
+// ██║   ██║███████╗ //
+// ██║   ██║╚════██║ //
+// ╚██████╔╝███████║ //
+//  ╚═════╝ ╚══════╝ //
+///////////////////////
+ 
+bool does_path_exist(const char* path);
+bool is_regular_file(const char* path);
+bool is_directory(const char* path);
+void create_directory(const char* path);
+void remove_directory(const char* path);
+void create_named_directory(const char* name);
+
+typedef struct DateTime {
+	int year;
+	int month;
+	int day;
+	int hour;
+	int minute;
+	int second;
+	int millisecond;
+} DateTime;
+
+DateTime get_date_time();
+
+typedef struct MemoryAllocator MemoryAllocator;
+void ma_add(const char* name, MemoryAllocator* allocator);
+MemoryAllocator* ma_find(const char* name);
+void* ma_alloc(MemoryAllocator* allocator, u32 size);
+void ma_free(MemoryAllocator* allocator, void* buffer);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -238,51 +317,6 @@ PreparedText* prepare_text_ex(const char* text, f32 px, f32 py, const char* font
 void create_font(const char* id, const char* family, u32 size);
 void add_imgui_font(const char* id);
 
-
-//////////////////////////////////////////////////////
-// ███████╗███╗   ██╗ ██████╗ ██╗███╗   ██╗███████╗ //
-// ██╔════╝████╗  ██║██╔════╝ ██║████╗  ██║██╔════╝ //
-// █████╗  ██╔██╗ ██║██║  ███╗██║██╔██╗ ██║█████╗   //
-// ██╔══╝  ██║╚██╗██║██║   ██║██║██║╚██╗██║██╔══╝   //
-// ███████╗██║ ╚████║╚██████╔╝██║██║ ╚████║███████╗ //
-// ╚══════╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝╚═╝  ╚═══╝╚══════╝ //
-//////////////////////////////////////////////////////
-
-void set_exit_game();
-const char* get_game_hash();
-void set_target_fps(f64 fps);
-f64 get_target_fps();
-
-
-// TIMERS
-void tm_add(const char* name);
-void tm_begin(const char* name);
-void tm_end(const char* name);
-double tm_average(const char* name);
-double tm_last(const char* name);
-double tm_largest(const char* name);
-double tm_smallest(const char* name);
-
-
-// NAMED PATHS
-typedef struct {
-    const char* name;
-    const char* path;
-} NamedPath;
-
-typedef struct {
-	NamedPath* named_paths;
-	u32 size;
-} NamedPathResult;
-
-NamedPathResult find_all_named_paths();
-
-void add_install_path(const char* name, const char* relative_path);
-void add_engine_path(const char* name, const char* relative_path);
-void add_write_path(const char* name, const char* relative_path);
-void add_named_subpath(const char* name, const char* parent_name, const char* relative_path);
-tstring resolve_named_path(const char* name);
-tstring resolve_format_path(const char* name, const char* file_name);
 
 
 ////////////////////////////////////////////////////////
@@ -802,43 +836,6 @@ void              sdf_oriented_box_ex(SdfRenderer* renderer, float px, float py,
 void              sdf_grid(SdfRenderer* renderer, u32 grid_width, u32 grid_size);
 
 
-
-
-///////////////////////
-//  ██████╗ ███████╗ //
-// ██╔═══██╗██╔════╝ //
-// ██║   ██║███████╗ //
-// ██║   ██║╚════██║ //
-// ╚██████╔╝███████║ //
-//  ╚═════╝ ╚══════╝ //
-///////////////////////
- 
-bool does_path_exist(const char* path);
-bool is_regular_file(const char* path);
-bool is_directory(const char* path);
-void create_directory(const char* path);
-void remove_directory(const char* path);
-void create_named_directory(const char* name);
-
-typedef struct DateTime {
-	int year;
-	int month;
-	int day;
-	int hour;
-	int minute;
-	int second;
-	int millisecond;
-} DateTime;
-
-DateTime get_date_time();
-
-void ma_add(const char* name, MemoryAllocator* allocator);
-MemoryAllocator* ma_find(const char* name);
-void* ma_alloc(MemoryAllocator* allocator, u32 size);
-void ma_free(MemoryAllocator* allocator, void* buffer);
-
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ██╗███╗   ██╗██████╗ ██╗   ██╗████████╗     █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗ //
 // ██║████╗  ██║██╔══██╗██║   ██║╚══██╔══╝    ██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝ //
@@ -1078,7 +1075,7 @@ function tdengine.handle_error(message)
 
   -- The stack trace contains absolute paths, which are just hard to read. Also, if the path is long, it is
   -- shortened with "...". Remove the absolute part of the path, including the "..."
-  local install_dir = tdengine.ffi.resolve_named_path('install'):to_interned()
+  local install_dir = tdengine.ffi.dn_paths_resolve('install'):to_interned()
   local escaped_install = install_dir:gsub('%.', '%%.')
   local last_path_element = install_dir:match("([^/]+)$")
   local pattern = '%.%.%.(.*)/' .. last_path_element
@@ -1279,27 +1276,27 @@ function tdengine.init_phase_0()
     return collected_paths
   end
   
-  local file_path = ffi.string(ffi.C.resolve_named_path('engine_paths').data)
+  local file_path = ffi.string(ffi.C.dn_paths_resolve('engine_paths').data)
 	local path_info = dofile(file_path)
 
 	local engine_paths = collect_paths(path_info.engine_paths)
 	for index, path in pairs(engine_paths) do
-		ffi.C.add_engine_path(path.name, path.path)
+		ffi.C.dn_paths_add_engine_subpath(path.name, path.path)
 	end
 
   local install_paths = collect_paths(path_info.install_paths)
 	for index, path in pairs(install_paths) do
-		ffi.C.add_install_path(path.name, path.path)
+		ffi.C.dn_paths_add_install_subpath(path.name, path.path)
 	end
 
   local app_paths = collect_paths(path_info.app_paths)
 	for index, path in pairs(app_paths) do
-		ffi.C.add_named_subpath(path.name, 'app', path.path)
+		ffi.C.dn_paths_add_subpath(path.name, 'app', path.path)
 	end
 
 	local write_paths = collect_paths(path_info.write_paths)
 	for index, path in pairs(write_paths) do
-		ffi.C.add_write_path(path.name, path.path)
+		ffi.C.dn_paths_add_write_subpath(path.name, path.path)
 	end
 
   -- We need a couple of files to even be able to load other files (since they
@@ -1315,7 +1312,7 @@ function tdengine.init_phase_0()
   }
 
   for _, file_name in pairs(loader) do
-    local file_path = ffi.string(ffi.C.resolve_format_path('engine_script', file_name).data)
+    local file_path = ffi.string(ffi.C.dn_paths_resolve_format('engine_script', file_name).data)
     dofile(file_path)
   end
 

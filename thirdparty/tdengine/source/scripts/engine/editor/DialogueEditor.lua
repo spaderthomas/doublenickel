@@ -488,7 +488,7 @@ function DialogueEditor:load(name_or_path)
 		return
 	end
 
-	local file_path = tdengine.ffi.resolve_format_path('dialogue_metadata', file_name):to_interned()
+	local file_path = tdengine.ffi.dn_paths_resolve_format('dialogue_metadata', file_name):to_interned()
 	self.gnodes = tdengine.module.read(file_path)
 	for id, gnode in pairs(self.gnodes) do
 		gnode.position = tdengine.vec2(gnode.position)
@@ -552,7 +552,7 @@ function DialogueEditor:save_impl(dialogue_name)
 		}
 	end
 
-	local file_path = tdengine.ffi.resolve_format_path('dialogue_metadata', dialogue_name):to_interned()
+	local file_path = tdengine.ffi.dn_paths_resolve_format('dialogue_metadata', dialogue_name):to_interned()
 	tdengine.module.write(file_path, gnodes, tdengine.module.WriteOptions.Compact)
 
 	-- Bookkeeping: Update the word count and mark the graph as clean
@@ -574,7 +574,7 @@ function DialogueEditor:new(name)
 	self.nodes = self.data.nodes
 	self.gnodes = self.data.gnodes
 
-	local directory = tdengine.ffi.resolve_format_path('dialogue_folder', name):to_interned()
+	local directory = tdengine.ffi.dn_paths_resolve_format('dialogue_folder', name):to_interned()
 	tdengine.ffi.remove_directory(directory)
 	tdengine.ffi.create_directory(directory)
 	self:save(name)
@@ -582,7 +582,7 @@ function DialogueEditor:new(name)
 end
 
 function DialogueEditor:delete(name)
-	local directory = tdengine.ffi.resolve_format_path('dialogue_folder', name):to_interned()
+	local directory = tdengine.ffi.dn_paths_resolve_format('dialogue_folder', name):to_interned()
 	tdengine.ffi.remove_directory(directory)
 
 	self:new('default')

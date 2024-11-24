@@ -1,3 +1,5 @@
+#ifndef DN_ENGINE_H
+#define DN_ENGINE_H
 struct Engine {
 	float32 target_fps;
 	float32 dt;
@@ -9,8 +11,63 @@ struct Engine {
 };
 Engine engine;
 
-bool is_game_done();
-bool exceeded_frame_time();
+void dn_engine_init();
+void dn_engine_update();
 
-FM_LUA_EXPORT void set_exit_game();
-FM_LUA_EXPORT const char* get_game_hash();
+FM_LUA_EXPORT void dn_engine_set_exit_game();
+FM_LUA_EXPORT const char* dn_engine_get_game_hash();
+FM_LUA_EXPORT void dn_engine_set_target_fps(double fps);
+FM_LUA_EXPORT double dn_engine_get_target_fps();
+FM_LUA_EXPORT bool dn_engine_exceeded_frame_time();
+FM_LUA_EXPORT bool dn_engine_should_exit();
+#endif
+
+
+
+#ifdef DN_ENGINE_IMPLEMENTATION
+void dn_engine_init() {
+	dn_engine_set_target_fps(60);
+}
+
+void dn_engine_update() {
+	dn_time_metric_begin("frame");
+
+	// Clearly this is not representative of elapsed real time
+	engine.elapsed_time += engine.dt;
+	engine.frame++;
+}
+
+void dn_engine_set_target_fps(float64 fps) {
+	engine.target_fps = fps;
+	engine.dt = 1.f / fps;
+}
+
+
+double dn_engine_get_target_fps() {
+	return engine.target_fps;
+}
+
+void dn_engine_set_exit_game() {
+	engine.exit_game = true;
+}
+
+const char* dn_engine_get_game_hash() {
+	return "hehe";
+	// return GIT_HASH;
+}
+
+bool dn_engine_should_exit() {
+	bool done = false;
+	done |= (bool)glfwWindowShouldClose(window.handle);
+	done |= engine.exit_game;
+	return done;
+}
+
+bool dn_engine_exceeded_frame_time() {
+	auto& frame_timer = time_metrics["frame"];
+	auto now = glfwGetTime();
+	double elapsed = (now - frame_timer.time_begin);
+	return elapsed >= engine.dt;
+}
+
+#endif

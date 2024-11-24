@@ -21,14 +21,14 @@ function tdengine.state.write(file_name, state)
     value.__editor = nil
   end
 
-  local file_path = tdengine.ffi.resolve_format_path('state', file_name):to_interned()
+  local file_path = tdengine.ffi.dn_paths_resolve_format('state', file_name):to_interned()
   state = state or tdengine.state.data
 
   tdengine.module.write(file_path, state, tdengine.module.WriteOptions.Pretty)
 end
 
 function tdengine.state.read_file(file_name)
-  local file_path = tdengine.ffi.resolve_format_path('state', file_name):to_interned()
+  local file_path = tdengine.ffi.dn_paths_resolve_format('state', file_name):to_interned()
   return tdengine.state.read(file_path)
 end
 

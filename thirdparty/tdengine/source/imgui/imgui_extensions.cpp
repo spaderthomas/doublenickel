@@ -66,11 +66,11 @@ void shutdown_imgui() {
 }
 
 void use_editor_layout(const char* file_name) {
-	layout_to_load = resolve_format_path_ex("layout", file_name, &standard_allocator);
+	layout_to_load = dn_paths_resolve_format_ex("layout", file_name, &standard_allocator);
 }
 
 void save_editor_layout(const char* file_name) {
-	auto file_path = resolve_format_path("layout", file_name);	
+	auto file_path = dn_paths_resolve_format("layout", file_name);	
 	ImGui::SaveIniSettingsToDisk(file_path);
 }
 

@@ -51,26 +51,26 @@ local function collect_paths(paths, full_parent)
 end
 
 function tdengine.paths.init(path_info)
-	local file_path = tdengine.ffi.resolve_named_path('path_info'):to_interned()
+	local file_path = tdengine.ffi.dn_paths_resolve('path_info'):to_interned()
 	local path_info = tdengine.module.read(file_path)
 	self.paths = tdengine.data_types.Array:new()
 
 	local install_paths = collect_paths(path_info.install_paths)
 	for path in install_paths:iterate_values() do
 		path.named_parent = path.named_parent or 'install'
-		tdengine.ffi.add_named_subpath(path.name, path.named_parent, path.full_path)
+		tdengine.ffi.dn_paths_add_subpath(path.name, path.named_parent, path.full_path)
 	end
 
 	local write_paths = collect_paths(path_info.write_paths)
 	for path in write_paths:iterate_values() do
 		path.named_parent = path.named_parent or 'write'
-		tdengine.ffi.add_named_subpath(path.name, path.named_parent, path.full_path)
+		tdengine.ffi.dn_paths_add_subpath(path.name, path.named_parent, path.full_path)
 	end
 
 	local app_paths = collect_paths(path_info.app_paths)
 	for path in app_paths:iterate_values() do
 		path.named_parent = path.named_parent or 'app'
-		tdengine.ffi.add_named_subpath(path.name, path.named_parent, path.full_path)
+		tdengine.ffi.dn_paths_add_subpath(path.name, path.named_parent, path.full_path)
 	end
 
 
@@ -80,7 +80,7 @@ function tdengine.paths.init(path_info)
 end
 
 function tdengine.paths.iterate()
-	local named_paths = tdengine.ffi.find_all_named_paths()
+	local named_paths = tdengine.ffi.dn_paths_find_all()
 	local i = -1
 
 	local function iterator()

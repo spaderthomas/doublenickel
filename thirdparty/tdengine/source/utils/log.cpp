@@ -41,7 +41,7 @@ void Log::write_impl(uint8_t flags, const char* fmt, va_list fmt_args) {
 }
 
 void init_log() {
-	tdns_log.file_path = resolve_named_path_ex("log", &standard_allocator);
+	tdns_log.file_path = dn_paths_resolve_ex("log", &standard_allocator);
 	
 	FILE* file = fopen(tdns_log.file_path, "w");
 	if (!file) {
@@ -54,6 +54,6 @@ void init_log() {
 
 	// We have to initialize paths before we can create the log file, so make sure that as soon as the
 	// file is setup that we log the base directories we're running out of
-	tdns_log.write("install directory = %s", resolve_named_path("install"));
-	tdns_log.write("write directory = %s", resolve_named_path("write"));
+	tdns_log.write("install directory = %s", dn_paths_resolve("install"));
+	tdns_log.write("write directory = %s", dn_paths_resolve("write"));
 }

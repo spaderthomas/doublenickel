@@ -422,7 +422,7 @@ function EngineStats:calculate_framerate()
 		local metrics = tdengine.time_metric.query_all()
 		table.merge(metrics, self.metrics)
 
-		self.metrics.target_fps = tdengine.ffi.get_target_fps()
+		self.metrics.target_fps = tdengine.ffi.dn_engine_get_target_fps()
 		self.metrics.actual_fps = math.floor(1000.0 / self.metrics.frame.average)
 	end
 end

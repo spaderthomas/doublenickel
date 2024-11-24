@@ -10,15 +10,15 @@ end
 
 function tdengine.time_metric.add(name)
   self.metrics:add(name)
-  tdengine.ffi.tm_add(name)
+  tdengine.ffi.dn_time_metric_add(name)
 end
 
 function tdengine.time_metric.query(name)
 	local metrics = {
-		average = tdengine.ffi.tm_average(name),
-		last = tdengine.ffi.tm_last(name),
-		largest = tdengine.ffi.tm_largest(name),
-		smallest = tdengine.ffi.tm_smallest(name)
+		average = tdengine.ffi.dn_time_metric_average(name),
+		last = tdengine.ffi.dn_time_metric_last(name),
+		largest = tdengine.ffi.dn_time_metric_largest(name),
+		smallest = tdengine.ffi.dn_time_metric_smallest(name)
 	}
 
   for key, value in pairs(metrics) do

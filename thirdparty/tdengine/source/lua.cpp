@@ -101,7 +101,7 @@ LuaState::LuaState() {
 		
 		auto manager = (LuaState*)userdata;
 
-		auto stripped_path = strip_named_path("install", event->file_path);
+		auto stripped_path = dn_paths_strip("install", event->file_path);
 		tdns_log.write("Hotloading script: %s", stripped_path);
 		manager->script_file(event->file_path);
 	};
@@ -164,7 +164,7 @@ bool LuaState::script_file(string file_path) {
 }
 
 void LuaState::script_named_dir(const_string name) {
-	auto path = resolve_named_path(name);
+	auto path = dn_paths_resolve(name);
 	script_dir(path);
 }
 
@@ -300,7 +300,7 @@ void LuaState::init_phase_0() {
 	lua_settable(l, -3);
 	// PHASE 0:
 	// Create the fundamental tables that the engine uses
-	auto bootstrap = resolve_named_path("bootstrap");
+	auto bootstrap = dn_paths_resolve("bootstrap");
 	lua_manager.script_file(bootstrap);
 
 	lua_pushstring(l, "init_phase_0");
@@ -344,10 +344,10 @@ void LuaState::init_phase_2() {
 	// Lua itself has been initialized, and we've loaded in other assets our scripts
 	// may use (shaders, fonts, etc). The last step is to load the game scripts and
 	// configure the game itself through Lua
-	arr_push(&script_dirs, resolve_named_path_ex("engine_components", &standard_allocator));
-	arr_push(&script_dirs, resolve_named_path_ex("engine_editor", &standard_allocator));
-	arr_push(&script_dirs, resolve_named_path_ex("engine_entities", &standard_allocator));
-	arr_push(&script_dirs, resolve_named_path_ex("app", &standard_allocator));
+	arr_push(&script_dirs, dn_paths_resolve_ex("engine_components", &standard_allocator));
+	arr_push(&script_dirs, dn_paths_resolve_ex("engine_editor", &standard_allocator));
+	arr_push(&script_dirs, dn_paths_resolve_ex("engine_entities", &standard_allocator));
+	arr_push(&script_dirs, dn_paths_resolve_ex("app", &standard_allocator));
 
 	arr_for(lua_manager.script_dirs, directory) {
 		lua_manager.script_dir(*directory);

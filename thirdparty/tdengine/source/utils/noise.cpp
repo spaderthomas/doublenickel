@@ -88,7 +88,7 @@ void init_perlin_texture() {
 #endif
 	
 	const char* file_name = "perlin.png";
-	auto file_path = resolve_format_path("image", file_name);
+	auto file_path = dn_paths_resolve_format("image", file_name);
 	create_sprite(file_name , file_path);
 }
 

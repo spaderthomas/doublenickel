@@ -1,5 +1,5 @@
 function tdengine.save.init()
-  local directory = tdengine.ffi.resolve_named_path('saves'):to_interned()
+  local directory = tdengine.ffi.dn_paths_resolve('saves'):to_interned()
   log.info('Initializing save directory; directory = %s', directory)
 
   tdengine.ffi.create_named_directory('saves')
@@ -15,7 +15,7 @@ function tdengine.save.create()
     scene = tdengine.current_scene,
   }
 
-  local file_path = tdengine.ffi.resolve_format_path('save', save_name):to_interned()
+  local file_path = tdengine.ffi.dn_paths_resolve_format('save', save_name):to_interned()
   tdengine.module.write(file_path, save, tdengine.module.WriteOptions.Pretty)
 
   tdengine.log(string.format('Created save file; file_path = %s', file_path))
@@ -23,14 +23,14 @@ end
 
 function tdengine.save.read(file_name)
   file_name = tdengine.strip_extension(file_name)
-  local file_path = tdengine.ffi.resolve_format_path('save', file_name):to_interned()
+  local file_path = tdengine.ffi.dn_paths_resolve_format('save', file_name):to_interned()
   return tdengine.module.read(file_path)
 end
 
 function tdengine.save.list()
   local saves = {}
 
-  local save_dir = tdengine.ffi.resolve_named_path('saves'):to_interned()
+  local save_dir = tdengine.ffi.dn_paths_resolve('saves'):to_interned()
   local files = tdengine.scandir(save_dir)
   for index, file_name in pairs(files) do
     table.insert(saves, tdengine.save.open(file_name))
@@ -40,7 +40,7 @@ function tdengine.save.list()
 end
 
 function tdengine.save.count()
-  local save_dir = tdengine.ffi.resolve_named_path('saves'):to_interned()
+  local save_dir = tdengine.ffi.dn_paths_resolve('saves'):to_interned()
   local files = tdengine.scandir(save_dir)
   return #files
 end
@@ -96,7 +96,7 @@ function tdengine.scene.update()
 end
 
 function tdengine.scene.read(file_name)
-  local file_path = tdengine.ffi.resolve_format_path('scene', file_name):to_interned()
+  local file_path = tdengine.ffi.dn_paths_resolve_format('scene', file_name):to_interned()
   return tdengine.module.read(file_path)
 end
 
@@ -107,7 +107,7 @@ function tdengine.scene.write(scene, file_name)
     serialized_entities[entity.uuid] = serialized_entity
   end
 
-  local file_path = tdengine.ffi.resolve_format_path('scene', file_name):to_interned()
+  local file_path = tdengine.ffi.dn_paths_resolve_format('scene', file_name):to_interned()
   tdengine.module.write(file_path, serialized_entities, tdengine.module.WriteOptions.Pretty)
 end
 

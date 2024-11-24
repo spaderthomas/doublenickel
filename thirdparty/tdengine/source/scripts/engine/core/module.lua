@@ -23,7 +23,7 @@ tdengine.module.WriteOptions = tdengine.enum.define(
 )
 
 function tdengine.module.write_to_named_path(name, data, pretty)
-  local file_path = tdengine.ffi.resolve_named_path(name):to_interned()
+  local file_path = tdengine.ffi.dn_paths_resolve(name):to_interned()
   local is_pretty = pretty == tdengine.module.WriteOptions.Pretty
 
   tdengine.write_file_to_return_table(file_path, data, pretty)
@@ -40,6 +40,6 @@ function tdengine.module.read(file_path)
 end
 
 function tdengine.module.read_from_named_path(name)
-  local file_path = tdengine.ffi.resolve_named_path(name):to_interned()
+  local file_path = tdengine.ffi.dn_paths_resolve(name):to_interned()
   return tdengine.module.read(file_path)
 end

@@ -103,7 +103,7 @@ void SteamManager::OnGetTicketForWebApiResponse(GetTicketForWebApiResponse_t* ca
 	
 void open_steam_page(const char* utm) {
 	const char* url_plain = "https://store.steampowered.com/app/480";
-	const char* url_utm = "https://store.steampowered.com/app/480?utm_campaign=%s";
+	const char* url_utm = "https://store.steampowered.com/app/480?udn_time_metric_campaign=%s";
 
 	auto url = bump_allocator.alloc_path();
 	if (utm) {

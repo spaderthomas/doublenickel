@@ -191,7 +191,7 @@ function MainMenu:Dialogue()
 		-- The hotkey entity in the editor takes care of the hotkey part
 		local dialogue_editor = tdengine.find_entity_editor('DialogueEditor')
 		if imgui.MenuItem('Open', 'Ctrl+O') then
-			local directory = tdengine.ffi.resolve_named_path('dialogues'):to_interned()
+			local directory = tdengine.ffi.dn_paths_resolve('dialogues'):to_interned()
 			imgui.SetFileBrowserWorkDir(directory)
 			imgui.OpenFileBrowser()
 			self.state = state.choosing_dialogue
@@ -240,7 +240,7 @@ function MainMenu:Window()
 	if imgui.BeginMenu('Window') then
 		if imgui.BeginMenu('Layout') then
 			if imgui.BeginMenu('Open') then
-				local layout_dir = tdengine.ffi.resolve_named_path('layouts'):to_interned()
+				local layout_dir = tdengine.ffi.dn_paths_resolve('layouts'):to_interned()
 				local layouts = tdengine.scandir(layout_dir)
 				for i, layout in pairs(layouts) do
 					if imgui.MenuItem(tdengine.strip_extension(layout)) then
@@ -411,7 +411,7 @@ function MainMenu:Scene()
 		local scene_editor = tdengine.find_entity_editor('SceneEditor')
 
 		if imgui.BeginMenu('Open') then
-			local scene_dir = tdengine.ffi.resolve_named_path('scenes'):to_interned()
+			local scene_dir = tdengine.ffi.dn_paths_resolve('scenes'):to_interned()
 			local scenes = tdengine.scandir(scene_dir)
 			for index, name in pairs(scenes) do
 				scenes[index] = string.gsub(name, '.lua', '')

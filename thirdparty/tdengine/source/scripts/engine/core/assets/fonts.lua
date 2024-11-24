@@ -4,7 +4,7 @@ end
 
 function tdengine.fonts.init()
   for font_id, font_data in pairs(tdengine.fonts.data) do
-    local file_path = tdengine.ffi.resolve_format_path('font', font_data.font):to_interned()
+    local file_path = tdengine.ffi.dn_paths_resolve_format('font', font_data.font):to_interned()
     tdengine.ffi.create_font(font_id, file_path, font_data.size)
   end
 

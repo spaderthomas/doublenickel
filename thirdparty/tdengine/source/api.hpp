@@ -32,11 +32,6 @@ namespace API {
 	// sprite
 	int sprite_size(lua_State* l);
 
-	// engine
-	int get_target_fps(lua_State* l);
-	int get_spf(lua_State* l);
-	int get_fps(lua_State* l);
-	int get_timer_metrics(lua_State* l);
 }
 
 

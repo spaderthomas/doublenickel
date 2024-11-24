@@ -49,7 +49,7 @@ bool TextureAtlas::is_dirty() {
 
 	// If, for some reason, the resulting PNG does not exist on disk, then we sure had better
 	// rebuild the atlas! This is also an easy way to manually force the atlas to rebuild.
-	auto output_path = resolve_format_path("atlas", name);
+	auto output_path = dn_paths_resolve_format("atlas", name);
 	dirty |= !std::filesystem::exists(output_path);
 	#endif
 
@@ -58,7 +58,7 @@ bool TextureAtlas::is_dirty() {
 
 void TextureAtlas::load_to_memory() {
 	// Load the atlas PNG into the GPU
-	auto file_path = resolve_format_path("atlas", name);
+	auto file_path = dn_paths_resolve_format("atlas", name);
 	
 	i32 width;
 	i32 height;
@@ -404,7 +404,7 @@ void TextureAtlas::write_to_config() {
 	lua_gettable(l, -2);
 
 	// First argument: config file path
-	auto file_path = resolve_named_path("texture_info");
+	auto file_path = dn_paths_resolve("texture_info");
 	lua_pushstring(l, file_path);
 
 	// Second argument: config data
@@ -424,7 +424,7 @@ void TextureAtlas::write_to_config() {
 }
 
 void TextureAtlas::write_to_png() {
-	auto file_path = resolve_format_path_ex("atlas", name, &standard_allocator);
+	auto file_path = dn_paths_resolve_format_ex("atlas", name, &standard_allocator);
 	stbi_write_png(file_path, TEXTURE_ATLAS_SIZE, TEXTURE_ATLAS_SIZE, 4, buffer.data, 0);
 	
 	standard_allocator.free(file_path);
@@ -537,7 +537,7 @@ void init_texture_atlas() {
 			DEFER_POP(l);
 
 			auto subdirectory = lua_tostring(l, -1);
-			auto directory = resolve_format_path_ex("image", subdirectory, &standard_allocator);
+			auto directory = dn_paths_resolve_format_ex("image", subdirectory, &standard_allocator);
 			arr_push(&atlas->directories, directory);
 			atlas->file_monitor->add_directory(directory);
 		}
@@ -640,7 +640,7 @@ void create_sprite_ex(Sprite* sprite, const char* id, u8* data, i32 width, i32 h
 /////////////////
 
 void init_screenshots() {
-	auto screenshots = resolve_named_path("screenshots");
+	auto screenshots = dn_paths_resolve("screenshots");
 	if (!std::filesystem::exists(screenshots)) return;
 	for (directory_iterator it(screenshots); it != directory_iterator(); ++it) {
 		auto path = it->path().string();

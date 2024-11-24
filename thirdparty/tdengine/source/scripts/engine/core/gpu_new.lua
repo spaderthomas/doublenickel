@@ -170,7 +170,7 @@ local todo = [[
 - Reimplement all of the post processing stuff
   - Reimplement ping-pong
 - Figure out the actual minimum number of command buffers you need
-- Make the benchmark timer API better (e.g. local timer = tdengine.ffi.tm_begin(Timer.Render); timer:end())
+- Make the benchmark timer API better (e.g. local timer = tdengine.ffi.dn_time_metric_begin(Timer.Render); timer:end())
 - Fully remove gpu.lua
 - Merge into the base engine...?
 ]]
@@ -205,7 +205,7 @@ function tdengine.gpu.init()
 end
 
 function tdengine.gpu.render()
-  tdengine.ffi.tm_begin('render')
+  tdengine.ffi.dn_time_metric_begin('render')
 
   tdengine.lifecycle.run_callback(tdengine.lifecycle.callbacks.on_render_scene)
   tdengine.lifecycle.run_callback(tdengine.lifecycle.callbacks.on_scene_rendered)
@@ -216,7 +216,7 @@ function tdengine.gpu.render()
   tdengine.app:on_swapchain_ready()
   tdengine.ffi.gpu_swap_buffers()
 
-  tdengine.ffi.tm_end('render')
+  tdengine.ffi.dn_time_metric_end('render')
 end
 
 

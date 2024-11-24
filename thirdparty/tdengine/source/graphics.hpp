@@ -330,32 +330,32 @@ FM_LUA_EXPORT void              gpu_set_world_space(GpuCommandBuffer* command_bu
 FM_LUA_EXPORT void              gpu_set_camera(GpuCommandBuffer* command_buffer, Vector2 camera);
 FM_LUA_EXPORT GpuPipeline*      gpu_pipeline_create(GpuPipelineDescriptor descriptor);
 FM_LUA_EXPORT GpuUniform*       gpu_uniform_create(GpuUniformDescriptor descriptor);
-FM_LUA_EXPORT GpuBuffer*         gpu_buffer_create(GpuBufferDescriptor descriptor);
-FM_LUA_EXPORT void               gpu_buffer_bind(GpuBuffer* buffer);
-FM_LUA_EXPORT void               gpu_buffer_bind_base(GpuBuffer* buffer, u32 base);
-FM_LUA_EXPORT void               gpu_buffer_sync(GpuBuffer* buffer, void* data, u32 size);
-FM_LUA_EXPORT void               gpu_buffer_sync_subdata(GpuBuffer* buffer, void* data, u32 byte_size, u32 byte_offset);
-FM_LUA_EXPORT void               gpu_buffer_zero(GpuBuffer* buffer, u32 size);
-FM_LUA_EXPORT GpuBackedBuffer    gpu_backed_buffer_create(GpuBufferDescriptor descriptor);
-FM_LUA_EXPORT u32                gpu_backed_buffer_size(GpuBackedBuffer* buffer);
-FM_LUA_EXPORT void               gpu_backed_buffer_clear(GpuBackedBuffer* buffer);
-FM_LUA_EXPORT u8*                gpu_backed_buffer_push(GpuBackedBuffer* buffer, void* data, u32 num_elements);
-FM_LUA_EXPORT void               gpu_backed_buffer_sync(GpuBackedBuffer* buffer);
-FM_LUA_EXPORT GpuShader*         gpu_shader_create(GpuShaderDescriptor descriptor);
-FM_LUA_EXPORT GpuShader*         gpu_shader_find(const char* name);
-FM_LUA_EXPORT GpuRenderTarget*   gpu_render_target_create(GpuRenderTargetDescriptor descriptor);
-FM_LUA_EXPORT GpuRenderTarget*   gpu_acquire_swapchain();
-FM_LUA_EXPORT void               gpu_render_target_bind(GpuRenderTarget* target);
-FM_LUA_EXPORT void               gpu_render_target_clear(GpuRenderTarget* target);
-FM_LUA_EXPORT void               gpu_render_target_blit(GpuRenderTarget* source, GpuRenderTarget* destination);
-FM_LUA_EXPORT void               gpu_memory_barrier(GpuMemoryBarrier barrier);
-FM_LUA_EXPORT void               gpu_dispatch_compute(GpuBuffer* buffer, u32 size);
-FM_LUA_EXPORT void               gpu_swap_buffers();
-FM_LUA_EXPORT void               gpu_error_clear();
-FM_LUA_EXPORT tstring            gpu_error_read();
-FM_LUA_EXPORT void               gpu_error_log_one();
-FM_LUA_EXPORT void               gpu_error_log_all();
-FM_LUA_EXPORT void               gpu_set_resource_name(GpuResourceId id, u32 handle, u32 name_len, const char* name);
+FM_LUA_EXPORT GpuBuffer*        gpu_buffer_create(GpuBufferDescriptor descriptor);
+FM_LUA_EXPORT void              gpu_buffer_bind(GpuBuffer* buffer);
+FM_LUA_EXPORT void              gpu_buffer_bind_base(GpuBuffer* buffer, u32 base);
+FM_LUA_EXPORT void              gpu_buffer_sync(GpuBuffer* buffer, void* data, u32 size);
+FM_LUA_EXPORT void              gpu_buffer_sync_subdata(GpuBuffer* buffer, void* data, u32 byte_size, u32 byte_offset);
+FM_LUA_EXPORT void              gpu_buffer_zero(GpuBuffer* buffer, u32 size);
+FM_LUA_EXPORT GpuBackedBuffer   gpu_backed_buffer_create(GpuBufferDescriptor descriptor);
+FM_LUA_EXPORT u32               gpu_backed_buffer_size(GpuBackedBuffer* buffer);
+FM_LUA_EXPORT void              gpu_backed_buffer_clear(GpuBackedBuffer* buffer);
+FM_LUA_EXPORT u8*               gpu_backed_buffer_push(GpuBackedBuffer* buffer, void* data, u32 num_elements);
+FM_LUA_EXPORT void              gpu_backed_buffer_sync(GpuBackedBuffer* buffer);
+FM_LUA_EXPORT GpuShader*        gpu_shader_create(GpuShaderDescriptor descriptor);
+FM_LUA_EXPORT GpuShader*        gpu_shader_find(const char* name);
+FM_LUA_EXPORT GpuRenderTarget*  gpu_render_target_create(GpuRenderTargetDescriptor descriptor);
+FM_LUA_EXPORT GpuRenderTarget*  gpu_acquire_swapchain();
+FM_LUA_EXPORT void              gpu_render_target_bind(GpuRenderTarget* target);
+FM_LUA_EXPORT void              gpu_render_target_clear(GpuRenderTarget* target);
+FM_LUA_EXPORT void              gpu_render_target_blit(GpuRenderTarget* source, GpuRenderTarget* destination);
+FM_LUA_EXPORT void              gpu_memory_barrier(GpuMemoryBarrier barrier);
+FM_LUA_EXPORT void              gpu_dispatch_compute(GpuBuffer* buffer, u32 size);
+FM_LUA_EXPORT void              gpu_swap_buffers();
+FM_LUA_EXPORT void              gpu_error_clear();
+FM_LUA_EXPORT tstring           gpu_error_read();
+FM_LUA_EXPORT void              gpu_error_log_one();
+FM_LUA_EXPORT void              gpu_error_log_all();
+FM_LUA_EXPORT void              gpu_set_resource_name(GpuResourceId id, u32 handle, u32 name_len, const char* name);
 
 //////////////
 // INTERNAL //
@@ -1013,7 +1013,7 @@ void gpu_init() {
 	};
 	td_gpu.shader_monitor = arr_push(&file_monitors);
 	td_gpu.shader_monitor->init(reload_all_shaders, FileChangeEvent::Modified, nullptr);
-	td_gpu.shader_monitor->add_directory(resolve_named_path("shaders"));
+	td_gpu.shader_monitor->add_directory(dn_paths_resolve("shaders"));
 }
 
 

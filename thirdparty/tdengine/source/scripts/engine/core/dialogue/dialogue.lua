@@ -45,7 +45,7 @@ function tdengine.dialogue.save(name, data, pretty)
     serialized_data.nodes[uuid] = node:serialize()
   end
 
-  local file_path = tdengine.ffi.resolve_format_path('dialogue_source', name):to_interned()
+  local file_path = tdengine.ffi.dn_paths_resolve_format('dialogue_source', name):to_interned()
   tdengine.module.write(file_path, serialized_data, tdengine.module.WriteOptions.Pretty)
 
   -- The cache always reflects what is on disk; so, if we update the copy on disk at runtime,
@@ -89,7 +89,7 @@ function tdengine.dialogue.find_node(graph, fid)
 end
 
 function tdengine.dialogue.list()
-  local directory = tdengine.ffi.resolve_named_path('dialogues'):to_interned()
+  local directory = tdengine.ffi.dn_paths_resolve('dialogues'):to_interned()
 
   local dialogues = {}
   for index, dialogue in ipairs(tdengine.scandir(directory)) do
@@ -127,7 +127,7 @@ end
 
 function tdengine.dialogue.cache:reload_single(name_or_path)
   local file_name = tdengine.dialogue.clean_name(name_or_path)
-  local file_path = tdengine.ffi.resolve_format_path('dialogue_source', file_name):to_interned()
+  local file_path = tdengine.ffi.dn_paths_resolve_format('dialogue_source', file_name):to_interned()
   tdengine.dialogue.data[file_name] = tdengine.module.read(file_path)
 end
 

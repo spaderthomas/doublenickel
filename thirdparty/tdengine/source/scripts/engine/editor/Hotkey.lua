@@ -71,7 +71,7 @@ function Hotkey:new_dialogue()
 end
 
 function Hotkey:open_dialogue()
-  local directory = tdengine.ffi.resolve_named_path('dialogues'):to_interned()
+  local directory = tdengine.ffi.dn_paths_resolve('dialogues'):to_interned()
   imgui.SetFileBrowserPwd(directory)
   imgui.OpenFileBrowser()
 
@@ -93,7 +93,7 @@ function Hotkey:toggle_play_mode()
 end
 
 function Hotkey:open_scene()
-  local scenes = tdengine.ffi.resolve_named_path('scenes'):to_interned()
+  local scenes = tdengine.ffi.dn_paths_resolve('scenes'):to_interned()
   imgui.SetFileBrowserWorkDir(scenes)
   imgui.OpenFileBrowser()
 

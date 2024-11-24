@@ -17,7 +17,7 @@ void update_assets() {
 				background->deinit();
 			}
 
-			if (exceeded_frame_time()) break;
+			if (dn_engine_exceeded_frame_time()) break;
 		}
 	}
 }
@@ -103,7 +103,7 @@ void AssetLoader::process_completion_queue() {
 			
 		}
 
-		if (exceeded_frame_time()) break;
+		if (dn_engine_exceeded_frame_time()) break;
 	}
 
 	if (num_assets_loaded) {

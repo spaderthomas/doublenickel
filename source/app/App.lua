@@ -54,8 +54,8 @@ function App:on_init_game()
 		)
 	)
 
-	tdengine.ffi.set_window_icon(tdengine.ffi.resolve_format_path('image', 'logo/icon.png'):to_interned())
-	tdengine.ffi.set_target_fps(144)
+	tdengine.ffi.set_window_icon(tdengine.ffi.dn_paths_resolve_format('image', 'logo/icon.png'):to_interned())
+	tdengine.ffi.dn_engine_set_target_fps(144)
 
 	tdengine.gpu.build(tdengine.module.read_from_named_path('gpu_info'))
 

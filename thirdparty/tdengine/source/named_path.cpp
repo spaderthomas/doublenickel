@@ -1,4 +1,4 @@
-void add_named_path_ex(const char* name, const char* absolute_path) {
+void dn_paths_add_ex(const char* name, const char* absolute_path) {
 	if (named_paths.contains(name)) {
 		auto& existing_path = named_paths.at(name);
 		tdns_log.write("Tried to add named path, but name was already registered; name = %s, existing_path = %s, new_path = %s", name, existing_path.c_str(), absolute_path);
@@ -7,32 +7,32 @@ void add_named_path_ex(const char* name, const char* absolute_path) {
 	named_paths[name] = absolute_path;
 }
 
-void add_named_subpath(const char* name, const char* parent_name, const char* relative_path) {
+void dn_paths_add_subpath(const char* name, const char* parent_name, const char* relative_path) {
 	if (!name) return;
 	if (!parent_name) return;
 	if (!relative_path) return;
 	
-	auto parent_path = resolve_named_path(parent_name);
+	auto parent_path = dn_paths_resolve(parent_name);
 	auto absolute_path = bump_allocator.alloc_path();
 	snprintf(absolute_path, TD_MAX_PATH_LEN, "%s/%s", parent_path, relative_path);
 	
-	add_named_path_ex(name, absolute_path);
+	dn_paths_add_ex(name, absolute_path);
 }
 
-void add_install_path(const char* name, const char* relative_path) {
-	add_named_subpath(name, "install", relative_path);
+void dn_paths_add_install_subpath(const char* name, const char* relative_path) {
+	dn_paths_add_subpath(name, "install", relative_path);
 }
 
-void add_engine_path(const char* name, const char* relative_path) {
-	add_named_subpath(name, "engine", relative_path);
+void dn_paths_add_engine_subpath(const char* name, const char* relative_path) {
+	dn_paths_add_subpath(name, "engine", relative_path);
 }
 
-void add_write_path(const char* name, const char* relative_path) {
-	add_named_subpath(name, "write", relative_path);
+void dn_paths_add_write_subpath(const char* name, const char* relative_path) {
+	dn_paths_add_subpath(name, "write", relative_path);
 }
 
-tstring strip_named_path(const char* name, const char* absolute_path) {
-	auto named_path = resolve_named_path_ex(name, &bump_allocator);
+tstring dn_paths_strip(const char* name, const char* absolute_path) {
+	auto named_path = dn_paths_resolve_ex(name, &bump_allocator);
 	auto named_path_len = strlen(named_path);
 	auto absolute_path_len = strlen(absolute_path);
 	
@@ -48,11 +48,11 @@ tstring strip_named_path(const char* name, const char* absolute_path) {
 	return stripped_path + num_stripped;
 }
 
-tstring resolve_named_path(const char* name) {
-	return resolve_named_path_ex(name, &bump_allocator);
+tstring dn_paths_resolve(const char* name) {
+	return dn_paths_resolve_ex(name, &bump_allocator);
 }
 
-string resolve_named_path_ex(const char* name, MemoryAllocator* allocator) {
+string dn_paths_resolve_ex(const char* name, MemoryAllocator* allocator) {
 	if (!name) return nullptr;
 	
 	if (!named_paths.contains(name)) {
@@ -64,11 +64,11 @@ string resolve_named_path_ex(const char* name, MemoryAllocator* allocator) {
 	return copy_string(path.c_str(), path.length(), allocator);		
 }
 
-tstring resolve_format_path(const char* name, const char* file_name) {
-	return resolve_format_path_ex(name, file_name, &bump_allocator);
+tstring dn_paths_resolve_format(const char* name, const char* file_name) {
+	return dn_paths_resolve_format_ex(name, file_name, &bump_allocator);
 }
 
-string resolve_format_path_ex(const char* name, const char* file_name, MemoryAllocator* allocator) {
+string dn_paths_resolve_format_ex(const char* name, const char* file_name, MemoryAllocator* allocator) {
 	if (!name) return nullptr;
 	if (!file_name) return nullptr;
 	
@@ -84,8 +84,8 @@ string resolve_format_path_ex(const char* name, const char* file_name, MemoryAll
 	return resolved_path;
 }
 
-NamedPathResult find_all_named_paths() {
-	Array<NamedPath> collected_paths;
+dn_named_path_result_t dn_paths_find_all() {
+	Array<dn_named_path_t> collected_paths;
 	arr_init(&collected_paths, named_paths.size(), &bump_allocator);
 
 	for (auto& [name, path] : named_paths) {
@@ -120,14 +120,14 @@ tstring build_path(const char* relative_path) {
 }
 
 void set_install_paths() {
-	add_named_path_ex("install", build_path(app.install_path));
-	add_named_path_ex("engine", build_path(app.engine_path));
-	add_named_path_ex("app", build_path(app.app_path));
+	dn_paths_add_ex("install", build_path(app.install_path));
+	dn_paths_add_ex("engine", build_path(app.engine_path));
+	dn_paths_add_ex("app", build_path(app.app_path));
 }
 
 void set_write_path() {	
 #if defined(FM_EDITOR)
-	add_named_path_ex("write", build_path(app.write_path));
+	dn_paths_add_ex("write", build_path(app.write_path));
 #else
 	auto appdata_dir = bump_allocator.alloc_path();
 
@@ -139,7 +139,7 @@ void set_write_path() {
 		if (appdata_dir[i] == 0) break;
 		if (appdata_dir[i] == '\\') appdata_dir[i] = '/';
 	}
-	add_named_path_ex("write", appdata_dir);
+	dn_paths_add_ex("write", appdata_dir);
 #endif
 }
 
@@ -147,7 +147,7 @@ void init_paths() {
 	set_install_paths();
 	set_write_path();
 
-	add_install_path("log", "tdengine.log");
-	add_engine_path("bootstrap", "source/scripts/engine/core/bootstrap.lua");
-	add_engine_path("engine_paths", "source/scripts/engine/data/paths.lua");
+	dn_paths_add_install_subpath("log", "tdengine.log");
+	dn_paths_add_engine_subpath("bootstrap", "source/scripts/engine/core/bootstrap.lua");
+	dn_paths_add_engine_subpath("engine_paths", "source/scripts/engine/data/paths.lua");
 }

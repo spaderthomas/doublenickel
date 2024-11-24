@@ -296,7 +296,7 @@ void sdf_oriented_box_ex(SdfRenderer* renderer, float px, float py, float r, flo
 
 
 void sdf_grid(SdfRenderer* renderer, u32 grid_width, u32 grid_size) {
-  tm_begin("sdf_c");
+  dn_time_metric_begin("sdf_c");
   for (u32 x = 0; x < grid_size; x += grid_width) {
     for (u32 y = 0; y < grid_size; y += grid_width) {
       sdf_circle_ex(renderer,
@@ -309,7 +309,7 @@ void sdf_grid(SdfRenderer* renderer, u32 grid_width, u32 grid_size) {
     }
     
   }
-  tm_end("sdf_c");
+  dn_time_metric_end("sdf_c");
 }
 
 

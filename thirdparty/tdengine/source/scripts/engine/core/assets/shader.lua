@@ -1,5 +1,5 @@
 local mod = tdengine.shaders
 
 function tdengine.shaders.init()
-  local shader_dir = tdengine.ffi.resolve_named_path('shaders'):to_interned()
+  local shader_dir = tdengine.ffi.dn_paths_resolve('shaders'):to_interned()
 end
