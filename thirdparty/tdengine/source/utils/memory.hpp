@@ -1,16 +1,16 @@
 typedef char* tstring;
 
-enum class AllocatorMode : u32 {
-	Allocate,
-	Free,
-	Resize,
-};
+typedef enum {
+	DN_ALLOCATOR_MODE_ALLOC,
+	DN_ALLOCATOR_MODE_FREE,
+	DN_ALLOCATOR_MODE_RESIZE,
+} dn_allocator_mode_t;
 
-typedef std::function<void*(AllocatorMode, u32, void*)> OnAllocate;
+typedef std::function<void*(dn_allocator_mode_t, u32, void*)> dn_alloc_fn_t;
 
 
-struct MemoryAllocator {
-	OnAllocate on_alloc;
+struct  dn_allocator_t {
+	dn_alloc_fn_t on_alloc;
 
 	template<typename T>
 	T* alloc();
@@ -30,18 +30,17 @@ struct MemoryAllocator {
 	template<typename T>
 	void free_array(Array<T>* array);
 
-	
 	char* alloc_path();
 };
-std::unordered_map<std::string, MemoryAllocator*> allocators;
+std::unordered_map<std::string, dn_allocator_t*> allocators;
 
-FM_LUA_EXPORT void             ma_add(const char* name, MemoryAllocator* allocator);
-FM_LUA_EXPORT MemoryAllocator* ma_find(const char* name);
-FM_LUA_EXPORT void*            ma_alloc(MemoryAllocator* allocator, u32 size);
-FM_LUA_EXPORT void*            ma_realloc(MemoryAllocator* allocator, void* memory, u32 size);
-FM_LUA_EXPORT void             ma_free(MemoryAllocator* allocator, void* buffer);
+FM_LUA_EXPORT void             dn_allocator_add(const char* name, dn_allocator_t* allocator);
+FM_LUA_EXPORT dn_allocator_t*  dn_allocator_find(const char* name);
+FM_LUA_EXPORT void*            dn_allocator_alloc(dn_allocator_t* allocator, u32 size);
+FM_LUA_EXPORT void*            dn_allocator_realloc(dn_allocator_t* allocator, void* memory, u32 size);
+FM_LUA_EXPORT void             dn_allocator_free(dn_allocator_t* allocator, void* buffer);
 
-struct BumpAllocator : MemoryAllocator {
+struct dn_bump_allocator_t : dn_allocator_t {
 	u8* buffer;
 	u32 capacity;
 	u32 bytes_used;
@@ -51,10 +50,10 @@ struct BumpAllocator : MemoryAllocator {
 	void init(u32 size);
 	void clear();
 };
-BumpAllocator bump_allocator;
+dn_bump_allocator_t bump_allocator;
 
-struct DefaultAllocator : MemoryAllocator {
+struct dn_standard_allocator_t : dn_allocator_t {
 	void init();
 };
 
-DefaultAllocator standard_allocator;
+dn_standard_allocator_t standard_allocator;

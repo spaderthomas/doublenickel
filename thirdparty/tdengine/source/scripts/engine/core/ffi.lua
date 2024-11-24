@@ -507,26 +507,26 @@ end
 ----------------------
 -- MEMORY ALLOCATOR --
 ----------------------
-MemoryAllocator = tdengine.class.metatype('MemoryAllocator')
+dn_allocator_t = tdengine.class.metatype('dn_allocator_t')
 
-function MemoryAllocator:find(name)
-	return tdengine.ffi.ma_find(name)
+function dn_allocator_t:find(name)
+	return tdengine.ffi.dn_allocator_find(name)
 end
 
-function MemoryAllocator:add(name)
-	return tdengine.ffi.ma_add(self, name)
+function dn_allocator_t:add(name)
+	return tdengine.ffi.dn_allocator_add(self, name)
 end
 
-function MemoryAllocator:alloc(size)
-	return tdengine.ffi.ma_alloc(self, size)
+function dn_allocator_t:alloc(size)
+	return tdengine.ffi.dn_allocator_alloc(self, size)
 end
 
-function MemoryAllocator:free(pointer)
-	return tdengine.ffi.ma_free(self, pointer)
+function dn_allocator_t:free(pointer)
+	return tdengine.ffi.dn_allocator_free(self, pointer)
 end
 
-function MemoryAllocator:alloc_array(ctype, n)
-	return ffi.cast(tdengine.ffi.ptr_type(ctype), tdengine.ffi.ma_alloc(self, ffi.sizeof(ctype) * n))
+function dn_allocator_t:alloc_array(ctype, n)
+	return ffi.cast(tdengine.ffi.ptr_type(ctype), tdengine.ffi.dn_allocator_alloc(self, ffi.sizeof(ctype) * n))
 end
 
 
@@ -651,14 +651,14 @@ function DynamicArray:init(ctype, allocator)
 	self.reference_type = string.format('%s [1]', ctype)
 	self.pointer_type = string.format('%s*', ctype)
 	self.element_size = ffi.sizeof(self.value_type)
-	self.allocator = allocator or tdengine.ffi.ma_find('bump')
+	self.allocator = allocator or tdengine.ffi.dn_allocator_find('bump')
 
-	self.data[0] = tdengine.ffi._dyn_array_alloc(self.element_size, self.allocator)
+	self.data[0] = tdengine.ffi._dn_dynamic_array_alloc(self.element_size, self.allocator)
 end
 
 function DynamicArray:push(value)
 	local marshalled_value = ffi.new(self.reference_type, value)
-	tdengine.ffi._dyn_array_push_n(self.data, marshalled_value, 1)
+	tdengine.ffi._dn_dynamic_array_push_n(self.data, marshalled_value, 1)
 end
 
 function DynamicArray:at(index)

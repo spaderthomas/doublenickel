@@ -1,4 +1,4 @@
-char* copy_string(const_string str, u32 length, MemoryAllocator* allocator) {
+char* copy_string(const_string str, u32 length, dn_allocator_t* allocator) {
 	if (!allocator) allocator = &standard_allocator;
 
 	auto buffer_length = length + 1;
@@ -7,15 +7,15 @@ char* copy_string(const_string str, u32 length, MemoryAllocator* allocator) {
 	return copy;
 }
 
-char* copy_string(const_string str, MemoryAllocator* allocator) {
+char* copy_string(const_string str, dn_allocator_t* allocator) {
 	return copy_string(str, strlen(str), allocator);
 }
 
-char* copy_string(const std::string& str, MemoryAllocator* allocator) {
+char* copy_string(const std::string& str, dn_allocator_t* allocator) {
 	return copy_string(str.c_str(), str.length(), allocator);
 }
 
-char* copy_string_u8(const u8* str, u32 length, MemoryAllocator* allocator) {
+char* copy_string_u8(const u8* str, u32 length, dn_allocator_t* allocator) {
 	return copy_string(reinterpret_cast<const char*>(str), length, allocator);
 }
 

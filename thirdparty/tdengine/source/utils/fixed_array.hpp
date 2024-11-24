@@ -32,7 +32,7 @@ void fixed_array_init(FixedArray* buffer, u32 max_vertices, u32 vertex_size) {
 	buffer->size = 0;
 	buffer->capacity = max_vertices;
 	buffer->vertex_size = vertex_size;
-	buffer->data = (u8*)ma_alloc(&standard_allocator, max_vertices * vertex_size);
+	buffer->data = (u8*)dn_allocator_alloc(&standard_allocator, max_vertices * vertex_size);
 }
 
 u8* fixed_array_at(FixedArray* buffer, u32 index) {

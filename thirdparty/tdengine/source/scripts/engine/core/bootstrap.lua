@@ -142,11 +142,12 @@ typedef struct dn_os_date_time_t {
 
 dn_os_date_time_t dn_os_get_date_time();
 
-typedef struct MemoryAllocator MemoryAllocator;
-void ma_add(const char* name, MemoryAllocator* allocator);
-MemoryAllocator* ma_find(const char* name);
-void* ma_alloc(MemoryAllocator* allocator, u32 size);
-void ma_free(MemoryAllocator* allocator, void* buffer);
+typedef struct dn_allocator_t dn_allocator_t;
+
+void dn_allocator_add(const char* name, dn_allocator_t* allocator);
+dn_allocator_t* dn_allocator_find(const char* name);
+void* dn_allocator_alloc(dn_allocator_t* allocator, u32 size);
+void dn_allocator_free(dn_allocator_t* allocator, void* buffer);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -161,21 +162,21 @@ typedef struct {
     u32 size;
     u32 capacity;
     u32 element_size;
-    MemoryAllocator* allocator;
-} dyn_array_header;
+    dn_allocator_t* allocator;
+} dn_dynamic_array_header_t;
 
-void*             _dyn_array_alloc(u32 element_size, MemoryAllocator* allocator);
-void              _dyn_array_push_n(void** array, void* data, u32 num_elements);
-void*             _dyn_array_reserve(void** array, u32 num_elements);
-dyn_array_header* _dyn_array_head(void** array);
-u32               _dyn_array_size(void** array);
-u32               _dyn_array_capacity(void** array);
-u32               _dyn_array_element_size(void** array);
-MemoryAllocator*  _dyn_array_allocator(void** array);
-bool              _dyn_array_full(void** array);
-bool              _dyn_array_need_grow(void** array, u32 num_elements);
-void              _dyn_array_grow(void** array, u32 requested_size);
-u32               _dyn_array_byte_size(void** array);
+void*                      _dn_dynamic_array_alloc(u32 element_size, dn_allocator_t* allocator);
+void                       _dn_dynamic_array_push_n(void** array, void* data, u32 num_elements);
+void*                      _dn_dynamic_array_reserve(void** array, u32 num_elements);
+dn_dynamic_array_header_t* _dn_dynamic_array_head(void** array);
+u32                        _dn_dynamic_array_size(void** array);
+u32                        _dn_dynamic_array_capacity(void** array);
+u32                        _dn_dynamic_array_element_size(void** array);
+dn_allocator_t*            _dn_dynamic_array_allocator(void** array);
+bool                       _dn_dynamic_array_full(void** array);
+bool                       _dn_dynamic_array_need_grow(void** array, u32 num_elements);
+void                       _dn_dynamic_array_grow(void** array, u32 requested_size);
+u32                        _dn_dynamic_array_byte_size(void** array);
 
 typedef struct {
 	u8* data;

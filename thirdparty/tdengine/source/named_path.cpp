@@ -52,7 +52,7 @@ tstring dn_paths_resolve(const char* name) {
 	return dn_paths_resolve_ex(name, &bump_allocator);
 }
 
-string dn_paths_resolve_ex(const char* name, MemoryAllocator* allocator) {
+string dn_paths_resolve_ex(const char* name, dn_allocator_t* allocator) {
 	if (!name) return nullptr;
 	
 	if (!named_paths.contains(name)) {
@@ -68,7 +68,7 @@ tstring dn_paths_resolve_format(const char* name, const char* file_name) {
 	return dn_paths_resolve_format_ex(name, file_name, &bump_allocator);
 }
 
-string dn_paths_resolve_format_ex(const char* name, const char* file_name, MemoryAllocator* allocator) {
+string dn_paths_resolve_format_ex(const char* name, const char* file_name, dn_allocator_t* allocator) {
 	if (!name) return nullptr;
 	if (!file_name) return nullptr;
 	

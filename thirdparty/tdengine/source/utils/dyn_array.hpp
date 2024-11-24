@@ -4,56 +4,55 @@
 #ifndef DYNAMIC_ARRAY_H
 #define DYNAMIC_ARRAY_H
 
-typedef struct dyn_array
-{
+typedef struct {
     u32 size;
     u32 capacity;
     u32 element_size;
-    MemoryAllocator* allocator;
-} dyn_array_header;
+    dn_allocator_t* allocator;
+} dn_dynamic_array_header_t;
 
 #define dyn_array void*
-#define DYN_ARRAY_VOIDP(ptr) ((void**)&ptr)
+#define DN_DYNAMIC_ARRAY_VOIDP(ptr) ((void**)&ptr)
 #define DYN_ARRAY(type) type*
 
-FM_LUA_EXPORT dyn_array         _dyn_array_alloc(u32 element_size, MemoryAllocator* allocator);
-#define                         dyn_array_alloc(element_size, allocator) _dyn_array_alloc(element_size, allocator)
-FM_LUA_EXPORT void              _dyn_array_push_n(dyn_array* array, void* data, u32 num_elements);
-#define                          dyn_array_push_n(array, data, num_elements) _dyn_array_alloc(DYN_ARRAY_VOIDP(array), data, num_elements)
-FM_LUA_EXPORT void*             _dyn_array_reserve(dyn_array* array, u32 num_elements);
-#define                          dyn_array_reserve(array, num_elements) _dyn_array_reserve(DYN_ARRAY_VOIDP(array), num_elements)
-FM_LUA_EXPORT dyn_array_header* _dyn_array_head(dyn_array* array);
-#define                          dyn_array_head(array) _dyn_array_head(DYN_ARRAY_VOIDP(array))
-FM_LUA_EXPORT u32               _dyn_array_size(dyn_array* array);
-#define                          dyn_array_size(array) _dyn_array_size(DYN_ARRAY_VOIDP(array))
-FM_LUA_EXPORT u32               _dyn_array_capacity(dyn_array* array);
-#define                          dyn_array_capacity(array) _dyn_array_capacity(DYN_ARRAY_VOIDP(array))
-FM_LUA_EXPORT u32               _dyn_array_element_size(dyn_array* array);
-#define                          dyn_array_element_size(array) _dyn_array_element_size(DYN_ARRAY_VOIDP(array))
-FM_LUA_EXPORT MemoryAllocator*  _dyn_array_allocator(dyn_array* array);
-#define                          dyn_array_allocator(array) _dyn_array_allocator(DYN_ARRAY_VOIDP(array))
-FM_LUA_EXPORT bool              _dyn_array_full(dyn_array* array);
-#define                          dyn_array_full(array) _dyn_array_full(DYN_ARRAY_VOIDP(array))
-FM_LUA_EXPORT bool              _dyn_array_need_grow(dyn_array* array, u32 num_elements);
-#define                          dyn_array_need_grow(array, num_elements) _dyn_array_need_grow(DYN_ARRAY_VOIDP(array), num_elements)
-FM_LUA_EXPORT void              _dyn_array_grow(dyn_array* array, u32 requested_size);
-#define                          dyn_array_grow(array, requested_size) _dyn_array_grow(DYN_ARRAY_VOIDP(array), requested_size)
-FM_LUA_EXPORT u32               _dyn_array_byte_size(dyn_array* array);
-#define                          dyn_array_byte_size(array) _dyn_array_byte_size(DYN_ARRAY_VOIDP(array))
+FM_LUA_EXPORT dyn_array                  dn_dynamic_array_alloc(u32 element_size, dn_allocator_t* allocator);
+#define                                  _dn_dynamic_array_alloc(element_size, allocator) _dn_dynamic_array_alloc(element_size, allocator)
+FM_LUA_EXPORT void                       dn_dynamic_array_push_n(dyn_array* array, void* data, u32 num_elements);
+#define                                   _dn_dynamic_array_push_n(array, data, num_elements) _dn_dynamic_array_alloc(DN_DYNAMIC_ARRAY_VOIDP(array), data, num_elements)
+FM_LUA_EXPORT void*                      dn_dynamic_array_reserve(dyn_array* array, u32 num_elements);
+#define                                   _dn_dynamic_array_reserve(array, num_elements) _dn_dynamic_array_reserve(DN_DYNAMIC_ARRAY_VOIDP(array), num_elements)
+FM_LUA_EXPORT dn_dynamic_array_header_t* dn_dynamic_array_head(dyn_array* array);
+#define                                   _dn_dynamic_array_head(array) _dn_dynamic_array_head(DN_DYNAMIC_ARRAY_VOIDP(array))
+FM_LUA_EXPORT u32                        dn_dynamic_array_size(dyn_array* array);
+#define                                   _dn_dynamic_array_size(array) _dn_dynamic_array_size(DN_DYNAMIC_ARRAY_VOIDP(array))
+FM_LUA_EXPORT u32                        dn_dynamic_array_capacity(dyn_array* array);
+#define                                   _dn_dynamic_array_capacity(array) _dn_dynamic_array_capacity(DN_DYNAMIC_ARRAY_VOIDP(array))
+FM_LUA_EXPORT u32                        dn_dynamic_array_element_size(dyn_array* array);
+#define                                   _dn_dynamic_array_element_size(array) _dn_dynamic_array_element_size(DN_DYNAMIC_ARRAY_VOIDP(array))
+FM_LUA_EXPORT dn_allocator_t*            dn_dynamic_array_allocator(dyn_array* array);
+#define                                   _dn_dynamic_array_allocator(array) _dn_dynamic_array_allocator(DN_DYNAMIC_ARRAY_VOIDP(array))
+FM_LUA_EXPORT bool                       dn_dynamic_array_full(dyn_array* array);
+#define                                   _dn_dynamic_array_full(array) _dn_dynamic_array_full(DN_DYNAMIC_ARRAY_VOIDP(array))
+FM_LUA_EXPORT bool                       dn_dynamic_array_need_grow(dyn_array* array, u32 num_elements);
+#define                                   _dn_dynamic_array_need_grow(array, num_elements) _dn_dynamic_array_need_grow(DN_DYNAMIC_ARRAY_VOIDP(array), num_elements)
+FM_LUA_EXPORT void                       dn_dynamic_array_grow(dyn_array* array, u32 requested_size);
+#define                                   _dn_dynamic_array_grow(array, requested_size) _dn_dynamic_array_grow(DN_DYNAMIC_ARRAY_VOIDP(array), requested_size)
+FM_LUA_EXPORT u32                        dn_dynamic_array_byte_size(dyn_array* array);
+#define                                   _dn_dynamic_array_byte_size(array) _dn_dynamic_array_byte_size(DN_DYNAMIC_ARRAY_VOIDP(array))
 
 #endif
 
 #ifdef DYNAMIC_ARRAY_IMPLEMENTATION
 
 template<typename T>
-T* dyn_array_alloc_t(MemoryAllocator* allocator) {
-    return (T*)dyn_array_alloc(sizeof(T), allocator);
+T* dn_dynamic_array_alloc_t(dn_allocator_t* allocator) {
+    return (T*)dn_dynamic_array_alloc(sizeof(T), allocator);
 }
 
-dyn_array _dyn_array_alloc(u32 element_size, MemoryAllocator* allocator) {
+dyn_array dn_dynamic_array_alloc(u32 element_size, dn_allocator_t* allocator) {
     assert(allocator);
  
-    dyn_array_header* header = (dyn_array_header*)ma_alloc(allocator, sizeof(dyn_array_header) + element_size);
+    dn_dynamic_array_header_t* header = (dn_dynamic_array_header_t*)dn_allocator_alloc(allocator, sizeof(dn_dynamic_array_header_t) + element_size);
     header->size = 0;
     header->capacity = 1;
     header->element_size = element_size;
@@ -61,75 +60,75 @@ dyn_array _dyn_array_alloc(u32 element_size, MemoryAllocator* allocator) {
     return header + 1;
 }
 
-dyn_array_header* _dyn_array_head(dyn_array* array) {
-    return ((dyn_array_header*)*array) - 1;
+dn_dynamic_array_header_t* dn_dynamic_array_head(dyn_array* array) {
+    return ((dn_dynamic_array_header_t*)*array) - 1;
 }
 
-u32 _dyn_array_byte_size(dyn_array* array) {
-    return _dyn_array_size(array) * _dyn_array_element_size(array);
+u32 dn_dynamic_array_byte_size(dyn_array* array) {
+    return dn_dynamic_array_size(array) * dn_dynamic_array_element_size(array);
 }
 
-u32 _dyn_array_size(dyn_array* array) {
-    return _dyn_array_head(array)->size;
+u32 dn_dynamic_array_size(dyn_array* array) {
+    return dn_dynamic_array_head(array)->size;
 }
 
-u32 _dyn_array_capacity(dyn_array* array) {
-    return _dyn_array_head(array)->capacity;
+u32 dn_dynamic_array_capacity(dyn_array* array) {
+    return dn_dynamic_array_head(array)->capacity;
 }
 
-u32 _dyn_array_element_size(dyn_array* array) {
-    return _dyn_array_head(array)->element_size;
+u32 dn_dynamic_array_element_size(dyn_array* array) {
+    return dn_dynamic_array_head(array)->element_size;
 }
 
-MemoryAllocator* _dyn_array_allocator(dyn_array* array) {
-    return _dyn_array_head(array)->allocator;
+dn_allocator_t* dn_dynamic_array_allocator(dyn_array* array) {
+    return dn_dynamic_array_head(array)->allocator;
 }
 
-bool _dyn_array_need_grow(dyn_array* array, u32 num_elements) {
-    return _dyn_array_size(array) + num_elements >= _dyn_array_capacity(array);
+bool dn_dynamic_array_need_grow(dyn_array* array, u32 num_elements) {
+    return dn_dynamic_array_size(array) + num_elements >= dn_dynamic_array_capacity(array);
 }
 
-void _dyn_array_grow(dyn_array* array, u32 requested_size) {
-    while (_dyn_array_capacity(array) < requested_size) {
-        _dyn_array_head(array)->capacity = _dyn_array_capacity(array) * 2;
+void dn_dynamic_array_grow(dyn_array* array, u32 requested_size) {
+    while (dn_dynamic_array_capacity(array) < requested_size) {
+        dn_dynamic_array_head(array)->capacity = dn_dynamic_array_capacity(array) * 2;
 
-        dyn_array_header* header = (dyn_array_header*)ma_realloc(
-            _dyn_array_allocator(array), 
-            _dyn_array_head(array),
-            _dyn_array_capacity(array) * _dyn_array_element_size(array) + sizeof(dyn_array_header)
+        dn_dynamic_array_header_t* header = (dn_dynamic_array_header_t*)dn_allocator_realloc(
+            dn_dynamic_array_allocator(array), 
+            dn_dynamic_array_head(array),
+            dn_dynamic_array_capacity(array) * dn_dynamic_array_element_size(array) + sizeof(dn_dynamic_array_header_t)
         );
 
         *array = header + 1;
     }
 }
 
-void* _dyn_array_reserve(dyn_array* array, u32 num_elements) {
+void* dn_dynamic_array_reserve(dyn_array* array, u32 num_elements) {
     assert(array);
 
-    if (_dyn_array_need_grow(array, num_elements)) {
-        u32 size = _dyn_array_size(array);
-        _dyn_array_grow(array, size + num_elements);
+    if (dn_dynamic_array_need_grow(array, num_elements)) {
+        u32 size = dn_dynamic_array_size(array);
+        dn_dynamic_array_grow(array, size + num_elements);
     }
 
     u8* memory = (u8*)(*array);
-    u8* reserved_memory =  memory + _dyn_array_byte_size(array);
-    _dyn_array_head(array)->size += num_elements;
+    u8* reserved_memory =  memory + dn_dynamic_array_byte_size(array);
+    dn_dynamic_array_head(array)->size += num_elements;
 
     return reserved_memory;
 }
 
-#define dyn_array_push(__ARR, __ARRVAL)\
+#define dn_dynamic_array_push(__ARR, __ARRVAL)\
     do {\
-        if (dyn_array_need_grow(__ARR, 1)) {\
-            dyn_array_grow(__ARR, dyn_array_size(__ARR) + 1); \
+        if (dn_dynamic_array_need_grow(__ARR, 1)) {\
+            dn_dynamic_array_grow(__ARR, dn_dynamic_array_size(__ARR) + 1); \
         }\
-        (__ARR)[dyn_array_size(__ARR)] = (__ARRVAL);\
-        dyn_array_head(__ARR)->size++;\
+        (__ARR)[dn_dynamic_array_size(__ARR)] = (__ARRVAL);\
+        dn_dynamic_array_head(__ARR)->size++;\
     } while(0)
 
-void _dyn_array_push_n(dyn_array* array, void* data, u32 num_elements) {
+void dn_dynamic_array_push_n(dyn_array* array, void* data, u32 num_elements) {
 
-    void* memory = _dyn_array_reserve(array, num_elements);
-    copy_memory(data, memory, _dyn_array_element_size(array) * num_elements);
+    void* memory = dn_dynamic_array_reserve(array, num_elements);
+    copy_memory(data, memory, dn_dynamic_array_element_size(array) * num_elements);
 }
 #endif

@@ -39,7 +39,7 @@
 //        size_t ht_sz = sizeof(*__HT);\
 //        __hash_table_init_impl((void**)&(__HT), ht_sz);\
 //        memset((__HT), 0, ht_sz);\
-//        dyn_array_reserve(__HT->data, 2);\
+//        dn_dynamic_array_reserve(__HT->data, 2);\
 //        __HT->data[0].state = HASH_TABLE_ENTRY_INACTIVE;\
 //        __HT->data[1].state = HASH_TABLE_ENTRY_INACTIVE;\
 //        uintptr_t d0 = (uintptr_t)&((__HT)->data[0]);\
@@ -55,41 +55,41 @@
 //        if ((_HT) == NULL) {\
 //            hash_table_init((_HT), _KT, _VT);\
 //        }\
-//        dyn_array_reserve((_HT)->data, _CT);\
+//        dn_dynamic_array_reserve((_HT)->data, _CT);\
 //    } while (0)
 //
-//    // ((__HT) != NULL ? (__HT)->size : 0) // dyn_array_size((__HT)->data) : 0)
+//    // ((__HT) != NULL ? (__HT)->size : 0) // dn_dynamic_array_size((__HT)->data) : 0)
 //#define hash_table_size(__HT)\
-//    ((__HT) != NULL ? dyn_array_size((__HT)->data) : 0)
+//    ((__HT) != NULL ? dn_dynamic_array_size((__HT)->data) : 0)
 //
 //#define hash_table_capacity(__HT)\
-//    ((__HT) != NULL ? dyn_array_capacity((__HT)->data) : 0)
+//    ((__HT) != NULL ? dn_dynamic_array_capacity((__HT)->data) : 0)
 //
 //#define hash_table_load_factor(__HT)\
 //    (hash_table_capacity(__HT) ? (float)(hash_table_size(__HT)) / (float)(hash_table_capacity(__HT)) : 0.f)
 //
 //#define hash_table_grow(__HT, __C)\
-//    ((__HT)->data = dyn_array_resize_impl((__HT)->data, sizeof(*((__HT)->data)), (__C)))
+//    ((__HT)->data = dn_dynamic_array_resize_impl((__HT)->data, sizeof(*((__HT)->data)), (__C)))
 //
 //#define hash_table_empty(__HT)\
-//    ((__HT) != NULL ? dyn_array_size((__HT)->data) == 0 : true)
+//    ((__HT) != NULL ? dn_dynamic_array_size((__HT)->data) == 0 : true)
 //
 //#define hash_table_clear(__HT)\
 //    do {\
 //        if ((__HT) != NULL) {\
-//            u32 capacity = dyn_array_capacity((__HT)->data);\
+//            u32 capacity = dn_dynamic_array_capacity((__HT)->data);\
 //            for (u32 i = 0; i < capacity; ++i) {\
 //                (__HT)->data[i].state = HASH_TABLE_ENTRY_INACTIVE;\
 //            }\
-//            /*memset((__HT)->data, 0, dyn_array_capacity((__HT)->data) * );*/\
-//            dyn_array_clear((__HT)->data);\
+//            /*memset((__HT)->data, 0, dn_dynamic_array_capacity((__HT)->data) * );*/\
+//            dn_dynamic_array_clear((__HT)->data);\
 //        }\
 //    } while (0)
 //
 //#define hash_table_free(__HT)\
 //    do {\
 //        if ((__HT) != NULL) {\
-//            dyn_array_free((__HT)->data);\
+//            dn_dynamic_array_free((__HT)->data);\
 //            (__HT)->data = NULL;\
 //            free(__HT);\
 //            (__HT) = NULL;\
@@ -111,8 +111,8 @@
 //        {\
 //            u32 NEW_CAP = __CAP ? __CAP * 2 : 2;\
 //            size_t ENTRY_SZ = sizeof((__HT)->tmp_key) + sizeof((__HT)->tmp_val) + sizeof(hash_table_entry_state);\
-//            dyn_array_reserve((__HT)->data, NEW_CAP);\
-//            /**((void **)&(__HT->data)) = dyn_array_resize_impl(__HT->data, ENTRY_SZ, NEW_CAP);*/\
+//            dn_dynamic_array_reserve((__HT)->data, NEW_CAP);\
+//            /**((void **)&(__HT->data)) = dn_dynamic_array_resize_impl(__HT->data, ENTRY_SZ, NEW_CAP);*/\
 //            /* Iterate through data and set state to null, from __CAP -> __CAP * 2 */\
 //            /* Memset here instead */\
 //            for (u32 __I = __CAP; __I < NEW_CAP; ++__I) {\
@@ -141,7 +141,7 @@
 //        (__HT)->data[__HSH_IDX].key = (__HMK);\
 //        (__HT)->data[__HSH_IDX].val = (__HMV);\
 //        (__HT)->data[__HSH_IDX].state = HASH_TABLE_ENTRY_ACTIVE;\
-//        dyn_array_head((__HT)->data)->size++;\
+//        dn_dynamic_array_head((__HT)->data)->size++;\
 //    } while (0)
 //
 //// Need size difference between two entries
@@ -153,8 +153,8 @@
 //
 //    // Need a better way to handle this. Can't do it like this anymore.
 //    // Need to fix this. Seriously messing me up.
-//    u32 capacity = dyn_array_capacity(*data);
-//	u32 size = dyn_array_size(*data);
+//    u32 capacity = dn_dynamic_array_capacity(*data);
+//	u32 size = dn_dynamic_array_size(*data);
 //	if (!capacity || !size) return (size_t)HASH_TABLE_INVALID_INDEX;
 //    size_t idx = (size_t)HASH_TABLE_INVALID_INDEX;
 //    size_t hash = (size_t)hash_bytes(key, key_len, HASH_TABLE_HASH_SEED);
@@ -221,7 +221,7 @@
 //            u32 __IDX = hash_table_get_key_index_func((void**)&(__HT)->data, (void*)&((__HT)->tmp_key), sizeof((__HT)->tmp_key), sizeof((__HT)->tmp_val), (__HT)->stride, (__HT)->klpvl);\
 //            if (__IDX != HASH_TABLE_INVALID_INDEX) {\
 //                (__HT)->data[__IDX].state = HASH_TABLE_ENTRY_INACTIVE;\
-//                if (dyn_array_head((__HT)->data)->size) dyn_array_head((__HT)->data)->size--;\
+//                if (dn_dynamic_array_head((__HT)->data)->size) dn_dynamic_array_head((__HT)->data)->size--;\
 //            }\
 //        }\
 //    } while (0)
@@ -234,7 +234,7 @@
 //u32 __find_first_valid_iterator(void* data, size_t key_len, size_t val_len, u32 idx, size_t stride, size_t klpvl)
 //{
 //    u32 it = (u32)idx;
-//    for (; it < (u32)dyn_array_capacity(data); ++it)
+//    for (; it < (u32)dn_dynamic_array_capacity(data); ++it)
 //    {
 //        size_t offset = (it * stride);
 //        hash_table_entry_state state = *(hash_table_entry_state*)((uint8_t*)data + offset + (klpvl));
@@ -257,7 +257,7 @@
 //void __hash_table_iter_advance_func(void** data, size_t key_len, size_t val_len, u32* it, size_t stride, size_t klpvl)
 //{
 //    (*it)++;
-//    for (; *it < (u32)dyn_array_capacity(*data); ++*it)
+//    for (; *it < (u32)dn_dynamic_array_capacity(*data); ++*it)
 //    {
 //        size_t offset = (size_t)(*it * stride);
 //        hash_table_entry_state state = *(hash_table_entry_state*)((uint8_t*)*data + offset + (klpvl));

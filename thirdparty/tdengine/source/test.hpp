@@ -158,36 +158,36 @@ void test_generational_arena() {
 }
 
 void test_bump_allocator() {
-	MemoryAllocator* allocator = &bump_allocator;
+	dn_allocator_t* allocator = &bump_allocator;
 
-	auto memory_block = (u32*)ma_alloc(allocator, sizeof(u32) * 8);
+	auto memory_block = (u32*)dn_allocator_alloc(allocator, sizeof(u32) * 8);
 	memory_block[0] = 69;
 	memory_block[7] = 420;
 	assert(bump_allocator.allocations[0] == sizeof(u32) * 8);
 
-	memory_block = (u32*)ma_realloc(allocator, memory_block, sizeof(u32) * 16);
+	memory_block = (u32*)dn_allocator_realloc(allocator, memory_block, sizeof(u32) * 16);
 	assert(memory_block[0] == 69);
 	assert(memory_block[7] == 420);
 	assert(bump_allocator.allocations[sizeof(u32) * 8] == sizeof(u32) * 16);
 }
 void test_dyn_array() {
-	auto array = dyn_array_alloc_t<u32>(ma_find("bump"));
-	assert(dyn_array_head(array)->size == 0);
+	auto array = dn_dynamic_array_alloc_t<u32>(dn_allocator_find("bump"));
+	assert(dn_dynamic_array_head(array)->size == 0);
 
-	dyn_array_push(array, 69);
+	dn_dynamic_array_push(array, 69);
 	assert(array[0] == 69);
-	assert(dyn_array_head(array)->size == 1);
+	assert(dn_dynamic_array_head(array)->size == 1);
 
-	dyn_array_push(array, 70);
+	dn_dynamic_array_push(array, 70);
 	assert(array[0] == 69);
 	assert(array[1] == 70);
-	assert(dyn_array_head(array)->size == 2);
+	assert(dn_dynamic_array_head(array)->size == 2);
 	
-	dyn_array_push(array, 71);
+	dn_dynamic_array_push(array, 71);
 	assert(array[0] == 69);
 	assert(array[1] == 70);
 	assert(array[2] == 71);
-	assert(dyn_array_head(array)->size == 3);
+	assert(dn_dynamic_array_head(array)->size == 3);
 }
 
 void run_tests() {

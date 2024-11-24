@@ -14,7 +14,7 @@ typedef struct {
 		u32 capacity;
 	} buffer;
 
-	MemoryAllocator* allocator;
+	dn_allocator_t* allocator;
 } StringBuilder;
 
 void   string_builder_grow(StringBuilder* builder);
@@ -25,10 +25,10 @@ char*  string_builder_write_cstr(StringBuilder* builder);
 #define STRING_LITERAL(s) (String) { .data = (u8*)(s), .len = sizeof(s) - 1}
 #define AS_CSTR(s) (char*)((s).data)
 
-char* copy_string(const_string str, u32 length, MemoryAllocator* allocator = nullptr);
-char* copy_string(const_string str, MemoryAllocator* allocator = nullptr);
-char* copy_string(const std::string& str, MemoryAllocator* allocator = nullptr);
-char* copy_string_u8(const u8* str, u32 length, MemoryAllocator* allocator = nullptr);
+char* copy_string(const_string str, u32 length, dn_allocator_t* allocator = nullptr);
+char* copy_string(const_string str, dn_allocator_t* allocator = nullptr);
+char* copy_string(const std::string& str, dn_allocator_t* allocator = nullptr);
+char* copy_string_u8(const u8* str, u32 length, dn_allocator_t* allocator = nullptr);
 
 FM_LUA_EXPORT void copy_string(const_string str, string buffer, u32 buffer_length);
 FM_LUA_EXPORT void copy_string_n(const_string str, u32 length, string buffer, u32 buffer_length);

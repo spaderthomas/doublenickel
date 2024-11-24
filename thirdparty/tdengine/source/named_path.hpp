@@ -18,7 +18,7 @@ FM_LUA_EXPORT tstring dn_paths_resolve_format(const char* name, const char* file
 FM_LUA_EXPORT tstring dn_paths_strip(const char* name, const char* absolute_path);
 
 void dn_paths_add_ex(const char* name, const char* absolute_path);
-string dn_paths_resolve_ex(const char* name, MemoryAllocator* allocator);
-string dn_paths_resolve_format_ex(const char* name, const char* file_name, MemoryAllocator* allocator);
+string dn_paths_resolve_ex(const char* name, dn_allocator_t* allocator);
+string dn_paths_resolve_format_ex(const char* name, const char* file_name, dn_allocator_t* allocator);
 
 std::unordered_map<std::string, std::string> named_paths;

@@ -11,7 +11,7 @@ void memfill(void* dst, i32 size, void* pattern, i32 pattern_size) {
 }
 
 template<typename T, u64 N>
-fm_error arr_init(Array<T, N>* array, u64 capacity, MemoryAllocator* allocator) {
+fm_error arr_init(Array<T, N>* array, u64 capacity, dn_allocator_t* allocator) {
 	array->size = 0;
 	array->capacity = capacity;
 	array->data = allocator->alloc<T>(capacity);
@@ -40,7 +40,7 @@ fm_error arr_init(Array<T, N>* array) {
 }
 
 template<typename T, u64 N>
-fm_error arr_init(Array<T, N>* array, MemoryAllocator* allocator) {
+fm_error arr_init(Array<T, N>* array, dn_allocator_t* allocator) {
 	static_assert(N > 0, "If you want to bake a fixed capacity into an Array, you need to put it as the second template parameter. Otherwise, specify the capacity when initializing.");
 	array->size = 0;
 	array->capacity = N;

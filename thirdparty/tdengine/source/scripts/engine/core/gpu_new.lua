@@ -52,7 +52,7 @@ end
 
 GpuBufferLayout = tdengine.class.metatype('GpuBufferLayout')
 function GpuBufferLayout:init(params)
-  local allocator = tdengine.ffi.ma_find('standard')
+  local allocator = tdengine.ffi.dn_allocator_find('standard')
 
   self.num_vertex_attributes = #params.vertex_attributes
   self.vertex_attributes = allocator:alloc_array('GpuVertexAttribute', self.num_vertex_attributes)
@@ -69,7 +69,7 @@ end
 
 GpuPipeline = tdengine.class.metatype('GpuPipeline')
 function GpuPipeline:init(params)
-  local allocator = tdengine.ffi.ma_find('standard')
+  local allocator = tdengine.ffi.dn_allocator_find('standard')
 
   self.raster = GpuRasterState:new(params.raster)
 
@@ -128,7 +128,7 @@ end
 
 GpuBufferBinding = tdengine.class.metatype('GpuBufferBinding')
 function GpuBufferBinding:init(params)
-  local allocator = tdengine.ffi.ma_find('standard')
+  local allocator = tdengine.ffi.dn_allocator_find('standard')
 
   if params.vertex then
     self.vertex.count = #params.vertex

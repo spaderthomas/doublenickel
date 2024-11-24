@@ -1,4 +1,4 @@
-struct MemoryAllocator;
+struct dn_allocator_t;
 
 void memfill(void* dst, i32 size, void* pattern, i32 pattern_size);
 
@@ -13,7 +13,7 @@ struct Array {
 };
 
 template<typename T, u64 N>
-fm_error arr_init(Array<T, N>* array, u64 capacity, MemoryAllocator* allocator);
+fm_error arr_init(Array<T, N>* array, u64 capacity, dn_allocator_t* allocator);
 
 template<typename T, u64 N>
 fm_error arr_init(Array<T, N>* array, u64 capacity);
@@ -25,7 +25,7 @@ template<typename T, u64 N>
 fm_error arr_init(Array<T, N>* array);
 
 template<typename T, u64 N>
-fm_error arr_init(Array<T, N>* array, MemoryAllocator* allocator);
+fm_error arr_init(Array<T, N>* array, dn_allocator_t* allocator);
 
 template<typename T, u64 N>
 void arr_clear(Array<T, N>* array);
