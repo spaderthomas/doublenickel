@@ -1,4 +1,15 @@
 local ffi_header = [[
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+// ██████╗  ██████╗ ██╗   ██╗██████╗ ██╗     ███████╗███╗   ██╗██╗ ██████╗██╗  ██╗███████╗██╗      //
+// ██╔══██╗██╔═══██╗██║   ██║██╔══██╗██║     ██╔════╝████╗  ██║██║██╔════╝██║ ██╔╝██╔════╝██║      //
+// ██║  ██║██║   ██║██║   ██║██████╔╝██║     █████╗  ██╔██╗ ██║██║██║     █████╔╝ █████╗  ██║      //
+// ██║  ██║██║   ██║██║   ██║██╔══██╗██║     ██╔══╝  ██║╚██╗██║██║██║     ██╔═██╗ ██╔══╝  ██║      //
+// ██████╔╝╚██████╔╝╚██████╔╝██████╔╝███████╗███████╗██║ ╚████║██║╚██████╗██║  ██╗███████╗███████╗ //
+// ╚═════╝  ╚═════╝  ╚═════╝ ╚═════╝ ╚══════╝╚══════╝╚═╝  ╚═══╝╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚══════╝ //
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
 ////////////////////////////////////////////////
 // ████████╗██╗   ██╗██████╗ ███████╗███████╗ //
 // ╚══██╔══╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔════╝ //
@@ -8,21 +19,13 @@ local ffi_header = [[
 //    ╚═╝      ╚═╝   ╚═╝     ╚══════╝╚══════╝ //
 ////////////////////////////////////////////////
    
+
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
 typedef int32_t  i32;
 typedef float f32;
 typedef double f64;
-
-
-typedef struct {
-    char* data;
-} tstring;
-
-typedef struct {
-    char* data;
-} string;
 
 typedef struct {
 	float x;
@@ -54,12 +57,47 @@ typedef struct {
   float data [4] [4];
 } Matrix4;
 
-typedef struct MemoryAllocator MemoryAllocator;
+// These are just in Lua, so I can add a metatype to returned strings for a nice interning API
+typedef struct {
+  char* data;
+} tstring;
 
 typedef struct {
-	u32 index;
-	u32 generation;
-} ArenaHandle;
+  char* data;
+} string;
+
+
+typedef struct MemoryAllocator MemoryAllocator;
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+//  ██████╗ ██████╗ ███╗   ██╗████████╗ █████╗ ██╗███╗   ██╗███████╗██████╗ ███████╗ //
+// ██╔════╝██╔═══██╗████╗  ██║╚══██╔══╝██╔══██╗██║████╗  ██║██╔════╝██╔══██╗██╔════╝ //
+// ██║     ██║   ██║██╔██╗ ██║   ██║   ███████║██║██╔██╗ ██║█████╗  ██████╔╝███████╗ //
+// ██║     ██║   ██║██║╚██╗██║   ██║   ██╔══██║██║██║╚██╗██║██╔══╝  ██╔══██╗╚════██║ //
+// ╚██████╗╚██████╔╝██║ ╚████║   ██║   ██║  ██║██║██║ ╚████║███████╗██║  ██║███████║ //
+//  ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚══════╝ //
+///////////////////////////////////////////////////////////////////////////////////////
+typedef struct {
+    u32 size;
+    u32 capacity;
+    u32 element_size;
+    MemoryAllocator* allocator;
+} dyn_array_header;
+
+void*             _dyn_array_alloc(u32 element_size, MemoryAllocator* allocator);
+void              _dyn_array_push_n(void** array, void* data, u32 num_elements);
+void*             _dyn_array_reserve(void** array, u32 num_elements);
+dyn_array_header* _dyn_array_head(void** array);
+u32               _dyn_array_size(void** array);
+u32               _dyn_array_capacity(void** array);
+u32               _dyn_array_element_size(void** array);
+MemoryAllocator*  _dyn_array_allocator(void** array);
+bool              _dyn_array_full(void** array);
+bool              _dyn_array_need_grow(void** array, u32 num_elements);
+void              _dyn_array_grow(void** array, u32 requested_size);
+u32               _dyn_array_byte_size(void** array);
 
 typedef struct {
 	u8* data;
@@ -69,10 +107,31 @@ typedef struct {
 	u32 vertex_size;
 } FixedArray;
 
+void fixed_array_init(FixedArray* vertex_buffer, u32 max_vertices, u32 vertex_size);
+u8*  fixed_array_push(FixedArray* vertex_buffer, void* data, u32 count);
+u8*  fixed_array_reserve(FixedArray* vertex_buffer, u32 count);
+void fixed_array_clear(FixedArray* vertex_buffer);
+u32  fixed_array_byte_size(FixedArray* vertex_buffer);
+u8*  fixed_array_at(FixedArray* vertex_buffer, u32 index);
 
-//
-// AUDIO
-//
+typedef struct {
+	u32 index;
+	u32 generation;
+} ArenaHandle;
+
+void copy_string(const char* str, char* buffer, u32 buffer_length);
+void copy_string_n(const char* str, u32 length, char* buffer, u32 buffer_length);
+
+
+///////////////////////////////////////////
+//  █████╗ ██╗   ██╗██████╗ ██╗ ██████╗  //
+// ██╔══██╗██║   ██║██╔══██╗██║██╔═══██╗ //
+// ███████║██║   ██║██║  ██║██║██║   ██║ //
+// ██╔══██║██║   ██║██║  ██║██║██║   ██║ //
+// ██║  ██║╚██████╔╝██████╔╝██║╚██████╔╝ //
+// ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝ ╚═════╝  //
+///////////////////////////////////////////
+
 typedef struct {
   i32 index;
   i32 generation;
@@ -106,9 +165,15 @@ void set_master_volume_mod(float v);
 void set_window_size(int x, int y);
 
 
-//
-// INPUT
-//
+/////////////////////////////////////////////
+// ██╗███╗   ██╗██████╗ ██╗   ██╗████████╗ //
+// ██║████╗  ██║██╔══██╗██║   ██║╚══██╔══╝ //
+// ██║██╔██╗ ██║██████╔╝██║   ██║   ██║    //
+// ██║██║╚██╗██║██╔═══╝ ██║   ██║   ██║    //
+// ██║██║ ╚████║██║     ╚██████╔╝   ██║    //
+// ╚═╝╚═╝  ╚═══╝╚═╝      ╚═════╝    ╚═╝    //
+/////////////////////////////////////////////
+
 typedef enum {
 	COORD_UNIT_SCREEN = 0,
 	COORD_UNIT_WINDOW = 1,
@@ -139,10 +204,15 @@ void show_text_input(const char* description, const char* existing_text);
 bool is_text_input_dirty();
 const char* read_text_input();
 
+////////////////////////////////////////
+// ████████╗███████╗██╗  ██╗████████╗ //
+// ╚══██╔══╝██╔════╝╚██╗██╔╝╚══██╔══╝ //
+//    ██║   █████╗   ╚███╔╝    ██║    //
+//    ██║   ██╔══╝   ██╔██╗    ██║    //
+//    ██║   ███████╗██╔╝ ██╗   ██║    //
+//    ╚═╝   ╚══════╝╚═╝  ╚═╝   ╚═╝    //
+////////////////////////////////////////
 
-//
-// TEXT
-//
 typedef struct {
   char text [1024];
 	Vector2 position;
@@ -169,9 +239,15 @@ void create_font(const char* id, const char* family, u32 size);
 void add_imgui_font(const char* id);
 
 
-//
-// ENGINE
-//
+//////////////////////////////////////////////////////
+// ███████╗███╗   ██╗ ██████╗ ██╗███╗   ██╗███████╗ //
+// ██╔════╝████╗  ██║██╔════╝ ██║████╗  ██║██╔════╝ //
+// █████╗  ██╔██╗ ██║██║  ███╗██║██╔██╗ ██║█████╗   //
+// ██╔══╝  ██║╚██╗██║██║   ██║██║██║╚██╗██║██╔══╝   //
+// ███████╗██║ ╚████║╚██████╔╝██║██║ ╚████║███████╗ //
+// ╚══════╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝╚═╝  ╚═══╝╚══════╝ //
+//////////////////////////////////////////////////////
+
 void set_exit_game();
 const char* get_game_hash();
 void set_target_fps(f64 fps);
@@ -217,6 +293,7 @@ tstring resolve_format_path(const char* name, const char* file_name);
 // ╚███╔███╔╝██║██║ ╚████║██████╔╝╚██████╔╝╚███╔███╔╝ //
 //  ╚══╝╚══╝ ╚═╝╚═╝  ╚═══╝╚═════╝  ╚═════╝  ╚══╝╚══╝  //
 ////////////////////////////////////////////////////////
+
 typedef enum {
 	DisplayMode_p480,
 	DisplayMode_p720,
@@ -248,7 +325,6 @@ void hide_cursor();
 void show_cursor();
 void use_editor_layout(const char* file_name);
 void save_editor_layout(const char* file_name);
-void render_imgui();
 
 
 
@@ -612,9 +688,14 @@ void               gpu_set_resource_name(GpuResourceId id, u32 handle, u32 name_
 
 
 
-/////////
-// SDF //
-/////////
+//////////////////////////////
+// ███████╗██████╗ ███████╗ //
+// ██╔════╝██╔══██╗██╔════╝ //
+// ███████╗██║  ██║█████╗   //
+// ╚════██║██║  ██║██╔══╝   //
+// ███████║██████╔╝██║      //
+// ╚══════╝╚═════╝ ╚═╝      //
+//////////////////////////////
 
 typedef enum {
   SDF_SHAPE_CIRCLE = 0,
@@ -698,8 +779,6 @@ typedef struct {
   Vector2 size;
 } SdfOrientedBox;
 
-
-
 typedef struct {
   SdfRendererState state;
   GpuBackedBuffer vertices;
@@ -722,6 +801,142 @@ void              sdf_ring_ex(SdfRenderer* renderer, float px, float py, float r
 void              sdf_oriented_box_ex(SdfRenderer* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float dx, float dy);
 void              sdf_grid(SdfRenderer* renderer, u32 grid_width, u32 grid_size);
 
+
+
+
+///////////////////////
+//  ██████╗ ███████╗ //
+// ██╔═══██╗██╔════╝ //
+// ██║   ██║███████╗ //
+// ██║   ██║╚════██║ //
+// ╚██████╔╝███████║ //
+//  ╚═════╝ ╚══════╝ //
+///////////////////////
+ 
+bool does_path_exist(const char* path);
+bool is_regular_file(const char* path);
+bool is_directory(const char* path);
+void create_directory(const char* path);
+void remove_directory(const char* path);
+void create_named_directory(const char* name);
+
+typedef struct DateTime {
+	int year;
+	int month;
+	int day;
+	int hour;
+	int minute;
+	int second;
+	int millisecond;
+} DateTime;
+
+DateTime get_date_time();
+
+void ma_add(const char* name, MemoryAllocator* allocator);
+MemoryAllocator* ma_find(const char* name);
+void* ma_alloc(MemoryAllocator* allocator, u32 size);
+void ma_free(MemoryAllocator* allocator, void* buffer);
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ██╗███╗   ██╗██████╗ ██╗   ██╗████████╗     █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗ //
+// ██║████╗  ██║██╔══██╗██║   ██║╚══██╔══╝    ██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝ //
+// ██║██╔██╗ ██║██████╔╝██║   ██║   ██║       ███████║██║        ██║   ██║██║   ██║██╔██╗ ██║███████╗ //
+// ██║██║╚██╗██║██╔═══╝ ██║   ██║   ██║       ██╔══██║██║        ██║   ██║██║   ██║██║╚██╗██║╚════██║ //
+// ██║██║ ╚████║██║     ╚██████╔╝   ██║       ██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║ //
+// ╚═╝╚═╝  ╚═══╝╚═╝      ╚═════╝    ╚═╝       ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝ //
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+typedef enum {
+  KEY_ACTION_PRESS = 0,
+  KEY_ACTION_DOWN = 1,
+} KeyAction;
+
+void register_action(const char* name, u32 key, u32 key_event, const char* action_set);
+void register_action_set(const char* name);
+void activate_action_set(const char* name);
+bool is_digital_active(const char* name);
+bool was_digital_active(const char* name);
+bool was_digital_pressed(const char* name);
+i32 get_action_set_cooldown();
+const char* get_active_action_set();
+
+
+
+
+
+////////////////////////////////////////////
+// ███╗   ██╗ ██████╗ ██╗███████╗███████╗ //
+// ████╗  ██║██╔═══██╗██║██╔════╝██╔════╝ //
+// ██╔██╗ ██║██║   ██║██║███████╗█████╗   //
+// ██║╚██╗██║██║   ██║██║╚════██║██╔══╝   //
+// ██║ ╚████║╚██████╔╝██║███████║███████╗ //
+// ╚═╝  ╚═══╝ ╚═════╝ ╚═╝╚══════╝╚══════╝ //
+////////////////////////////////////////////
+
+f64 perlin(f64 x, f64 y, f64 vmin, f64 vmax);
+
+
+
+
+///////////////////////////////////////////////////////////////////////////
+// ██╗   ██╗███╗   ██╗██████╗  ██████╗ ██████╗ ████████╗███████╗██████╗  //
+// ██║   ██║████╗  ██║██╔══██╗██╔═══██╗██╔══██╗╚══██╔══╝██╔════╝██╔══██╗ //
+// ██║   ██║██╔██╗ ██║██████╔╝██║   ██║██████╔╝   ██║   █████╗  ██║  ██║ //
+// ██║   ██║██║╚██╗██║██╔═══╝ ██║   ██║██╔══██╗   ██║   ██╔══╝  ██║  ██║ //
+// ╚██████╔╝██║ ╚████║██║     ╚██████╔╝██║  ██║   ██║   ███████╗██████╔╝ //
+//  ╚═════╝ ╚═╝  ╚═══╝╚═╝      ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═════╝	 //
+///////////////////////////////////////////////////////////////////////////
+
+//
+// FLUID
+//
+	typedef struct {
+		u32 next_unprocessed_index;
+		u32 grid_size;
+	} EulerianFluidSystem;
+
+ArenaHandle lf_create(u32 num_particles);
+void lf_destroy(ArenaHandle handle);
+void lf_destroy_all();
+void lf_init(ArenaHandle handle);
+void lf_inspect(ArenaHandle handle);
+void lf_set_volume(ArenaHandle handle, float ax, float ay, float bx, float by, float radius);
+void lf_set_velocity(ArenaHandle handle, float x, float y);
+void lf_set_smoothing_radius(ArenaHandle handle, float r);
+void lf_set_particle_mass(ArenaHandle handle, float mass);
+void lf_set_viscosity(ArenaHandle handle, float viscosity);
+void lf_set_pressure(ArenaHandle handle, float pressure);
+void lf_set_gravity(ArenaHandle handle, float gravity);
+void lf_set_timestep(ArenaHandle handle, float dt);
+void lf_bind(ArenaHandle handle);
+void lf_update(ArenaHandle handle);
+void lf_draw(ArenaHandle handle);
+
+ArenaHandle ef_create(u32 grid_size);
+void ef_destroy(ArenaHandle handle);
+void ef_destroy_all();
+void ef_init(ArenaHandle handle);
+void ef_inspect(ArenaHandle handle);
+u32 ef_pair_to_index(u32 grid_size, u32 x, u32 y);
+void ef_set_render_size(ArenaHandle handle, u32 size);
+void ef_set_velocity(ArenaHandle handle, u32 x, u32 y, float vx, float vy);
+void ef_clear_density_source(ArenaHandle handle);
+void ef_set_density_source(ArenaHandle handle, u32 x, u32 y, float amount);
+void ef_set_gauss_seidel(ArenaHandle handle, u32 iterations);
+void ef_bind(ArenaHandle handle);
+void ef_update(ArenaHandle handle);
+void ef_draw(ArenaHandle handle);
+
+
+// SCREENSHOTS
+void take_screenshot();
+void write_screenshot_to_png(const char* file_name);
+
+// STEAM
+void open_steam_page(const char* utm);
+bool is_steam_deck();
 
 //
 // DRAW
@@ -748,75 +963,6 @@ void draw_text_ex(const char* text, f32 px, f32 py, Vector4 color, const char* f
 void draw_prepared_text(PreparedText* text);
 
 u32 find_texture_handle(const char* name);
-
-//
-// OS
-//
-bool does_path_exist(const char* path);
-bool is_regular_file(const char* path);
-bool is_directory(const char* path);
-void create_directory(const char* path);
-void remove_directory(const char* path);
-void create_named_directory(const char* name);
-
-typedef struct DateTime {
-	int year;
-	int month;
-	int day;
-	int hour;
-	int minute;
-	int second;
-	int millisecond;
-} DateTime;
-
-DateTime get_date_time();
-
-void ma_add(const char* name, MemoryAllocator* allocator);
-MemoryAllocator* ma_find(const char* name);
-void* ma_alloc(MemoryAllocator* allocator, u32 size);
-void ma_free(MemoryAllocator* allocator, void* buffer);
-
-typedef struct dyn_array
-{
-    u32 size;
-    u32 capacity;
-    u32 element_size;
-    MemoryAllocator* allocator;
-} dyn_array_header;
-
-void*             _dyn_array_alloc(u32 element_size, MemoryAllocator* allocator);
-void              _dyn_array_push_n(void** array, void* data, u32 num_elements);
-void*             _dyn_array_reserve(void** array, u32 num_elements);
-dyn_array_header* _dyn_array_head(void** array);
-u32               _dyn_array_size(void** array);
-u32               _dyn_array_capacity(void** array);
-u32               _dyn_array_element_size(void** array);
-MemoryAllocator*  _dyn_array_allocator(void** array);
-bool              _dyn_array_full(void** array);
-bool              _dyn_array_need_grow(void** array, u32 num_elements);
-void              _dyn_array_grow(void** array, u32 requested_size);
-u32               _dyn_array_byte_size(void** array);
-
-void copy_string(const char* str, char* buffer, u32 buffer_length);
-void copy_string_n(const char* str, u32 length, char* buffer, u32 buffer_length);
-
-//
-// ACTIONS
-//
-void register_action(const char* name, u32 key, u32 key_event, const char* action_set);
-void register_action_set(const char* name);
-void activate_action_set(const char* name);
-bool is_digital_active(const char* name);
-bool was_digital_active(const char* name);
-bool was_digital_pressed(const char* name);
-i32 get_action_set_cooldown();
-const char* get_active_action_set();
-
-enum {
-	KeyAction_Press = 0,
-	KeyAction_Down = 1
-};
-
 
 //
 // INTERPOLATION
@@ -892,74 +1038,6 @@ void set_particle_gravity_intensity(ParticleSystemHandle handle, float intensity
 void set_particle_gravity_enabled(ParticleSystemHandle handle, bool enabled);
 void set_particle_master_opacity(ParticleSystemHandle handle, float opacity);
 
-//
-// MATH
-//
-f64 perlin(f64 x, f64 y, f64 vmin, f64 vmax);
-
-
-
-
-///////////////////////////////////////////////////////////////////////////
-// ██╗   ██╗███╗   ██╗██████╗  ██████╗ ██████╗ ████████╗███████╗██████╗  //
-// ██║   ██║████╗  ██║██╔══██╗██╔═══██╗██╔══██╗╚══██╔══╝██╔════╝██╔══██╗ //
-// ██║   ██║██╔██╗ ██║██████╔╝██║   ██║██████╔╝   ██║   █████╗  ██║  ██║ //
-// ██║   ██║██║╚██╗██║██╔═══╝ ██║   ██║██╔══██╗   ██║   ██╔══╝  ██║  ██║ //
-// ╚██████╔╝██║ ╚████║██║     ╚██████╔╝██║  ██║   ██║   ███████╗██████╔╝ //
-//  ╚═════╝ ╚═╝  ╚═══╝╚═╝      ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═════╝	 //
-///////////////////////////////////////////////////////////////////////////
-
-//
-// FLUID
-//
-	typedef struct {
-		u32 next_unprocessed_index;
-		u32 grid_size;
-	} EulerianFluidSystem;
-
-ArenaHandle lf_create(u32 num_particles);
-void lf_destroy(ArenaHandle handle);
-void lf_destroy_all();
-void lf_init(ArenaHandle handle);
-void lf_inspect(ArenaHandle handle);
-void lf_set_volume(ArenaHandle handle, float ax, float ay, float bx, float by, float radius);
-void lf_set_velocity(ArenaHandle handle, float x, float y);
-void lf_set_smoothing_radius(ArenaHandle handle, float r);
-void lf_set_particle_mass(ArenaHandle handle, float mass);
-void lf_set_viscosity(ArenaHandle handle, float viscosity);
-void lf_set_pressure(ArenaHandle handle, float pressure);
-void lf_set_gravity(ArenaHandle handle, float gravity);
-void lf_set_timestep(ArenaHandle handle, float dt);
-void lf_bind(ArenaHandle handle);
-void lf_update(ArenaHandle handle);
-void lf_draw(ArenaHandle handle);
-
-ArenaHandle ef_create(u32 grid_size);
-void ef_destroy(ArenaHandle handle);
-void ef_destroy_all();
-void ef_init(ArenaHandle handle);
-void ef_inspect(ArenaHandle handle);
-u32 ef_pair_to_index(u32 grid_size, u32 x, u32 y);
-void ef_set_render_size(ArenaHandle handle, u32 size);
-void ef_set_velocity(ArenaHandle handle, u32 x, u32 y, float vx, float vy);
-void ef_clear_density_source(ArenaHandle handle);
-void ef_set_density_source(ArenaHandle handle, u32 x, u32 y, float amount);
-void ef_set_gauss_seidel(ArenaHandle handle, u32 iterations);
-void ef_bind(ArenaHandle handle);
-void ef_update(ArenaHandle handle);
-void ef_draw(ArenaHandle handle);
-
-
-// SCREENSHOTS
-void take_screenshot();
-void write_screenshot_to_png(const char* file_name);
-
-// STEAM
-void open_steam_page(const char* utm);
-bool is_steam_deck();
-
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ██╗   ██╗███╗   ██╗ ██████╗ █████╗ ████████╗███████╗ ██████╗  ██████╗ ██████╗ ██╗███████╗███████╗██████╗  //
 // ██║   ██║████╗  ██║██╔════╝██╔══██╗╚══██╔══╝██╔════╝██╔════╝ ██╔═══██╗██╔══██╗██║╚══███╔╝██╔════╝██╔══██╗ //
@@ -1024,7 +1102,6 @@ function tdengine.handle_error(message)
 
   tdengine.debug.open_debugger(1)
   --tdengine.analytics.submit_crash(error_message, trace_message)
-  tdengine.ffi.render_imgui()
 
   return
 end

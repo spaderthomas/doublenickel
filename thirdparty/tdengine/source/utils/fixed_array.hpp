@@ -12,12 +12,12 @@ typedef struct {
 	u32 vertex_size;
 } FixedArray;
 
-inline void fixed_array_init(FixedArray* vertex_buffer, u32 max_vertices, u32 vertex_size);
-inline u8*  fixed_array_push(FixedArray* vertex_buffer, void* data, u32 count);
-inline u8*  fixed_array_reserve(FixedArray* vertex_buffer, u32 count);
-inline void fixed_array_clear(FixedArray* vertex_buffer);
-inline u32  fixed_array_byte_size(FixedArray* vertex_buffer);
-__forceinline u8*  fixed_array_at(FixedArray* vertex_buffer, u32 index);
+FM_LUA_EXPORT void fixed_array_init(FixedArray* vertex_buffer, u32 max_vertices, u32 vertex_size);
+FM_LUA_EXPORT u8*  fixed_array_push(FixedArray* vertex_buffer, void* data, u32 count);
+FM_LUA_EXPORT u8*  fixed_array_reserve(FixedArray* vertex_buffer, u32 count);
+FM_LUA_EXPORT void fixed_array_clear(FixedArray* vertex_buffer);
+FM_LUA_EXPORT u32  fixed_array_byte_size(FixedArray* vertex_buffer);
+FM_LUA_EXPORT u8*  fixed_array_at(FixedArray* vertex_buffer, u32 index);
 #endif
 
 

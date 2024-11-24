@@ -1,7 +1,7 @@
 function tdengine.action.init()
   tdengine.action.event_kind = {
-    press = tdengine.ffi.KeyAction_Press,
-    down = tdengine.ffi.KeyAction_Down,
+    press = tdengine.ffi.KEY_ACTION_PRESS,
+    down = tdengine.ffi.KEY_ACTION_DOWN,
   }
 
   tdengine.action.data = tdengine.module.read_from_named_path('action_info')
