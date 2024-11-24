@@ -62,7 +62,7 @@ function App:on_init_game()
 	self.sdf_renderer = ffi.new('SdfRenderer [1]');
   self.sdf_renderer = tdengine.ffi.sdf_renderer_create(1024 * 1024)
 
-  self.command_buffer = tdengine.ffi._gpu_command_buffer_create(GpuCommandBufferDescriptor:new({
+  self.command_buffer = tdengine.ffi.gpu_command_buffer_create(GpuCommandBufferDescriptor:new({
     max_commands = 1024
   }))
 
@@ -100,12 +100,12 @@ function App:on_start_game()
 end
 
 function App:on_scene_rendered()
-	tdengine.ffi._gpu_begin_render_pass(self.command_buffer, self.render_pass)
-  tdengine.ffi._gpu_set_world_space(self.command_buffer, true)
-  tdengine.ffi._gpu_set_camera(self.command_buffer, tdengine.editor.find('EditorCamera').offset:to_ctype())
+	tdengine.ffi.gpu_begin_render_pass(self.command_buffer, self.render_pass)
+  tdengine.ffi.gpu_set_world_space(self.command_buffer, true)
+  tdengine.ffi.gpu_set_camera(self.command_buffer, tdengine.editor.find('EditorCamera').offset:to_ctype())
   tdengine.ffi.sdf_renderer_draw(self.sdf_renderer, self.command_buffer)
-  tdengine.ffi._gpu_end_render_pass(self.command_buffer)
-  tdengine.ffi._gpu_command_buffer_submit(self.command_buffer)
+  tdengine.ffi.gpu_end_render_pass(self.command_buffer)
+  tdengine.ffi.gpu_command_buffer_submit(self.command_buffer)
 
 	tdengine.ffi.gpu_render_target_blit(
     tdengine.gpu.find(RenderTarget.Native),
@@ -114,6 +114,7 @@ function App:on_scene_rendered()
 end
 
 function App:on_swapchain_ready()
-	tdengine.ffi.render_imgui()
+	imgui.Imgui_Impl_glfw_opengl3:Render()
+	-- tdengine.ffi.render_imgui()
 end
 

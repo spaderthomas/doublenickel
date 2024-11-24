@@ -40,6 +40,9 @@ extern "C" {
 	#include "lua/lauxlib.h"
 }
 
+// I'm not sure if this is totally kosher (i.e. ImGui IS a C++ library, they could feasibly
+// add something which does not compile under extern C), but it's not a big deal. 
+#define IMGUI_IMPL_API extern "C" __declspec(dllexport)
 #define IMGUI_IMPL_OPENGL_LOADER_CUSTOM
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui/imgui.h"
@@ -47,6 +50,8 @@ extern "C" {
 #include "imgui/imgui_impl_opengl3.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imfilebrowser.h"
+#define CIMGUI_USE_GLFW
+#define CIMGUI_USE_OPENGL3
 #include "imgui/cimgui.hpp"
 
 #define SOKOL_IMPL

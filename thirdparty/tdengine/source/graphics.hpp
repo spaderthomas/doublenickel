@@ -317,19 +317,19 @@ typedef struct {
 ///////////////
 // FUNCTIONS //
 ///////////////
-FM_LUA_EXPORT GpuCommandBuffer* _gpu_command_buffer_create(GpuCommandBufferDescriptor descriptor);
-FM_LUA_EXPORT void              _gpu_command_buffer_draw(GpuCommandBuffer* command_buffer, GpuDrawCall draw_call);
-FM_LUA_EXPORT void              _gpu_command_buffer_submit(GpuCommandBuffer* command_buffer);
-FM_LUA_EXPORT void              _gpu_bind_pipeline(GpuCommandBuffer* command_buffer, GpuPipeline* pipeline);
-FM_LUA_EXPORT void              _gpu_begin_render_pass(GpuCommandBuffer* command_buffer, GpuRenderPass render_pass);
-FM_LUA_EXPORT void              _gpu_end_render_pass(GpuCommandBuffer* command_buffer);
-FM_LUA_EXPORT void              _gpu_apply_bindings(GpuCommandBuffer* command_buffer, GpuBufferBinding bindings);
-FM_LUA_EXPORT void              _gpu_bind_render_state(GpuCommandBuffer* command_buffer, GpuRendererState render);
-FM_LUA_EXPORT void              _gpu_set_layer(GpuCommandBuffer* command_buffer, u32 layer);
-FM_LUA_EXPORT void              _gpu_set_world_space(GpuCommandBuffer* command_buffer, bool world_space);
-FM_LUA_EXPORT void              _gpu_set_camera(GpuCommandBuffer* command_buffer, Vector2 camera);
-FM_LUA_EXPORT GpuPipeline*      _gpu_pipeline_create(GpuPipelineDescriptor descriptor);
-FM_LUA_EXPORT GpuUniform*       _gpu_uniform_create(GpuUniformDescriptor descriptor);
+FM_LUA_EXPORT GpuCommandBuffer* gpu_command_buffer_create(GpuCommandBufferDescriptor descriptor);
+FM_LUA_EXPORT void              gpu_command_buffer_draw(GpuCommandBuffer* command_buffer, GpuDrawCall draw_call);
+FM_LUA_EXPORT void              gpu_command_buffer_submit(GpuCommandBuffer* command_buffer);
+FM_LUA_EXPORT void              gpu_bind_pipeline(GpuCommandBuffer* command_buffer, GpuPipeline* pipeline);
+FM_LUA_EXPORT void              gpu_begin_render_pass(GpuCommandBuffer* command_buffer, GpuRenderPass render_pass);
+FM_LUA_EXPORT void              gpu_end_render_pass(GpuCommandBuffer* command_buffer);
+FM_LUA_EXPORT void              gpu_apply_bindings(GpuCommandBuffer* command_buffer, GpuBufferBinding bindings);
+FM_LUA_EXPORT void              gpu_bind_render_state(GpuCommandBuffer* command_buffer, GpuRendererState render);
+FM_LUA_EXPORT void              gpu_set_layer(GpuCommandBuffer* command_buffer, u32 layer);
+FM_LUA_EXPORT void              gpu_set_world_space(GpuCommandBuffer* command_buffer, bool world_space);
+FM_LUA_EXPORT void              gpu_set_camera(GpuCommandBuffer* command_buffer, Vector2 camera);
+FM_LUA_EXPORT GpuPipeline*      gpu_pipeline_create(GpuPipelineDescriptor descriptor);
+FM_LUA_EXPORT GpuUniform*       gpu_uniform_create(GpuUniformDescriptor descriptor);
 FM_LUA_EXPORT GpuBuffer*         gpu_buffer_create(GpuBufferDescriptor descriptor);
 FM_LUA_EXPORT void               gpu_buffer_bind(GpuBuffer* buffer);
 FM_LUA_EXPORT void               gpu_buffer_bind_base(GpuBuffer* buffer, u32 base);
@@ -373,8 +373,8 @@ typedef struct {
 GpuInfo td_gpu;
 
 void                   gpu_init();
-void                   _gpu_command_buffer_clear_cached_state(GpuCommandBuffer* command_buffer);
-u32                    _gpu_vertex_layout_calculate_stride(GpuBufferLayout* layout);
+void                   gpu_command_buffer_clear_cached_state(GpuCommandBuffer* command_buffer);
+u32                    gpu_vertex_layout_calculate_stride(GpuBufferLayout* layout);
 u32                    gpu_draw_primitive_to_gl_draw_primitive(GpuDrawPrimitive primitive);
 GpuVertexAttributeInfo gpu_vertex_attribute_info(GpuVertexAttributeKind kind);
 void*                  gpu_u32_to_gl_void_pointer(u32 value);
@@ -398,7 +398,7 @@ u32                    gpu_memory_barrier_to_gl_barrier(GpuMemoryBarrier barrier
 ////////////////////
 // COMMAND BUFFER //
 ////////////////////
-GpuCommandBuffer* _gpu_command_buffer_create(GpuCommandBufferDescriptor descriptor) {
+GpuCommandBuffer* gpu_command_buffer_create(GpuCommandBufferDescriptor descriptor) {
   auto command_buffer = arr_push(&td_gpu.command_buffers);
   arr_init(&command_buffer->commands, descriptor.max_commands);
   glGenVertexArrays(1, &command_buffer->vao);
@@ -407,7 +407,7 @@ GpuCommandBuffer* _gpu_command_buffer_create(GpuCommandBufferDescriptor descript
   return command_buffer;
 }
 
-void _gpu_command_buffer_clear_cached_state(GpuCommandBuffer* command_buffer) {
+void gpu_command_buffer_clear_cached_state(GpuCommandBuffer* command_buffer) {
   command_buffer->pipeline = nullptr;
   zero_memory(&command_buffer->bindings, sizeof(GpuBufferBinding));
   zero_memory(&command_buffer->render_pass, sizeof(GpuRenderPass));
@@ -415,8 +415,8 @@ void _gpu_command_buffer_clear_cached_state(GpuCommandBuffer* command_buffer) {
   zero_memory(&command_buffer->scissor, sizeof(GpuScissorState));
 }
 
-void _gpu_command_buffer_submit(GpuCommandBuffer* command_buffer) {
-  _gpu_command_buffer_clear_cached_state(command_buffer);
+void gpu_command_buffer_submit(GpuCommandBuffer* command_buffer) {
+  gpu_command_buffer_clear_cached_state(command_buffer);
   glBindVertexArray(command_buffer->vao);
 
   arr_for(command_buffer->commands, it) {
@@ -480,7 +480,7 @@ void _gpu_command_buffer_submit(GpuCommandBuffer* command_buffer) {
 
           gpu_buffer_bind(buffer);
 
-          u32 stride = _gpu_vertex_layout_calculate_stride(&buffer_layout);
+          u32 stride = gpu_vertex_layout_calculate_stride(&buffer_layout);
 
           u64 offset = 0;
           for (u32 i = 0; i < buffer_layout.num_vertex_attributes; i++) {
@@ -581,12 +581,12 @@ void _gpu_command_buffer_submit(GpuCommandBuffer* command_buffer) {
   }
 
   glBindVertexArray(0);
-  _gpu_command_buffer_clear_cached_state(command_buffer);
+  gpu_command_buffer_clear_cached_state(command_buffer);
   arr_clear(&command_buffer->commands);
 }
 
 
-void _gpu_command_buffer_draw(GpuCommandBuffer* command_buffer, GpuDrawCall draw_call) {
+void gpu_command_buffer_draw(GpuCommandBuffer* command_buffer, GpuDrawCall draw_call) {
   arr_push(&command_buffer->commands, {
     .kind = GPU_COMMAND_OP_DRAW,
     .draw = draw_call
@@ -597,7 +597,7 @@ void _gpu_command_buffer_draw(GpuCommandBuffer* command_buffer, GpuDrawCall draw
 //////////////
 // PIPELINE //
 //////////////
-GpuPipeline* _gpu_pipeline_create(GpuPipelineDescriptor descriptor) {
+GpuPipeline* gpu_pipeline_create(GpuPipelineDescriptor descriptor) {
   GpuPipeline* pipeline = arr_push(&td_gpu.pipelines);
   pipeline->raster = descriptor.raster;
   pipeline->blend = descriptor.blend;
@@ -607,7 +607,7 @@ GpuPipeline* _gpu_pipeline_create(GpuPipelineDescriptor descriptor) {
   return pipeline;
 }
 
-void _gpu_bind_pipeline(GpuCommandBuffer* command_buffer, GpuPipeline* pipeline) {
+void gpu_bind_pipeline(GpuCommandBuffer* command_buffer, GpuPipeline* pipeline) {
   arr_push(&command_buffer->commands, {
     .kind = GPU_COMMAND_OP_BIND_PIPELINE,
     .pipeline = pipeline
@@ -618,20 +618,20 @@ void _gpu_bind_pipeline(GpuCommandBuffer* command_buffer, GpuPipeline* pipeline)
 /////////////
 // BINDING //
 /////////////
-void _gpu_begin_render_pass(GpuCommandBuffer* command_buffer, GpuRenderPass render_pass) {
+void gpu_begin_render_pass(GpuCommandBuffer* command_buffer, GpuRenderPass render_pass) {
   arr_push(&command_buffer->commands, {
     .kind = GPU_COMMAND_OP_BEGIN_RENDER_PASS,
     .render_pass = render_pass
   });
 }
 
-void _gpu_end_render_pass(GpuCommandBuffer* command_buffer) {
+void gpu_end_render_pass(GpuCommandBuffer* command_buffer) {
   arr_push(&command_buffer->commands, {
     .kind = GPU_COMMAND_OP_END_RENDER_PASS,
   });
 }
 
-void _gpu_apply_bindings(GpuCommandBuffer* command_buffer, GpuBufferBinding bindings) {
+void gpu_apply_bindings(GpuCommandBuffer* command_buffer, GpuBufferBinding bindings) {
   if (is_memory_equal(&command_buffer->bindings, &bindings, sizeof(GpuBufferBinding))) return;
 
   arr_push(&command_buffer->commands, {
@@ -644,7 +644,7 @@ void _gpu_apply_bindings(GpuCommandBuffer* command_buffer, GpuBufferBinding bind
 //////////////////
 // RENDER STATE //
 //////////////////
-void _gpu_set_layer(GpuCommandBuffer* command_buffer, u32 layer) {
+void gpu_set_layer(GpuCommandBuffer* command_buffer, u32 layer) {
   if (command_buffer->render.layer == layer) return;
 
   arr_push(&command_buffer->commands, {
@@ -655,7 +655,7 @@ void _gpu_set_layer(GpuCommandBuffer* command_buffer, u32 layer) {
   });
 }
 
-void _gpu_set_world_space(GpuCommandBuffer* command_buffer, bool world_space) {
+void gpu_set_world_space(GpuCommandBuffer* command_buffer, bool world_space) {
   if (command_buffer->render.world_space == world_space) return;
 
   arr_push(&command_buffer->commands, {
@@ -666,7 +666,7 @@ void _gpu_set_world_space(GpuCommandBuffer* command_buffer, bool world_space) {
   });
 }
 
-void _gpu_set_camera(GpuCommandBuffer* command_buffer, Vector2 camera) {
+void gpu_set_camera(GpuCommandBuffer* command_buffer, Vector2 camera) {
   if (is_memory_equal(&command_buffer->render.camera,  &camera, sizeof(Vector2))) return;
 
   arr_push(&command_buffer->commands, {
@@ -677,17 +677,17 @@ void _gpu_set_camera(GpuCommandBuffer* command_buffer, Vector2 camera) {
   });
 }
 
-void _gpu_bind_render_state(GpuCommandBuffer* command_buffer, GpuRendererState render) {
-  _gpu_set_layer(command_buffer, render.layer);
-  _gpu_set_camera(command_buffer, render.camera);
-  _gpu_set_world_space(command_buffer, render.world_space);
+void gpu_bind_render_state(GpuCommandBuffer* command_buffer, GpuRendererState render) {
+  gpu_set_layer(command_buffer, render.layer);
+  gpu_set_camera(command_buffer, render.camera);
+  gpu_set_world_space(command_buffer, render.world_space);
 }
 
 
 //////////////
 // UNIFORMS //
 //////////////
-GpuUniform* _gpu_uniform_create(GpuUniformDescriptor descriptor) {
+GpuUniform* gpu_uniform_create(GpuUniformDescriptor descriptor) {
   auto uniform = arr_push(&td_gpu.uniforms);
   copy_string_n(descriptor.name, MAX_UNIFORM_NAME, uniform->name, MAX_UNIFORM_NAME);
   uniform->kind = descriptor.kind;
@@ -974,7 +974,7 @@ void* gpu_u32_to_gl_void_pointer(u32 value) {
   return (void*)(uintptr_t)value;
 }
 
-u32 _gpu_vertex_layout_calculate_stride(GpuBufferLayout* layout) {
+u32 gpu_vertex_layout_calculate_stride(GpuBufferLayout* layout) {
   assert(layout);
 
   u32 stride = 0;

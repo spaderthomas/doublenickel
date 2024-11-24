@@ -1,7 +1,13 @@
 local ffi_header = [[
-//
-// TYPES
-//
+////////////////////////////////////////////////
+// ████████╗██╗   ██╗██████╗ ███████╗███████╗ //
+// ╚══██╔══╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔════╝ //
+//    ██║    ╚████╔╝ ██████╔╝█████╗  ███████╗ //
+//    ██║     ╚██╔╝  ██╔═══╝ ██╔══╝  ╚════██║ //
+//    ██║      ██║   ██║     ███████╗███████║ //
+//    ╚═╝      ╚═╝   ╚═╝     ╚══════╝╚══════╝ //
+////////////////////////////////////////////////
+   
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -63,15 +69,6 @@ typedef struct {
 	u32 vertex_size;
 } FixedArray;
 
-void set_gl_name(u32 kind, u32 handle, u32 name_len, const char* name);
-
-void IGE_PushGameFont(const char* font_name);
-void IGE_GameImage(const char* image, float sx, float sy);
-void IGE_OpenFileBrowser();
-void IGE_CloseFileBrowser();
-void IGE_SetFileBrowserWorkDir(const char* directory);
-bool IGE_IsAnyFileSelected();
-tstring IGE_GetSelectedFile();
 
 //
 // AUDIO
@@ -147,10 +144,10 @@ const char* read_text_input();
 // TEXT
 //
 typedef struct {
-    char text [1024];
+  char text [1024];
 	Vector2 position;
 	Vector2 padding;
-    Vector4 color;
+  Vector4 color;
 	void* font;
 	float wrap;
 	float offset;
@@ -168,8 +165,6 @@ typedef struct {
 PreparedText* prepare_text(const char* text, f32 px, f32 py, const char* font);
 PreparedText* prepare_text_wrap(const char* text, f32 px, f32 py, const char* font, f32 wrap);
 PreparedText* prepare_text_ex(const char* text, f32 px, f32 py, const char* font, f32 wrap, Vector4 color, bool precise);
-void draw_prepared_text(PreparedText* text);
-
 void create_font(const char* id, const char* family, u32 size);
 void add_imgui_font(const char* id);
 
@@ -182,6 +177,8 @@ const char* get_game_hash();
 void set_target_fps(f64 fps);
 f64 get_target_fps();
 
+
+// TIMERS
 void tm_add(const char* name);
 void tm_begin(const char* name);
 void tm_end(const char* name);
@@ -190,15 +187,8 @@ double tm_last(const char* name);
 double tm_largest(const char* name);
 double tm_smallest(const char* name);
 
-void submit_feedback(const char* feedback);
-void submit_analytics(const char* analytics);
-void submit_crash(const char* crash);
-void submit_image(const char* file_path);
-void open_steam_page(const char* utm);
-bool is_steam_deck();
-void take_screenshot();
-void write_screenshot_to_png(const char* file_name);
 
+// NAMED PATHS
 typedef struct {
     const char* name;
     const char* path;
@@ -218,11 +208,15 @@ void add_named_subpath(const char* name, const char* parent_name, const char* re
 tstring resolve_named_path(const char* name);
 tstring resolve_format_path(const char* name, const char* file_name);
 
-void add_script_directory(const char* name);
 
-//
-// WINDOW
-//
+////////////////////////////////////////////////////////
+// ██╗    ██╗██╗███╗   ██╗██████╗  ██████╗ ██╗    ██╗ //
+// ██║    ██║██║████╗  ██║██╔══██╗██╔═══██╗██║    ██║ //
+// ██║ █╗ ██║██║██╔██╗ ██║██║  ██║██║   ██║██║ █╗ ██║ //
+// ██║███╗██║██║██║╚██╗██║██║  ██║██║   ██║██║███╗██║ //
+// ╚███╔███╔╝██║██║ ╚████║██████╔╝╚██████╔╝╚███╔███╔╝ //
+//  ╚══╝╚══╝ ╚═╝╚═╝  ╚═══╝╚═════╝  ╚═════╝  ╚══╝╚══╝  //
+////////////////////////////////////////////////////////
 typedef enum {
 	DisplayMode_p480,
 	DisplayMode_p720,
@@ -244,8 +238,6 @@ void         coord_set_camera(float x, float y);
 void         coord_set_framebuffer_position(float x, float y);
 void         coord_set_framebuffer_size(float x, float y);
 
-
-
 void create_window(const char* title, u32 x, u32 y, u32 flags);
 void set_window_icon(const char* file_path);
 Vector2 get_content_area();
@@ -262,16 +254,20 @@ void render_imgui();
 
 
 
+////////////////////////////////
+//  ██████╗ ██████╗ ██╗   ██╗ //
+// ██╔════╝ ██╔══██╗██║   ██║ //
+// ██║  ███╗██████╔╝██║   ██║ //
+// ██║   ██║██╔═══╝ ██║   ██║ //
+// ╚██████╔╝██║     ╚██████╔╝ //
+//  ╚═════╝ ╚═╝      ╚═════╝  //
+////////////////////////////////
+                          
 
 typedef struct GpuShader GpuShader;
 typedef struct GpuBuffer GpuBuffer;
 typedef struct GpuVertexLayout GpuVertexLayout;
 
-
-
-///////////
-// ENUMS //
-///////////
 typedef enum {
   GPU_COMMAND_OP_BIND_BUFFERS = 10,
   GPU_COMMAND_OP_BEGIN_RENDER_PASS = 20,
@@ -574,19 +570,19 @@ typedef struct {
 ///////////////////
 // GPU FUNCTIONS //
 ///////////////////
-GpuCommandBuffer* _gpu_command_buffer_create(GpuCommandBufferDescriptor descriptor);
-void              _gpu_command_buffer_draw(GpuCommandBuffer* command_buffer, GpuDrawCall draw_call);
-void              _gpu_command_buffer_submit(GpuCommandBuffer* command_buffer);
-void              _gpu_bind_pipeline(GpuCommandBuffer* command_buffer, GpuPipeline* pipeline);
-void              _gpu_begin_render_pass(GpuCommandBuffer* command_buffer, GpuRenderPass render_pass);
-void              _gpu_end_render_pass(GpuCommandBuffer* command_buffer);
-void              _gpu_apply_bindings(GpuCommandBuffer* command_buffer, GpuBufferBinding bindings);
-void              _gpu_bind_render_state(GpuCommandBuffer* command_buffer, GpuRendererState render);
-void              _gpu_set_layer(GpuCommandBuffer* command_buffer, u32 layer);
-void              _gpu_set_world_space(GpuCommandBuffer* command_buffer, bool world_space);
-void              _gpu_set_camera(GpuCommandBuffer* command_buffer, Vector2 camera);
-GpuPipeline*      _gpu_pipeline_create(GpuPipelineDescriptor descriptor);
-GpuUniform*       _gpu_uniform_create(GpuUniformDescriptor descriptor);
+GpuCommandBuffer*  gpu_command_buffer_create(GpuCommandBufferDescriptor descriptor);
+void               gpu_command_buffer_draw(GpuCommandBuffer* command_buffer, GpuDrawCall draw_call);
+void               gpu_command_buffer_submit(GpuCommandBuffer* command_buffer);
+void               gpu_bind_pipeline(GpuCommandBuffer* command_buffer, GpuPipeline* pipeline);
+void               gpu_begin_render_pass(GpuCommandBuffer* command_buffer, GpuRenderPass render_pass);
+void               gpu_end_render_pass(GpuCommandBuffer* command_buffer);
+void               gpu_apply_bindings(GpuCommandBuffer* command_buffer, GpuBufferBinding bindings);
+void               gpu_bind_render_state(GpuCommandBuffer* command_buffer, GpuRendererState render);
+void               gpu_set_layer(GpuCommandBuffer* command_buffer, u32 layer);
+void               gpu_set_world_space(GpuCommandBuffer* command_buffer, bool world_space);
+void               gpu_set_camera(GpuCommandBuffer* command_buffer, Vector2 camera);
+GpuPipeline*       gpu_pipeline_create(GpuPipelineDescriptor descriptor);
+GpuUniform*        gpu_uniform_create(GpuUniformDescriptor descriptor);
 GpuBuffer*         gpu_buffer_create(GpuBufferDescriptor descriptor);
 void               gpu_buffer_bind(GpuBuffer* buffer);
 void               gpu_buffer_bind_base(GpuBuffer* buffer, u32 base);
@@ -749,6 +745,7 @@ void draw_image_ex(const char* name, float px, float py, float dx, float dy, flo
 void draw_image_pro(u32 texture, f32 px, f32 py, f32 dx, f32 dy, Vector2* uv, f32 opacity);
 void draw_text(const char* text, f32 px, f32 py);
 void draw_text_ex(const char* text, f32 px, f32 py, Vector4 color, const char* font, f32 wrap);
+void draw_prepared_text(PreparedText* text);
 
 u32 find_texture_handle(const char* name);
 
@@ -902,6 +899,16 @@ f64 perlin(f64 x, f64 y, f64 vmin, f64 vmax);
 
 
 
+
+///////////////////////////////////////////////////////////////////////////
+// ██╗   ██╗███╗   ██╗██████╗  ██████╗ ██████╗ ████████╗███████╗██████╗  //
+// ██║   ██║████╗  ██║██╔══██╗██╔═══██╗██╔══██╗╚══██╔══╝██╔════╝██╔══██╗ //
+// ██║   ██║██╔██╗ ██║██████╔╝██║   ██║██████╔╝   ██║   █████╗  ██║  ██║ //
+// ██║   ██║██║╚██╗██║██╔═══╝ ██║   ██║██╔══██╗   ██║   ██╔══╝  ██║  ██║ //
+// ╚██████╔╝██║ ╚████║██║     ╚██████╔╝██║  ██║   ██║   ███████╗██████╔╝ //
+//  ╚═════╝ ╚═╝  ╚═══╝╚═╝      ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═════╝	 //
+///////////////////////////////////////////////////////////////////////////
+
 //
 // FLUID
 //
@@ -941,6 +948,36 @@ void ef_set_gauss_seidel(ArenaHandle handle, u32 iterations);
 void ef_bind(ArenaHandle handle);
 void ef_update(ArenaHandle handle);
 void ef_draw(ArenaHandle handle);
+
+
+// SCREENSHOTS
+void take_screenshot();
+void write_screenshot_to_png(const char* file_name);
+
+// STEAM
+void open_steam_page(const char* utm);
+bool is_steam_deck();
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ██╗   ██╗███╗   ██╗ ██████╗ █████╗ ████████╗███████╗ ██████╗  ██████╗ ██████╗ ██╗███████╗███████╗██████╗  //
+// ██║   ██║████╗  ██║██╔════╝██╔══██╗╚══██╔══╝██╔════╝██╔════╝ ██╔═══██╗██╔══██╗██║╚══███╔╝██╔════╝██╔══██╗ //
+// ██║   ██║██╔██╗ ██║██║     ███████║   ██║   █████╗  ██║  ███╗██║   ██║██████╔╝██║  ███╔╝ █████╗  ██║  ██║ //
+// ██║   ██║██║╚██╗██║██║     ██╔══██║   ██║   ██╔══╝  ██║   ██║██║   ██║██╔══██╗██║ ███╔╝  ██╔══╝  ██║  ██║ //
+// ╚██████╔╝██║ ╚████║╚██████╗██║  ██║   ██║   ███████╗╚██████╔╝╚██████╔╝██║  ██║██║███████╗███████╗██████╔╝ //
+//  ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝╚══════╝╚══════╝╚═════╝  //
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void IGE_PushGameFont(const char* font_name);
+void IGE_GameImage(const char* image, float sx, float sy);
+void IGE_OpenFileBrowser();
+void IGE_CloseFileBrowser();
+void IGE_SetFileBrowserWorkDir(const char* directory);
+bool IGE_IsAnyFileSelected();
+tstring IGE_GetSelectedFile();
+
+void add_script_directory(const char* name);
+
 ]]
 
 ffi = require('ffi')

@@ -159,7 +159,7 @@ SdfRenderer sdf_renderer_create(u32 buffer_size) {
         .count = 2
       }
     },
-    .pipeline = _gpu_pipeline_create({
+    .pipeline = gpu_pipeline_create({
       .blend = {
         .fn = GPU_BLEND_FUNC_ADD,
         .source = GPU_BLEND_MODE_SRC_ALPHA,
@@ -206,9 +206,9 @@ void sdf_renderer_draw(SdfRenderer* renderer, GpuCommandBuffer* command_buffer) 
   gpu_backed_buffer_sync(&renderer->shape_data);
   gpu_backed_buffer_sync(&renderer->combinations);
 
-  _gpu_bind_pipeline(command_buffer, renderer->pipeline);
-  _gpu_apply_bindings(command_buffer, renderer->bindings);
-  _gpu_command_buffer_draw(command_buffer, {
+  gpu_bind_pipeline(command_buffer, renderer->pipeline);
+  gpu_apply_bindings(command_buffer, renderer->bindings);
+  gpu_command_buffer_draw(command_buffer, {
     .mode = GPU_DRAW_MODE_INSTANCE,
     .vertex_offset = 0,
     .num_vertices = 6,
