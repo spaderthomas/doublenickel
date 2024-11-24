@@ -273,7 +273,7 @@ function validate_random(node, context, errors)
   validate_no_choice_children(node, context, errors)
 end
 
-function validate_play_sound(node, context, errors)
+function validate_dn_audio_play_sound(node, context, errors)
   validate_one_child(node, context, errors)
   validate_no_choice_children(node, context, errors)
 end
@@ -534,7 +534,7 @@ function validate_graph(graph)
     elseif current.kind == 'OpenNotesPassword' then
       validate_notes_password_input(current, context, errors)
     elseif current.kind == 'PlaySound' then
-      validate_play_sound(current, context, errors)
+      validate_dn_audio_play_sound(current, context, errors)
     elseif current.kind == 'Random' then
       validate_random(current, context, errors)
     elseif current.kind == 'Return' then

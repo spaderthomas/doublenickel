@@ -122,7 +122,7 @@ int td_main(TdAppDescriptor app) {
 	init_buffers();
 	init_lua();
 	init_actions();
-	init_audio();
+	dn_audio_init();
 	init_scripts();
 
 	while(!dn_engine_should_exit()) {
@@ -138,7 +138,7 @@ int td_main(TdAppDescriptor app) {
 		dn_time_metrics_update();
 	}
 
-	shutdown_audio();
+	dn_audio_shutdown();
 	shutdown_steam();
 	shutdown_imgui();
 	shutdown_glfw();

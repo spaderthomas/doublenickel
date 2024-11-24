@@ -19,22 +19,20 @@ typedef enum {
 	DN_AUDIO_FILTER_MODE_BUTTERWORTH = 1,
 } dn_audio_filter_mode_t;
 
-struct LowPassFilter {
+typedef struct {
 	dn_audio_filter_mode_t mode;
-	bool enabled = false;
-	float cutoff_frequency = 22000.f;
+	bool enabled;
+	float cutoff_frequency;
 
 	// First order
-	float cutoff_alpha = 0.1f;
+	float cutoff_alpha;
 
 	// Second order Butterworth filter
 	float a0, a1, a2, b1, b2;
-	float input_history [2] = {0};
-	float output_history [2] = {0};
+	float input_history [2];
+	float output_history [2];
+} dn_low_pass_filter_t;
 
-	void set_cutoff(float cutoff);
-	float apply(float input);
-};
 
 std::recursive_mutex audio_mutex;
 Array<float> sample_buffer;
@@ -47,7 +45,7 @@ float release_time = 1.f;
 float sample_frequency = 44100;
 float master_volume = 1.0f;
 float master_volume_mod = 1.0f;
-LowPassFilter low_pass;
+dn_low_pass_filter_t low_pass;
 
 
 typedef dn_gen_arena_handle_t dn_audio_instance_handle_t;
@@ -58,7 +56,7 @@ typedef struct {
 	u32 next_sample;
 	bool loop;
 	float32 volume;
-	LowPassFilter filter;
+	dn_low_pass_filter_t filter;
 	bool paused;
 	i32 sample_buffer_offset;
 	i32 samples_from_next;
@@ -67,40 +65,43 @@ typedef struct {
 	u32 generation;
 } dn_audio_instance_t;
 
-FM_LUA_EXPORT void  dn_audio_set_compressor_threshold(float t);
-FM_LUA_EXPORT void  dn_audio_set_compressor_ratio(float v);
-FM_LUA_EXPORT void  dn_audio_set_compressor_attack(float v);
-FM_LUA_EXPORT void  dn_audio_set_compressor_release(float v);
-FM_LUA_EXPORT void  dn_audio_set_sample_rate(float v);
-FM_LUA_EXPORT float dn_audio_get_master_volume();
-FM_LUA_EXPORT void  dn_audio_set_master_volume(float v);
-FM_LUA_EXPORT float dn_audio_get_master_volume_mod();
-FM_LUA_EXPORT void  dn_audio_set_master_volume_mod(float v);
-FM_LUA_EXPORT float dn_audio_get_master_filter_cutoff();
-FM_LUA_EXPORT void  dn_audio_set_master_filter_cutoff(float v);
-FM_LUA_EXPORT void  dn_audio_set_master_filter_cutoff_enabled(bool enabled);
-FM_LUA_EXPORT void  dn_audio_set_master_filter_mode(dn_audio_filter_mode_t mode);
-FM_LUA_EXPORT void  dn_audio_set_volume(dn_audio_instance_handle_t handle, float volume);
-FM_LUA_EXPORT void  dn_audio_set_cutoff(dn_audio_instance_handle_t handle, float cutoff);
+FM_LUA_EXPORT void                       dn_audio_set_compressor_threshold(float t);
+FM_LUA_EXPORT void                       dn_audio_set_compressor_ratio(float v);
+FM_LUA_EXPORT void                       dn_audio_set_compressor_attack(float v);
+FM_LUA_EXPORT void                       dn_audio_set_compressor_release(float v);
+FM_LUA_EXPORT void                       dn_audio_set_sample_rate(float v);
+FM_LUA_EXPORT float                      dn_audio_get_master_volume();
+FM_LUA_EXPORT void                       dn_audio_set_master_volume(float v);
+FM_LUA_EXPORT float                      dn_audio_get_master_volume_mod();
+FM_LUA_EXPORT void                       dn_audio_set_master_volume_mod(float v);
+FM_LUA_EXPORT float                      dn_audio_get_master_filter_cutoff();
+FM_LUA_EXPORT void                       dn_audio_set_master_filter_cutoff(float v);
+FM_LUA_EXPORT void                       dn_audio_set_master_filter_cutoff_enabled(bool enabled);
+FM_LUA_EXPORT void                       dn_audio_set_master_filter_mode(dn_audio_filter_mode_t mode);
+FM_LUA_EXPORT void                       dn_audio_set_volume(dn_audio_instance_handle_t handle, float volume);
+FM_LUA_EXPORT void                       dn_audio_set_filter_cutoff(dn_audio_instance_handle_t handle, float cutoff);
+FM_LUA_EXPORT void                       dn_audio_set_filter_enabled(dn_audio_instance_handle_t handle, bool enabled);
+FM_LUA_EXPORT dn_audio_instance_handle_t dn_audio_play_sound(const char* name);
+FM_LUA_EXPORT dn_audio_instance_handle_t dn_audio_play_looped(const char* name);
+FM_LUA_EXPORT void                       dn_audio_queue(dn_audio_instance_handle_t current, dn_audio_instance_handle_t next);
+FM_LUA_EXPORT void                       dn_audio_stop(dn_audio_instance_handle_t handle);
+FM_LUA_EXPORT void                       dn_audio_stop_all();
+FM_LUA_EXPORT void                       dn_audio_pause(dn_audio_instance_handle_t handle);
+FM_LUA_EXPORT void                       dn_audio_resume(dn_audio_instance_handle_t handle);
+FM_LUA_EXPORT bool                       dn_audio_is_playing(dn_audio_instance_handle_t handle);
+FM_LUA_EXPORT bool                       dn_audio_is_any_playing();
+FM_LUA_EXPORT void                       dn_audio_load(const char* file_path, const char* file_name);
+FM_LUA_EXPORT void                       dn_low_pass_filter_set_cutoff(dn_low_pass_filter_t* filter, float cutoff);
+FM_LUA_EXPORT float                      dn_low_pass_filter_apply(dn_low_pass_filter_t* filter, float input);
 
-FM_LUA_EXPORT dn_audio_instance_handle_t play_sound(const char* name);
-FM_LUA_EXPORT dn_audio_instance_handle_t play_sound_loop(const char* name);
-FM_LUA_EXPORT void dn_audio_play_after(dn_audio_instance_handle_t current, dn_audio_instance_handle_t next);
-FM_LUA_EXPORT void stop_sound(dn_audio_instance_handle_t handle);
-FM_LUA_EXPORT void stop_all_sounds();
-FM_LUA_EXPORT void pause_sound(dn_audio_instance_handle_t handle);
-FM_LUA_EXPORT void unpause_sound(dn_audio_instance_handle_t handle);
-FM_LUA_EXPORT bool is_sound_playing(dn_audio_instance_handle_t handle);
+// @dn: You should be able to specify a directory when you initialize the audio
+void dn_audio_init();
+void dn_audio_update(float* buffer, int frames_requested, int num_channels);
+void dn_audio_shutdown();
 
-void init_audio();
-void update_audio(float* buffer, int frames_requested, int num_channels);
-void shutdown_audio();
-
-dn_audio_info_t* find_sound(const char* name);
-dn_audio_info_t* find_sound_no_default(const char* name);
-dn_audio_instance_t* find_active_sound(dn_audio_instance_handle_t handle);
-dn_audio_instance_handle_t find_free_active_sound();
-dn_audio_instance_handle_t play_sound_ex(dn_audio_info_t* sound, bool loop);
-void stop_sound_ex(dn_audio_instance_t* active_sound);
-bool is_any_sound_active();
-void load_audio_file(const char* file_path, const char* file_name);
+dn_audio_info_t* dn_audio_find(const char* name);
+dn_audio_info_t* dn_audio_find_no_default(const char* name);
+dn_audio_instance_t* dn_audio_resolve(dn_audio_instance_handle_t handle);
+dn_audio_instance_handle_t dn_audio_reserve();
+dn_audio_instance_handle_t dn_audio_play_sound_ex(dn_audio_info_t* sound, bool loop);
+void dn_audio_stop_ex(dn_audio_instance_t* active_sound);

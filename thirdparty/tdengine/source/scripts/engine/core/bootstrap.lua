@@ -218,33 +218,31 @@ typedef enum {
 
 typedef dn_gen_arena_handle_t dn_audio_instance_handle_t;
 
-dn_audio_instance_handle_t play_sound(const char* name);
-dn_audio_instance_handle_t play_sound_loop(const char* name);
-void stop_all_sounds();
-void stop_sound(dn_audio_instance_handle_t handle);
-void pause_sound(dn_audio_instance_handle_t handle);
-void unpause_sound(dn_audio_instance_handle_t handle);
-bool is_sound_playing(dn_audio_instance_handle_t handle);
-void dn_audio_play_after(dn_audio_instance_handle_t current, dn_audio_instance_handle_t next);
-
-void dn_audio_set_volume(dn_audio_instance_handle_t handle, float volume);
-void dn_audio_set_cutoff(dn_audio_instance_handle_t handle, float cutoff);
-
-float dn_audio_get_master_filter_cutoff();
-float dn_audio_get_master_volume();
-float dn_audio_get_master_volume_mod();
-void dn_audio_set_compressor_threshold(float t);
-void dn_audio_set_compressor_ratio(float v);
-void dn_audio_set_compressor_attack(float v);
-void dn_audio_set_compressor_release(float v);
-void dn_audio_set_sample_rate(float v);
-void dn_audio_set_master_volume(float v);
-void dn_audio_set_master_filter_cutoff(float v);
-void dn_audio_set_master_filter_cutoff_enabled(bool enabled);
-void dn_audio_set_master_filter_mode(dn_audio_filter_mode_t mode);
-void dn_audio_set_master_volume_mod(float v);
-
-void set_window_size(int x, int y);
+void                       dn_audio_set_compressor_threshold(float t);
+void                       dn_audio_set_compressor_ratio(float v);
+void                       dn_audio_set_compressor_attack(float v);
+void                       dn_audio_set_compressor_release(float v);
+void                       dn_audio_set_sample_rate(float v);
+float                      dn_audio_get_master_volume();
+void                       dn_audio_set_master_volume(float v);
+float                      dn_audio_get_master_volume_mod();
+void                       dn_audio_set_master_volume_mod(float v);
+float                      dn_audio_get_master_filter_cutoff();
+void                       dn_audio_set_master_filter_cutoff(float v);
+void                       dn_audio_set_master_filter_cutoff_enabled(bool enabled);
+void                       dn_audio_set_master_filter_mode(dn_audio_filter_mode_t mode);
+void                       dn_audio_set_volume(dn_audio_instance_handle_t handle, float volume);
+void                       dn_audio_set_filter_cutoff(dn_audio_instance_handle_t handle, float cutoff);
+dn_audio_instance_handle_t dn_audio_play_sound(const char* name);
+dn_audio_instance_handle_t dn_audio_play_looped(const char* name);
+void                       dn_audio_queue(dn_audio_instance_handle_t current, dn_audio_instance_handle_t next);
+void                       dn_audio_stop(dn_audio_instance_handle_t handle);
+void                       dn_audio_stop_all();
+void                       dn_audio_pause(dn_audio_instance_handle_t handle);
+void                       dn_audio_resume(dn_audio_instance_handle_t handle);
+bool                       dn_audio_is_playing(dn_audio_instance_handle_t handle);
+bool                       dn_audio_is_any_playing();
+void                       dn_audio_load(const char* file_path, const char* file_name);
 
 
 /////////////////////////////////////////////
@@ -354,6 +352,7 @@ void         coord_set_framebuffer_size(float x, float y);
 
 void create_window(const char* title, u32 x, u32 y, u32 flags);
 void set_window_icon(const char* file_path);
+void set_window_size(int x, int y);
 Vector2 get_content_area();
 Vector2 get_native_resolution();
 void set_display_mode(u32 mode);

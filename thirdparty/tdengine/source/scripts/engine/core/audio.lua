@@ -22,23 +22,23 @@ function tdengine.audio.play(sound, loop)
     if #sound == 0 then return end
 
     if loop then
-      return tdengine.ffi.play_sound_loop(sound)
+      return tdengine.ffi.dn_audio_play_looped(sound)
     else
-      return tdengine.ffi.play_sound(sound)
+      return tdengine.ffi.dn_audio_play_sound(sound)
     end
   end
 end
 
 function tdengine.audio.play_after(after_handle, ...)
   local handle = tdengine.audio.play(...)
-  tdengine.ffi.dn_audio_play_after(after_handle, handle);
+  tdengine.ffi.dn_audio_queue(after_handle, handle);
 
   return handle
 end
 
 function tdengine.audio.is_playing(handle)
   if not handle then return false end
-  return tdengine.ffi.is_sound_playing(handle)
+  return tdengine.ffi.dn_audio_is_playing(handle)
 end
 
 function tdengine.audio.play_interpolated(sound, interpolator, loop)
@@ -76,11 +76,11 @@ function tdengine.audio.stop_after_interpolate(handle)
 end
 
 function tdengine.audio.stop(handle)
-  if handle then tdengine.ffi.stop_sound(handle) end
+  if handle then tdengine.ffi.dn_audio_stop(handle) end
 end
 
 function tdengine.audio.stop_all()
-  tdengine.ffi.stop_all_sounds()
+  tdengine.ffi.dn_audio_stop_all()
 end
 
 function tdengine.audio.defer_stop(handle, time)
@@ -91,11 +91,11 @@ function tdengine.audio.defer_stop(handle, time)
 end
 
 function tdengine.audio.pause(handle)
-  return tdengine.ffi.pause_sound(handle)
+  return tdengine.ffi.dn_audio_pause(handle)
 end
 
 function tdengine.audio.unpause(handle)
-  return tdengine.ffi.unpause_sound(handle)
+  return tdengine.ffi.dn_audio_resume(handle)
 end
 
 function tdengine.audio.set_volume(handle, volume)
@@ -114,7 +114,7 @@ function tdengine.audio.dn_audio_set_master_volume_mod(volume_mod)
 end
 
 function tdengine.audio.set_cutoff(handle, cutoff)
-  if handle then tdengine.ffi.dn_audio_set_cutoff(handle, cutoff) end
+  if handle then tdengine.ffi.dn_audio_set_filter_cutoff(handle, cutoff) end
 end
 
 function tdengine.audio.dn_audio_set_master_filter_cutoff(cutoff)
