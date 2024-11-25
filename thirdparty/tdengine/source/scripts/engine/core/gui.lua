@@ -98,7 +98,7 @@ local function make_text(text, font, color, wrap, precise)
   item.color = color or tdengine.colors.white
   item.wrap = wrap or 0
   item.precise = ternary(precise, true, false)
-  item.prepared = tdengine.ffi.prepare_text_ex(item.text, 0, 0, item.font, item.wrap, item.color:to_vec4(), item.precise)
+  item.prepared = tdengine.ffi.dn_prepare_text_ex(item.text, 0, 0, item.font, item.wrap, item.color:to_vec4(), item.precise)
 
   if item.precise then
     item.size = tdengine.vec2(item.prepared.width, item.prepared.height)
@@ -1443,7 +1443,7 @@ local function update_animations()
       end
 
       -- REBUILD PREPARED TEXT
-      -- prepare_text() returns a pointer to temporary storage. But here, we want to cache a list of draw calls
+      -- dn_prepare_text() returns a pointer to temporary storage. But here, we want to cache a list of draw calls
       -- and redraw them across many frames. That leaves us with two options:
       -- 1. (VERY HARD) Figure out a way to allocate prepared text such that it survives across frame boundaries
       --    but isn't memory leaked when were done with it.
@@ -1451,7 +1451,7 @@ local function update_animations()
       --    each frame. This is """"slow""" but dead simple in every possible way. (Also it's not slow)
       for index, item in animation.hide_data.draw_list:iterate() do
         if item.kind == GuiItem.kinds.text then
-          item.prepared = tdengine.ffi.prepare_text_ex(item.text, 0, 0, item.font, item.wrap,
+          item.prepared = tdengine.ffi.dn_prepare_text_ex(item.text, 0, 0, item.font, item.wrap,
             tdengine.color_to_vec4(item.color), item.precise)
         end
       end

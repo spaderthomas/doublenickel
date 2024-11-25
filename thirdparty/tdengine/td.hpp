@@ -66,7 +66,8 @@
 #define APP_IMPLEMENTATION
 #include "source/app.hpp"
 #include "source/asset.cpp"
-#include "source/audio.cpp"
+#define DN_AUDIO_IMPLEMENTATION
+#include "source/audio.hpp"
 #include "source/background.cpp" // INVERT (I need something to load large images though, in general)
 #include "source/draw.cpp"
 #define DN_ENGINE_IMPLEMENTATION

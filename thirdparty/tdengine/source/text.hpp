@@ -1,7 +1,8 @@
 #define MAX_TEXT_LEN 1024
 #define MAX_LINE_BREAKS 32
 
-struct PreparedText {
+struct dn_prepared_text {
+	// @dn: This should be temporary storage 99% of the time
 	char text [MAX_TEXT_LEN] = { 0 };
 	Vector2 position;
 	Vector2 padding;
@@ -12,7 +13,7 @@ struct PreparedText {
 	bool world_space = false;
 
 	// [ b[i], b[i+1] )
-	int32 breaks [MAX_LINE_BREAKS] = { 0 };
+	i32 breaks [MAX_LINE_BREAKS] = { 0 };
 
 	// There are two modes: Precise and imprecise. Precise aims to put an exact bounding box around the text, from
 	// the baseline to the top (i.e. excluding glyph pieces under the baseline). Imprecise aims to give a worst-case
@@ -32,31 +33,31 @@ struct PreparedText {
 	void init();
 	void set_font(const char* name);
 	void set_text(const char* text);
-	void set_wrap(float32 wrap);
-	void set_position(float32 x, float32 y);
-	void set_offset(float32 offset);
+	void set_wrap(float wrap);
+	void set_position(float x, float y);
+	void set_offset(float offset);
 	void set_color(Vector4 color);
 	void set_precision(bool precision);
 	bool is_empty();
-	int32 count_breaks();
-	int32 count_lines();
-	int32 get_break(int32 index);
-	void add_break(int32 index);
-	ArrayView<char> get_line(int32 index);
+	i32 count_breaks();
+	i32 count_lines();
+	i32 get_break(i32 index);
+	void add_break(i32 index);
+	ArrayView<char> get_line(i32 index);
 };
-//PreparedText* prepare_text(const char* text, float32 px, float32 py, Vector4 color, const char* font, float32 wrap);
-FM_LUA_EXPORT PreparedText* prepare_text(const char* text, float32 px, float32 py, const char* font);
-FM_LUA_EXPORT PreparedText* prepare_text_wrap(const char* text, float32 px, float32 py, const char* font, float32 wrap);
-FM_LUA_EXPORT PreparedText* prepare_text_ex(const char* text, float32 px, float32 py, const char* font, float32 wrap, Vector4 color, bool precise);
+
+FM_LUA_EXPORT dn_prepared_text* dn_prepare_text(const char* text, float px, float py, const char* font);
+FM_LUA_EXPORT dn_prepared_text* dn_prepare_text_wrap(const char* text, float px, float py, const char* font, float wrap);
+FM_LUA_EXPORT dn_prepared_text* dn_prepare_text_ex(const char* text, float px, float py, const char* font, float wrap, Vector4 color, bool precise);
 
 struct LineBreakContext {
 	// Input
-	PreparedText* info;
+	dn_prepared_text* info;
 
 	// Calculated
-	float32 point = 0;
-	float32 point_max;
+	float point = 0;
+	float point_max;
 
-	void set_info(PreparedText* info);
+	void set_info(dn_prepared_text* info);
 	void calculate();
 };

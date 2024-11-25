@@ -1,18 +1,18 @@
 ///////////////////
-// PreparedText //
+// dn_prepared_text //
 ///////////////////
-void PreparedText::init() {
+void dn_prepared_text::init() {
 	this->color = colors::white;
 	this->font = font_find("inconsolata-64");
 	this->wrap = 0;
 }
 
-void PreparedText::set_font(const char* name) {
+void dn_prepared_text::set_font(const char* name) {
 	this->font = font_find(name);
 	if (!this->font) this->font = font_find("game");
 }
 
-void PreparedText::set_text(const char* text) {
+void dn_prepared_text::set_text(const char* text) {
 	// @spader: I learned that when the source buffer is larger than n, strncpy will not
 	// null terminate the destination buffer. It is basically unfathomable to me that this
 	// would ever be what you want, but apparently strncpy was written fifty years ago
@@ -21,36 +21,36 @@ void PreparedText::set_text(const char* text) {
 		//strncpy(this->text, text, MAX_TEXT_LEN - 1);
 }
 
-void PreparedText::set_wrap(float32 wrap) {
+void dn_prepared_text::set_wrap(float32 wrap) {
 	this->wrap = wrap;
 }
 
-void PreparedText::set_position(float32 x, float32 y) {
+void dn_prepared_text::set_position(float32 x, float32 y) {
 	this->position.x = x;
 	this->position.y = y;
 }
 
-void PreparedText::set_offset(float32 offset) {
+void dn_prepared_text::set_offset(float32 offset) {
 	this->offset = offset;
 }
 
-void PreparedText::set_color(Vector4 color) {
+void dn_prepared_text::set_color(Vector4 color) {
 	this->color = color;
 }
 
-void PreparedText::set_precision(bool precision) {
+void dn_prepared_text::set_precision(bool precision) {
 	this->precise = precision;
 }
 
-bool PreparedText::is_empty() {
+bool dn_prepared_text::is_empty() {
 	return !this->text[0];
 }
 
-int32 PreparedText::count_lines() {
+int32 dn_prepared_text::count_lines() {
 	return count_breaks() - 1;
 }
 
-int32 PreparedText::count_breaks() {
+int32 dn_prepared_text::count_breaks() {
 	for (int32 i = 1; i < MAX_LINE_BREAKS; i++) {
 		if (breaks[i]) continue;
 		return i;
@@ -59,16 +59,16 @@ int32 PreparedText::count_breaks() {
 	return MAX_LINE_BREAKS;
 }
 
-int32 PreparedText::get_break(int32 index) {
+int32 dn_prepared_text::get_break(int32 index) {
 	return breaks[index];
 }
 
-void PreparedText::add_break(int32 index) {
+void dn_prepared_text::add_break(int32 index) {
 	auto i = count_breaks();
 	breaks[i] = index;
 }
 
-ArrayView<char> PreparedText::get_line(int32 index) {
+ArrayView<char> dn_prepared_text::get_line(int32 index) {
 	auto begin = get_break(index);
 	auto end   = get_break(index + 1);
 	auto count = end - begin;
@@ -79,18 +79,18 @@ ArrayView<char> PreparedText::get_line(int32 index) {
 	);
 }
 
-PreparedText* prepare_text(const char* text, float32 px, float32 py, const char* font) {
-	return prepare_text_ex(text, px, py, font, 0, colors::white, true);
+dn_prepared_text* dn_prepare_text(const char* text, float32 px, float32 py, const char* font) {
+	return dn_prepare_text_ex(text, px, py, font, 0, colors::white, true);
 }
 
-PreparedText* prepare_text_wrap(const char* text, float32 px, float32 py, const char* font, float32 wrap) {
-	return prepare_text_ex(text, px, py, font, wrap, colors::white, true);
+dn_prepared_text* dn_prepare_text_wrap(const char* text, float32 px, float32 py, const char* font, float32 wrap) {
+	return dn_prepare_text_ex(text, px, py, font, wrap, colors::white, true);
 }
 
-PreparedText* prepare_text_ex(const char* text, float32 px, float32 py, const char* font, float32 wrap, Vector4 color, bool precise) {
+dn_prepared_text* dn_prepare_text_ex(const char* text, float32 px, float32 py, const char* font, float32 wrap, Vector4 color, bool precise) {
 	if (!text) return nullptr;
 	
-	auto prepared_text = bump_allocator.alloc<PreparedText>();
+	auto prepared_text = bump_allocator.alloc<dn_prepared_text>();
 	prepared_text->init();
 	prepared_text->set_text(text);
 	prepared_text->set_position(px, py);
@@ -157,7 +157,7 @@ PreparedText* prepare_text_ex(const char* text, float32 px, float32 py, const ch
 ////////////////////////
 // LINE BREAK CONTEXT //
 ////////////////////////
-void LineBreakContext::set_info(PreparedText* info) {
+void LineBreakContext::set_info(dn_prepared_text* info) {
 	this->info = info;
 }
 

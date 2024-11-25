@@ -45,7 +45,6 @@ const struct luaL_Reg api [] = {
 	{ "chsize",                   &API::get_character_size },
 	{ "scandir_impl",             &API::scandir_impl },
 	{ "log",                      &API::log },
-	{ "calc_text_size",           &API::calc_text_size },
 	{ "screen_dimensions",        &API::screen_dimensions },
 	{ "sprite_size",              &API::sprite_size },
 	{ "get_window_scale",         &API::get_window_scale },

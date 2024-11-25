@@ -70,7 +70,7 @@ function EditorUtility:draw_pallette()
         text_color = tdengine.colors.black
       end
 
-      local label = tdengine.ffi.prepare_text_ex(color_name,
+      local label = tdengine.ffi.dn_prepare_text_ex(color_name,
         0, 0,
         'merriweather-bold-32',
         0,
@@ -254,7 +254,7 @@ function EditorUtility:plot_derivative(f, df, xmin, xmax, scale, color)
     self.style.plot.derivative_width, 
     color:to_vec4())
 
-  local label = tdengine.ffi.prepare_text_ex(
+  local label = tdengine.ffi.dn_prepare_text_ex(
     string.format('%.3f', delta.y / delta.x),
     scaled_point.x, scaled_point.y,
     'merriweather-bold-48',

@@ -310,11 +310,11 @@ typedef struct {
 	float baseline_offset_imprecise;
 	float height_imprecise;
 	bool precise;
-} PreparedText;
+} dn_prepared_text;
 
-PreparedText* prepare_text(const char* text, f32 px, f32 py, const char* font);
-PreparedText* prepare_text_wrap(const char* text, f32 px, f32 py, const char* font, f32 wrap);
-PreparedText* prepare_text_ex(const char* text, f32 px, f32 py, const char* font, f32 wrap, Vector4 color, bool precise);
+dn_prepared_text* dn_prepare_text(const char* text, f32 px, f32 py, const char* font);
+dn_prepared_text* dn_prepare_text_wrap(const char* text, f32 px, f32 py, const char* font, f32 wrap);
+dn_prepared_text* dn_prepare_text_ex(const char* text, f32 px, f32 py, const char* font, f32 wrap, Vector4 color, bool precise);
 void create_font(const char* id, const char* family, u32 size);
 void add_imgui_font(const char* id);
 
@@ -959,7 +959,7 @@ void draw_image_ex(const char* name, float px, float py, float dx, float dy, flo
 void draw_image_pro(u32 texture, f32 px, f32 py, f32 dx, f32 dy, Vector2* uv, f32 opacity);
 void draw_text(const char* text, f32 px, f32 py);
 void draw_text_ex(const char* text, f32 px, f32 py, Vector4 color, const char* font, f32 wrap);
-void draw_prepared_text(PreparedText* text);
+void draw_prepared_text(dn_prepared_text* text);
 
 u32 find_texture_handle(const char* name);
 

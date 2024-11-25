@@ -122,53 +122,6 @@ int API::get_character_size(lua_State* l) {
 	return 2;
 }
 
-PreparedText* prepare_text_api() {
-	auto& state = get_lua();
-	auto l = state.state;
-	
-	BEGIN_ARGS();
-	ADD_STRING_ARG(TEXT);
-	ADD_OPTIONAL_TABLE_ARG(POSITION);
-	ADD_OPTIONAL_TABLE_ARG(OPTIONS);
-	END_ARGS();
-
-	const char* text = nullptr;
-	Vector2 position;
-	Vector4 color = colors::white;
-	const char* font = "inconsolata-32";
-	float32 wrap = 0;
-	bool world_space = false;
-
-	state.parse_string(IDX_TEXT, &text);
-	if (!text) return nullptr;
-
-	if (HAS_ARG(IDX_POSITION)) {
-		state.parse_vec2(IDX_POSITION, &position);
-	}
-	
-	if (HAS_ARG(IDX_OPTIONS)) {
-		state.parse_bool("world", &world_space);
-		state.parse_string("font", &font);
-		state.parse_float("wrap", &wrap);
-		state.parse_color("color", &color);
-	}
-
-	return prepare_text_ex(text, position.x, position.y, font, wrap, color, true);
-}
-
-int API::calc_text_size(lua_State* l) {
-	lua_pushnil(l);
-	lua_insert(l, 2);
-	auto prepared_text = prepare_text_api();
-	if (prepared_text) {
-		lua_pushnumber(l, prepared_text->width);
-		lua_pushnumber(l, prepared_text->height);
-		return 2;
-	}
-	
-	return 0;
-}
-
 int API::get_window_scale(lua_State* l) {
 	fm_assert(lua_gettop(l) == 0);
 
