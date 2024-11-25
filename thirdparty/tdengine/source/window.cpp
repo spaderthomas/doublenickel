@@ -69,11 +69,11 @@ void create_window(const char* title, u32 x, u32 y, WindowFlags flags) {
 		glfwSwapInterval(0);
 	}
 
-	glfwSetCursorPosCallback(window.handle, GLFW_Cursor_Pos_Callback);
-	glfwSetMouseButtonCallback(window.handle, GLFW_Mouse_Button_Callback);
-	glfwSetKeyCallback(window.handle, GLFW_Key_Callback);
-	glfwSetScrollCallback(window.handle, GLFW_Scroll_Callback);
-	glfwSetWindowSizeCallback(window.handle, GLFW_Window_Size_Callback);
+	glfwSetCursorPosCallback(window.handle, dn_input_callback_cursor);
+	glfwSetMouseButtonCallback(window.handle, dn_input_callback_click);
+	glfwSetKeyCallback(window.handle, dn_input_callback_key);
+	glfwSetScrollCallback(window.handle, dn_input_callback_scroll);
+	glfwSetWindowSizeCallback(window.handle, dn_input_callback_window_size);
 
 	init_noise();
 	init_imgui();
@@ -189,12 +189,8 @@ float get_display_scale() {
 	return window.content_area.x / window.native_resolution.x;
 }
 
-void hide_cursor() {
-	glfwSetInputMode(window.handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-}
-
-void show_cursor() {
-	glfwSetInputMode(window.handle, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+void dn_window_set_cursor_visible(bool visible) {
+	glfwSetInputMode(window.handle, GLFW_CURSOR, visible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
 }
 
 Vector2 get_native_resolution() {

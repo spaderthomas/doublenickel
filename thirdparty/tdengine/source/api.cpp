@@ -78,16 +78,6 @@ int API::scandir_impl(lua_State* lua) {
 	return 1;
 }
 
-int API::get_mouse_scroll(lua_State* l) {
-	NO_ARGS();
-	
-	auto input = get_input_manager();
-	lua_pushnumber(l, input.scroll.x);
-	lua_pushnumber(l, input.scroll.y);
-	
-	return 2;
-}
-
 int API::get_character_size(lua_State* l) {
 	fm_assert(lua_gettop(l) >= 1);
 

@@ -335,23 +335,21 @@ DN_API Vector2         dn_coord_world_to_window_mag(float x, float y);
 DN_API Vector2         dn_coord_world_to_game_mag(float x, float y);
 
 typedef enum {
-	INPUT_DEVICE_MOUSE_AND_KEYBOARD = 0,
-	INPUT_DEVICE_CONTROLLER = 1,
-} InputDevice;
+	DN_INPUT_DEVICE_MOUSE_AND_KEYBOARD = 0,
+	DN_INPUT_DEVICE_CONTROLLER = 1,
+} dn_input_device_t;
 
-bool is_editor_requesting_input();
-bool was_key_pressed(int key);
-bool was_key_released(int key);
-bool is_key_down(int key);
-bool is_mod_down(int mod);
-bool was_chord_pressed(int mod, int key);
-u32 shift_key(u32 key);
-Vector2 get_scroll();
-InputDevice get_input_device();
+bool dn_input_pressed(int key);
+bool dn_input_released(int key);
+bool dn_input_down(int key);
+bool dn_input_mod_down(int mod);
+bool dn_input_chord_pressed(int mod, int key);
+u32 dn_input_shift_key(u32 key);
+Vector2 dn_input_scroll();
+dn_input_device_t get_input_device();
 
-Vector2 get_mouse(dn_coord_t unit);
-Vector2 get_mouse_delta(dn_coord_t unit);
-void set_game_focus(bool focus);
+Vector2 dn_input_mouse(dn_coord_t unit);
+Vector2 dn_input_mouse_delta(dn_coord_t unit);
 
 void show_text_input(const char* description, const char* existing_text);
 bool is_text_input_dirty();
@@ -430,8 +428,7 @@ Vector2 get_content_area();
 Vector2 get_native_resolution();
 void set_display_mode(u32 mode);
 u32 get_display_mode();
-void hide_cursor();
-void show_cursor();
+void dn_window_set_cursor_visible(bool visible);
 void use_editor_layout(const char* file_name);
 void save_editor_layout(const char* file_name);
 

@@ -40,7 +40,7 @@ void update_actions() {
 	if (steam_input.update_cooldown_hack()) return;
 
 	// Poll for action inputs
-	auto& input = get_input_manager();
+	auto& input = dn_input;
 	arr_for(steam_input.actions, action) {
 		if (!steam_input.is_action_active(action)) continue;
 
@@ -55,22 +55,22 @@ void update_actions() {
 
 		// Check keyboard controls
 		if (action->key_event == KeyEvent::Press) {
-			action->state |= was_key_pressed(action->key);
+			action->state |= dn_input_pressed(action->key);
 		}
 		else if (action->key_event == KeyEvent::Down) {
-			action->state |= is_key_down(action->key);
+			action->state |= dn_input_down(action->key);
 		}
 	}
 
 	// This is a little out of place because I probably need to merge action.cpp and input.cpp. But, the idea
 	// is that we've received all input for the frame, so we know whether to consider ourselves as in mouse
 	// + keyboard mode or controller mode
-	auto& input_manager = get_input_manager();
+	auto& input_manager = dn_input;
 	if (steam_input.got_controller_input) {
-		steam_input.last_input_device = INPUT_DEVICE_CONTROLLER;
+		steam_input.last_input_device = DN_INPUT_DEVICE_CONTROLLER;
 	}
 	else if (input_manager.got_keyboard_input || input_manager.got_mouse_input) {
-		steam_input.last_input_device = INPUT_DEVICE_MOUSE_AND_KEYBOARD;
+		steam_input.last_input_device = DN_INPUT_DEVICE_MOUSE_AND_KEYBOARD;
 	}
 }
 

@@ -44,7 +44,6 @@ function GameView:update()
 
     end
 
-    ffi.C.set_game_focus(self.focus and self.hover)
   end
 
   imgui.Image(

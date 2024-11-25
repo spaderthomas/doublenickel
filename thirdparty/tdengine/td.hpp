@@ -74,7 +74,8 @@
 #include "source/engine.hpp"
 #include "source/font.cpp"
 #include "source/image.cpp" // HALF (Screenshots should be reworked, probably? I'm referencing a named path when I initialize)
-#include "source/input.cpp"
+#define DN_INPUT_IMPLEMENTATION
+#include "source/input.hpp"
 #include "source/fluid.cpp" // GAME
 #define GRAPHICS_IMPLEMENTATION
 #include "source/graphics.hpp"
@@ -116,6 +117,7 @@ int td_main(TdAppDescriptor app) {
 	init_paths();
 	init_log();
 	dn_engine_init();
+	dn_input_init();
 	dn_time_metrics_init();
 	init_steam();
 	init_file_monitors();
@@ -133,7 +135,7 @@ int td_main(TdAppDescriptor app) {
 		update_file_monitors();
 		update_assets();
 		update_imgui();
-		update_input();
+		dn_input_update();
 		update_actions();
 		update_game();
 		dn_time_metrics_update();

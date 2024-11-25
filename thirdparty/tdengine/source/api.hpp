@@ -6,11 +6,6 @@
 // there are new drawing functions, I'll put them in draw.hpp rather than having all Lua exports in one file (like this). I still
 // stick new stuff in here if it doesn't fit anywhere else, but I always use the FFI instead of making new lua_State functions.
 namespace API {
-	// Input
-	int cursor(lua_State* l);
-	int cursor_delta(lua_State* l);
-	int get_mouse_scroll(lua_State* l);
-
 	// logging
 	int log(lua_State* l);
 
@@ -41,7 +36,6 @@ namespace API {
 void register_api();
 
 const struct luaL_Reg api [] = {
-	{ "get_mouse_scroll",         &API::get_mouse_scroll },
 	{ "chsize",                   &API::get_character_size },
 	{ "scandir_impl",             &API::scandir_impl },
 	{ "log",                      &API::log },
