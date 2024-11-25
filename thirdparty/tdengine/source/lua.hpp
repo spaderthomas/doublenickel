@@ -11,6 +11,7 @@ struct LuaState {
 	void script_named_dir(const_string name);
 	bool script_file(string path);
 	void dump_stack();
+	void dump_call_stack();
 
 	void init_phase_0();
 	void init_phase_1();

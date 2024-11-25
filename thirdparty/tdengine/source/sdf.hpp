@@ -10,23 +10,23 @@ typedef enum {
   SDF_SHAPE_BOX = 2,
   SDF_SHAPE_ORIENTED_BOX = 3,
   SDF_SHAPE_COMBINE = 100,
-} SdfShape;
+} dn_sdf_shape_t;
 
 typedef enum {
   SDF_COMBINE_OP_UNION = 0,
   SDF_COMBINE_OP_INTERSECTION = 1,
   SDF_COMBINE_OP_SUBTRACTION = 2,
-} SdfCombineOp;
+} dn_sdf_combine_op_t;
 
 typedef enum {
   SDF_SMOOTH_KERNEL_NONE = 0,
   SDF_SMOOTH_KERNEL_POLYNOMIAL_QUADRATIC = 1,
-} SdfSmoothingKernel;
+} dn_sdf_smoothing_kernel_t;
 
 typedef enum {
   SDF_RENDERER_STATE_NONE,
   SDF_RENDERER_STATE_COMBINATION,
-} SdfRendererState;
+} dn_sdf_renderer_state_t;
 
 
 /////////////////////
@@ -35,23 +35,23 @@ typedef enum {
 typedef struct {
   Vector2 position;
   Vector2 uv;
-} SdfVertex;
+} dn_sdf_vertex_t;
 
 typedef struct {
-  SdfShape shape;
+  dn_sdf_shape_t shape;
   u32 buffer_index;
-} SdfInstance;
+} dn_sdf_instance_t;
 
 typedef struct {
   u32 num_sdfs;
-} SdfCombineHeader;
+} dn_sdf_combine_header_t;
 
 typedef struct {
   u32 buffer_index;
-  SdfShape shape;
-  SdfCombineOp op;
-  SdfSmoothingKernel kernel;
-} SdfCombineEntry;
+  dn_sdf_shape_t shape;
+  dn_sdf_combine_op_t op;
+  dn_sdf_smoothing_kernel_t kernel;
+} dn_sdf_combine_entry_t;
 
 
 ////////////////////
@@ -62,82 +62,77 @@ typedef struct {
   Vector2 position;
   float rotation;
   float edge_thickness;
-  SdfShape shape;
-} SdfHeader;
+  dn_sdf_shape_t shape;
+} dn_sdf_header_t;
 
 typedef struct {
-  SdfHeader header;
+  dn_sdf_header_t header;
   float radius;
-} SdfCircle;
+} dn_sdf_circle_t;
 
 typedef struct {
-  SdfHeader header;
+  dn_sdf_header_t header;
   float inner_radius;
   float outer_radius;
-} SdfRing;
+} dn_sdf_ring_t;
 
 typedef struct {
-  SdfHeader header;
+  dn_sdf_header_t header;
   Vector2 size;
-} SdfBox;
-
-typedef struct {
-  SdfHeader header;
-  Vector2 size;
-} SdfOrientedBox;
+} dn_sdf_oriented_box_t;
 
 
 typedef struct {
-  SdfRendererState state;
+  dn_sdf_renderer_state_t state;
   dn_gpu_backed_buffer_t vertices;
   dn_gpu_backed_buffer_t instances;
   dn_gpu_backed_buffer_t combinations;
   dn_gpu_backed_buffer_t shape_data;
   dn_gpu_buffer_binding_t bindings;
   dn_gpu_pipeline_t* pipeline;
-} SdfRenderer;
+} dn_sdf_renderer_t;
 
-DN_API SdfRenderer       sdf_renderer_create(u32 buffer_size);
-DN_API void              sdf_renderer_draw(SdfRenderer* renderer, dn_gpu_command_buffer_t* command_buffer);
-DN_API void              sdf_renderer_push_instance(SdfRenderer* renderer, SdfShape shape);
-DN_API void              sdf_renderer_push_header(SdfRenderer* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness);
-DN_API SdfCombineHeader* sdf_combination_begin(SdfRenderer* renderer);
-DN_API void              sdf_combination_append(SdfRenderer* renderer, SdfCombineHeader* header, SdfShape shape, SdfCombineOp op, SdfSmoothingKernel kernel);
-DN_API void              sdf_combination_commit(SdfRenderer* renderer);
-DN_API void              sdf_circle_ex(SdfRenderer* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float radius);
-DN_API void              sdf_ring_ex(SdfRenderer* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float inner_radius, float outer_radius);
-DN_API void              sdf_oriented_box_ex(SdfRenderer* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float dx, float dy);
-DN_API void              sdf_grid(SdfRenderer* renderer, u32 grid_width, u32 grid_size);
+DN_API dn_sdf_renderer_t        dn_sdf_renderer_create(u32 buffer_size);
+DN_API void                     dn_sdf_renderer_draw(dn_sdf_renderer_t* renderer, dn_gpu_command_buffer_t* command_buffer);
+DN_API void                     dn_sdf_renderer_push_instance(dn_sdf_renderer_t* renderer, dn_sdf_shape_t shape);
+DN_API void                     dn_sdf_renderer_push_header(dn_sdf_renderer_t* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness);
+DN_API dn_sdf_combine_header_t* dn_sdf_combination_begin(dn_sdf_renderer_t* renderer);
+DN_API void                     dn_sdf_combination_append(dn_sdf_renderer_t* renderer, dn_sdf_combine_header_t* header, dn_sdf_shape_t shape, dn_sdf_combine_op_t op, dn_sdf_smoothing_kernel_t kernel);
+DN_API void                     dn_sdf_combination_commit(dn_sdf_renderer_t* renderer);
+DN_API void                     dn_sdf_circle_ex(dn_sdf_renderer_t* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float radius);
+DN_API void                     dn_sdf_ring_ex(dn_sdf_renderer_t* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float inner_radius, float outer_radius);
+DN_API void                     dn_sdf_oriented_box_ex(dn_sdf_renderer_t* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float dx, float dy);
+DN_API void                     dn_sdf_grid(dn_sdf_renderer_t* renderer, u32 grid_width, u32 grid_size);
 #endif
 
 #ifdef SDF_IMPLEMENTATION
-SdfRenderer sdf_renderer_create(u32 buffer_size) {
-  SdfRenderer renderer = {
+dn_sdf_renderer_t dn_sdf_renderer_create(u32 buffer_size) {
+  dn_sdf_renderer_t renderer = {
     .state = SDF_RENDERER_STATE_NONE,
 
     .vertices = dn_gpu_backed_buffer_create({
-      .name = "SdfRendererVertices",
+      .name = "dn_sdf_renderer_tVertices",
       .kind = GPU_BUFFER_KIND_ARRAY,
       .usage = GPU_BUFFER_USAGE_STATIC,
       .capacity = buffer_size,
-      .element_size = sizeof(SdfVertex)
+      .element_size = sizeof(dn_sdf_vertex_t)
     }),
     .instances = dn_gpu_backed_buffer_create({
-      .name = "SdfRendererInstances",
+      .name = "dn_sdf_renderer_tInstances",
       .kind = GPU_BUFFER_KIND_ARRAY,
       .usage = GPU_BUFFER_USAGE_DYNAMIC,
       .capacity = buffer_size,
-      .element_size = sizeof(SdfInstance)
+      .element_size = sizeof(dn_sdf_instance_t)
     }),
     .combinations = dn_gpu_backed_buffer_create({
-      .name = "SdfRendererCombinations",
+      .name = "dn_sdf_renderer_tCombinations",
       .kind = GPU_BUFFER_KIND_STORAGE,
       .usage = GPU_BUFFER_USAGE_DYNAMIC,
       .capacity = buffer_size,
       .element_size = sizeof(u32)
     }),
     .shape_data = dn_gpu_backed_buffer_create({
-      .name = "SdfRendererShapeData",
+      .name = "dn_sdf_renderer_tShapeData",
       .kind = GPU_BUFFER_KIND_STORAGE,
       .usage = GPU_BUFFER_USAGE_DYNAMIC,
       .capacity = buffer_size,
@@ -190,7 +185,7 @@ SdfRenderer sdf_renderer_create(u32 buffer_size) {
 
   Vector2 vertices [6] = TD_MAKE_QUAD(0.5, -0.5, -0.5, 0.5);
   for (u32 i = 0; i < 6; i++) {
-    SdfVertex vertex = {
+    dn_sdf_vertex_t vertex = {
       .position = vertices[i],
       .uv = vertices[i],
     };
@@ -201,7 +196,7 @@ SdfRenderer sdf_renderer_create(u32 buffer_size) {
   return renderer;
 }
 
-void sdf_renderer_draw(SdfRenderer* renderer, dn_gpu_command_buffer_t* command_buffer) {
+void dn_sdf_renderer_draw(dn_sdf_renderer_t* renderer, dn_gpu_command_buffer_t* command_buffer) {
   dn_gpu_backed_buffer_sync(&renderer->instances);
   dn_gpu_backed_buffer_sync(&renderer->shape_data);
   dn_gpu_backed_buffer_sync(&renderer->combinations);
@@ -220,9 +215,9 @@ void sdf_renderer_draw(SdfRenderer* renderer, dn_gpu_command_buffer_t* command_b
   dn_gpu_backed_buffer_clear(&renderer->combinations);
 }
 
-void sdf_renderer_push_instance(SdfRenderer* renderer, SdfShape shape) {
+void dn_sdf_renderer_push_instance(dn_sdf_renderer_t* renderer, dn_sdf_shape_t shape) {
   if (renderer->state == SDF_RENDERER_STATE_NONE) {
-    SdfInstance instance = {
+    dn_sdf_instance_t instance = {
       .shape = shape,
       .buffer_index = dn_gpu_backed_buffer_size(&renderer->shape_data),
     };
@@ -230,7 +225,7 @@ void sdf_renderer_push_instance(SdfRenderer* renderer, SdfShape shape) {
   }
 }
 
-void sdf_renderer_push_header(SdfRenderer* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness) {
+void dn_sdf_renderer_push_header(dn_sdf_renderer_t* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness) {
   dn_gpu_backed_buffer_push(&renderer->shape_data, &r, 1);
   dn_gpu_backed_buffer_push(&renderer->shape_data, &g, 1);
   dn_gpu_backed_buffer_push(&renderer->shape_data, &b, 1);
@@ -240,9 +235,9 @@ void sdf_renderer_push_header(SdfRenderer* renderer, float px, float py, float r
   dn_gpu_backed_buffer_push(&renderer->shape_data, &edge_thickness, 1);
 }
 
-SdfCombineHeader* sdf_combination_begin(SdfRenderer* renderer) {
+dn_sdf_combine_header_t* dn_sdf_combination_begin(dn_sdf_renderer_t* renderer) {
   // First, push an instance that points into the combination buffer.
-  SdfInstance instance = {
+  dn_sdf_instance_t instance = {
     .shape = SDF_SHAPE_COMBINE,
     .buffer_index = dn_gpu_backed_buffer_size(&renderer->combinations),
   };
@@ -252,15 +247,15 @@ SdfCombineHeader* sdf_combination_begin(SdfRenderer* renderer) {
 
   // Then, put a combination header in the data buffer; this'll tell the GPU how many combination entries 
   // there are. Since we don't know that yet, return a pointer that gets filled in as you push shapes.
-  SdfCombineHeader* header = (SdfCombineHeader*)dn_gpu_backed_buffer_push(&renderer->combinations, NULL, 1);
+  dn_sdf_combine_header_t* header = (dn_sdf_combine_header_t*)dn_gpu_backed_buffer_push(&renderer->combinations, NULL, 1);
   header->num_sdfs = 0;
   return header;
 }
 
-void sdf_combination_append(SdfRenderer* renderer, SdfCombineHeader* header, SdfShape shape, SdfCombineOp op, SdfSmoothingKernel kernel) {
+void dn_sdf_combination_append(dn_sdf_renderer_t* renderer, dn_sdf_combine_header_t* header, dn_sdf_shape_t shape, dn_sdf_combine_op_t op, dn_sdf_smoothing_kernel_t kernel) {
   header->num_sdfs++;
   
-  SdfCombineEntry entry = {
+  dn_sdf_combine_entry_t entry = {
     .buffer_index = dn_gpu_backed_buffer_size(&renderer->shape_data),
     .shape = shape,
     .op = op,
@@ -269,37 +264,35 @@ void sdf_combination_append(SdfRenderer* renderer, SdfCombineHeader* header, Sdf
   dn_gpu_backed_buffer_push(&renderer->combinations, &entry, 4);
 }
 
-void sdf_combination_commit(SdfRenderer* renderer) {
+void dn_sdf_combination_commit(dn_sdf_renderer_t* renderer) {
   renderer->state = SDF_RENDERER_STATE_NONE;
 }
 
-void sdf_circle_ex(SdfRenderer* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float radius) {
-  sdf_renderer_push_instance(renderer, SDF_SHAPE_CIRCLE);
-  sdf_renderer_push_header(renderer, px, py, r, g, b, rotation, edge_thickness);
+void dn_sdf_circle_ex(dn_sdf_renderer_t* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float radius) {
+  dn_sdf_renderer_push_instance(renderer, SDF_SHAPE_CIRCLE);
+  dn_sdf_renderer_push_header(renderer, px, py, r, g, b, rotation, edge_thickness);
   dn_gpu_backed_buffer_push(&renderer->shape_data, &radius, 1);
 }
 
-void sdf_ring_ex(SdfRenderer* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float inner_radius, float outer_radius) {
-  sdf_renderer_push_instance(renderer, SDF_SHAPE_RING);
-  sdf_renderer_push_header(renderer, px, py, r, g, b, rotation, edge_thickness);
+void dn_sdf_ring_ex(dn_sdf_renderer_t* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float inner_radius, float outer_radius) {
+  dn_sdf_renderer_push_instance(renderer, SDF_SHAPE_RING);
+  dn_sdf_renderer_push_header(renderer, px, py, r, g, b, rotation, edge_thickness);
   dn_gpu_backed_buffer_push(&renderer->shape_data, &inner_radius, 1);
   dn_gpu_backed_buffer_push(&renderer->shape_data, &outer_radius, 1);
 }
 
-void sdf_oriented_box_ex(SdfRenderer* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float dx, float dy) {
-  sdf_renderer_push_instance(renderer, SDF_SHAPE_ORIENTED_BOX);
-  sdf_renderer_push_header(renderer, px, py, r, g, b, rotation, edge_thickness);
+void dn_sdf_oriented_box_ex(dn_sdf_renderer_t* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float dx, float dy) {
+  dn_sdf_renderer_push_instance(renderer, SDF_SHAPE_ORIENTED_BOX);
+  dn_sdf_renderer_push_header(renderer, px, py, r, g, b, rotation, edge_thickness);
   dn_gpu_backed_buffer_push(&renderer->shape_data, &dx, 1);
   dn_gpu_backed_buffer_push(&renderer->shape_data, &dy, 1);
 }
 
-
-
-void sdf_grid(SdfRenderer* renderer, u32 grid_width, u32 grid_size) {
+void dn_sdf_grid(dn_sdf_renderer_t* renderer, u32 grid_width, u32 grid_size) {
   dn_time_metric_begin("sdf_c");
   for (u32 x = 0; x < grid_size; x += grid_width) {
     for (u32 y = 0; y < grid_size; y += grid_width) {
-      sdf_circle_ex(renderer,
+      dn_sdf_circle_ex(renderer,
         x, y,
         0.40f, 0.65f, 0.55f, 
         0.0f,

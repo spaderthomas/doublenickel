@@ -765,45 +765,45 @@ typedef struct dn_gpu_command_buffer_t dn_gpu_command_buffer_t;
 ///////////////
 // FUNCTIONS //
 ///////////////
-dn_gpu_command_buffer_t*       dn_gpu_command_buffer_create(dn_gpu_command_buffer_descriptor_t descriptor);
-void                           dn_gpu_command_buffer_draw(dn_gpu_command_buffer_t* command_buffer, dn_gpu_draw_call_t draw_call);
-void                           dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer);
-void                           dn_gpu_bind_pipeline(dn_gpu_command_buffer_t* command_buffer, dn_gpu_pipeline_t* pipeline);
-void                           dn_gpu_begin_render_pass(dn_gpu_command_buffer_t* command_buffer, dn_gpu_render_pass_t render_pass);
-void                           dn_gpu_end_render_pass(dn_gpu_command_buffer_t* command_buffer);
-void                           dn_gpu_apply_bindings(dn_gpu_command_buffer_t* command_buffer, dn_gpu_buffer_binding_t bindings);
-void                           dn_gpu_bind_render_state(dn_gpu_command_buffer_t* command_buffer, dn_gpu_renderer_state_t render);
-void                           dn_gpu_set_layer(dn_gpu_command_buffer_t* command_buffer, u32 layer);
-void                           dn_gpu_set_world_space(dn_gpu_command_buffer_t* command_buffer, bool world_space);
-void                           dn_gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, Vector2 camera);
-dn_gpu_pipeline_t*             dn_gpu_pipeline_create(dn_gpu_pipeline_descriptor_t descriptor);
-dn_gpu_uniform_t*              dn_gpu_uniform_create(dn_gpu_uniform_descriptor_t descriptor);
-dn_gpu_buffer_t*               dn_gpu_buffer_create(dn_gpu_buffer_descriptor_t descriptor);
-void                           dn_gpu_buffer_bind(dn_gpu_buffer_t* buffer);
-void                           dn_gpu_buffer_bind_base(dn_gpu_buffer_t* buffer, u32 base);
-void                           dn_gpu_buffer_sync(dn_gpu_buffer_t* buffer, void* data, u32 size);
-void                           dn_gpu_buffer_sync_subdata(dn_gpu_buffer_t* buffer, void* data, u32 byte_size, u32 byte_offset);
-void                           dn_gpu_buffer_zero(dn_gpu_buffer_t* buffer, u32 size);
-dn_gpu_backed_buffer_t         dn_gpu_backed_buffer_create(dn_gpu_buffer_descriptor_t descriptor);
-u32                            dn_gpu_backed_buffer_size(dn_gpu_backed_buffer_t* buffer);
-void                           dn_gpu_backed_buffer_clear(dn_gpu_backed_buffer_t* buffer);
-u8*                            dn_gpu_backed_buffer_push(dn_gpu_backed_buffer_t* buffer, void* data, u32 num_elements);
-void                           dn_gpu_backed_buffer_sync(dn_gpu_backed_buffer_t* buffer);
-dn_gpu_shader_t*               dn_gpu_shader_create(dn_gpu_shader_descriptor_t descriptor);
-dn_gpu_shader_t*               dn_gpu_shader_find(const char* name);
-dn_gpu_render_target_t*        dn_gpu_render_target_create(dn_gpu_render_target_descriptor_t descriptor);
-dn_gpu_render_target_t*        dn_gpu_acquire_swapchain();
-void                           dn_gpu_render_target_bind(dn_gpu_render_target_t* target);
-void                           dn_gpu_render_target_clear(dn_gpu_render_target_t* target);
-void                           dn_gpu_render_target_blit(dn_gpu_render_target_t* source, dn_gpu_render_target_t* destination);
-void                           dn_gpu_memory_barrier(dn_gpu_memory_barrier_t barrier);
-void                           dn_gpu_dispatch_compute(dn_gpu_buffer_t* buffer, u32 size);
-void                           dn_gpu_swap_buffers();
-void                           dn_gpu_error_clear();
-tstring                        dn_gpu_error_read();
-void                           dn_gpu_error_log_one();
-void                           dn_gpu_error_log_all();
-void                           dn_gpu_set_resource_name(dn_gpu_resource_id_t id, u32 handle, u32 name_len, const char* name);
+dn_gpu_command_buffer_t* dn_gpu_command_buffer_create(dn_gpu_command_buffer_descriptor_t descriptor);
+void                     dn_gpu_command_buffer_draw(dn_gpu_command_buffer_t* command_buffer, dn_gpu_draw_call_t draw_call);
+void                     dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer);
+void                     dn_gpu_bind_pipeline(dn_gpu_command_buffer_t* command_buffer, dn_gpu_pipeline_t* pipeline);
+void                     dn_gpu_begin_render_pass(dn_gpu_command_buffer_t* command_buffer, dn_gpu_render_pass_t render_pass);
+void                     dn_gpu_end_render_pass(dn_gpu_command_buffer_t* command_buffer);
+void                     dn_gpu_apply_bindings(dn_gpu_command_buffer_t* command_buffer, dn_gpu_buffer_binding_t bindings);
+void                     dn_gpu_bind_render_state(dn_gpu_command_buffer_t* command_buffer, dn_gpu_renderer_state_t render);
+void                     dn_gpu_set_layer(dn_gpu_command_buffer_t* command_buffer, u32 layer);
+void                     dn_gpu_set_world_space(dn_gpu_command_buffer_t* command_buffer, bool world_space);
+void                     dn_gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, Vector2 camera);
+dn_gpu_pipeline_t*       dn_gpu_pipeline_create(dn_gpu_pipeline_descriptor_t descriptor);
+dn_gpu_uniform_t*        dn_gpu_uniform_create(dn_gpu_uniform_descriptor_t descriptor);
+dn_gpu_buffer_t*         dn_gpu_buffer_create(dn_gpu_buffer_descriptor_t descriptor);
+void                     dn_gpu_buffer_bind(dn_gpu_buffer_t* buffer);
+void                     dn_gpu_buffer_bind_base(dn_gpu_buffer_t* buffer, u32 base);
+void                     dn_gpu_buffer_sync(dn_gpu_buffer_t* buffer, void* data, u32 size);
+void                     dn_gpu_buffer_sync_subdata(dn_gpu_buffer_t* buffer, void* data, u32 byte_size, u32 byte_offset);
+void                     dn_gpu_buffer_zero(dn_gpu_buffer_t* buffer, u32 size);
+dn_gpu_backed_buffer_t   dn_gpu_backed_buffer_create(dn_gpu_buffer_descriptor_t descriptor);
+u32                      dn_gpu_backed_buffer_size(dn_gpu_backed_buffer_t* buffer);
+void                     dn_gpu_backed_buffer_clear(dn_gpu_backed_buffer_t* buffer);
+u8*                      dn_gpu_backed_buffer_push(dn_gpu_backed_buffer_t* buffer, void* data, u32 num_elements);
+void                     dn_gpu_backed_buffer_sync(dn_gpu_backed_buffer_t* buffer);
+dn_gpu_shader_t*         dn_gpu_shader_create(dn_gpu_shader_descriptor_t descriptor);
+dn_gpu_shader_t*         dn_gpu_shader_find(const char* name);
+dn_gpu_render_target_t*  dn_gpu_render_target_create(dn_gpu_render_target_descriptor_t descriptor);
+dn_gpu_render_target_t*  dn_gpu_acquire_swapchain();
+void                     dn_gpu_render_target_bind(dn_gpu_render_target_t* target);
+void                     dn_gpu_render_target_clear(dn_gpu_render_target_t* target);
+void                     dn_gpu_render_target_blit(dn_gpu_render_target_t* source, dn_gpu_render_target_t* destination);
+void                     dn_gpu_memory_barrier(dn_gpu_memory_barrier_t barrier);
+void                     dn_gpu_dispatch_compute(dn_gpu_buffer_t* buffer, u32 size);
+void                     dn_gpu_swap_buffers();
+void                     dn_gpu_error_clear();
+tstring                  dn_gpu_error_read();
+void                     dn_gpu_error_log_one();
+void                     dn_gpu_error_log_all();
+void                     dn_gpu_set_resource_name(dn_gpu_resource_id_t id, u32 handle, u32 name_len, const char* name);
 
 
 
@@ -822,23 +822,23 @@ typedef enum {
   SDF_SHAPE_BOX = 2,
   SDF_SHAPE_ORIENTED_BOX = 3,
   SDF_SHAPE_COMBINE = 100,
-} SdfShape;
+} dn_sdf_shape_t;
 
 typedef enum {
   SDF_COMBINE_OP_UNION = 0,
   SDF_COMBINE_OP_INTERSECTION = 1,
   SDF_COMBINE_OP_SUBTRACTION = 2,
-} SdfCombineOp;
+} dn_sdf_combine_op_t;
 
 typedef enum {
   SDF_SMOOTH_KERNEL_NONE = 0,
   SDF_SMOOTH_KERNEL_POLYNOMIAL_QUADRATIC = 1,
-} SdfSmoothingKernel;
+} dn_sdf_smoothing_kernel_t;
  
 typedef enum {
   SDF_RENDERER_STATE_NONE,
   SDF_RENDERER_STATE_COMBINATION,
-} SdfRendererState;
+} dn_sdf_renderer_state_t;
 
 
 /////////////////////
@@ -847,23 +847,23 @@ typedef enum {
 typedef struct {
   Vector2 position;
   Vector2 uv;
-} SdfVertex;
+} dn_sdf_vertex_t;
 
 typedef struct {
-  SdfShape shape;
+  dn_sdf_shape_t shape;
   u32 buffer_index;
-} SdfInstance;
+} dn_sdf_instance_t;
 
 typedef struct {
   u32 num_sdfs;
-} SdfCombineHeader;
+} dn_sdf_combine_header_t;
 
 typedef struct {
   u32 buffer_index;
   u32 kind;
-  SdfCombineOp op;
-  SdfSmoothingKernel kernel;
-} SdfCombineEntry;
+  dn_sdf_combine_op_t op;
+  dn_sdf_smoothing_kernel_t kernel;
+} dn_sdf_combine_entry_t;
 
 
 ////////////////////
@@ -874,51 +874,51 @@ typedef struct {
   Vector2 position;
   float rotation;
   float edge_thickness;
-  SdfShape shape;
-} SdfHeader;
+  dn_sdf_shape_t shape;
+} dn_sdf_header_t;
 
 typedef struct {
-  SdfHeader header;
+  dn_sdf_header_t header;
   float radius;
-} SdfCircle;
+} dn_sdf_circle_t;
 
 typedef struct {
-  SdfHeader header;
+  dn_sdf_header_t header;
   float inner_radius;
   float outer_radius;
-} SdfRing;
+} dn_sdf_ring_t;
 
 typedef struct {
-  SdfHeader header;
+  dn_sdf_header_t header;
   Vector2 size;
 } SdfBox;
 
 typedef struct {
-  SdfHeader header;
+  dn_sdf_header_t header;
   Vector2 size;
-} SdfOrientedBox;
+} dn_sdf_oriented_box_t;
 
 typedef struct {
-  SdfRendererState state;
+  dn_sdf_renderer_state_t state;
   dn_gpu_backed_buffer_t vertices;
   dn_gpu_backed_buffer_t instances;
   dn_gpu_backed_buffer_t combinations;
   dn_gpu_backed_buffer_t shape_data;
   dn_gpu_buffer_binding_t bindings;
   dn_gpu_pipeline_t* pipeline;
-} SdfRenderer;
+} dn_sdf_renderer_t;
 
-SdfRenderer       sdf_renderer_create(u32 buffer_size);
-void              sdf_renderer_draw(SdfRenderer* renderer, dn_gpu_command_buffer_t* command_buffer);
-void              sdf_renderer_push_instance(SdfRenderer* renderer, SdfShape shape);
-void              sdf_renderer_push_header(SdfRenderer* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness);
-SdfCombineHeader* sdf_combination_begin(SdfRenderer* renderer);
-void              sdf_combination_append(SdfRenderer* renderer, SdfCombineHeader* header, SdfShape shape, SdfCombineOp op, SdfSmoothingKernel kernel);
-void              sdf_combination_commit(SdfRenderer* renderer);
-void              sdf_circle_ex(SdfRenderer* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float radius);
-void              sdf_ring_ex(SdfRenderer* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float inner_radius, float outer_radius);
-void              sdf_oriented_box_ex(SdfRenderer* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float dx, float dy);
-void              sdf_grid(SdfRenderer* renderer, u32 grid_width, u32 grid_size);
+dn_sdf_renderer_t        dn_sdf_renderer_create(u32 buffer_size);
+void                     dn_sdf_renderer_draw(dn_sdf_renderer_t* renderer, dn_gpu_command_buffer_t* command_buffer);
+void                     dn_sdf_renderer_push_instance(dn_sdf_renderer_t* renderer, dn_sdf_shape_t shape);
+void                     dn_sdf_renderer_push_header(dn_sdf_renderer_t* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness);
+dn_sdf_combine_header_t* dn_sdf_combination_begin(dn_sdf_renderer_t* renderer);
+void                     dn_sdf_combination_append(dn_sdf_renderer_t* renderer, dn_sdf_combine_header_t* header, dn_sdf_shape_t shape, dn_sdf_combine_op_t op, dn_sdf_smoothing_kernel_t kernel);
+void                     dn_sdf_combination_commit(dn_sdf_renderer_t* renderer);
+void                     dn_sdf_circle_ex(dn_sdf_renderer_t* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float radius);
+void                     dn_sdf_ring_ex(dn_sdf_renderer_t* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float inner_radius, float outer_radius);
+void                     dn_sdf_oriented_box_ex(dn_sdf_renderer_t* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float dx, float dy);
+void                     dn_sdf_grid(dn_sdf_renderer_t* renderer, u32 grid_width, u32 grid_size);
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1166,18 +1166,53 @@ void add_script_directory(const char* name);
 ffi = require('ffi')
 bit = require('bit')
 
-function tdengine.handle_error(message)
-  -- Strip the message's filename the script filename to make it more readable
-  local parts = split(message, ' ')
-  local path = parts[1]
-  local path_elements = split(path, '/')
-  local filename = path_elements[#path_elements]
+-- function tdengine.handle_error(message)
+--   -- Strip the message's filename the script filename to make it more readable
+--   local parts = split(message, ' ')
+--   local path = parts[1]
+--   local path_elements = split(path, '/')
+--   local filename = path_elements[#path_elements]
 
-  local message = filename
-  for index = 2, #parts do
-    message = message .. ' ' .. parts[index]
-  end
+--   local message = filename
+--   for index = 2, #parts do
+--     message = message .. ' ' .. parts[index]
+--   end
 
+--   local stack_trace = debug.traceback()
+--   stack_trace = stack_trace:gsub('stack traceback:\n', '')
+--   stack_trace = stack_trace:gsub('\t', '	')
+
+--   -- The stack trace contains absolute paths, which are just hard to read. Also, if the path is long, it is
+--   -- shortened with "...". Remove the absolute part of the path, including the "..."
+--   local install_dir = tdengine.ffi.dn_paths_resolve('install'):to_interned()
+--   local escaped_install = install_dir:gsub('%.', '%%.')
+--   local last_path_element = install_dir:match("([^/]+)$")
+--   local pattern = '%.%.%.(.*)/' .. last_path_element
+
+--   -- Replace the full path first
+--   stack_trace = stack_trace:gsub(escaped_install, '')
+
+--   -- Then replace any possible shortened versions with ...
+--   local shortened_path_pattern = '[^%.]+%.[^%.]+%.[^%.]+%.[^%.]+%.[^%.]+'
+--   stack_trace = stack_trace:gsub(pattern, '')
+
+--   -- Print
+--   local error_message = string.format('lua runtime error:\n\t%s', message)
+--   local trace_message = string.format('stack trace:\n%s', stack_trace)
+
+--   tdengine.debug.last_error = error_message
+--   tdengine.debug.last_trace = trace_message
+
+--   tdengine.log(error_message)
+--   tdengine.log(trace_message)
+
+--   tdengine.debug.open_debugger(1)
+--   --tdengine.analytics.submit_crash(error_message, trace_message)
+
+--   return
+-- end
+
+function tdengine.handle_error()
   local stack_trace = debug.traceback()
   stack_trace = stack_trace:gsub('stack traceback:\n', '')
   stack_trace = stack_trace:gsub('\t', '	')
@@ -1196,20 +1231,10 @@ function tdengine.handle_error(message)
   local shortened_path_pattern = '[^%.]+%.[^%.]+%.[^%.]+%.[^%.]+%.[^%.]+'
   stack_trace = stack_trace:gsub(pattern, '')
 
-  -- Print
-  local error_message = string.format('lua runtime error:\n\t%s', message)
   local trace_message = string.format('stack trace:\n%s', stack_trace)
-
-  tdengine.debug.last_error = error_message
-  tdengine.debug.last_trace = trace_message
-
-  tdengine.log(error_message)
   tdengine.log(trace_message)
 
   tdengine.debug.open_debugger(1)
-  --tdengine.analytics.submit_crash(error_message, trace_message)
-
-  return
 end
 
 function tdengine.init_phase_0()

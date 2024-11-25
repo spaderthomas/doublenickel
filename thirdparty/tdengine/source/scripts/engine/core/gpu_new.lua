@@ -160,7 +160,7 @@ local todo = [[
 - Draw an SDF circle using the other buffer
   - Make a GL_ARRAY_BUFFER from Lua to hold the vertex data (position and UV, just reuse Vertex)
   - Upload vertices for a quad to the buffer (once at startup)
-  - Create another GL_ARRAY_BUFFER to hold the instance-specific data (SdfVertex)
+  - Create another GL_ARRAY_BUFFER to hold the instance-specific data (dn_sdf_vertex_t)
   - Create a VAO which first specifies the vertex layout, then the instance data layout. It uses the divisor to tell OpenGL to only advance the instance data once per instance, rather than once per vertex.
   - Every frame, update a CPU buffer with instance data. Sync that to the GPU buffer when you're ready to render.
   - Call glDrawArraysInstanced, telling it to start at instance 0, draw 6 vertices per instance, and however many instances you have

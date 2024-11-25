@@ -23,15 +23,15 @@ layout (std430, binding = 1) readonly buffer SdfCombineBuffer {
 ////////////////
 // SDF HEADER //
 ////////////////
-struct SdfHeader {
+struct dn_sdf_header_t {
     vec3 color;
     vec2 position;
     float rotation;
     float edge_thickness;
 };
 
-SdfHeader pull_header(inout uint buffer_index) {
-    SdfHeader header;
+dn_sdf_header_t pull_header(inout uint buffer_index) {
+    dn_sdf_header_t header;
     header.color          = PULL_VEC3(sdf_data, buffer_index);
     header.position       = PULL_VEC2(sdf_data, buffer_index);
     header.rotation       = PULL_F32(sdf_data, buffer_index);
@@ -43,12 +43,12 @@ SdfHeader pull_header(inout uint buffer_index) {
 ////////////////
 // SDF CIRCLE //
 ////////////////
-struct SdfCircle {
+struct dn_sdf_circle_t {
     float radius;
 };
 
-SdfCircle pull_circle(inout uint buffer_index) {
-    SdfCircle circle;
+dn_sdf_circle_t pull_circle(inout uint buffer_index) {
+    dn_sdf_circle_t circle;
     circle.radius = PULL_F32(sdf_data, buffer_index);
     return circle;
 }
@@ -61,13 +61,13 @@ float sdf_circle(vec2 point, vec2 center, float radius) {
 //////////////
 // SDF RING //
 //////////////
-struct SdfRing {
+struct dn_sdf_ring_t {
     float inner_radius;
     float outer_radius;
 };
 
-SdfRing pull_ring(inout uint buffer_index) {
-    SdfRing ring;
+dn_sdf_ring_t pull_ring(inout uint buffer_index) {
+    dn_sdf_ring_t ring;
     ring.inner_radius = PULL_F32(sdf_data, buffer_index);
     ring.outer_radius = PULL_F32(sdf_data, buffer_index);
     return ring;
@@ -84,12 +84,12 @@ float sdf_ring(vec2 world_point, vec2 center, float inner_radius, float outer_ra
 //////////////////////
 // SDF ORIENTED BOX //
 //////////////////////
-struct SdfOrientedBox {
+struct dn_sdf_oriented_box_t {
     vec2 size;
 };
 
-SdfOrientedBox pull_oriented_box(inout uint buffer_index) {
-    SdfOrientedBox box;
+dn_sdf_oriented_box_t pull_oriented_box(inout uint buffer_index) {
+    dn_sdf_oriented_box_t box;
     box.size = PULL_VEC2(sdf_data, buffer_index);
     return box;
 }
@@ -137,14 +137,14 @@ struct SdfIndex {
 };
 
 
-struct SdfCombineEntry {
+struct dn_sdf_combine_entry_t {
     SdfIndex index;
     uint combine_op;
     uint kernel;
 };
 
-SdfCombineEntry pull_sdf_combine_entry(inout uint index) {
-    SdfCombineEntry entry;
+dn_sdf_combine_entry_t pull_sdf_combine_entry(inout uint index) {
+    dn_sdf_combine_entry_t entry;
     entry.index.buffer_index = PULL_U32(sdf_combine_data, index);
     entry.index.shape = PULL_U32(sdf_combine_data, index);
     entry.combine_op = PULL_U32(sdf_combine_data, index);
@@ -198,7 +198,7 @@ float sdf_op_intersection(float a, float b, uint kernel) {
 ////////////////////////
 struct SdfDecodeContext {
     SdfIndex index;
-    SdfHeader header;
+    dn_sdf_header_t header;
     float sdf_distance;
     vec4 color;
 };

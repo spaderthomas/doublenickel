@@ -1,21 +1,21 @@
 
-SdfRenderer = tdengine.class.metatype('SdfRenderer', 'sdf')
+SdfRenderer = tdengine.class.metatype('dn_sdf_renderer_t', 'dn_sdf')
 function SdfRenderer:init(params)
 	self = tdengine.ffi.sdf_renderer_create(params.buffer_size)
 end
 
-SdfInstance = tdengine.class.metatype('SdfInstance')
+SdfInstance = tdengine.class.metatype('dn_sdf_instance_t')
 function SdfInstance:init(params)
 	self.buffer_index = params.buffer_index or 0
 	self.kind = tdengine.enum.is_enum(params.kind) and params.kind:to_number() or params.kind
 end
 
-SdfCombineHeader = tdengine.class.metatype('SdfCombineHeader')
+SdfCombineHeader = tdengine.class.metatype('dn_sdf_combine_header_t')
 function SdfCombineHeader:init(params)
 	self.num_sdfs = params.num_sdfs
 end
 
-SdfCombineEntry = tdengine.class.metatype('SdfCombineEntry')
+SdfCombineEntry = tdengine.class.metatype('dn_sdf_combine_entry_t')
 function SdfCombineEntry:init(params)
 	self.kind = params.kind
 	self.buffer_index = params.buffer_index
@@ -23,7 +23,7 @@ function SdfCombineEntry:init(params)
 	self.kernel = params.kernel:to_number()
 end
 
-SdfHeader = tdengine.class.metatype('SdfHeader')
+SdfHeader = tdengine.class.metatype('dn_sdf_header_t')
 function SdfHeader:init(params)
 	self.shape = params.shape:to_number()
 	self.color = tdengine.color(params.color):to_vec3()
@@ -33,7 +33,7 @@ function SdfHeader:init(params)
 end
 
 function SdfHeader:init_raw(params)
-	local header = ffi.new('SdfHeader')
+	local header = ffi.new('dn_sdf_header_t')
 	header.color = params[1]
   header.position = params[2]
   header.rotation = params[3]
@@ -42,14 +42,14 @@ function SdfHeader:init_raw(params)
 	return header
 end
 
-SdfCircle = tdengine.class.metatype('SdfCircle')
+SdfCircle = tdengine.class.metatype('dn_sdf_circle_t')
 function SdfCircle:init(params)
 	params.shape = Sdf.Circle
 	self.header = SdfHeader:new(params)
   self.radius = params.radius or 10
 end
 
-SdfRing = tdengine.class.metatype('SdfRing')
+SdfRing = tdengine.class.metatype('dn_sdf_ring_t')
 function SdfRing:init(params)
 	params.shape = Sdf.Ring
 	self.header = SdfHeader:new(params)
@@ -57,7 +57,7 @@ function SdfRing:init(params)
   self.outer_radius = params.outer_radius or 20
 end
 
-SdfOrientedBox = tdengine.class.metatype('SdfOrientedBox')
+SdfOrientedBox = tdengine.class.metatype('dn_sdf_oriented_box_t')
 function SdfOrientedBox:init(params)
 	params.shape = Sdf.OrientedBox
 	self.header = SdfHeader:new(params)

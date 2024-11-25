@@ -271,6 +271,24 @@ void LuaState::dump_stack () {
 	printf("\n");
 }
 
+void LuaState::dump_call_stack () {
+	lua_State* l = state;
+
+	lua_getglobal(l, "tdengine");
+	DEFER_POP(l);
+	lua_pushstring(l, "handle_error");
+	lua_gettable(l, -2);
+	auto result = lua_pcall(l, 0, 0, 0);
+	if (result) {
+		const char* error = lua_tostring(l, -1);
+		tdns_log.write("handle_error(): error = %s", error);
+		exit(0);
+	}
+
+	printf("\n");
+}
+
+
 
 void LuaState::init_phase_0() {
 	// Basic Lua bootstrapping. Don't load any game scripts here. This is called before

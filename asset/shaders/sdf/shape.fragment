@@ -15,15 +15,15 @@ vec4 sdf_primitive(vec2 world, inout SdfDecodeContext context) {
 
 	context.sdf_distance = 0.0;	
 	if (context.index.shape == SDF_CIRCLE) {
-		SdfCircle circle = pull_circle(context.index.buffer_index);
+		dn_sdf_circle_t circle = pull_circle(context.index.buffer_index);
 		context.sdf_distance = sdf_circle(world, context.header.position, circle.radius);
 	}
 	else if (context.index.shape == SDF_RING) {
-		SdfRing ring = pull_ring(context.index.buffer_index);
+		dn_sdf_ring_t ring = pull_ring(context.index.buffer_index);
 		context.sdf_distance = sdf_ring(world, context.header.position, ring.inner_radius, ring.outer_radius);
 	}
 	else if (context.index.shape == SDF_ORIENTED_BOX) {
-		SdfOrientedBox box = pull_oriented_box(context.index.buffer_index);
+		dn_sdf_oriented_box_t box = pull_oriented_box(context.index.buffer_index);
 
 		vec2 axis = vec2(cos(context.header.rotation), sin(context.header.rotation));
 		vec2 offset = axis * box.size.x / 2;
@@ -37,14 +37,14 @@ vec4 sdf_combination(vec2 world, inout SdfDecodeContext context) {
 
 	uint num_sdfs = PULL_U32(sdf_combine_data, combine_index);
 
-	SdfCombineEntry entry = pull_sdf_combine_entry(combine_index);
+	dn_sdf_combine_entry_t entry = pull_sdf_combine_entry(combine_index);
 	context.index = entry.index;
 	sdf_primitive(world, context);
 
 
 	float sdf_distance = context.sdf_distance;
 	for (uint i = 1; i < num_sdfs; i++) {
-		SdfCombineEntry entry = pull_sdf_combine_entry(combine_index);
+		dn_sdf_combine_entry_t entry = pull_sdf_combine_entry(combine_index);
 		context.index = entry.index;
 	// FN_DBG_SCALAR_EQ(context.index.shape, SDF_CIRCLE);
 		sdf_primitive(world, context);

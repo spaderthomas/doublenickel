@@ -18,23 +18,23 @@ void main() {
 	sdf_index.shape = index.x;
 	sdf_index.buffer_index = index.y;
 
-	SdfHeader header = pull_header(sdf_index.buffer_index);
+	dn_sdf_header_t header = pull_header(sdf_index.buffer_index);
 	if (sdf_index.shape == SDF_CIRCLE) {
-		SdfCircle circle = pull_circle(sdf_index.buffer_index);
+		dn_sdf_circle_t circle = pull_circle(sdf_index.buffer_index);
 
 		mat3 transform_matrix = transformation_matrix(header.position, header.rotation, vec2(circle.radius * 2));
 		vec3 transformed_position = transform_matrix * vec3(vertex_position, 1.0);
 		gl_Position = projection * view * vec4(transformed_position.xy, 1.0, 1.0);
 	}
 	else if (sdf_index.shape == SDF_RING) {
-		SdfRing ring = pull_ring(sdf_index.buffer_index);
+		dn_sdf_ring_t ring = pull_ring(sdf_index.buffer_index);
 
 		mat3 transform_matrix = transformation_matrix(header.position, header.rotation, vec2(ring.outer_radius * 2));
 		vec3 transformed_position = transform_matrix * vec3(vertex_position, 1.0);
 		gl_Position = projection * view * vec4(transformed_position.xy, 1.0, 1.0);
 	}
 	else if (sdf_index.shape == SDF_ORIENTED_BOX) {
-		SdfOrientedBox box = pull_oriented_box(sdf_index.buffer_index);
+		dn_sdf_oriented_box_t box = pull_oriented_box(sdf_index.buffer_index);
 
 		mat3 transform_matrix = transformation_matrix(header.position, header.rotation, box.size);
 		vec3 transformed_position = transform_matrix * vec3(vertex_position, 1.0);
