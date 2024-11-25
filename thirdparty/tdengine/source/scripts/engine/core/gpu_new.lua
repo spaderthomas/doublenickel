@@ -15,7 +15,7 @@ function GpuShaderDescriptor:init(params)
   end
 end
 
-GpuRenderTargetDescriptor = tdengine.class.metatype('GpuRenderTargetDescriptor')
+GpuRenderTargetDescriptor = tdengine.class.metatype('dn_gpu_render_target_descriptor_t')
 function GpuRenderTargetDescriptor:init(params)
   if params.resolution then
     self.size = tdengine.gpu.find(params.resolution)
@@ -32,55 +32,55 @@ function GpuBufferDescriptor:init(params)
   self.element_size = 1
 end
 
-GpuUniformDescriptor = tdengine.class.metatype('GpuUniformDescriptor')
+GpuUniformDescriptor = tdengine.class.metatype('dn_gpu_uniform_descriptor_t')
 function GpuUniformDescriptor:init(params)
   self.name = params.name
   self.kind = tdengine.enum.load(params.kind):to_number()
 end
 
-GpuCommandBufferDescriptor = tdengine.class.metatype('GpuCommandBufferDescriptor')
+GpuCommandBufferDescriptor = tdengine.class.metatype('dn_gpu_command_buffer_descriptor_t')
 function GpuCommandBufferDescriptor:init(params)
   self.max_commands = params.max_commands
 end
 
-GpuVertexAttribute = tdengine.class.metatype('GpuVertexAttribute')
+GpuVertexAttribute = tdengine.class.metatype('dn_gpu_vertex_attribute_t')
 function GpuVertexAttribute:init(params)
   self.kind = tdengine.enum.load(params.kind):to_number()
   self.count = params.count
   self.divisor = params.divisor or 0
 end
 
-GpuBufferLayout = tdengine.class.metatype('GpuBufferLayout')
+GpuBufferLayout = tdengine.class.metatype('dn_gpu_buffer_layout_t')
 function GpuBufferLayout:init(params)
   local allocator = tdengine.ffi.dn_allocator_find('standard')
 
   self.num_vertex_attributes = #params.vertex_attributes
-  self.vertex_attributes = allocator:alloc_array('GpuVertexAttribute', self.num_vertex_attributes)
+  self.vertex_attributes = allocator:alloc_array('dn_gpu_vertex_attribute_t', self.num_vertex_attributes)
   for i = 1, self.num_vertex_attributes, 1 do
     self.vertex_attributes[i - 1] = GpuVertexAttribute:new(params.vertex_attributes[i])
   end
 end
 
-GpuRasterState = tdengine.class.metatype('GpuRasterState')
+GpuRasterState = tdengine.class.metatype('dn_gpu_raster_state_t')
 function GpuRasterState:init(params)
   self.shader = tdengine.gpu.find(params.shader)
   self.primitive = tdengine.enum.load(params.primitive):to_number()
 end
 
-GpuPipeline = tdengine.class.metatype('GpuPipeline')
-function GpuPipeline:init(params)
+GpuPipelineDescriptor = tdengine.class.metatype('dn_gpu_pipeline_descriptor_t')
+function GpuPipelineDescriptor:init(params)
   local allocator = tdengine.ffi.dn_allocator_find('standard')
 
-  self.raster = GpuRasterState:new(params.raster)
+  self.raster = dn_gpu_raster_state_t:new(params.raster)
 
   self.num_buffer_layouts = #params.buffer_layouts
-  self.buffer_layouts = allocator:alloc_array('GpuBufferLayout', self.num_buffer_layouts)
+  self.buffer_layouts = allocator:alloc_array('dn_gpu_buffer_layout_t', self.num_buffer_layouts)
   for i = 1, self.num_buffer_layouts do
     self.buffer_layouts[i - 1] = GpuBufferLayout:new(params.buffer_layouts[i])
   end
 end
 
-GpuRenderPass = tdengine.class.metatype('GpuRenderPass')
+GpuRenderPass = tdengine.class.metatype('dn_gpu_render_pass_t')
 function GpuRenderPass:init(params)
   if params.color then
     self.color.attachment = tdengine.gpu.find(params.color.attachment)

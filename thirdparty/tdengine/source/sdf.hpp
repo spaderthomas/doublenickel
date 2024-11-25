@@ -89,16 +89,16 @@ typedef struct {
 
 typedef struct {
   SdfRendererState state;
-  GpuBackedBuffer vertices;
-  GpuBackedBuffer instances;
-  GpuBackedBuffer combinations;
-  GpuBackedBuffer shape_data;
-  GpuBufferBinding bindings;
-  GpuPipeline* pipeline;
+  dn_gpu_backed_buffer_t vertices;
+  dn_gpu_backed_buffer_t instances;
+  dn_gpu_backed_buffer_t combinations;
+  dn_gpu_backed_buffer_t shape_data;
+  dn_gpu_buffer_binding_t bindings;
+  dn_gpu_pipeline_t* pipeline;
 } SdfRenderer;
 
 DN_API SdfRenderer       sdf_renderer_create(u32 buffer_size);
-DN_API void              sdf_renderer_draw(SdfRenderer* renderer, GpuCommandBuffer* command_buffer);
+DN_API void              sdf_renderer_draw(SdfRenderer* renderer, dn_gpu_command_buffer_t* command_buffer);
 DN_API void              sdf_renderer_push_instance(SdfRenderer* renderer, SdfShape shape);
 DN_API void              sdf_renderer_push_header(SdfRenderer* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness);
 DN_API SdfCombineHeader* sdf_combination_begin(SdfRenderer* renderer);
@@ -201,7 +201,7 @@ SdfRenderer sdf_renderer_create(u32 buffer_size) {
   return renderer;
 }
 
-void sdf_renderer_draw(SdfRenderer* renderer, GpuCommandBuffer* command_buffer) {
+void sdf_renderer_draw(SdfRenderer* renderer, dn_gpu_command_buffer_t* command_buffer) {
   gpu_backed_buffer_sync(&renderer->instances);
   gpu_backed_buffer_sync(&renderer->shape_data);
   gpu_backed_buffer_sync(&renderer->combinations);

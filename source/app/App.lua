@@ -70,7 +70,7 @@ function App:on_init_game()
   self.render_pass = GpuRenderPass:new({
     color = {
       attachment = RenderTarget.Native,
-      load = GpuLoadOp.Clear
+      load = dn_gpu_load_op_t.Clear
     }
   })
 

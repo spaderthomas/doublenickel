@@ -108,7 +108,7 @@ function App:on_init_game()
 	buffer_descriptor.vertex_attributes[2].kind = tdengine.enums.VertexAttributeKind.Float:to_number()
 	local command_buffer = tdengine.gpu.add_command_buffer('scene', buffer_descriptor)
 
-	tdengine.gpu.add_render_pass('scene', command_buffer, render_target, nil, tdengine.enums.GpuLoadOp.Clear)
+	tdengine.gpu.add_render_pass('scene', command_buffer, render_target, nil, tdengine.enums.dn_gpu_load_op_t.Clear)
 end
 ```
 ### `tdengine.callback`
