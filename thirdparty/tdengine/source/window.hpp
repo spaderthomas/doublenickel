@@ -48,4 +48,5 @@ DN_API void create_window(const char* title, u32 x, u32 y, WindowFlags flags);
 DN_API void set_window_icon(const char* path);
 DN_API void set_display_mode(DisplayMode mode);
 DN_API DisplayMode get_display_mode();
+DN_API void              dn_window_set_cursor_visible(bool visible);
 

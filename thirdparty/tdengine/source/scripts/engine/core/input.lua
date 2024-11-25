@@ -147,7 +147,7 @@ function tdengine.input.is_context_active(context)
 end
 
 function tdengine.input.get_input_device()
-	return InputDevice:new(tdengine.ffi.get_input_device())
+	return InputDevice:new(tdengine.ffi.dn_input_get_device())
 end
 
 function tdengine.input.is_controller_mode()

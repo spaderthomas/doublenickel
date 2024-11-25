@@ -22,28 +22,26 @@ typedef struct {
 } dn_input_t;
 dn_input_t dn_input;
 
-void dn_input_init();
-void dn_input_update();
 
-DN_API bool dn_input_pressed(int key);
-DN_API bool dn_input_released(int key);
-DN_API bool dn_input_down(int key);
-DN_API bool dn_input_mod_down(int mod);
-DN_API bool dn_input_chord_pressed(int mod, int key);
-DN_API Vector2 dn_input_scroll();
-DN_API Vector2 dn_input_mouse(dn_coord_t unit);
-DN_API Vector2 dn_input_mouse_delta(dn_coord_t unit);
-DN_API void dn_window_set_cursor_visible(bool visible);
-DN_API u32 dn_input_shift_key(u32 key);
-DN_API dn_input_device_t get_input_device();
 
-void dn_input_callback_cursor(GLFWwindow* window, double xpos, double ypos);
-void dn_input_callback_click(GLFWwindow* window, int button, int action, int mods);
-void dn_input_callback_key(GLFWwindow* window, int key, int scancode, int action, int mods);
-void dn_input_callback_scroll(GLFWwindow* window, double xoffset, double yoffset);
-void dn_input_callback_error(int err, const char* msg);
-void dn_input_callback_window_size(GLFWwindow* window, int width, int height);
-
+DN_API bool              dn_input_pressed(int key);
+DN_API bool              dn_input_released(int key);
+DN_API bool              dn_input_down(int key);
+DN_API bool              dn_input_mod_down(int mod);
+DN_API bool              dn_input_chord_pressed(int mod, int key);
+DN_API Vector2           dn_input_scroll();
+DN_API Vector2           dn_input_mouse(dn_coord_t unit);
+DN_API Vector2           dn_input_mouse_delta(dn_coord_t unit);
+DN_API u32               dn_input_shift_key(u32 key);
+DN_API dn_input_device_t dn_input_get_device();
+DN_IMP void              dn_input_init();
+DN_IMP void              dn_input_update();       
+DN_IMP void              dn_input_callback_cursor(GLFWwindow* window, double xpos, double ypos);
+DN_IMP void              dn_input_callback_click(GLFWwindow* window, int button, int action, int mods);
+DN_IMP void              dn_input_callback_key(GLFWwindow* window, int key, int scancode, int action, int mods);
+DN_IMP void              dn_input_callback_scroll(GLFWwindow* window, double xoffset, double yoffset);
+DN_IMP void              dn_input_callback_error(int err, const char* msg);
+DN_IMP void              dn_input_callback_window_size(GLFWwindow* window, int width, int height);
 #endif
 
 
@@ -318,7 +316,7 @@ u32 dn_input_shift_key(u32 key) {
 	return key;
 }
 
-dn_input_device_t get_input_device() {
+dn_input_device_t dn_input_get_device() {
 	return steam_input.last_input_device;
 }
 #endif

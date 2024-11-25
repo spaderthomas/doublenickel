@@ -346,7 +346,7 @@ bool dn_input_mod_down(int mod);
 bool dn_input_chord_pressed(int mod, int key);
 u32 dn_input_shift_key(u32 key);
 Vector2 dn_input_scroll();
-dn_input_device_t get_input_device();
+dn_input_device_t dn_input_get_device();
 
 Vector2 dn_input_mouse(dn_coord_t unit);
 Vector2 dn_input_mouse_delta(dn_coord_t unit);

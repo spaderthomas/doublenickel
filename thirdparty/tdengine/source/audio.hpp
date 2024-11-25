@@ -94,18 +94,15 @@ DN_API void                       dn_audio_load(const char* file_path, const cha
 DN_API void                       dn_low_pass_filter_set_mode(dn_low_pass_filter_t* filter, dn_audio_filter_mode_t mode);
 DN_API void                       dn_low_pass_filter_set_cutoff(dn_low_pass_filter_t* filter, float cutoff);
 DN_API float                      dn_low_pass_filter_apply(dn_low_pass_filter_t* filter, float input);
-
-// @dn: You should be able to specify a directory when you initialize the audio
-void dn_audio_init();
-void dn_audio_update(float* buffer, int frames_requested, int num_channels);
-void dn_audio_shutdown();
-
-dn_audio_info_t* dn_audio_find(const char* name);
-dn_audio_info_t* dn_audio_find_no_default(const char* name);
-dn_audio_instance_t* dn_audio_resolve(dn_audio_instance_handle_t handle);
-dn_audio_instance_handle_t dn_audio_reserve();
-dn_audio_instance_handle_t dn_audio_play_sound_ex(dn_audio_info_t* sound, bool loop);
-void dn_audio_stop_ex(dn_audio_instance_t* active_sound);
+DN_IMP void                       dn_audio_init(); // @dn: You should be able to specify a directory when you initialize the audio
+DN_IMP void                       dn_audio_update(float* buffer, int frames_requested, int num_channels);
+DN_IMP void                       dn_audio_shutdown();
+DN_IMP dn_audio_info_t*           dn_audio_find(const char* name);
+DN_IMP dn_audio_info_t*           dn_audio_find_no_default(const char* name);
+DN_IMP dn_audio_instance_t*       dn_audio_resolve(dn_audio_instance_handle_t handle);
+DN_IMP dn_audio_instance_handle_t dn_audio_reserve();
+DN_IMP dn_audio_instance_handle_t dn_audio_play_sound_ex(dn_audio_info_t* sound, bool loop);
+DN_IMP void                       dn_audio_stop_ex(dn_audio_instance_t* active_sound);
 #endif
 
 

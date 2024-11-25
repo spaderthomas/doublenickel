@@ -8,6 +8,7 @@
 // All Lua functions have to be declared as extern C! Otherwise, they'll get name mangled,
 // and LuaJIT cannot find them when you declare them with ffi.cdef()
 #define DN_API extern "C" __declspec(dllexport)
+#define DN_IMP
 
 #define TD_ALIGN(n) __declspec(align(n))
 
