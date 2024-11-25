@@ -92,16 +92,16 @@ function tdengine.window.get_content_area()
 end
 
 function tdengine.window.get_game_area_size()
-  local data = tdengine.ffi.coord_get()
+  local data = tdengine.ffi.dn_coord_get()
   return tdengine.vec2(data.framebuffer_size.x, data.framebuffer_size.y)
 end
 
 function tdengine.window.set_game_area_size(size)
-  tdengine.ffi.coord_set_framebuffer_size(size.x, size.y)
+  tdengine.ffi.dn_coord_set_framebuffer_size(size.x, size.y)
 end
 
 function tdengine.window.set_game_area_position(position)
-  tdengine.ffi.coord_set_framebuffer_position(position.x, position.y)
+  tdengine.ffi.dn_coord_set_framebuffer_position(position.x, position.y)
 end
 
 function tdengine.window.get_native_resolution()

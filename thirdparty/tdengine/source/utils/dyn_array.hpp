@@ -16,29 +16,30 @@ typedef struct {
 #define DYN_ARRAY(type) type*
 
 DN_API dyn_array                  dn_dynamic_array_alloc(u32 element_size, dn_allocator_t* allocator);
-#define                                  _dn_dynamic_array_alloc(element_size, allocator) _dn_dynamic_array_alloc(element_size, allocator)
 DN_API void                       dn_dynamic_array_push_n(dyn_array* array, void* data, u32 num_elements);
-#define                                   _dn_dynamic_array_push_n(array, data, num_elements) _dn_dynamic_array_alloc(DN_DYNAMIC_ARRAY_VOIDP(array), data, num_elements)
 DN_API void*                      dn_dynamic_array_reserve(dyn_array* array, u32 num_elements);
-#define                                   _dn_dynamic_array_reserve(array, num_elements) _dn_dynamic_array_reserve(DN_DYNAMIC_ARRAY_VOIDP(array), num_elements)
 DN_API dn_dynamic_array_header_t* dn_dynamic_array_head(dyn_array* array);
-#define                                   _dn_dynamic_array_head(array) _dn_dynamic_array_head(DN_DYNAMIC_ARRAY_VOIDP(array))
 DN_API u32                        dn_dynamic_array_size(dyn_array* array);
-#define                                   _dn_dynamic_array_size(array) _dn_dynamic_array_size(DN_DYNAMIC_ARRAY_VOIDP(array))
 DN_API u32                        dn_dynamic_array_capacity(dyn_array* array);
-#define                                   _dn_dynamic_array_capacity(array) _dn_dynamic_array_capacity(DN_DYNAMIC_ARRAY_VOIDP(array))
 DN_API u32                        dn_dynamic_array_element_size(dyn_array* array);
-#define                                   _dn_dynamic_array_element_size(array) _dn_dynamic_array_element_size(DN_DYNAMIC_ARRAY_VOIDP(array))
 DN_API dn_allocator_t*            dn_dynamic_array_allocator(dyn_array* array);
-#define                                   _dn_dynamic_array_allocator(array) _dn_dynamic_array_allocator(DN_DYNAMIC_ARRAY_VOIDP(array))
 DN_API bool                       dn_dynamic_array_full(dyn_array* array);
-#define                                   _dn_dynamic_array_full(array) _dn_dynamic_array_full(DN_DYNAMIC_ARRAY_VOIDP(array))
 DN_API bool                       dn_dynamic_array_need_grow(dyn_array* array, u32 num_elements);
-#define                                   _dn_dynamic_array_need_grow(array, num_elements) _dn_dynamic_array_need_grow(DN_DYNAMIC_ARRAY_VOIDP(array), num_elements)
 DN_API void                       dn_dynamic_array_grow(dyn_array* array, u32 requested_size);
-#define                                   _dn_dynamic_array_grow(array, requested_size) _dn_dynamic_array_grow(DN_DYNAMIC_ARRAY_VOIDP(array), requested_size)
 DN_API u32                        dn_dynamic_array_byte_size(dyn_array* array);
-#define                                   _dn_dynamic_array_byte_size(array) _dn_dynamic_array_byte_size(DN_DYNAMIC_ARRAY_VOIDP(array))
+
+#define                          _dn_dynamic_array_alloc(element_size, allocator) dn_dynamic_array_alloc(element_size, allocator)
+#define                          _dn_dynamic_array_push_n(array, data, num_elements) dn_dynamic_array_alloc(DN_DYNAMIC_ARRAY_VOIDP(array), data, num_elements)
+#define                          _dn_dynamic_array_reserve(array, num_elements) dn_dynamic_array_reserve(DN_DYNAMIC_ARRAY_VOIDP(array), num_elements)
+#define                          _dn_dynamic_array_head(array) dn_dynamic_array_head(DN_DYNAMIC_ARRAY_VOIDP(array))
+#define                          _dn_dynamic_array_size(array) dn_dynamic_array_size(DN_DYNAMIC_ARRAY_VOIDP(array))
+#define                          _dn_dynamic_array_capacity(array) dn_dynamic_array_capacity(DN_DYNAMIC_ARRAY_VOIDP(array))
+#define                          _dn_dynamic_array_element_size(array) dn_dynamic_array_element_size(DN_DYNAMIC_ARRAY_VOIDP(array))
+#define                          _dn_dynamic_array_allocator(array) dn_dynamic_array_allocator(DN_DYNAMIC_ARRAY_VOIDP(array))
+#define                          _dn_dynamic_array_full(array) dn_dynamic_array_full(DN_DYNAMIC_ARRAY_VOIDP(array))
+#define                          _dn_dynamic_array_need_grow(array, num_elements) dn_dynamic_array_need_grow(DN_DYNAMIC_ARRAY_VOIDP(array), num_elements)
+#define                          _dn_dynamic_array_grow(array, requested_size) dn_dynamic_array_grow(DN_DYNAMIC_ARRAY_VOIDP(array), requested_size)
+#define                          _dn_dynamic_array_byte_size(array) dn_dynamic_array_byte_size(DN_DYNAMIC_ARRAY_VOIDP(array))
 
 #endif
 

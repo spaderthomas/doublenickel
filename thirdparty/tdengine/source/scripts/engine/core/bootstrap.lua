@@ -84,7 +84,8 @@ void        dn_engine_set_exit_game();
 const char* dn_engine_get_game_hash();
 void        dn_engine_set_target_fps(double fps);
 double      dn_engine_get_target_fps();
-
+bool        dn_engine_exceeded_frame_time();
+bool        dn_engine_should_exit();
 
 void   dn_time_metric_add(const char* name);
 void   dn_time_metric_begin(const char* name);
@@ -95,8 +96,8 @@ double dn_time_metric_largest(const char* name);
 double dn_time_metric_smallest(const char* name);
 
 typedef struct {
-    const char* name;
-    const char* path;
+  const char* name;
+  const char* path;
 } dn_named_path_t;
 
 typedef struct {
@@ -123,13 +124,6 @@ tstring                dn_paths_resolve_format(const char* name, const char* fil
 //  ╚═════╝ ╚══════╝ //
 ///////////////////////
  
-bool dn_os_does_path_exist(const char* path);
-bool dn_os_is_regular_file(const char* path);
-bool dn_os_is_directory(const char* path);
-void dn_os_create_directory(const char* path);
-void dn_os_remove_directory(const char* path);
-void create_named_directory(const char* name);
-
 typedef struct dn_os_date_time_t {
 	int year;
 	int month;
@@ -140,6 +134,11 @@ typedef struct dn_os_date_time_t {
 	int millisecond;
 } dn_os_date_time_t;
 
+bool              dn_os_does_path_exist(const char* path);
+bool              dn_os_is_regular_file(const char* path);
+bool              dn_os_is_directory(const char* path);
+void              dn_os_create_directory(const char* path);
+void              dn_os_remove_directory(const char* path);
 dn_os_date_time_t dn_os_get_date_time();
 
 typedef struct dn_allocator_t dn_allocator_t;
@@ -161,24 +160,24 @@ void             dn_allocator_free(dn_allocator_t* allocator, void* buffer);
 ///////////////////////////////////////////////////////////////////////////////////////
 
 typedef struct {
-    u32 size;
-    u32 capacity;
-    u32 element_size;
-    dn_allocator_t* allocator;
+  u32 size;
+  u32 capacity;
+  u32 element_size;
+  dn_allocator_t* allocator;
 } dn_dynamic_array_header_t;
 
-void*                      _dn_dynamic_array_alloc(u32 element_size, dn_allocator_t* allocator);
-void                       _dn_dynamic_array_push_n(void** array, void* data, u32 num_elements);
-void*                      _dn_dynamic_array_reserve(void** array, u32 num_elements);
-dn_dynamic_array_header_t* _dn_dynamic_array_head(void** array);
-u32                        _dn_dynamic_array_size(void** array);
-u32                        _dn_dynamic_array_capacity(void** array);
-u32                        _dn_dynamic_array_element_size(void** array);
-dn_allocator_t*            _dn_dynamic_array_allocator(void** array);
-bool                       _dn_dynamic_array_full(void** array);
-bool                       _dn_dynamic_array_need_grow(void** array, u32 num_elements);
-void                       _dn_dynamic_array_grow(void** array, u32 requested_size);
-u32                        _dn_dynamic_array_byte_size(void** array);
+void*                      dn_dynamic_array_alloc(u32 element_size, dn_allocator_t* allocator);
+void                       dn_dynamic_array_push_n(void** array, void* data, u32 num_elements);
+void*                      dn_dynamic_array_reserve(void** array, u32 num_elements);
+dn_dynamic_array_header_t* dn_dynamic_array_head(void** array);
+u32                        dn_dynamic_array_size(void** array);
+u32                        dn_dynamic_array_capacity(void** array);
+u32                        dn_dynamic_array_element_size(void** array);
+dn_allocator_t*            dn_dynamic_array_allocator(void** array);
+bool                       dn_dynamic_array_full(void** array);
+bool                       dn_dynamic_array_need_grow(void** array, u32 num_elements);
+void                       dn_dynamic_array_grow(void** array, u32 requested_size);
+u32                        dn_dynamic_array_byte_size(void** array);
 
 typedef struct {
 	u8* data;
@@ -305,34 +304,34 @@ typedef struct {
 } dn_coord_data_t;
 dn_coord_data_t dn_coord_data;
 
-DN_API dn_coord_data_t dn_coord_get();
-DN_API void            dn_coord_set_camera(float x, float y);
-DN_API void            dn_coord_set_framebuffer_position(float x, float y);
-DN_API void            dn_coord_set_framebuffer_size(float x, float y);
-DN_API Vector2         dn_coord_screen_to_window(float x, float y);
-DN_API Vector2         dn_coord_screen_to_game(float x, float y);
-DN_API Vector2         dn_coord_screen_to_world(float x, float y);
-DN_API Vector2         dn_coord_window_to_screen(float x, float y);
-DN_API Vector2         dn_coord_window_to_game(float x, float y);
-DN_API Vector2         dn_coord_window_to_world(float x, float y);
-DN_API Vector2         dn_coord_game_to_screen(float x, float y);
-DN_API Vector2         dn_coord_game_to_window(float x, float y);
-DN_API Vector2         dn_coord_game_to_world(float x, float y);
-DN_API Vector2         dn_coord_world_to_screen(float x, float y);
-DN_API Vector2         dn_coord_world_to_window(float x, float y);
-DN_API Vector2         dn_coord_world_to_game(float x, float y);
-DN_API Vector2         dn_coord_screen_to_window_mag(float x, float y);
-DN_API Vector2         dn_coord_screen_to_game_mag(float x, float y);
-DN_API Vector2         dn_coord_screen_to_world_mag(float x, float y);
-DN_API Vector2         dn_coord_window_to_screen_mag(float x, float y);
-DN_API Vector2         dn_coord_window_to_game_mag(float x, float y);
-DN_API Vector2         dn_coord_window_to_world_mag(float x, float y);
-DN_API Vector2         dn_coord_game_to_screen_mag(float x, float y);
-DN_API Vector2         dn_coord_game_to_window_mag(float x, float y);
-DN_API Vector2         dn_coord_game_to_world_mag(float x, float y);
-DN_API Vector2         dn_coord_world_to_screen_mag(float x, float y);
-DN_API Vector2         dn_coord_world_to_window_mag(float x, float y);
-DN_API Vector2         dn_coord_world_to_game_mag(float x, float y);
+dn_coord_data_t dn_coord_get();
+void            dn_coord_set_camera(float x, float y);
+void            dn_coord_set_framebuffer_position(float x, float y);
+void            dn_coord_set_framebuffer_size(float x, float y);
+Vector2         dn_coord_screen_to_window(float x, float y);
+Vector2         dn_coord_screen_to_game(float x, float y);
+Vector2         dn_coord_screen_to_world(float x, float y);
+Vector2         dn_coord_window_to_screen(float x, float y);
+Vector2         dn_coord_window_to_game(float x, float y);
+Vector2         dn_coord_window_to_world(float x, float y);
+Vector2         dn_coord_game_to_screen(float x, float y);
+Vector2         dn_coord_game_to_window(float x, float y);
+Vector2         dn_coord_game_to_world(float x, float y);
+Vector2         dn_coord_world_to_screen(float x, float y);
+Vector2         dn_coord_world_to_window(float x, float y);
+Vector2         dn_coord_world_to_game(float x, float y);
+Vector2         dn_coord_screen_to_window_mag(float x, float y);
+Vector2         dn_coord_screen_to_game_mag(float x, float y);
+Vector2         dn_coord_screen_to_world_mag(float x, float y);
+Vector2         dn_coord_window_to_screen_mag(float x, float y);
+Vector2         dn_coord_window_to_game_mag(float x, float y);
+Vector2         dn_coord_window_to_world_mag(float x, float y);
+Vector2         dn_coord_game_to_screen_mag(float x, float y);
+Vector2         dn_coord_game_to_window_mag(float x, float y);
+Vector2         dn_coord_game_to_world_mag(float x, float y);
+Vector2         dn_coord_world_to_screen_mag(float x, float y);
+Vector2         dn_coord_world_to_window_mag(float x, float y);
+Vector2         dn_coord_world_to_game_mag(float x, float y);
 
 typedef enum {
 	DN_INPUT_DEVICE_MOUSE_AND_KEYBOARD = 0,

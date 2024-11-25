@@ -6,20 +6,18 @@ struct Engine {
 	float32 elapsed_time;
 	int32 frame = 0;
 	bool exit_game = false;
-
 	bool steam = false;
 };
 Engine engine;
 
-void dn_engine_init();
-void dn_engine_update();
-
-DN_API void dn_engine_set_exit_game();
+DN_API void        dn_engine_set_exit_game();
 DN_API const char* dn_engine_get_game_hash();
-DN_API void dn_engine_set_target_fps(double fps);
-DN_API double dn_engine_get_target_fps();
-DN_API bool dn_engine_exceeded_frame_time();
-DN_API bool dn_engine_should_exit();
+DN_API void        dn_engine_set_target_fps(double fps);
+DN_API double      dn_engine_get_target_fps();
+DN_API bool        dn_engine_exceeded_frame_time();
+DN_API bool        dn_engine_should_exit();
+DN_IMP void        dn_engine_init();
+DN_IMP void        dn_engine_update();
 #endif
 
 
