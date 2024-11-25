@@ -761,7 +761,6 @@ typedef struct {
 
 typedef struct dn_gpu_command_buffer_t dn_gpu_command_buffer_t;
 
-
 ///////////////
 // FUNCTIONS //
 ///////////////
@@ -957,7 +956,10 @@ const char* get_active_action_set();
 // ╚═╝  ╚═══╝ ╚═════╝ ╚═╝╚══════╝╚══════╝ //
 ////////////////////////////////////////////
 
-f64 perlin(f64 x, f64 y, f64 vmin, f64 vmax);
+double dn_noise_perlin(double x, double y);
+double dn_noise_perlin_scaled(double x, double y, double vmin, double vmax);
+double dn_noise_chaotic(double x, double y);
+double dn_noise_chaotic_scaled(double x, double y, double vmin, double vmax);
 
 /////////////////////////////////////////
 // ██╗███╗   ███╗ ██████╗ ██╗   ██╗██╗ //
@@ -1161,6 +1163,15 @@ void set_particle_master_opacity(ParticleSystemHandle handle, float opacity);
 
 void add_script_directory(const char* name);
 
+typedef enum {
+	DN_LOG_FLAG_CONSOLE = 1,
+	DN_LOG_FLAG_FILE = 2,
+	DN_LOG_FLAG_DEFAULT = 3,
+} dn_log_flags_t;
+
+void dn_log(const char* fmt, ...);
+void dn_log_flags(dn_log_flags_t flags, const char* fmt, ...);
+
 ]]
 
 ffi = require('ffi')
@@ -1203,8 +1214,8 @@ bit = require('bit')
 --   tdengine.debug.last_error = error_message
 --   tdengine.debug.last_trace = trace_message
 
---   tdengine.log(error_message)
---   tdengine.log(trace_message)
+--   tdengine.ffi.dn_log(error_message)
+--   tdengine.ffi.dn_log(trace_message)
 
 --   tdengine.debug.open_debugger(1)
 --   --tdengine.analytics.submit_crash(error_message, trace_message)
@@ -1232,7 +1243,7 @@ function tdengine.handle_error()
   stack_trace = stack_trace:gsub(pattern, '')
 
   local trace_message = string.format('stack trace:\n%s', stack_trace)
-  tdengine.log(trace_message)
+  tdengine.ffi.dn_log(trace_message)
 
   tdengine.debug.open_debugger(1)
 end
@@ -1485,5 +1496,4 @@ function tdengine.init_phase_2()
   tdengine.persistent.init()
 
   tdengine.lifecycle.run_callback(tdengine.lifecycle.callbacks.on_start_game)
-
 end

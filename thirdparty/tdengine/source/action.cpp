@@ -5,7 +5,7 @@ void init_actions() {
 	
 	bool explicitly_run_frame = false; // i.e. use SteamAPI_RunCallbacks
 	if (!steam_input.steam->Init(explicitly_run_frame)) {
-		tdns_log.write("%s: could not initialize steam input", __func__);
+		dn_log("%s: could not initialize steam input", __func__);
 		return;
 	}
 
@@ -111,7 +111,7 @@ void SteamInputManager::poll_for_controllers() {
 	
 	if (added_controller) {
 		auto controller_name = get_controller_name(controller);
-		tdns_log.write("%s: added controller; num_controllers = %d, active_controller = %s", __func__, controllers.size, controller_name);
+		dn_log("%s: added controller; num_controllers = %d, active_controller = %s", __func__, controllers.size, controller_name);
 
 		// SteamInput, from my testing, doesn't return valid handles until a controller is connected. Therefore, when
 		// we see that a controller connects, we need to re-register everything. This should be idempotent when there
@@ -122,7 +122,7 @@ void SteamInputManager::poll_for_controllers() {
 	else if (replaced_controller) {
 		auto controller_name = get_controller_name(controller);
 		auto last_controller_name = get_controller_name(last_controller);
-		tdns_log.write("%s: replaced controller; num_controllers = %d, active_controller = %s, last_controller = %s", 
+		dn_log("%s: replaced controller; num_controllers = %d, active_controller = %s, last_controller = %s", 
 			__func__, 
 			controllers.size, controller_name,
 			last_controller_name);
@@ -133,7 +133,7 @@ void SteamInputManager::poll_for_controllers() {
 		}
 	}
 	else if (removed_controller) {
-		tdns_log.write("%s: no controller detected", __func__);
+		dn_log("%s: no controller detected", __func__);
 	}
 
 	if (added_controller || replaced_controller) {
@@ -156,7 +156,7 @@ void SteamInputManager::load_controller_glyphs() {
 			unsigned char* glyph_data = (unsigned char*)stbi_load(glyph_path, &height, &width, &channels, 0);
 			defer { stbi_image_free(glyph_data); };
 			if (channels != 4) {
-				tdns_log.write("could not load glyph %s for action %s; num_channels = %d", glyph_path, action->name, channels);
+				dn_log("could not load glyph %s for action %s; num_channels = %d", glyph_path, action->name, channels);
 				continue;
 			}
 
@@ -164,7 +164,7 @@ void SteamInputManager::load_controller_glyphs() {
 			if (sprite) create_sprite_ex(sprite, action->name, glyph_data, width, height, channels);
 			else        create_sprite(action->name, glyph_data, width, height, channels);
 
-			tdns_log.write("loaded controller glyph %s for action %s", glyph_path, action->name);
+			dn_log("loaded controller glyph %s for action %s", glyph_path, action->name);
 		}
 	}
 }

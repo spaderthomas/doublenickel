@@ -7,7 +7,6 @@
 // stick new stuff in here if it doesn't fit anywhere else, but I always use the FFI instead of making new lua_State functions.
 namespace API {
 	// logging
-	int log(lua_State* l);
 
 	// internal
 	int scandir_impl(lua_State* l);
@@ -32,7 +31,6 @@ void register_api();
 
 const struct luaL_Reg api [] = {
 	{ "scandir_impl",             &API::scandir_impl },
-	{ "log",                      &API::log },
 	{ "screen_dimensions",        &API::screen_dimensions },
 	{ "sprite_size",              &API::sprite_size },
 	{  NULL,                      NULL }

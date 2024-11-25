@@ -110,8 +110,8 @@ function Camera:update_sway()
     local t = self.perlin.speed * tdengine.elapsed_time
     local amp_max = self.perlin.amplitude
     local amp_min = self.perlin.amplitude * -1
-    local nx = tdengine.ffi.perlin(t, 0, amp_min, amp_max)
-    local ny = tdengine.ffi.perlin(0, t, amp_min, amp_max)
+    local nx = tdengine.ffi.dn_noise_perlin_scaled(t, 0, amp_min, amp_max)
+    local ny = tdengine.ffi.dn_noise_perlin_scaled(0, t, amp_min, amp_max)
 
     self.perlin.interpolation:update()
     local blend = self.perlin.interpolation:get_value()

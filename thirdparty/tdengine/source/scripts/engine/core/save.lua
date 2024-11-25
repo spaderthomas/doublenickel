@@ -18,7 +18,7 @@ function tdengine.save.create()
   local file_path = tdengine.ffi.dn_paths_resolve_format('save', save_name):to_interned()
   tdengine.module.write(file_path, save, tdengine.module.WriteOptions.Pretty)
 
-  tdengine.log(string.format('Created save file; file_path = %s', file_path))
+  tdengine.ffi.dn_log(string.format('Created save file; file_path = %s', file_path))
 end
 
 function tdengine.save.read(file_name)

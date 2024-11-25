@@ -27,7 +27,7 @@
 #include "source/utils/filesystem.hpp"
 #include "source/utils/time_function.hpp"
 #include "source/utils/noise.hpp"
-#include "source/utils/dyn_array.hpp"
+#include "source/utils/dynamic_array.hpp"
 #include "source/utils/hash.hpp"
 #include "source/utils/preprocessor.hpp"
 #include "source/imgui/dn_imgui.hpp"
@@ -95,19 +95,21 @@
 #include "source/utils/array.cpp"
 #define COORDINATE_IMPLEMENTATION
 #include "source/utils/coordinate.hpp"
-#define DYNAMIC_ARRAY_IMPLEMENTATION
-#include "source/utils/dyn_array.hpp"
+#define DN_DYNAMIC_ARRAY_IMPLEMENTATION
+#include "source/utils/dynamic_array.hpp"
 #include "source/utils/file_monitor.cpp"
-#define FIXED_ARRAY_IMPLEMENTATION
+#define DN_FIXED_ARRAY_IMPLEMENTATION
 #include "source/utils/fixed_array.hpp"
-#include "source/utils/log.cpp"
+#define DN_LOG_IMPLEMENTATION
+#include "source/utils/log.hpp"
 #include "source/utils/memory.cpp"
+#define DN_NOISE_IMPLEMENTATION
+#include "source/utils/noise.hpp"
 #define DN_OS_IMPLEMENTATION
 #include "source/utils/os.hpp"
 #include "source/utils/path.cpp"
 #define PREPROCESSOR_IMPLEMENTATION
 #include "source/utils/preprocessor.hpp"
-#include "source/utils/noise.cpp"
 #include "source/utils/string.cpp"
 
 
@@ -116,7 +118,7 @@ int td_main(TdAppDescriptor app) {
 	init_random();
 	init_app(app);
 	init_paths();
-	init_log();
+	dn_log_init();
 	dn_engine_init();
 	dn_input_init();
 	dn_time_metrics_init();

@@ -1,8 +1,8 @@
 // Ripped verbatim from the excellent https://github.com/MrFrenik/gunslinger, since I never got around
 // to making quite a few pure C data structures. Thank you kindly for your excellent code!
 
-#ifndef DYNAMIC_ARRAY_H
-#define DYNAMIC_ARRAY_H
+#ifndef DN_DYNAMIC_ARRAY_H
+#define DN_DYNAMIC_ARRAY_H
 
 typedef struct {
     u32 size;
@@ -43,7 +43,7 @@ DN_API u32                        dn_dynamic_array_byte_size(dyn_array* array);
 
 #endif
 
-#ifdef DYNAMIC_ARRAY_IMPLEMENTATION
+#ifdef DN_DYNAMIC_ARRAY_IMPLEMENTATION
 
 template<typename T>
 T* dn_dynamic_array_alloc_t(dn_allocator_t* allocator) {

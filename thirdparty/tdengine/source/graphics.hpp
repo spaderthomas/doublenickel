@@ -844,7 +844,7 @@ tstring build_shader_source(const char* file_path) {
 	td_include(&context);
 
 	if (!context.result) {
-		tdns_log.write("shader preprocessor error; shader = %s, err = %s", shader_file, context.error);
+		dn_log("shader preprocessor error; shader = %s, err = %s", shader_file, context.error);
 		return copy_string("YOUR_SHADER_FAILED_TO_COMPILE", &bump_allocator);
 	}
 	
@@ -863,7 +863,7 @@ void check_shader_compilation(u32 shader, const char* file_path) {
 		
 		glGetShaderInfoLog(shader, error_size, NULL, compilation_status);
 
-		tdns_log.write("shader compile error; shader = %s, err = %s", file_path, compilation_status);
+		dn_log("shader compile error; shader = %s, err = %s", file_path, compilation_status);
 	}
 }
 
@@ -876,7 +876,7 @@ void check_shader_linkage(u32 program, const char* file_path) {
 		auto compilation_status = bump_allocator.alloc<char>(error_size);
 		
 		glGetProgramInfoLog(program, error_size, NULL, compilation_status);
-		tdns_log.write("shader link error; shader = %s, err = %s", file_path, compilation_status);
+		dn_log("shader link error; shader = %s, err = %s", file_path, compilation_status);
 	}
 }
 
@@ -1210,7 +1210,7 @@ void dn_gpu_init() {
 	swapchain->size = window.content_area;
 
 	auto reload_all_shaders = [](FileMonitor* file_monitor, FileChange* event, void* userdata) {
-		tdns_log.write("SHADER_RELOAD");
+		dn_log("SHADER_RELOAD");
 		arr_for(td_gpu.shaders, shader) {
 			dn_gpu_shader_reload(shader);
 		}
@@ -1247,7 +1247,7 @@ tstring dn_gpu_error_read() {
 }
 
 void dn_gpu_error_log_one() {
-	tdns_log.write(dn_gpu_error_read());
+	dn_log(dn_gpu_error_read());
 }
 
 void dn_gpu_error_log_all() {
@@ -1256,7 +1256,7 @@ void dn_gpu_error_log_all() {
 		if (!error) break;
 		if (!strcmp(error, "GL_NO_ERROR")) break;
 
-		tdns_log.write(error);
+		dn_log(error);
 	}
 }
 
@@ -1357,7 +1357,7 @@ void gl_error_callback(GLenum source, GLenum type, GLuint id,GLenum severity, GL
     }
 
 
-    tdns_log.write("%d: %s of %s severity, raised from %s: %s\n",
+    dn_log("%d: %s of %s severity, raised from %s: %s\n",
             id, _type, _severity, _source, msg);
 	int x = 0;
 }

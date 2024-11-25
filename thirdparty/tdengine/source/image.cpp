@@ -195,7 +195,7 @@ void TextureAtlas::build_from_config() {
 }
 	
 void TextureAtlas::build_from_source() {
-	tdns_log.write("%s: rebuilding %s", __func__, this->name);
+	dn_log("%s: rebuilding %s", __func__, this->name);
 
 	this->rects = Array<stbrp_rect>();
 	arr_init(&this->rects, MAX_IMAGES_PER_ATLAS);

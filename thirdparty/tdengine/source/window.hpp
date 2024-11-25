@@ -88,7 +88,7 @@ void dn_window_create(dn_window_descriptor_t descriptor) {
 		glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 	}
 
-	tdns_log.write("creating window: native_resolution = [%.0f, %.0f], content_area = [%.0f, %.0f], windowed = %d, border = %d, vsync = %d, refresh_rate = %d, monitor = %d",
+	dn_log("creating window: native_resolution = [%.0f, %.0f], content_area = [%.0f, %.0f], windowed = %d, border = %d, vsync = %d, refresh_rate = %d, monitor = %d",
 				   window.native_resolution.x, window.native_resolution.y,
 				   window.content_area.x, window.content_area.y,
 				   descriptor.flags & DN_WINDOW_FLAG_WINDOWED,
@@ -106,9 +106,9 @@ void dn_window_create(dn_window_descriptor_t descriptor) {
 
 	auto version = glGetString(GL_VERSION);
     if (version) {
-		tdns_log.write("OpenGL version: %s", version);
+		dn_log("OpenGL version: %s", version);
     } else {
-		tdns_log.write("Failed to get OpenGL version");
+		dn_log("Failed to get OpenGL version");
     }
 
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -128,7 +128,7 @@ void dn_window_create(dn_window_descriptor_t descriptor) {
 	glfwSetScrollCallback(window.handle, dn_input_callback_scroll);
 	glfwSetWindowSizeCallback(window.handle, dn_input_callback_window_size);
 
-	init_noise();
+	dn_noise_init();
 	dn_imgui_init();
 	dn_gpu_init();
 	init_texture_atlas(); // Invert control
@@ -184,7 +184,7 @@ void dn_window_set_native_resolution(float width, float height) {
 }
 
 void dn_window_set_display_mode(dn_display_mode_t mode) {
-	tdns_log.write("%s: mode = %d", __func__, static_cast<int>(mode));
+	dn_log("%s: mode = %d", __func__, static_cast<int>(mode));
 	
 	if (window.display_mode == DN_DISPLAY_MODE_FULLSCREEN && mode != DN_DISPLAY_MODE_FULLSCREEN) {
 		// Toggle back to windowed

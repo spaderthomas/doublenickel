@@ -51,7 +51,7 @@ float random_float(float min, float max) {
 	return distribution(generator);
 }
 
-int random_int(int min, int max) {
+int dn_math_random_int(int min, int max) {
 	static std::random_device rd;
 	static std::mt19937 generator(rd());
 	

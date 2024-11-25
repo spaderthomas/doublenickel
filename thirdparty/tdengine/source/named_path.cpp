@@ -1,7 +1,7 @@
 void dn_paths_add_ex(const char* name, const char* absolute_path) {
 	if (named_paths.contains(name)) {
 		auto& existing_path = named_paths.at(name);
-		tdns_log.write("Tried to add named path, but name was already registered; name = %s, existing_path = %s, new_path = %s", name, existing_path.c_str(), absolute_path);
+		dn_log("Tried to add named path, but name was already registered; name = %s, existing_path = %s, new_path = %s", name, existing_path.c_str(), absolute_path);
 	}
 	
 	named_paths[name] = absolute_path;
@@ -56,7 +56,7 @@ string dn_paths_resolve_ex(const char* name, dn_allocator_t* allocator) {
 	if (!name) return nullptr;
 	
 	if (!named_paths.contains(name)) {
-		tdns_log.write("Tried to find named path, but name was not registered; name = %s", name);
+		dn_log("Tried to find named path, but name was not registered; name = %s", name);
 		return nullptr;
 	}
 
@@ -73,7 +73,7 @@ string dn_paths_resolve_format_ex(const char* name, const char* file_name, dn_al
 	if (!file_name) return nullptr;
 	
 	if (!named_paths.contains(name)) {
-		tdns_log.write("Tried to find named path, but name was not registered; name = %s", name);
+		dn_log("Tried to find named path, but name was not registered; name = %s", name);
 		return nullptr;
 	}
 

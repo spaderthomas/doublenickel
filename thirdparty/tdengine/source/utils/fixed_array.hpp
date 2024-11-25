@@ -1,5 +1,5 @@
-#ifndef FIXED_ARRAY_H
-#define FIXED_ARRAY_H
+#ifndef DN_FIXED_ARRAY_H
+#define DN_FIXED_ARRAY_H
 
 typedef struct {
 	u8* data;
@@ -40,7 +40,7 @@ T* dn_fixed_array_at_t(dn_fixed_array<T, N>* fixed_array, u32 index) {
 #endif
 
 
-#ifdef FIXED_ARRAY_IMPLEMENTATION
+#ifdef DN_FIXED_ARRAY_IMPLEMENTATION
 
 void dn_fixed_array_init(dn_fixed_array_t* buffer, u32 max_vertices, u32 element_size) {
 	TD_ASSERT(buffer);

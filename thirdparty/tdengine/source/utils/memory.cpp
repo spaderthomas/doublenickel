@@ -128,7 +128,7 @@ dn_allocator_t* dn_allocator_find(const char* name) {
 	if (!name) return nullptr;
 
 	if (!allocators.contains(name)) {
-		tdns_log.write("Tried to find allocator, but name was not registered; name = %s", name);
+		dn_log("Tried to find allocator, but name was not registered; name = %s", name);
 		return nullptr;
 	}
 

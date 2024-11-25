@@ -216,12 +216,12 @@ end
 -- source. In other words, source is the canonical form, make dest comply.
 function make_keys_match(source, dest)
 	if source == nil then
-		tdengine.log('make_keys_match: nil source table')
+		tdengine.ffi.dn_log('make_keys_match: nil source table')
 		return
 	end
 
 	if dest == nil then
-		tdengine.log('make_keys_match: nil dest table')
+		tdengine.ffi.dn_log('make_keys_match: nil dest table')
 		return
 	end
 

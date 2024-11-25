@@ -31,15 +31,6 @@ int API::sprite_size(lua_State* lua) {
 	return 2;
 }
 
-int API::log(lua_State* lua) {
-	fm_assert(lua_gettop(lua) == 1);
-
-	const char* fmt = lua_tostring(lua, 1);
-	tdns_log.write(Log_Flags::Default, fmt);
-
-	return 0;
-}
-
 
 int API::scandir_impl(lua_State* lua) {
 	fm_assert(lua_gettop(lua) == 1);
@@ -80,7 +71,6 @@ int API::scandir_impl(lua_State* lua) {
 
 
 void register_api() {
-	tdns_log.write(Log_Flags::File, "registering lua API");
 
 	auto l = get_lua().state;
 	

@@ -59,7 +59,7 @@ end
 
 function DialogueController:load_dialogue(dialogue)
   if not dialogue then
-    tdengine.log(string.format('controller got bad dialogue param, dialogue = %s', dialogue))
+    tdengine.ffi.dn_log(string.format('controller got bad dialogue param, dialogue = %s', dialogue))
     self:update_state(dialogue_state.err)
     return
   end
@@ -99,7 +99,7 @@ function DialogueController:change_dialogue(dialogue)
   -- Load a new dialogue, but without totally reinitializing ourselves. This is used when switching between dialogues in
   -- one interaction (like for a Call)
   if not dialogue then
-    tdengine.log(string.format('DialogueController::change_dialogue(): bad dialogue, name = %s', dialogue))
+    tdengine.ffi.dn_log(string.format('DialogueController::change_dialogue(): bad dialogue, name = %s', dialogue))
     self:update_state(dialogue_state.err)
     return
   end

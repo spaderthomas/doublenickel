@@ -230,7 +230,7 @@ void dn_audio_update(float* buffer, int frames_requested, int num_channels) {
 	// Cap the number of samples so we don't overwrite the buffer
 	int32 samples_requested = frames_requested * num_channels;
 	if (samples_requested > dn_audio.sample_buffer.capacity) {
-		tdns_log.write("requested too many audio samples: %d", samples_requested);
+		dn_log("requested too many audio samples: %d", samples_requested);
 		samples_requested = dn_audio.sample_buffer.capacity;
 	}
 
@@ -423,7 +423,7 @@ void dn_audio_load(const char* file_path, const char* file_name) {
 	
 	sound->samples = drwav_open_file_and_read_pcm_frames_f32(file_path, &sound->num_channels, &sound->sample_rate, &sound->num_frames, NULL);
 	if (!sound->samples) {
-		tdns_log.write("failed to load sound file sound file: %s", file_path);
+		dn_log("failed to load sound file sound file: %s", file_path);
 	}
 	sound->num_samples = sound->num_frames * sound->num_channels;
 };

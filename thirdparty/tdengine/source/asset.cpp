@@ -79,7 +79,7 @@ void AssetLoader::process_completion_queue() {
 
 		if (completion.kind == AssetKind::Background) {
 			auto background = completion.background;
-			tdns_log.write(Log_Flags::File, "%s: AssetKind = Background, AssetName = %s", __func__, background->name);
+			dn_log_flags(DN_LOG_FLAG_FILE, "%s: AssetKind = Background, AssetName = %s", __func__, background->name);
 			
 			if (background->is_dirty()) {
 				background->update_config();
@@ -89,7 +89,7 @@ void AssetLoader::process_completion_queue() {
 		}
 		else if (completion.kind == AssetKind::TextureAtlas) {
 			auto atlas = completion.atlas;
-			tdns_log.write(Log_Flags::File, "%s: atlas, %s", __func__, atlas->name);
+			dn_log_flags(DN_LOG_FLAG_FILE, "%s: atlas, %s", __func__, atlas->name);
 			
 			if (atlas->need_gl_init) {
 				atlas->load_to_gpu();
@@ -109,7 +109,7 @@ void AssetLoader::process_completion_queue() {
 	if (num_assets_loaded) {
 		std::unique_lock lock(mutex);
 		auto now = glfwGetTime();
-		tdns_log.write(Log_Flags::File,
+		dn_log_flags(DN_LOG_FLAG_FILE,
 					   "AssetLoader: frame = %d, assets_loaded =  %d, assets_remaining = %d, time_ms =  %f",
 					   engine.frame,
 					   num_assets_loaded, completion_queue.size,

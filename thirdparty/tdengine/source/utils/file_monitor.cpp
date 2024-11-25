@@ -9,7 +9,7 @@ void FileMonitor::init(FileChangeCallback callback, FileChangeEvent events, void
 
 bool FileMonitor::add_directory(const char* directory_path) {
 #if defined(FM_EDITOR)
-	tdns_log.write(Log_Flags::File, "%s: added %s", __func__, directory_path);
+	dn_log_flags(DN_LOG_FLAG_FILE, "%s: added %s", __func__, directory_path);
 				   
 	auto event = CreateEventW(NULL, false, false, NULL);
 	if (!event) return false;
@@ -41,7 +41,7 @@ bool FileMonitor::add_directory(const char* directory_path) {
 }
 
 bool FileMonitor::add_file(const char* file_path) {
-    tdns_log.write(Log_Flags::File, "%s: added %s", __func__, file_path);
+    dn_log_flags(DN_LOG_FLAG_FILE, "%s: added %s", __func__, file_path);
     
     // Create an event for overlapped I/O
     auto event = CreateEventW(NULL, false, false, NULL);
@@ -218,7 +218,7 @@ bool FileMonitor::check_cache(char* file_path, float64 time) {
 
 
 void init_file_monitors() {
-	tdns_log.write(Log_Flags::File, "initializing file monitors");
+	dn_log_flags(DN_LOG_FLAG_FILE, "initializing file monitors");
 	arr_init(&file_monitors, 64);
 }
 

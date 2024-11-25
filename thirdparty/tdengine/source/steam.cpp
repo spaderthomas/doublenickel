@@ -3,10 +3,10 @@ void init_steam() {
 	
 	if (SteamAPI_InitEx(&steam_error) == k_ESteamAPIInitResult_OK) {
 		engine.steam = true;
-		tdns_log.write("%s: successfully initialized Steam", __func__);
+		dn_log("%s: successfully initialized Steam", __func__);
 	} else {
 		engine.steam = false;
-		tdns_log.write("Could not initialize Steam. Error: %s", steam_error);
+		dn_log("Could not initialize Steam. Error: %s", steam_error);
 	}
 }
 
@@ -62,7 +62,7 @@ void SteamManager::OnDismissTextInput(GamepadTextInputDismissed_t* callback) {
 	auto length = SteamUtils()->GetEnteredGamepadTextLength();
     bool success = SteamUtils()->GetEnteredGamepadTextInput(steam.text_input, length);
     if (!success) {
-		tdns_log.write("%s: failed to get steam text input data", __func__);
+		dn_log("%s: failed to get steam text input data", __func__);
 		return;
 	}
 }
@@ -83,7 +83,7 @@ void SteamManager::OnGetTicketForWebApiResponse(GetTicketForWebApiResponse_t* ca
 	auth_ticket_wait = false;
 	
 	if (callback->m_eResult != k_EResultOK) {
-		tdns_log.write("%s: auth ticket callback failed, result = %d", __func__, callback->m_eResult);
+		dn_log("%s: auth ticket callback failed, result = %d", __func__, callback->m_eResult);
 		return;
 	}
 

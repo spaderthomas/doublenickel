@@ -102,7 +102,7 @@ LuaState::LuaState() {
 		auto manager = (LuaState*)userdata;
 
 		auto stripped_path = dn_paths_strip("install", event->file_path);
-		tdns_log.write("Hotloading script: %s", stripped_path);
+		dn_log("Hotloading script: %s", stripped_path);
 		manager->script_file(event->file_path);
 	};
 
@@ -121,7 +121,7 @@ bool LuaState::script_file(string file_path) {
 	auto l = state;
 	i32 initial_stack_size = lua_gettop(l);
 
-	tdns_log.write(Log_Flags::File, "scripting file: file_path = %s", file_path);
+	dn_log_flags(DN_LOG_FLAG_FILE, "scripting file: file_path = %s", file_path);
 
 	lua_pushcfunction(l, &format_file_load_error);
 	
@@ -134,8 +134,8 @@ bool LuaState::script_file(string file_path) {
 		const char* error = lua_tostring(l, -1);
 		error = format_file_load_error(error);
 		
-		tdns_log.write("error scripting file; file = %s", file_path);
-		tdns_log.write(error);
+		dn_log("error scripting file; file = %s", file_path);
+		dn_log(error);
 		lua_pop(l, 2);
 		goto check_stack;
 	}
@@ -146,8 +146,8 @@ bool LuaState::script_file(string file_path) {
 		if (result) {
 			// There was a runtime error running the chunk.
 			const char* error = lua_tostring(l, -1);
-			tdns_log.write("error running file; file = %s", file_path);
-			tdns_log.write(error);
+			dn_log("error running file; file = %s", file_path);
+			dn_log(error);
 			lua_pop(l, 2);
 			goto check_stack;
 		}
@@ -170,7 +170,7 @@ void LuaState::script_named_dir(const_string name) {
 
 void LuaState::script_dir(string path) {
 	if (!std::filesystem::exists(path)) return;
-	tdns_log.write(Log_Flags::File, "Loading scripts from directory; path = %s", path);
+	dn_log_flags(DN_LOG_FLAG_FILE, "Loading scripts from directory; path = %s", path);
 
 	this->file_monitor->add_directory(path);
 
@@ -281,7 +281,7 @@ void LuaState::dump_call_stack () {
 	auto result = lua_pcall(l, 0, 0, 0);
 	if (result) {
 		const char* error = lua_tostring(l, -1);
-		tdns_log.write("handle_error(): error = %s", error);
+		dn_log("handle_error(): error = %s", error);
 		exit(0);
 	}
 
@@ -326,7 +326,7 @@ void LuaState::init_phase_0() {
 	auto result = lua_pcall(l, 0, 0, 0);
 	if (result) {
 		const char* error = lua_tostring(l, -1);
-		tdns_log.write("init_phase_0(): error = %s", error);
+		dn_log("init_phase_0(): error = %s", error);
 		exit(0);
 	}
 	
@@ -346,7 +346,7 @@ void LuaState::init_phase_0() {
 	result = lua_pcall(l, 0, 0, 0);
 	if (result) {
 		const char* error = lua_tostring(l, -1);
-		tdns_log.write("init_phase_1(): error = %s", error);
+		dn_log("init_phase_1(): error = %s", error);
 		exit(0);
 	}
 }
@@ -379,7 +379,7 @@ void LuaState::init_phase_2() {
 	auto result = lua_pcall(l, 0, 0, 0);
 	if (result) {
 		const char* error = lua_tostring(l, -1);
-		tdns_log.write("init_phase_2(): error = %s", error);
+		dn_log("init_phase_2(): error = %s", error);
 		exit(0);
 	}
 }

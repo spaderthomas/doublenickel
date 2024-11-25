@@ -24,7 +24,7 @@ Array<ParticleSystem> particle_systems;
 
 
 void init_buffers() { 
-	tdns_log.write(Log_Flags::File, "initializing buffers");
+	dn_log_flags(DN_LOG_FLAG_FILE, "initializing buffers");
 	
 	arr_init(&font_infos,        FONT_INFO_SIZE);
 	arr_init(&glyph_infos,       GLYPH_INFO_SIZE);

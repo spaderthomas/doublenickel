@@ -95,16 +95,16 @@ void dn_font_bake(dn_font_descriptor_t desc) {
 
 		FT_Library ft;
 
-		tdns_log.write(Log_Flags::File, "%s: %s, %s, %d", __func__, desc.id, file_path, size);
+		dn_log_flags(DN_LOG_FLAG_FILE, "%s: %s, %s, %d", __func__, desc.id, file_path, size);
 		
 		if (FT_Init_FreeType(&ft)) {
-			tdns_log.write("%s: failed to initialize FreeType", __func__);
+			dn_log("%s: failed to initialize FreeType", __func__);
 			exit(0);
 		}
 		
 		FT_Face face = nullptr;
 		if (FT_New_Face(ft, file_path, 0, &face)) {
-			tdns_log.write("%s: failed to load font, font = %s", __func__, file_path);
+			dn_log("%s: failed to load font, font = %s", __func__, file_path);
 			return;
 		}
 
@@ -170,7 +170,7 @@ void dn_font_bake(dn_font_descriptor_t desc) {
 		for (GLubyte c = 0; c < num_glyphs; c++) {
 			i32 failure = FT_Load_Char(face, c, FT_LOAD_RENDER);
 			if (failure) {
-				tdns_log.write("%s: failed to load character, char = %c", __func__, c);
+				dn_log("%s: failed to load character, char = %c", __func__, c);
 				return;
 			}
 
@@ -284,7 +284,7 @@ void dn_font_bake(dn_font_descriptor_t desc) {
 
 		if (desc.flags & DN_FONT_FLAG_DEFAULT) {
 			if (dn_fonts.default_font) {
-				tdns_log.write(
+				dn_log(
 					"Tried to register default font, but a default was already registered; old = %s, new = %s",
 					dn_fonts.default_font->path,
 					font->path

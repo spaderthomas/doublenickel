@@ -190,11 +190,11 @@ void dn_input_callback_key(GLFWwindow* window, int key, int scancode, int action
 }
 
 void dn_input_callback_error(int err, const char* msg) {
-	tdns_log.write("GLFW error: code = %d, message = %s", err, msg);
+	dn_log("GLFW error: code = %d, message = %s", err, msg);
 }
 
 void dn_input_callback_window_size(GLFWwindow* window_handle, int width, int height) {
-	tdns_log.write("%s: width = %d, height = %d", __func__, width, height);
+	dn_log("%s: width = %d, height = %d", __func__, width, height);
 	
 	window.content_area.x = width;
 	window.content_area.y = height;
@@ -205,7 +205,7 @@ void dn_input_callback_window_size(GLFWwindow* window_handle, int width, int hei
 	// In the editor, the game are is specified by some editor code that figures out the best size
 	// for it. In the packaged build, it's just the entire screen, so we sync it up with the window.
 #if !defined(FM_EDITOR)
-	tdns_log.write("%s: width = %d, height = %d", __func__, width, height);
+	dn_log("%s: width = %d, height = %d", __func__, width, height);
 
 	Coord::game_area_size.x = width;
 	Coord::game_area_size.y = height;
