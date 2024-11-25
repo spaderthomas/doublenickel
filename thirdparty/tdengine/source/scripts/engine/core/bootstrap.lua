@@ -218,6 +218,23 @@ typedef enum {
 	DN_AUDIO_FILTER_MODE_BUTTERWORTH = 1,
 } dn_audio_filter_mode_t;
 
+typedef struct {
+	dn_audio_filter_mode_t mode;
+	bool enabled;
+	float cutoff_frequency;
+	float cutoff_alpha;
+	float a0, a1, a2, b1, b2;
+	float input_history [2];
+	float output_history [2];
+} dn_low_pass_filter_t;
+
+typedef struct {
+	float threshold;
+	float ratio;
+	float attack_time;
+	float release_time;
+} dn_compressor_t;
+
 typedef dn_gen_arena_handle_t dn_audio_instance_handle_t;
 
 void                       dn_audio_set_compressor_threshold(float t);
@@ -235,6 +252,8 @@ void                       dn_audio_set_master_filter_cutoff_enabled(bool enable
 void                       dn_audio_set_master_filter_mode(dn_audio_filter_mode_t mode);
 void                       dn_audio_set_volume(dn_audio_instance_handle_t handle, float volume);
 void                       dn_audio_set_filter_cutoff(dn_audio_instance_handle_t handle, float cutoff);
+void                       dn_audio_set_filter_mode(dn_audio_instance_handle_t handle, float cutoff);
+void                       dn_audio_set_filter_enabled(dn_audio_instance_handle_t handle, bool enabled);
 dn_audio_instance_handle_t dn_audio_play_sound(const char* name);
 dn_audio_instance_handle_t dn_audio_play_looped(const char* name);
 void                       dn_audio_queue(dn_audio_instance_handle_t current, dn_audio_instance_handle_t next);
@@ -245,6 +264,9 @@ void                       dn_audio_resume(dn_audio_instance_handle_t handle);
 bool                       dn_audio_is_playing(dn_audio_instance_handle_t handle);
 bool                       dn_audio_is_any_playing();
 void                       dn_audio_load(const char* file_path, const char* file_name);
+void                       dn_low_pass_filter_set_mode(dn_low_pass_filter_t* filter, dn_audio_filter_mode_t mode);
+void                       dn_low_pass_filter_set_cutoff(dn_low_pass_filter_t* filter, float cutoff);
+float                      dn_low_pass_filter_apply(dn_low_pass_filter_t* filter, float input);
 
 
 /////////////////////////////////////////////

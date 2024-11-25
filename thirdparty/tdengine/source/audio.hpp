@@ -79,6 +79,7 @@ DN_API void                       dn_audio_set_master_filter_cutoff_enabled(bool
 DN_API void                       dn_audio_set_master_filter_mode(dn_audio_filter_mode_t mode);
 DN_API void                       dn_audio_set_volume(dn_audio_instance_handle_t handle, float volume);
 DN_API void                       dn_audio_set_filter_cutoff(dn_audio_instance_handle_t handle, float cutoff);
+DN_API void                       dn_audio_set_filter_mode(dn_audio_instance_handle_t handle, float cutoff);
 DN_API void                       dn_audio_set_filter_enabled(dn_audio_instance_handle_t handle, bool enabled);
 DN_API dn_audio_instance_handle_t dn_audio_play_sound(const char* name);
 DN_API dn_audio_instance_handle_t dn_audio_play_looped(const char* name);
@@ -90,6 +91,7 @@ DN_API void                       dn_audio_resume(dn_audio_instance_handle_t han
 DN_API bool                       dn_audio_is_playing(dn_audio_instance_handle_t handle);
 DN_API bool                       dn_audio_is_any_playing();
 DN_API void                       dn_audio_load(const char* file_path, const char* file_name);
+DN_API void                       dn_low_pass_filter_set_mode(dn_low_pass_filter_t* filter, dn_audio_filter_mode_t mode);
 DN_API void                       dn_low_pass_filter_set_cutoff(dn_low_pass_filter_t* filter, float cutoff);
 DN_API float                      dn_low_pass_filter_apply(dn_low_pass_filter_t* filter, float input);
 
@@ -433,6 +435,11 @@ void dn_audio_load(const char* file_path, const char* file_name) {
 //////////////////////
 // LOW PASS FILTER  //
 //////////////////////
+void dn_low_pass_filter_set_mode(dn_low_pass_filter_t* filter, dn_audio_filter_mode_t mode) {
+	filter->mode = mode;
+	dn_low_pass_filter_set_cutoff(filter, filter->cutoff_frequency);
+}
+
 void dn_low_pass_filter_set_cutoff(dn_low_pass_filter_t* filter, float cutoff) {
 	// The low pass filters are unstable at frequencies higher than the Nyquist frequency, so clamp. Add a little wiggle room
 	// to make sure we're not close to it, because it sounds a little bad that high anyway.
@@ -530,6 +537,14 @@ void dn_audio_set_volume(dn_audio_instance_handle_t handle, float volume) {
 	std::unique_lock lock(dn_audio_mutex);
 
 	active_sound->volume = clamp(volume, 0.f, 1.f);
+}
+
+void dn_audio_set_filter_mode(dn_audio_instance_handle_t handle, dn_audio_filter_mode_t mode) {
+	auto active_sound = dn_audio_resolve(handle);
+	if (!active_sound) return;
+
+	std::unique_lock lock(dn_audio_mutex);
+	dn_low_pass_filter_set_mode(&active_sound->filter, mode);
 }
 
 void dn_audio_set_filter_cutoff(dn_audio_instance_handle_t handle, float cutoff) {
