@@ -13,16 +13,11 @@ namespace API {
 	int scandir_impl(lua_State* l);
 
 	// game
-	int convert(lua_State* l);
 
 	// font
-	int get_character_size(lua_State* l);
-	int calc_text_size(lua_State* l);
 
 	// window
 	int screen_dimensions(lua_State* l);
-	int get_window_scale(lua_State* l);
-	int get_game_texture(lua_State* l);
 	
 	// sprite
 	int sprite_size(lua_State* l);
@@ -40,7 +35,5 @@ const struct luaL_Reg api [] = {
 	{ "log",                      &API::log },
 	{ "screen_dimensions",        &API::screen_dimensions },
 	{ "sprite_size",              &API::sprite_size },
-	{ "get_window_scale",         &API::get_window_scale },
-	{ "get_game_texture",         &API::get_game_texture },
 	{  NULL,                      NULL }
 };

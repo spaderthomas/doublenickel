@@ -90,7 +90,8 @@
 #include "source/text.cpp"
 #define DN_TIME_METRICS_IMPLEMENTATION
 #include "source/time_metrics.hpp"
-#include "source/window.cpp"
+#define DN_WINDOW_IMPLEMENTATION
+#include "source/window.hpp"
 #define DN_IMGUI_IMPLEMENTATION
 #include "source/imgui/dn_imgui.hpp"
 #include "source/utils/array.cpp"
@@ -147,7 +148,7 @@ int td_main(TdAppDescriptor app) {
 	dn_audio_shutdown();
 	shutdown_steam();
 	dn_imgui_shutdown();
-	shutdown_glfw();
+	dn_window_shutdown();
 
 	return 0;
 }

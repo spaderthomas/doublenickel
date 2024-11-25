@@ -88,10 +88,10 @@ function App:init()
 end
 
 function App:on_init_game()
-	tdengine.ffi.create_window('tdengine', self.native_resolution.x, self.native_resolution.y, self.window_flags)
+	tdengine.ffi.dn_window_create('tdengine', self.native_resolution.x, self.native_resolution.y, self.window_flags)
 
 	local icon_path = tdengine.ffi.dn_paths_resolve_format('image', 'logo/icon.png'):to_interned()
-	tdengine.ffi.set_window_icon(icon_path)
+	tdengine.ffi.dn_window_set_icon(icon_path)
 
 	local render_target = tdengine.gpu.add_render_target('scene', self.native_resolution.x, self.native_resolution.y)
 

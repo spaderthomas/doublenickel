@@ -78,20 +78,6 @@ int API::scandir_impl(lua_State* lua) {
 	return 1;
 }
 
-int API::get_window_scale(lua_State* l) {
-	fm_assert(lua_gettop(l) == 0);
-
-	lua_pushnumber(l, get_display_scale());
-	return 1;
-}
-
-int API::get_game_texture(lua_State* l) {
-	//lua_pushnumber(l, render.native_render_target->texture);
-	lua_pushnumber(l, 0);
-	//lua_pushnumber(l, scene_target->color_buffer);
-	return 1;
-}
-
 
 void register_api() {
 	tdns_log.write(Log_Flags::File, "registering lua API");

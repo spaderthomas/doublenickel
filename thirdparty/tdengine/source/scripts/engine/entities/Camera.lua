@@ -152,7 +152,7 @@ function Camera:move_to_player()
   -- local collider = player:find_component('Collider')
 
   -- local position = collider:get_position()
-  -- local nx, ny = tdengine.get_native_resolution()
+  -- local nx, ny = tdengine.dn_window_get_native_resolution()
   -- self.offset.x = position.x - nx / 2
   -- self.offset.y = position.y - ny / 2
 end
@@ -246,7 +246,7 @@ function Camera:get_player_offset(n)
 
   -- local player = tdengine.find_entity('Player'):find_component('Collider')
   -- local base_position = player:get_position()
-  -- local nx, ny = tdengine.get_native_resolution();
+  -- local nx, ny = tdengine.dn_window_get_native_resolution();
   -- return tdengine.vec2(base_position.x - nx / n, base_position.y - ny / n)
 end
 

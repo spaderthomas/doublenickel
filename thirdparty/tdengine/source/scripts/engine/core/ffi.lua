@@ -101,10 +101,10 @@ function tdengine.ffi.init()
 	WindowFlags = tdengine.enum.define(
 		'WindowFlags',
 		{
-			None = 0,
-			Windowed = 1,
-			Border = 2,
-			Vsync = 4
+			None = tdengine.ffi.DN_WINDOW_FLAG_NONE,
+			Windowed = tdengine.ffi.DN_WINDOW_FLAG_WINDOWED,
+			Border = tdengine.ffi.DN_WINDOW_FLAG_BORDER,
+			Vsync = tdengine.ffi.DN_WINDOW_FLAG_VSYNC,
 		}
 	)
 
@@ -223,13 +223,13 @@ function tdengine.ffi.init()
 	DisplayMode = tdengine.enum.define(
 		'DisplayMode',
 		{
-			p480 = 0,
-			p720 = 1,
-			p1080 = 2,
-			p1440 = 3,
-			p2160 = 4,
-			p1280_800 = 5,
-			Fullscreen = 6,
+			p480 = ffi.C.DN_DISPLAY_MODE_480,
+			p720 = ffi.C.DN_DISPLAY_MODE_720,
+			p1080 = ffi.C.DN_DISPLAY_MODE_1080,
+			p1440 = ffi.C.DN_DISPLAY_MODE_1440,
+			p2160 = ffi.C.DN_DISPLAY_MODE_2160,
+			p1280_800 = ffi.C.DN_DISPLAY_MODE_1280_800,
+			Fullscreen = ffi.C.DN_DISPLAY_MODE_FULLSCREEN,
 		}
 	)
 
@@ -766,11 +766,18 @@ function GpuBuffer:bind_base(base)
 end
 
 
+WindowDescriptor = tdengine.class.metatype('dn_window_descriptor_t')
+function WindowDescriptor:init(params)
+	self.title = params.title or 'doublenickel'
+	self.size = params.size or Vector2:new(1920, 1080)
+	self.flags = params.flags
+end
+
 ------------------
 -- FFI WRAPPERS --
 ------------------
-function tdengine.ffi.get_display_mode()
-	return tdengine.enums.DisplayMode(ffi.C.get_display_mode())
+function tdengine.ffi.dm_window_get_display_mode()
+	return tdengine.enums.DisplayMode(ffi.C.dm_window_get_display_mode())
 end
 
 function tdengine.ffi.set_camera()
@@ -778,7 +785,7 @@ end
 
 
 function tdengine.ffi.push_fullscreen_quad()
-	local n = ffi.C.get_native_resolution()
+	local n = ffi.C.dn_window_get_native_resolution()
 	local uvs = nil
 	local opacity = 1.0
 	ffi.C.push_quad(0, n.y, n.x, n.y, uvs, opacity);

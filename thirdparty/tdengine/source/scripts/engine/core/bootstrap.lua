@@ -413,36 +413,36 @@ dn_baked_font_t* dn_font_find(const char* id, u32 size);
 ////////////////////////////////////////////////////////
 
 typedef enum {
-	DisplayMode_p480,
-	DisplayMode_p720,
-	DisplayMode_p1080,
-	DisplayMode_p1440,
-	DisplayMode_p2160,
-	DisplayMode_p1280_800,
-	DisplayMode_FullScreen
-} DisplayMode;
+	DN_WINDOW_FLAG_NONE = 0,
+	DN_WINDOW_FLAG_WINDOWED = 1,
+	DN_WINDOW_FLAG_BORDER = 2,
+	DN_WINDOW_FLAG_VSYNC = 4
+} dn_window_flags_t;
+
+typedef enum {
+	DN_DISPLAY_MODE_480,
+	DN_DISPLAY_MODE_720,
+	DN_DISPLAY_MODE_1080,
+	DN_DISPLAY_MODE_1440,
+	DN_DISPLAY_MODE_2160,
+	DN_DISPLAY_MODE_1280_800,
+	DN_DISPLAY_MODE_FULLSCREEN
+} dn_display_mode_t;
 
 typedef struct {
-	Vector2 camera;
-	Vector2 framebuffer_position;
-	Vector2 framebuffer_size;
-} dn_coord_data_t;
+	const char* title;
+	Vector2 size;
+	dn_window_flags_t flags;
+} dn_window_descriptor_t;
 
-dn_coord_data_t  coord_get();
-void         coord_set_camera(float x, float y);
-void         coord_set_framebuffer_position(float x, float y);
-void         coord_set_framebuffer_size(float x, float y);
-
-void create_window(const char* title, u32 x, u32 y, u32 flags);
-void set_window_icon(const char* file_path);
-void set_window_size(int x, int y);
-Vector2 get_content_area();
-Vector2 get_native_resolution();
-void set_display_mode(u32 mode);
-u32 get_display_mode();
-void dn_window_set_cursor_visible(bool visible);
-void dn_imgui_load_layout(const char* file_name);
-void dn_imgui_save_layout(const char* file_name);
+void              dn_window_create(dn_window_descriptor_t descriptor);
+void              dn_window_set_native_resolution(float width, float height);
+Vector2           dn_window_get_content_area();
+Vector2           dn_window_get_native_resolution();
+void              dn_window_set_icon(const char* path);
+void              dn_window_set_display_mode(dn_display_mode_t mode);
+dn_display_mode_t dm_window_get_display_mode();
+void              dn_window_set_cursor_visible(bool visible);
 
 
 
@@ -968,26 +968,23 @@ f64 perlin(f64 x, f64 y, f64 vmin, f64 vmax);
 /////////////////////////////////////////
                                    
 typedef struct {
-	ImVec4 light;
-	ImVec4 medium_light;
-	ImVec4 low_light;
-	ImVec4 neutral;
-	ImVec4 medium_dark;
+	Vector4 light;
+	Vector4 medium_light;
+	Vector4 low_light;
+	Vector4 neutral;
+	Vector4 medium_dark;
 } dn_imgui_colors_t;
 
-DN_IMP void    dn_imgui_init();
-DN_IMP void    dn_imgui_shutdown();
-DN_IMP void    dn_imgui_update();
-DN_API void    dn_imgui_push_font(const char* font_name, u32 size);
-DN_API void    dn_imgui_image(const char* image, float sx, float sy);
-DN_API void    dn_imgui_file_browser_open();
-DN_API void    dn_imgui_file_browser_close();
-DN_API void    dn_imgui_file_browser_set_work_dir(const char* directory);
-DN_API bool    dn_imgui_file_browser_is_file_selected();
-DN_API tstring dn_imgui_file_browser_get_selected_file();
-DN_API void    dn_imgui_load_layout(const char* file_name);
-DN_API void    dn_imgui_save_layout(const char* file_name);
-DN_API void    dn_imgui_load_colors(dn_imgui_colors_t colors);
+void    dn_imgui_push_font(const char* font_name, u32 size);
+void    dn_imgui_image(const char* image, float sx, float sy);
+void    dn_imgui_file_browser_open();
+void    dn_imgui_file_browser_close();
+void    dn_imgui_file_browser_set_work_dir(const char* directory);
+bool    dn_imgui_file_browser_is_file_selected();
+tstring dn_imgui_file_browser_get_selected_file();
+void    dn_imgui_load_layout(const char* file_name);
+void    dn_imgui_save_layout(const char* file_name);
+void    dn_imgui_load_colors(dn_imgui_colors_t colors);
 
 
 

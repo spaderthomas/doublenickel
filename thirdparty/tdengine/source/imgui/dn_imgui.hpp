@@ -2,11 +2,11 @@
 #define DN_IMGUI_H
 
 typedef struct {
-	ImVec4 light;
-	ImVec4 medium_light;
-	ImVec4 low_light;
-	ImVec4 neutral;
-	ImVec4 medium_dark;
+	Vector4 light;
+	Vector4 medium_light;
+	Vector4 low_light;
+	Vector4 neutral;
+	Vector4 medium_dark;
 } dn_imgui_colors_t;
 
 typedef struct {
@@ -58,11 +58,11 @@ void dn_imgui_init() {
 	style.WindowBorderSize = 0;
 
 	dn_imgui_load_colors({
-		.light = ImVec4(0.47f, 0.47f, 0.47f, 255.0f),
-		.medium_light = ImVec4(0.35f, 0.35f, 0.35f, 255.0f),
-		.low_light = ImVec4(0.31f, 0.31f, 0.31f, 255.0f),
-		.neutral = ImVec4(0.22f, 0.22f, 0.22f, 255.0f),
-		.medium_dark = ImVec4(0.16f, 0.16f, 0.16f, 255.0f),
+		.light        = { .r = 0.47f, .g = 0.47f, .b = 0.47f, .a = 255.0f },
+		.medium_light = { .r = 0.35f, .g = 0.35f, .b = 0.35f, .a = 255.0f },
+		.low_light    = { .r = 0.31f, .g = 0.31f, .b = 0.31f, .a = 255.0f },
+		.neutral      = { .r = 0.22f, .g = 0.22f, .b = 0.22f, .a = 255.0f },
+		.medium_dark  = { .r = 0.16f, .g = 0.16f, .b = 0.16f, .a = 255.0f },
 	});
 	
 	// Engine will pick this up on the first tick (before ImGui renders, so no flickering)
@@ -107,25 +107,27 @@ void dn_imgui_shutdown() {
 void dn_imgui_load_colors(dn_imgui_colors_t colors) {
 	ImVec4* imgui_colors = ImGui::GetStyle().Colors;
 	
-	imgui_colors[ImGuiCol_Button]             = colors.medium_light;
-	imgui_colors[ImGuiCol_ButtonHovered]      = colors.light;
-	imgui_colors[ImGuiCol_ButtonActive]       = colors.medium_light;
-	imgui_colors[ImGuiCol_FrameBg]            = colors.medium_dark;
-	imgui_colors[ImGuiCol_FrameBgHovered]     = colors.medium_dark;
-	imgui_colors[ImGuiCol_FrameBgActive]      = colors.medium_dark;
-	imgui_colors[ImGuiCol_Header]             = colors.neutral;
-	imgui_colors[ImGuiCol_HeaderHovered]      = colors.low_light;
-	imgui_colors[ImGuiCol_HeaderActive]       = colors.neutral;
-	imgui_colors[ImGuiCol_Separator]          = colors.medium_dark;
-	imgui_colors[ImGuiCol_Tab]                = colors.medium_dark;
-	imgui_colors[ImGuiCol_TabHovered]         = colors.neutral;
-	imgui_colors[ImGuiCol_TabActive]          = colors.neutral;
-	imgui_colors[ImGuiCol_TabUnfocused]       = colors.medium_dark;
-	imgui_colors[ImGuiCol_TabUnfocusedActive] = colors.neutral;
-	imgui_colors[ImGuiCol_TitleBg]            = colors.medium_dark;
-	imgui_colors[ImGuiCol_TitleBgActive]      = colors.medium_dark;
-	imgui_colors[ImGuiCol_TitleBgCollapsed]   = colors.medium_dark;
-	imgui_colors[ImGuiCol_WindowBg]           = colors.neutral;
+	#define DN_VEC4_TO_IMVEC4(dn_vec) ImVec4((dn_vec.r), (dn_vec.g), (dn_vec.b), (dn_vec.a))
+
+	imgui_colors[ImGuiCol_Button]             = DN_VEC4_TO_IMVEC4(colors.medium_light);
+	imgui_colors[ImGuiCol_ButtonHovered]      = DN_VEC4_TO_IMVEC4(colors.light);
+	imgui_colors[ImGuiCol_ButtonActive]       = DN_VEC4_TO_IMVEC4(colors.medium_light);
+	imgui_colors[ImGuiCol_FrameBg]            = DN_VEC4_TO_IMVEC4(colors.medium_dark);
+	imgui_colors[ImGuiCol_FrameBgHovered]     = DN_VEC4_TO_IMVEC4(colors.medium_dark);
+	imgui_colors[ImGuiCol_FrameBgActive]      = DN_VEC4_TO_IMVEC4(colors.medium_dark);
+	imgui_colors[ImGuiCol_Header]             = DN_VEC4_TO_IMVEC4(colors.neutral);
+	imgui_colors[ImGuiCol_HeaderHovered]      = DN_VEC4_TO_IMVEC4(colors.low_light);
+	imgui_colors[ImGuiCol_HeaderActive]       = DN_VEC4_TO_IMVEC4(colors.neutral);
+	imgui_colors[ImGuiCol_Separator]          = DN_VEC4_TO_IMVEC4(colors.medium_dark);
+	imgui_colors[ImGuiCol_Tab]                = DN_VEC4_TO_IMVEC4(colors.medium_dark);
+	imgui_colors[ImGuiCol_TabHovered]         = DN_VEC4_TO_IMVEC4(colors.neutral);
+	imgui_colors[ImGuiCol_TabActive]          = DN_VEC4_TO_IMVEC4(colors.neutral);
+	imgui_colors[ImGuiCol_TabUnfocused]       = DN_VEC4_TO_IMVEC4(colors.medium_dark);
+	imgui_colors[ImGuiCol_TabUnfocusedActive] = DN_VEC4_TO_IMVEC4(colors.neutral);
+	imgui_colors[ImGuiCol_TitleBg]            = DN_VEC4_TO_IMVEC4(colors.medium_dark);
+	imgui_colors[ImGuiCol_TitleBgActive]      = DN_VEC4_TO_IMVEC4(colors.medium_dark);
+	imgui_colors[ImGuiCol_TitleBgCollapsed]   = DN_VEC4_TO_IMVEC4(colors.medium_dark);
+	imgui_colors[ImGuiCol_WindowBg]           = DN_VEC4_TO_IMVEC4(colors.neutral);
 
 	dn_imgui.colors = colors;
 }

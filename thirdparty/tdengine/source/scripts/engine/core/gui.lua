@@ -111,7 +111,7 @@ end
 
 
 local function setup_animation_interpolation(interpolator, direction)
-  local native_resolution = tdengine.window.get_native_resolution()
+  local native_resolution = tdengine.window.dn_window_get_native_resolution()
 
   local start = tdengine.vec2()
   if direction == tdengine.gui.animation_direction.left then
@@ -335,7 +335,7 @@ Gui.mouse_state = {
 }
 
 function Gui:init()
-  self.native_resolution = tdengine.window.get_native_resolution()
+  self.native_resolution = tdengine.window.dn_window_get_native_resolution()
   self.scale = table.deep_copy(self.native_resolution)
 
   self.active_regions = tdengine.data_types.stack:new()

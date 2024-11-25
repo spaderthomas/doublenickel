@@ -11,7 +11,7 @@ tdengine.window.states = tdengine.enum.define(
 function tdengine.window.init()
   self.state = self.states.Idle
 
-  self.display_mode = tdengine.ffi.get_display_mode()
+  self.display_mode = tdengine.ffi.dm_window_get_display_mode()
   self.interpolation = {
     window_size = tdengine.interpolation.EaseInOut2:new({ time = 1, exponent = 3 })
   }
@@ -26,14 +26,14 @@ function tdengine.window.update()
 
     self.interpolation.window_size:update()
     if self.interpolation.window_size:is_done() then
-      tdengine.ffi.set_display_mode(self.display_mode)
+      tdengine.ffi.dn_window_set_display_mode(self.display_mode)
       self.state = self.states.Idle
     end
   end
 
-  local display_mode = tdengine.ffi.get_display_mode()
+  local display_mode = tdengine.ffi.dm_window_get_display_mode()
   if display_mode == tdengine.enums.DisplayMode.p1280_800 then
-    local content_area       = tdengine.ffi.get_content_area()
+    local content_area       = tdengine.ffi.dn_window_get_content_area()
     local ratio              = content_area.x / content_area.y
     local sixteen_nine_width = content_area.y * 16 / 9
 
@@ -48,7 +48,7 @@ function tdengine.window.animate_display_mode(display_mode)
   local was_full_screen = self.display_mode == tdengine.enums.DisplayMode.Fullscreen
   local is_full_screen = display_mode == tdengine.enums.DisplayMode.Fullscreen
   if was_full_screen or is_full_screen or tdengine.ffi.is_steam_deck() then
-    tdengine.ffi.set_display_mode(display_mode)
+    tdengine.ffi.dn_window_set_display_mode(display_mode)
     self.display_mode = display_mode
     self.state = self.states.Idle
     return
@@ -57,7 +57,7 @@ function tdengine.window.animate_display_mode(display_mode)
   self.display_mode = display_mode
 
 
-  local current_size = tdengine.ffi.get_content_area()
+  local current_size = tdengine.ffi.dn_window_get_content_area()
   current_size = tdengine.vec2(current_size.x, current_size.y)
   local target_size = tdengine.vec2()
 
@@ -87,9 +87,6 @@ function tdengine.window.animate_display_mode(display_mode)
   self.state = self.states.Interpolate
 end
 
-function tdengine.window.get_content_area()
-  return tdengine.vec2(tdengine.ffi.get_content_area())
-end
 
 function tdengine.window.get_game_area_size()
   local data = tdengine.ffi.dn_coord_get()
@@ -104,6 +101,6 @@ function tdengine.window.set_game_area_position(position)
   tdengine.ffi.dn_coord_set_framebuffer_position(position.x, position.y)
 end
 
-function tdengine.window.get_native_resolution()
-	return tdengine.vec2(tdengine.ffi.get_native_resolution())
+function tdengine.window.dn_window_get_native_resolution()
+	return tdengine.vec2(tdengine.ffi.dn_window_get_native_resolution())
 end

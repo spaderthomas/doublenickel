@@ -1,52 +1,235 @@
-enum class WindowFlags {
-	None = 0,
-	Windowed = 1 << 0,
-	Border = 1 << 1,
-	Vsync = 1 << 2
-};
-DEFINE_ENUM_FLAG_OPERATORS(WindowFlags)
+#ifndef DN_WINDOW_H
+#define DN_WINDOW_H
+typedef enum {
+	DN_WINDOW_FLAG_NONE = 0,
+	DN_WINDOW_FLAG_WINDOWED = 1,
+	DN_WINDOW_FLAG_BORDER = 2,
+	DN_WINDOW_FLAG_VSYNC = 4
+} dn_window_flags_t;
 
-enum class DisplayMode : u32 {
+typedef enum {
 	// 16:9
-	p480,
-	p720,
-	p1080,
-	p1440,
-	p2160,
+	DN_DISPLAY_MODE_480,
+	DN_DISPLAY_MODE_720,
+	DN_DISPLAY_MODE_1080,
+	DN_DISPLAY_MODE_1440,
+	DN_DISPLAY_MODE_2160,
 
 	// 16:10
-	p1280_800,
+	DN_DISPLAY_MODE_1280_800,
 
 	// Fullscreen
-	FullScreen
-};
+	DN_DISPLAY_MODE_FULLSCREEN
+} dn_display_mode_t;
 
-struct WindowInfo {
+typedef struct {
+	const char* title;
+	Vector2 size;
+	dn_window_flags_t flags;
+} dn_window_descriptor_t;
+
+typedef struct {
 	GLFWwindow* handle;
-	WindowFlags flags;
-	DisplayMode display_mode;
+	dn_window_flags_t flags;
+	dn_display_mode_t display_mode;
 	Vector2I windowed_position;
 	Vector2 native_resolution;
 	Vector2 requested_area;
 	Vector2 content_area;
-};
-WindowInfo window;
+} dn_window_t;
+dn_window_t window;
 
-void init_glfw();
-void shutdown_glfw();
-void set_native_resolution(float width, float height);
-float get_display_scale();
-
-DN_API Vector2 get_content_area();
-DN_API Vector2 get_game_area_size();
-DN_API Vector2 get_native_resolution();
-
-DN_API void set_game_area_size(float x, float y);
-DN_API void set_game_area_position(float x, float y);
-
-DN_API void create_window(const char* title, u32 x, u32 y, WindowFlags flags);
-DN_API void set_window_icon(const char* path);
-DN_API void set_display_mode(DisplayMode mode);
-DN_API DisplayMode get_display_mode();
+DN_IMP void              dn_window_shutdown();
+DN_API void              dn_window_create(dn_window_descriptor_t descriptor);
+DN_API void              dn_window_set_native_resolution(float width, float height);
+DN_API Vector2           dn_window_get_content_area();
+DN_API Vector2           dn_window_get_native_resolution();
+DN_API void              dn_window_set_icon(const char* path);
+DN_API void              dn_window_set_display_mode(dn_display_mode_t mode);
+DN_API dn_display_mode_t dm_window_get_display_mode();
 DN_API void              dn_window_set_cursor_visible(bool visible);
+#endif
 
+#ifdef DN_WINDOW_IMPLEMENTATION
+void dn_window_shutdown() {
+	glfwDestroyWindow(window.handle);
+	glfwTerminate();
+}
+
+void dn_window_create(dn_window_descriptor_t descriptor) {
+	dn_window_set_native_resolution(descriptor.size.x, descriptor.size.y);
+	
+	glfwInit();
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+
+	auto monitor = glfwGetPrimaryMonitor();
+
+	int wax, way, wsx, wsy;
+	glfwGetMonitorWorkarea(monitor, &wax, &way, &wsx, &wsy);
+
+
+	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+	glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+	glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+	glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+	glfwWindowHint(GLFW_SAMPLES, 4);
+
+	// Translate the window flags into GLFW stuff that'll set up the window correctly	
+	if (descriptor.flags & DN_WINDOW_FLAG_WINDOWED) {
+		monitor = nullptr;
+	}
+	
+	if (!(descriptor.flags & DN_WINDOW_FLAG_BORDER)) {
+		glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+	}
+
+	tdns_log.write("creating window: native_resolution = [%.0f, %.0f], content_area = [%.0f, %.0f], windowed = %d, border = %d, vsync = %d, refresh_rate = %d, monitor = %d",
+				   window.native_resolution.x, window.native_resolution.y,
+				   window.content_area.x, window.content_area.y,
+				   descriptor.flags & DN_WINDOW_FLAG_WINDOWED,
+				   descriptor.flags & DN_WINDOW_FLAG_BORDER,
+				   descriptor.flags & DN_WINDOW_FLAG_VSYNC,
+				   mode->refreshRate,
+				   monitor != nullptr);
+
+	// Init the window, give it a GL context, and load OpenGL. Don't bother passing in the real size here, because we're going to set it later.
+	window.handle = glfwCreateWindow(1, 1, descriptor.title, monitor, NULL);
+	glfwMakeContextCurrent(window.handle);
+
+	// Initialize OpenGL
+	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+
+	auto version = glGetString(GL_VERSION);
+    if (version) {
+		tdns_log.write("OpenGL version: %s", version);
+    } else {
+		tdns_log.write("Failed to get OpenGL version");
+    }
+
+	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+	glDebugMessageCallback(gl_error_callback, 0);
+
+	// This has to be done after context creation
+	if (descriptor.flags & DN_WINDOW_FLAG_VSYNC) {
+		glfwSwapInterval(1);
+	}
+	else {
+		glfwSwapInterval(0);
+	}
+
+	glfwSetCursorPosCallback(window.handle, dn_input_callback_cursor);
+	glfwSetMouseButtonCallback(window.handle, dn_input_callback_click);
+	glfwSetKeyCallback(window.handle, dn_input_callback_key);
+	glfwSetScrollCallback(window.handle, dn_input_callback_scroll);
+	glfwSetWindowSizeCallback(window.handle, dn_input_callback_window_size);
+
+	init_noise();
+	dn_imgui_init();
+	gpu_init();
+	init_texture_atlas(); // Invert control
+	init_backgrounds(); // Invert control
+	init_screenshots(); // Use the asset loader
+	init_particles();
+	init_fluid();
+
+#ifdef FM_EDITOR
+	// Set a best guess for our default output resolution based on the monitor
+	if (mode->width == 3840) {
+		dn_window_set_display_mode(DN_DISPLAY_MODE_2160);
+	}
+	else if (mode->width == 2560) {
+		dn_window_set_display_mode(DN_DISPLAY_MODE_1440);
+	}
+	else if (mode->width == 1920) {
+		dn_window_set_display_mode(DN_DISPLAY_MODE_1080);
+	}
+	else {
+		dn_window_set_display_mode(DN_DISPLAY_MODE_1080);
+	}
+#else
+	if (SteamUtils()->IsSteamRunningOnSteamDeck()) {
+		dn_window_set_display_mode(DN_DISPLAY_MODE_1280_800);
+	} else {
+		dn_window_set_display_mode(DN_DISPLAY_MODE_1080);
+	}
+#endif
+}
+
+void dn_window_set_icon(const char* path) {
+	int width, height, channels;
+	unsigned char* pixels = stbi_load(path, &width, &height, &channels, STBI_rgb_alpha);
+	if (!pixels) {
+		std::cerr << "Failed to load icon image!" << std::endl;
+		return;
+	}
+
+	GLFWimage icon;
+	icon.width = width;
+	icon.height = height;
+	icon.pixels = pixels;
+
+	glfwSetWindowIcon(window.handle, 1, &icon);
+
+	stbi_image_free(pixels);
+}
+
+void dn_window_set_native_resolution(float width, float height) {
+	window.native_resolution.x = width;
+	window.native_resolution.y = height;
+}
+
+void dn_window_set_display_mode(dn_display_mode_t mode) {
+	tdns_log.write("%s: mode = %d", __func__, static_cast<int>(mode));
+	
+	if (window.display_mode == DN_DISPLAY_MODE_FULLSCREEN && mode != DN_DISPLAY_MODE_FULLSCREEN) {
+		// Toggle back to windowed
+		glfwSetWindowMonitor(window.handle, NULL, window.windowed_position.x, window.windowed_position.y, window.requested_area.x, window.requested_area.y, GLFW_DONT_CARE);
+	}
+
+	window.display_mode = mode;
+
+	switch (window.display_mode) {
+		case DN_DISPLAY_MODE_FULLSCREEN: {
+			GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+			const GLFWvidmode* video_mode = glfwGetVideoMode(monitor);
+			glfwGetWindowPos(window.handle, &window.windowed_position.x, &window.windowed_position.y);
+			glfwSetWindowMonitor(window.handle, monitor, 0, 0, video_mode->width, video_mode->height, video_mode->refreshRate);
+
+			return;
+		} break;
+		case DN_DISPLAY_MODE_480: window.requested_area = { .x = 854, .y = 480 }; break;
+		case DN_DISPLAY_MODE_720: window.requested_area = { .x = 1280, .y = 720 }; break;
+		case DN_DISPLAY_MODE_1080: window.requested_area = { .x = 1920, .y = 1080 }; break;
+		case DN_DISPLAY_MODE_1440: window.requested_area = { .x = 2560, .y = 1440 }; break;
+		case DN_DISPLAY_MODE_2160: window.requested_area = { .x = 3840, .y = 2160 }; break;
+		case DN_DISPLAY_MODE_1280_800: window.requested_area = { .x = 1280, .y = 800 }; break;
+	}
+
+	glfwSetWindowSize(window.handle, window.requested_area.x, window.requested_area.y);
+}
+
+DN_API void set_window_size(int x, int y) {
+	glfwSetWindowSize(window.handle, x, y);
+}
+
+dn_display_mode_t dm_window_get_display_mode() {
+	return window.display_mode;
+}
+
+void dn_window_set_cursor_visible(bool visible) {
+	glfwSetInputMode(window.handle, GLFW_CURSOR, visible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
+}
+
+Vector2 dn_window_get_native_resolution() {
+	return window.native_resolution;
+}
+
+Vector2 dn_window_get_content_area() {
+	return window.content_area;
+}
+#endif

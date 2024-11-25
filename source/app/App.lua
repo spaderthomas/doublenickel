@@ -45,16 +45,16 @@ function App:init()
 end
 
 function App:on_init_game()
-	tdengine.ffi.create_window(
-		'SDF Clock', 
-		self.native_resolution.x, self.native_resolution.y, 
-		tdengine.enum.bitwise_or(
+	tdengine.ffi.dn_window_create(WindowDescriptor:new({
+		title = 'SDF Clock',
+		size = Vector2:new(320, 180),
+		flags = tdengine.enum.bitwise_or(
 			tdengine.enums.WindowFlags.Windowed,
 			tdengine.enums.WindowFlags.Border
 		)
-	)
+	}))
 
-	tdengine.ffi.set_window_icon(tdengine.ffi.dn_paths_resolve_format('image', 'logo/icon.png'):to_interned())
+	tdengine.ffi.dn_window_set_icon(tdengine.ffi.dn_paths_resolve_format('image', 'logo/icon.png'):to_interned())
 	tdengine.ffi.dn_engine_set_target_fps(144)
 
 	tdengine.gpu.build(tdengine.module.read_from_named_path('gpu_info'))

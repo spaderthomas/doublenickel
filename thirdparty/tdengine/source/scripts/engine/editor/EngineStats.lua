@@ -90,7 +90,7 @@ end
 function EngineStats:playground()
 	if self.window then
 		self.window:update()
-		local x = tdengine.ffi.get_content_area()
+		local x = tdengine.ffi.dn_window_get_content_area()
 		tdengine.ffi.set_window_size(self.window:get_value(), x.y)
 
 		if self.window:is_done() then
@@ -139,8 +139,8 @@ function EngineStats:engine_viewer()
 	if imgui.TreeNode('Window') then
 		local main_view = tdengine.editor.find('GameViewManager'):find_main_view()
 		imgui.extensions.TableField('Main View', main_view.name)
-		imgui.extensions.Vec2('Content Area', tdengine.window.get_content_area())
-		imgui.extensions.Vec2('Native Resolution', tdengine.window.get_native_resolution())
+		imgui.extensions.Vec2('Content Area', tdengine.window.dn_window_get_content_area())
+		imgui.extensions.Vec2('Native Resolution', tdengine.window.dn_window_get_native_resolution())
 		imgui.extensions.Vec2('Game View', tdengine.window.get_game_area_size())
 		imgui.TreePop()
 	end
