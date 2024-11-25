@@ -76,7 +76,7 @@ void create_window(const char* title, u32 x, u32 y, WindowFlags flags) {
 	glfwSetWindowSizeCallback(window.handle, dn_input_callback_window_size);
 
 	init_noise();
-	init_imgui();
+	dn_imgui_init();
 	gpu_init();
 	init_texture_atlas(); // Invert control
 	init_backgrounds(); // Invert control

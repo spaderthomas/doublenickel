@@ -3,6 +3,14 @@ local self = tdengine.editor
 ----------------
 -- PUBLIC API --
 ----------------
+EditorFonts = tdengine.enum.define(
+  'EditorFonts',
+  {
+    Regular = 0,
+    Bold = 1,
+  }
+)
+
 EditorConfig = tdengine.class.define('EditorConfig')
 function EditorConfig:init(params)
   self.grid_enabled = params.grid_enabled
@@ -13,6 +21,11 @@ function EditorConfig:init(params)
   self.layout = params.layout or 'default'
   self.render_pass = params.render_pass
   self.command_buffer = params.command_buffer
+  self.fonts = {
+    regular = params.fonts and params.fonts.regular or 'inconsolata',
+    bold = params.fonts and params.fonts.bold or 'inconsolata-extrabold',
+    size = params.fonts and params.fonts.size or 16,
+  }
 end
 
 function tdengine.editor.configure(config)
@@ -27,7 +40,7 @@ function tdengine.editor.configure(config)
   end
 
   tdengine.editor.find('SceneEditor'):load(config.scene)
-  tdengine.ffi.use_editor_layout(config.layout)
+  tdengine.ffi.dn_imgui_load_layout(config.layout)
 end
 
 
@@ -56,6 +69,14 @@ end
 function tdengine.editor.end_window()
   self.window_stack:pop()
   imgui.End()
+end
+
+function tdengine.editor.push_font(font)
+  if EditorFonts.Regular:match(font) then
+    imgui.PushFont(self.config.fonts.regular, self.config.fonts.size)
+  elseif EditorFonts.Bold:match(font) then
+    imgui.PushFont(self.config.fonts.bold, self.config.fonts.size)
+  end
 end
 
 function tdengine.editor.begin_child(name, x, y, flags)

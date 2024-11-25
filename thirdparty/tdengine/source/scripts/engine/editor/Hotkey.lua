@@ -73,7 +73,7 @@ end
 function Hotkey:open_dialogue()
   local directory = tdengine.ffi.dn_paths_resolve('dialogues'):to_interned()
   imgui.SetFileBrowserPwd(directory)
-  imgui.OpenFileBrowser()
+  imgui.file_browser_open()
 
   -- @hack: I wanted to move the hoykey code out of the main menu, but I forgot that it was
   -- doing more than just drawing a menu. Not a hard fix, just not right now.
@@ -94,8 +94,8 @@ end
 
 function Hotkey:open_scene()
   local scenes = tdengine.ffi.dn_paths_resolve('scenes'):to_interned()
-  imgui.SetFileBrowserWorkDir(scenes)
-  imgui.OpenFileBrowser()
+  imgui.file_browser_set_work_dir(scenes)
+  imgui.file_browser_open()
 
   -- @hack: I wanted to move the hoykey code out of the main menu, but I forgot that it was
   -- doing more than just drawing a menu. Not a hard fix, just not right now.

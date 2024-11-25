@@ -30,7 +30,7 @@
 #include "source/utils/dyn_array.hpp"
 #include "source/utils/hash.hpp"
 #include "source/utils/preprocessor.hpp"
-#include "source/imgui/imgui_extensions.hpp"
+#include "source/imgui/dn_imgui.hpp"
 #include "source/lua.hpp"
 #include "source/engine.hpp"
 #include "source/time_metrics.hpp"
@@ -91,7 +91,8 @@
 #define DN_TIME_METRICS_IMPLEMENTATION
 #include "source/time_metrics.hpp"
 #include "source/window.cpp"
-#include "source/imgui/imgui_extensions.cpp"
+#define DN_IMGUI_IMPLEMENTATION
+#include "source/imgui/dn_imgui.hpp"
 #include "source/utils/array.cpp"
 #define COORDINATE_IMPLEMENTATION
 #include "source/utils/coordinate.hpp"
@@ -136,7 +137,7 @@ int td_main(TdAppDescriptor app) {
 		update_allocators();
 		update_file_monitors();
 		update_assets();
-		update_imgui();
+		dn_imgui_update();
 		dn_input_update();
 		update_actions();
 		update_game();
@@ -145,7 +146,7 @@ int td_main(TdAppDescriptor app) {
 
 	dn_audio_shutdown();
 	shutdown_steam();
-	shutdown_imgui();
+	dn_imgui_shutdown();
 	shutdown_glfw();
 
 	return 0;

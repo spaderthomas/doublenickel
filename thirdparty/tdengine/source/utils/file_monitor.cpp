@@ -150,7 +150,7 @@ void FileMonitor::add_change(char* file_path, char* file_name, FileChangeEvent e
 
 	// We don't care about directory updates. They're annoying and hard to understand
 	// on Windows, and file updates give us everything we need.
-	if (dn_os_is_regular_file(file_path)) return;
+	if (dn_os_is_directory(file_path)) return;
 
 	// Exclude some annoying files
 	if (file_name) {

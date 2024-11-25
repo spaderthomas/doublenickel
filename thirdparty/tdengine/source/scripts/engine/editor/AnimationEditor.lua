@@ -116,7 +116,7 @@ function AnimationEditor:popup()
 
 		self.animation:update()
 		local image = self.animation:get_image()
-		imgui.GameImage(image, sprite:unpack())
+		imgui.image(image, sprite:unpack())
 
 		local remaining = self.sizes.preview.y - sprite.y
 

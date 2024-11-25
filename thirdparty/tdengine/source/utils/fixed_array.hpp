@@ -8,7 +8,7 @@ typedef struct {
 	u32 element_size;
 } dn_fixed_array_t;
 
-template<typename T>
+template<typename T, u32 N>
 struct dn_fixed_array : dn_fixed_array_t {};
 
 DN_API void dn_fixed_array_init(dn_fixed_array_t* vertex_buffer, u32 max_vertices, u32 element_size);
@@ -18,18 +18,23 @@ DN_API void dn_fixed_array_clear(dn_fixed_array_t* vertex_buffer);
 DN_API u32  dn_fixed_array_byte_size(dn_fixed_array_t* vertex_buffer);
 DN_API u8*  dn_fixed_array_at(dn_fixed_array_t* vertex_buffer, u32 index);
 
-template<typename T>
-void dn_fixed_array_init_t(dn_fixed_array<T>* vertex_buffer, u32 count) {
-	return dn_fixed_array_init(vertex_buffer, count, sizeof(T));
+template<typename T, u32 N>
+void dn_fixed_array_init_t(dn_fixed_array<T, N>* vertex_buffer) {
+	return dn_fixed_array_init(vertex_buffer, N, sizeof(T));
 }
 
-template<typename T>
-T* dn_fixed_array_push_t(dn_fixed_array<T>* vertex_buffer, T* data, u32 count) {
+template<typename T, u32 N>
+T* dn_fixed_array_push_t(dn_fixed_array<T, N>* vertex_buffer, T* data, u32 count) {
 	return (T*)dn_fixed_array_push(vertex_buffer, data, count);
 }
 
-template<typename T>
-T* dn_fixed_array_at_t(dn_fixed_array<T>* fixed_array, u32 index) {
+template<typename T, u32 N>
+T* dn_fixed_array_reserve_t(dn_fixed_array<T, N>* vertex_buffer, u32 count) {
+	return (T*)dn_fixed_array_reserve(vertex_buffer, count);
+}
+
+template<typename T, u32 N>
+T* dn_fixed_array_at_t(dn_fixed_array<T, N>* fixed_array, u32 index) {
 	return (T*)dn_fixed_array_at((dn_fixed_array_t*)fixed_array, index);
 }
 #endif

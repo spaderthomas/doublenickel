@@ -892,15 +892,11 @@ function DialogueEditor:on_node_draw(id)
 	local node = self.nodes[id]
 	local display_name = ternary(node.who, node.who, node.kind)
 
-	imgui.PushFont('editor-bold-32')
+	tdengine.editor.push_font(EditorFonts.Bold)
 	imgui.Text(display_name)
 	imgui.PopFont()
 
-	if node.kind == tdengine.dialogue.node_kind.DevMarker then
-		imgui.PushFont('editor-24')
-	end
-
-	imgui.PushFont('editor-16')
+	tdengine.editor.push_font(EditorFonts.Regular)
 	imgui.Text(node:short_text())
 	imgui.PopFont()
 

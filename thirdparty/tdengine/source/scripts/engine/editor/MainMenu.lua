@@ -50,19 +50,19 @@ end
 
 function MainMenu:update_state()
 	if self.state == state.choosing_dialogue then
-		if imgui.IsAnyFileSelected() then
+		if imgui.file_browser_is_file_selected() then
 			local dialogue_editor = tdengine.find_entity_editor('DialogueEditor')
-			dialogue_editor:load(imgui.GetSelectedFile())
+			dialogue_editor:load(imgui.file_browser_get_selected_file())
 			self.state = state.idle
 		end
 	elseif self.state == state.choosing_state then
-		if imgui.IsAnyFileSelected() then
-			tdengine.load_save_by_path(imgui.GetSelectedFile())
+		if imgui.file_browser_is_file_selected() then
+			tdengine.load_save_by_path(imgui.file_browser_get_selected_file())
 			self.state = state.idle
 		end
 	elseif self.state == state.choosing_scene then
-		if imgui.IsAnyFileSelected() then
-			local path = imgui.GetSelectedFile()
+		if imgui.file_browser_is_file_selected() then
+			local path = imgui.file_browser_get_selected_file()
 			local scene = tdengine.extract_filename(path)
 			scene = tdengine.strip_extension(scene)
 
@@ -73,7 +73,7 @@ function MainMenu:update_state()
 		end
 
 		if self.input:pressed(glfw.keys.ESCAPE) then
-			imgui.CloseFileBrowser()
+			imgui.file_browser_close()
 			self.state = state.idle
 		end
 	end
@@ -93,7 +93,7 @@ function MainMenu:show_modals(dt)
 		imgui.Dummy(5, 5)
 
 		if imgui.Button('Save') then
-			tdengine.ffi.save_editor_layout(self.saved_layout_name)
+			tdengine.ffi.dn_imgui_save_layout(self.saved_layout_name)
 			self.saved_layout_name = ''
 			imgui.CloseCurrentPopup()
 		end
@@ -192,8 +192,8 @@ function MainMenu:Dialogue()
 		local dialogue_editor = tdengine.find_entity_editor('DialogueEditor')
 		if imgui.MenuItem('Open', 'Ctrl+O') then
 			local directory = tdengine.ffi.dn_paths_resolve('dialogues'):to_interned()
-			imgui.SetFileBrowserWorkDir(directory)
-			imgui.OpenFileBrowser()
+			imgui.file_browser_set_work_dir(directory)
+			imgui.file_browser_open()
 			self.state = state.choosing_dialogue
 		end
 
@@ -245,7 +245,7 @@ function MainMenu:Window()
 				for i, layout in pairs(layouts) do
 					if imgui.MenuItem(tdengine.strip_extension(layout)) then
 						local file_name = tdengine.strip_extension(layout)
-						tdengine.ffi.use_editor_layout(file_name)
+						tdengine.ffi.dn_imgui_load_layout(file_name)
 					end
 				end
 

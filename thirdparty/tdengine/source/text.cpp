@@ -7,9 +7,8 @@ void dn_prepared_text_t::init() {
 	this->wrap = 0;
 }
 
-void dn_prepared_text_t::set_font(const char* name) {
-	this->font = dn_font_find(name);
-	if (!this->font) this->font = dn_font_default();
+void dn_prepared_text_t::set_font(dn_baked_font_t* font) {
+	this->font = font;
 }
 
 void dn_prepared_text_t::set_text(const char* text) {
@@ -79,15 +78,15 @@ ArrayView<char> dn_prepared_text_t::get_line(int32 index) {
 	);
 }
 
-dn_prepared_text_t* dn_prepare_text(const char* text, float32 px, float32 py, const char* font) {
+dn_prepared_text_t* dn_prepare_text(const char* text, float32 px, float32 py, dn_baked_font_t* font) {
 	return dn_prepare_text_ex(text, px, py, font, 0, colors::white, true);
 }
 
-dn_prepared_text_t* dn_prepare_text_wrap(const char* text, float32 px, float32 py, const char* font, float32 wrap) {
+dn_prepared_text_t* dn_prepare_text_wrap(const char* text, float32 px, float32 py, dn_baked_font_t* font, float32 wrap) {
 	return dn_prepare_text_ex(text, px, py, font, wrap, colors::white, true);
 }
 
-dn_prepared_text_t* dn_prepare_text_ex(const char* text, float32 px, float32 py, const char* font, float32 wrap, Vector4 color, bool precise) {
+dn_prepared_text_t* dn_prepare_text_ex(const char* text, float32 px, float32 py, dn_baked_font_t* font, float32 wrap, Vector4 color, bool precise) {
 	if (!text) return nullptr;
 	
 	auto prepared_text = bump_allocator.alloc<dn_prepared_text_t>();
@@ -110,8 +109,8 @@ dn_prepared_text_t* dn_prepare_text_ex(const char* text, float32 px, float32 py,
 		auto line = prepared_text->get_line(i);
 		arr_for(line, c) {
 			if (*c == 0) break;
-			dn_glyph_t* glyph = prepared_text->font->glyphs[*c];
-			this_line_width += glyph->advance.x;
+			dn_baked_glyph_t& glyph = prepared_text->font->glyphs[*c];
+			this_line_width += glyph.advance.x;
 		}
 
 		prepared_text->width = fox_max(prepared_text->width, this_line_width);
@@ -124,9 +123,9 @@ dn_prepared_text_t* dn_prepare_text_ex(const char* text, float32 px, float32 py,
 	float32 first_line_descender = 0;
 	arr_for(first_line, c) {
 		if (*c == 0) break;
-		dn_glyph_t* glyph = prepared_text->font->glyphs[*c];
-		first_line_height = std::max(first_line_height, glyph->size.y - glyph->descender);
-		first_line_descender = std::max(first_line_descender, glyph->descender);
+		dn_baked_glyph_t& glyph = prepared_text->font->glyphs[*c];
+		first_line_height = std::max(first_line_height, glyph.size.y - glyph.descender);
+		first_line_descender = std::max(first_line_descender, glyph.descender);
 	}
 
 	if (prepared_text->is_empty()) {
@@ -178,7 +177,7 @@ void LineBreakContext::calculate() {
 
 	float32 word_size = 0;
 	int32 word_begin  = 0;
-	dn_glyph_t* glyph  = nullptr;
+	dn_baked_glyph_t* glyph  = nullptr;
 	auto text = arr_view(info->text, MAX_TEXT_LEN);
 
 	auto break_on_previous_word = [&]() {
@@ -196,7 +195,7 @@ void LineBreakContext::calculate() {
 
 	arr_for(text, c) {
 		if (*c == 0) break;
-		glyph = this->info->font->glyphs[*c];
+		glyph = &this->info->font->glyphs[*c];
 
 		if (*c == '\n') {
 			// If the current word would not have fit on this line anyway, so move it to the next.

@@ -117,34 +117,34 @@ function imgui.internal.init_lua_api_overwrites()
 	end
 
 
-	function imgui.PushFont(font_name)
-		ffi.C.IGE_PushGameFont(font_name)
+	function imgui.PushFont(font_name, size)
+		ffi.C.dn_imgui_push_font(font_name, size)
 	end
 
-	function imgui.GameImage(image, sx, sy)
+	function imgui.image(image, sx, sy)
 		sx = sx or 0
 		sy = sy or 0
-		ffi.C.IGE_GameImage(image, sx, sy)
+		ffi.C.dn_imgui_image(image, sx, sy)
 	end
 
-	function imgui.OpenFileBrowser()
-		ffi.C.IGE_OpenFileBrowser()
+	function imgui.file_browser_open()
+		ffi.C.dn_imgui_file_browser_open()
 	end
 
-	function imgui.CloseFileBrowser()
-		ffi.C.IGE_CloseFileBrowser()
+	function imgui.file_browser_close()
+		ffi.C.dn_imgui_file_browser_close()
 	end
 
-	function imgui.SetFileBrowserWorkDir(directory)
-		ffi.C.IGE_SetFileBrowserWorkDir(directory)
+	function imgui.file_browser_set_work_dir(directory)
+		ffi.C.dn_imgui_file_browser_set_work_dir(directory)
 	end
 
-	function imgui.IsAnyFileSelected()
-		return ffi.C.IGE_IsAnyFileSelected()
+	function imgui.file_browser_is_file_selected()
+		return ffi.C.dn_imgui_file_browser_is_file_selected()
 	end
 
-	function imgui.GetSelectedFile()
-		return ffi.C.IGE_GetSelectedFile():to_interned()
+	function imgui.file_browser_get_selected_file()
+		return ffi.C.dn_imgui_file_browser_get_selected_file():to_interned()
 	end
 
 

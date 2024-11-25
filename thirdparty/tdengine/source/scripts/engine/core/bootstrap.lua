@@ -381,9 +381,26 @@ typedef struct {
 dn_prepared_text_t* dn_prepare_text(const char* text, f32 px, f32 py, const char* font);
 dn_prepared_text_t* dn_prepare_text_wrap(const char* text, f32 px, f32 py, const char* font, f32 wrap);
 dn_prepared_text_t* dn_prepare_text_ex(const char* text, f32 px, f32 py, const char* font, f32 wrap, Vector4 color, bool precise);
-void dn_font_create(const char* id, const char* family, u32 size);
-void dn_font_add_to_imgui(const char* id);
 
+typedef enum {
+	DN_FONT_FLAG_NONE = 0,
+	DN_FONT_FLAG_IMGUI = 1,
+	DN_FONT_FLAG_DEFAULT = 2,
+} dn_font_flags_t;
+
+typedef struct {
+	const char* id;
+	const char* file_name;
+	u32 sizes [16];
+	dn_font_flags_t flags;
+} dn_font_descriptor_t;
+
+typedef struct dn_baked_font_t dn_baked_font_t;
+
+void             dn_font_bake_n(dn_font_descriptor_t* descriptors, u32 num_descriptors);
+void             dn_font_bake(dn_font_descriptor_t descriptor);
+dn_baked_font_t* dn_font_default();
+dn_baked_font_t* dn_font_find(const char* id, u32 size);
 
 
 ////////////////////////////////////////////////////////
@@ -424,8 +441,8 @@ Vector2 get_native_resolution();
 void set_display_mode(u32 mode);
 u32 get_display_mode();
 void dn_window_set_cursor_visible(bool visible);
-void use_editor_layout(const char* file_name);
-void save_editor_layout(const char* file_name);
+void dn_imgui_load_layout(const char* file_name);
+void dn_imgui_save_layout(const char* file_name);
 
 
 
@@ -941,6 +958,36 @@ const char* get_active_action_set();
 
 f64 perlin(f64 x, f64 y, f64 vmin, f64 vmax);
 
+/////////////////////////////////////////
+// ██╗███╗   ███╗ ██████╗ ██╗   ██╗██╗ //
+// ██║████╗ ████║██╔════╝ ██║   ██║██║ //
+// ██║██╔████╔██║██║  ███╗██║   ██║██║ //
+// ██║██║╚██╔╝██║██║   ██║██║   ██║██║ //
+// ██║██║ ╚═╝ ██║╚██████╔╝╚██████╔╝██║ //
+// ╚═╝╚═╝     ╚═╝ ╚═════╝  ╚═════╝ ╚═╝ //
+/////////////////////////////////////////
+                                   
+typedef struct {
+	ImVec4 light;
+	ImVec4 medium_light;
+	ImVec4 low_light;
+	ImVec4 neutral;
+	ImVec4 medium_dark;
+} dn_imgui_colors_t;
+
+DN_IMP void    dn_imgui_init();
+DN_IMP void    dn_imgui_shutdown();
+DN_IMP void    dn_imgui_update();
+DN_API void    dn_imgui_push_font(const char* font_name, u32 size);
+DN_API void    dn_imgui_image(const char* image, float sx, float sy);
+DN_API void    dn_imgui_file_browser_open();
+DN_API void    dn_imgui_file_browser_close();
+DN_API void    dn_imgui_file_browser_set_work_dir(const char* directory);
+DN_API bool    dn_imgui_file_browser_is_file_selected();
+DN_API tstring dn_imgui_file_browser_get_selected_file();
+DN_API void    dn_imgui_load_layout(const char* file_name);
+DN_API void    dn_imgui_save_layout(const char* file_name);
+DN_API void    dn_imgui_load_colors(dn_imgui_colors_t colors);
 
 
 
@@ -1113,19 +1160,13 @@ void set_particle_master_opacity(ParticleSystemHandle handle, float opacity);
 // ╚██████╔╝██║ ╚████║╚██████╗██║  ██║   ██║   ███████╗╚██████╔╝╚██████╔╝██║  ██║██║███████╗███████╗██████╔╝ //
 //  ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝╚══════╝╚══════╝╚═════╝  //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void IGE_PushGameFont(const char* font_name);
-void IGE_GameImage(const char* image, float sx, float sy);
-void IGE_OpenFileBrowser();
-void IGE_CloseFileBrowser();
-void IGE_SetFileBrowserWorkDir(const char* directory);
-bool IGE_IsAnyFileSelected();
-tstring IGE_GetSelectedFile();
 
 void add_script_directory(const char* name);
 
 ]]
 
 ffi = require('ffi')
+bit = require('bit')
 
 function tdengine.handle_error(message)
   -- Strip the message's filename the script filename to make it more readable
@@ -1400,7 +1441,6 @@ function tdengine.init_phase_1()
   tdengine.animation.load()
   tdengine.texture.load()
   tdengine.background.load()
-  tdengine.fonts.load()
   tdengine.dialogue.init()
   tdengine.audio.init()
   tdengine.gui.init()
@@ -1416,7 +1456,6 @@ function tdengine.init_phase_2()
   tdengine.app:on_init_game()
 
   tdengine.window.init()
-  tdengine.fonts.init()
   tdengine.shaders.init()
   tdengine.save.init()
   tdengine.editor.init()

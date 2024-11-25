@@ -7,7 +7,7 @@ struct dn_prepared_text_t {
 	Vector2 position;
 	Vector2 padding;
 	Vector4 color;
-	dn_font_t* font;
+	dn_baked_font_t* font;
 	float wrap;
 	float offset;
 	bool world_space = false;
@@ -31,7 +31,7 @@ struct dn_prepared_text_t {
 	bool precise = false;
 
 	void init();
-	void set_font(const char* name);
+	void set_font(dn_baked_font_t* font);
 	void set_text(const char* text);
 	void set_wrap(float wrap);
 	void set_position(float x, float y);
@@ -46,9 +46,9 @@ struct dn_prepared_text_t {
 	ArrayView<char> get_line(i32 index);
 };
 
-DN_API dn_prepared_text_t* dn_prepare_text(const char* text, float px, float py, const char* font);
-DN_API dn_prepared_text_t* dn_prepare_text_wrap(const char* text, float px, float py, const char* font, float wrap);
-DN_API dn_prepared_text_t* dn_prepare_text_ex(const char* text, float px, float py, const char* font, float wrap, Vector4 color, bool precise);
+DN_API dn_prepared_text_t* dn_prepare_text(const char* text, float px, float py, dn_baked_font_t* font);
+DN_API dn_prepared_text_t* dn_prepare_text_wrap(const char* text, float px, float py, dn_baked_font_t* font, float wrap);
+DN_API dn_prepared_text_t* dn_prepare_text_ex(const char* text, float px, float py, dn_baked_font_t* font, float wrap, Vector4 color, bool precise);
 
 struct LineBreakContext {
 	// Input

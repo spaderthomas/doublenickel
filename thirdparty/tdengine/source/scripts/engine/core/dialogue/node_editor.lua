@@ -546,8 +546,7 @@ function NodeEditor:push_scaled_font()
 	local base_font_size = 16
 	local scaled_font_size = base_font_size * self.zoom
 	local clamped_font_size = tdengine.math.snap_to_range(base_font_size * self.zoom, range)
-	local font = string.format('editor-%s', clamped_font_size)
-	imgui.PushFont(font)
+	imgui.PushFont(tdengine.editor.config.fonts.regular, clamped_font_size)
 
 	-- @hack: The problem here is that instead of making nodes the same size (which would be smart), I calculate
 	-- their size based on their contents. Because you don't have to calculate node sizes when zoomed (it just fits

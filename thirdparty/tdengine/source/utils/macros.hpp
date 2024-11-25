@@ -14,3 +14,5 @@
 
  #define TD_ASSERT(condition) assert(condition)
 //#define TD_ASSERT(condition)
+
+#define dn_zero_initialize() { 0 };

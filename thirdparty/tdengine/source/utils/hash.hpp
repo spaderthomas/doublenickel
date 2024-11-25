@@ -4,7 +4,7 @@
 #define gs_rotate_left(__V, __N)   (((__V) << (__N)) | ((__V) >> (GS_SIZE_T_BITS - (__N))))
 #define gs_rotate_right(__V, __N)  (((__V) >> (__N)) | ((__V) << (GS_SIZE_T_BITS - (__N))))
 
-size_t hash_siphash_bytes(void *p, size_t len, size_t seed) {
+size_t hash_siphash_bytes(const void *p, size_t len, size_t seed) {
   unsigned char *d = (unsigned char *) p;
   size_t i,j;
   size_t v0,v1,v2,v3, data;
@@ -68,6 +68,15 @@ size_t hash_siphash_bytes(void *p, size_t len, size_t seed) {
 #endif
 }
 
-size_t hash_bytes_ex(void *p, size_t len, size_t seed) {
+#define DN_HASH_SEED 0x9de341c9
+dn_hash_t dn_hash_bytes(const void *p, size_t len) {
+  return hash_siphash_bytes(p, len, DN_HASH_SEED);
+}
+
+dn_hash_t dn_hash_bytes_ex(const void *p, size_t len, size_t seed) {
   return hash_siphash_bytes(p,len,seed);
+}
+
+dn_hash_t dn_combine_hashes(dn_hash_t a, dn_hash_t b) {
+  return a ^ (b + 0x9e3779b9 + (a << 6) + (a >> 2));
 }

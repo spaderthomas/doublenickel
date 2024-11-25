@@ -128,22 +128,22 @@ function CharacterEditor:draw_portrait()
   if #self.character.portrait == 0 then 
     imgui.Text('NO PORTRAIT')
   else
-    imgui.GameImage(self.character.portrait, self.portrait_size:unpack())
+    imgui.image(self.character.portrait, self.portrait_size:unpack())
   end
 
 end
 
 function CharacterEditor:draw_name()
-  local draw_colored = function(text, font, color)
+  local draw_colored = function(text, font_name, font_size, color)
     imgui.PushStyleColor(ffi.C.ImGuiCol_Text, color:to_u32())
-    imgui.PushFont(font)
+    imgui.PushFont(font_name, font_size)
     imgui.Text(text)
     imgui.PopFont()
     imgui.PopStyleColor()
   end
 
-  draw_colored(self.character.display_name, 'merriweather-bold-32', self.character.color)
-  draw_colored('This is what my dialogue looks like', 'merriweather', self.character.body_color)
+  draw_colored(self.character.display_name, 'merriweather', 32, self.character.color)
+  draw_colored('This is what my dialogue looks like', 'merriweather', 24, self.character.body_color)
 end
 
 function CharacterEditor:draw_buttons()

@@ -108,7 +108,7 @@ end
 function EngineStats:engine_viewer()
 	tdengine.editor.begin_window('Engine')
 
-	imgui.PushFont('editor-bold-16')
+	tdengine.editor.push_font(EditorFonts.Bold)
 	imgui.Text('User')
 	imgui.PopFont()
 
@@ -125,7 +125,7 @@ function EngineStats:engine_viewer()
 
 	tdengine.lifecycle.run_callback(tdengine.lifecycle.callbacks.on_engine_viewer)
 
-	imgui.PushFont('editor-bold-16')
+	tdengine.editor.push_font(EditorFonts.Bold)
 	imgui.Text('Engine')
 	imgui.PopFont()
 

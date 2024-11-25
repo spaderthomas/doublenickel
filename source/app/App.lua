@@ -58,6 +58,7 @@ function App:on_init_game()
 	tdengine.ffi.dn_engine_set_target_fps(144)
 
 	tdengine.gpu.build(tdengine.module.read_from_named_path('gpu_info'))
+	tdengine.fonts.build(tdengine.module.read_from_named_path('font_info'))
 
 	self.sdf_renderer = ffi.new('SdfRenderer [1]');
   self.sdf_renderer = tdengine.ffi.sdf_renderer_create(1024 * 1024)
