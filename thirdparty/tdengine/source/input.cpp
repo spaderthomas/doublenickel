@@ -235,26 +235,26 @@ bool was_chord_pressed(int mod, int key) {
 	return is_mod_down(mod) && was_key_pressed(key);
 }
 
-Vector2 get_mouse(CoordinateUnit unit) {
+Vector2 get_mouse(dn_coord_t unit) {
 	auto& input = get_input_manager();
 	switch (unit) {
-		case COORD_UNIT_SCREEN: return input.mouse; break;
-		case COORD_UNIT_WINDOW: return coord_screen_to_window(input.mouse.x, input.mouse.y); break;
-		case COORD_UNIT_GAME:   return coord_screen_to_game(input.mouse.x, input.mouse.y); break;
-		case COORD_UNIT_WORLD:  return coord_screen_to_world(input.mouse.x, input.mouse.y); break;
+		case DN_COORD_UNIT_SCREEN: return input.mouse; break;
+		case DN_COORD_UNIT_WINDOW: return dn_coord_screen_to_window(input.mouse.x, input.mouse.y); break;
+		case DN_COORD_UNIT_GAME:   return dn_coord_screen_to_game(input.mouse.x, input.mouse.y); break;
+		case DN_COORD_UNIT_WORLD:  return dn_coord_screen_to_world(input.mouse.x, input.mouse.y); break;
 	}
 
 	TD_ASSERT(false);
 	return {0};
 }
 
-Vector2 get_mouse_delta(CoordinateUnit unit) {
+Vector2 get_mouse_delta(dn_coord_t unit) {
 	auto& input = get_input_manager();
 	switch (unit) {
-		case COORD_UNIT_SCREEN: return input.mouse_delta; break;
-		case COORD_UNIT_WINDOW: return coord_screen_to_window_mag(input.mouse_delta.x, input.mouse_delta.y); break;
-		case COORD_UNIT_GAME:   return coord_screen_to_game_mag(input.mouse_delta.x, input.mouse_delta.y); break;
-		case COORD_UNIT_WORLD:  return coord_screen_to_world_mag(input.mouse_delta.x, input.mouse_delta.y); break;
+		case DN_COORD_UNIT_SCREEN: return input.mouse_delta; break;
+		case DN_COORD_UNIT_WINDOW: return dn_coord_screen_to_window_mag(input.mouse_delta.x, input.mouse_delta.y); break;
+		case DN_COORD_UNIT_GAME:   return dn_coord_screen_to_game_mag(input.mouse_delta.x, input.mouse_delta.y); break;
+		case DN_COORD_UNIT_WORLD:  return dn_coord_screen_to_world_mag(input.mouse_delta.x, input.mouse_delta.y); break;
 	}
 
 	TD_ASSERT(false);

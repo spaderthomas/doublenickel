@@ -73,10 +73,10 @@ function tdengine.ffi.init()
 	CoordinateSystem = tdengine.enum.define(
 		'CoordinateSystem',
 		{
-			World = tdengine.ffi.COORD_UNIT_WORLD,
-			Screen = tdengine.ffi.COORD_UNIT_SCREEN,
-			Window = tdengine.ffi.COORD_UNIT_WINDOW,
-			Game = tdengine.ffi.COORD_UNIT_GAME,
+			World = tdengine.ffi.DN_COORD_UNIT_WORLD,
+			Screen = tdengine.ffi.DN_COORD_UNIT_SCREEN,
+			Window = tdengine.ffi.DN_COORD_UNIT_WINDOW,
+			Game = tdengine.ffi.DN_COORD_UNIT_GAME,
 		}
 	)
 

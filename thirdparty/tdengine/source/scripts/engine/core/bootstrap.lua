@@ -279,11 +279,60 @@ float                      dn_low_pass_filter_apply(dn_low_pass_filter_t* filter
 /////////////////////////////////////////////
 
 typedef enum {
-	COORD_UNIT_SCREEN = 0,
-	COORD_UNIT_WINDOW = 1,
-	COORD_UNIT_GAME = 2,
-	COORD_UNIT_WORLD = 3,
-} CoordinateUnit;
+	// Exactly where you are on the monitor. In other words, a fraction of the output resolution
+	// in screen units of [0, 1]
+	DN_COORD_UNIT_SCREEN = 0,
+
+	// Where you are on the window of the screen displaying the game; the game is rendered
+	// to a framebuffer, which could be displayed as some fraction of the screen in any position.
+	// Window dn_coord_data take into account the position and size of that framebuffer. In the
+	// case where the game is running full screen, this is equivalent to Screen
+	//
+	// In other words, a fraction of the framebuffer resolution in screen units of [0, 1]
+	DN_COORD_UNIT_WINDOW = 1,
+
+	// Same as Window, except it's in the range of [0, native_resolution]
+	DN_COORD_UNIT_GAME = 2,
+
+	// Same as Game, except takes the camera into account
+	DN_COORD_UNIT_WORLD = 3,
+} dn_coord_t;
+
+typedef struct {
+	Vector2 camera;
+	Vector2 framebuffer_position;
+	Vector2 framebuffer_size;
+} dn_coord_data_t;
+dn_coord_data_t dn_coord_data;
+
+DN_API dn_coord_data_t dn_coord_get();
+DN_API void            dn_coord_set_camera(float x, float y);
+DN_API void            dn_coord_set_framebuffer_position(float x, float y);
+DN_API void            dn_coord_set_framebuffer_size(float x, float y);
+DN_API Vector2         dn_coord_screen_to_window(float x, float y);
+DN_API Vector2         dn_coord_screen_to_game(float x, float y);
+DN_API Vector2         dn_coord_screen_to_world(float x, float y);
+DN_API Vector2         dn_coord_window_to_screen(float x, float y);
+DN_API Vector2         dn_coord_window_to_game(float x, float y);
+DN_API Vector2         dn_coord_window_to_world(float x, float y);
+DN_API Vector2         dn_coord_game_to_screen(float x, float y);
+DN_API Vector2         dn_coord_game_to_window(float x, float y);
+DN_API Vector2         dn_coord_game_to_world(float x, float y);
+DN_API Vector2         dn_coord_world_to_screen(float x, float y);
+DN_API Vector2         dn_coord_world_to_window(float x, float y);
+DN_API Vector2         dn_coord_world_to_game(float x, float y);
+DN_API Vector2         dn_coord_screen_to_window_mag(float x, float y);
+DN_API Vector2         dn_coord_screen_to_game_mag(float x, float y);
+DN_API Vector2         dn_coord_screen_to_world_mag(float x, float y);
+DN_API Vector2         dn_coord_window_to_screen_mag(float x, float y);
+DN_API Vector2         dn_coord_window_to_game_mag(float x, float y);
+DN_API Vector2         dn_coord_window_to_world_mag(float x, float y);
+DN_API Vector2         dn_coord_game_to_screen_mag(float x, float y);
+DN_API Vector2         dn_coord_game_to_window_mag(float x, float y);
+DN_API Vector2         dn_coord_game_to_world_mag(float x, float y);
+DN_API Vector2         dn_coord_world_to_screen_mag(float x, float y);
+DN_API Vector2         dn_coord_world_to_window_mag(float x, float y);
+DN_API Vector2         dn_coord_world_to_game_mag(float x, float y);
 
 typedef enum {
 	INPUT_DEVICE_MOUSE_AND_KEYBOARD = 0,
@@ -300,8 +349,8 @@ u32 shift_key(u32 key);
 Vector2 get_scroll();
 InputDevice get_input_device();
 
-Vector2 get_mouse(CoordinateUnit unit);
-Vector2 get_mouse_delta(CoordinateUnit unit);
+Vector2 get_mouse(dn_coord_t unit);
+Vector2 get_mouse_delta(dn_coord_t unit);
 void set_game_focus(bool focus);
 
 void show_text_input(const char* description, const char* existing_text);
@@ -367,9 +416,9 @@ typedef struct {
 	Vector2 camera;
 	Vector2 framebuffer_position;
 	Vector2 framebuffer_size;
-} Coordinates;
+} dn_coord_data_t;
 
-Coordinates  coord_get();
+dn_coord_data_t  coord_get();
 void         coord_set_camera(float x, float y);
 void         coord_set_framebuffer_position(float x, float y);
 void         coord_set_framebuffer_size(float x, float y);

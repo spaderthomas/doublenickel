@@ -163,7 +163,7 @@ function EngineStats:engine_viewer()
 		imgui.Checkbox('Display Cursor', self, 'display_cursor')
 
 		if self.display_cursor then
-			local world = tdengine.vec2(tdengine.ffi.get_mouse(ffi.C.COORD_UNIT_WORLD))
+			local world = tdengine.vec2(tdengine.ffi.get_mouse(ffi.C.DN_COORD_UNIT_WORLD))
 			tdengine.draw_circle_l(world, 5, tdengine.colors.red)
 		end
 
@@ -180,10 +180,10 @@ function EngineStats:engine_viewer()
 
 
 		if imgui.TreeNode('Mouse') then
-			imgui.extensions.Vec2('Screen', tdengine.ffi.get_mouse(ffi.C.COORD_UNIT_SCREEN), '%.3f')
-			imgui.extensions.Vec2('Window', tdengine.ffi.get_mouse(ffi.C.COORD_UNIT_WINDOW), '%.3f')
-			imgui.extensions.Vec2('Game  ', tdengine.ffi.get_mouse(ffi.C.COORD_UNIT_GAME), '%d')
-			imgui.extensions.Vec2('World ', tdengine.ffi.get_mouse(ffi.C.COORD_UNIT_WORLD), '%d')
+			imgui.extensions.Vec2('Screen', tdengine.ffi.get_mouse(ffi.C.DN_COORD_UNIT_SCREEN), '%.3f')
+			imgui.extensions.Vec2('Window', tdengine.ffi.get_mouse(ffi.C.DN_COORD_UNIT_WINDOW), '%.3f')
+			imgui.extensions.Vec2('Game  ', tdengine.ffi.get_mouse(ffi.C.DN_COORD_UNIT_GAME), '%d')
+			imgui.extensions.Vec2('World ', tdengine.ffi.get_mouse(ffi.C.DN_COORD_UNIT_WORLD), '%d')
 
 			imgui.TreePop()
 		end
