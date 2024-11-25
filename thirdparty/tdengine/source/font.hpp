@@ -23,8 +23,8 @@ struct FontInfo {
 };
 
 
-FM_LUA_EXPORT void create_font(const char* id, const char* file_path, u32 size);
-FM_LUA_EXPORT void add_imgui_font(const char* id);
+DN_API void create_font(const char* id, const char* file_path, u32 size);
+DN_API void add_imgui_font(const char* id);
 
 FontInfo* font_find(size_t hash);
 FontInfo* font_find(const char* name);

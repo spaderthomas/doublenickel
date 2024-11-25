@@ -1,20 +1,5 @@
 #ifndef DN_AUDIO_H
 #define DN_AUDIO_H
-typedef dn_gen_arena_handle_t dn_audio_info_handle_t;
-
-struct dn_audio_info_t {
-	static constexpr int name_len = 64;
-	char name [name_len];
-	hash_t hash;
-	u32 num_channels;
-	u32 sample_rate;
-	drwav_uint64 num_frames;
-	u32 num_samples;
-	float* samples;
-	u32 generation = 0;
-
-	double file_mod_time;
-};
 
 typedef enum {
 	DN_AUDIO_FILTER_MODE_FIRST_ORDER = 0,
@@ -25,39 +10,39 @@ typedef struct {
 	dn_audio_filter_mode_t mode;
 	bool enabled;
 	float cutoff_frequency;
-
-	// First order
 	float cutoff_alpha;
-
-	// Second order Butterworth filter
 	float a0, a1, a2, b1, b2;
 	float input_history [2];
 	float output_history [2];
 } dn_low_pass_filter_t;
 
+typedef struct {
+	float threshold;
+	float ratio;
+	float attack_time;
+	float release_time;
+} dn_compressor_t;
 
-std::recursive_mutex audio_mutex;
-Array<float> sample_buffer;
-FileMonitor* audio_monitor;
-
-float threshold = 0.5f;
-float ratio = 2.0f;
-float attack_time = 0.95f;
-float release_time = 1.f;
-float sample_frequency = 44100;
-float master_volume = 1.0f;
-float master_volume_mod = 1.0f;
-dn_low_pass_filter_t low_pass;
-
+typedef dn_gen_arena_handle_t dn_audio_info_handle_t;
+typedef struct {
+	dn_asset_name_t name;
+	dn_hash_t hash;
+	u32 num_channels;
+	u32 sample_rate;
+	drwav_uint64 num_frames;
+	u32 num_samples;
+	float* samples;
+	u32 generation;
+	double file_mod_time;
+} dn_audio_info_t;
 
 typedef dn_gen_arena_handle_t dn_audio_instance_handle_t;
-
 typedef struct {
 	dn_audio_info_handle_t info;
 	dn_audio_instance_handle_t next;
 	u32 next_sample;
 	bool loop;
-	float32 volume;
+	float volume;
 	dn_low_pass_filter_t filter;
 	bool paused;
 	i32 sample_buffer_offset;
@@ -67,34 +52,46 @@ typedef struct {
 	u32 generation;
 } dn_audio_instance_t;
 
-FM_LUA_EXPORT void                       dn_audio_set_compressor_threshold(float t);
-FM_LUA_EXPORT void                       dn_audio_set_compressor_ratio(float v);
-FM_LUA_EXPORT void                       dn_audio_set_compressor_attack(float v);
-FM_LUA_EXPORT void                       dn_audio_set_compressor_release(float v);
-FM_LUA_EXPORT void                       dn_audio_set_sample_rate(float v);
-FM_LUA_EXPORT float                      dn_audio_get_master_volume();
-FM_LUA_EXPORT void                       dn_audio_set_master_volume(float v);
-FM_LUA_EXPORT float                      dn_audio_get_master_volume_mod();
-FM_LUA_EXPORT void                       dn_audio_set_master_volume_mod(float v);
-FM_LUA_EXPORT float                      dn_audio_get_master_filter_cutoff();
-FM_LUA_EXPORT void                       dn_audio_set_master_filter_cutoff(float v);
-FM_LUA_EXPORT void                       dn_audio_set_master_filter_cutoff_enabled(bool enabled);
-FM_LUA_EXPORT void                       dn_audio_set_master_filter_mode(dn_audio_filter_mode_t mode);
-FM_LUA_EXPORT void                       dn_audio_set_volume(dn_audio_instance_handle_t handle, float volume);
-FM_LUA_EXPORT void                       dn_audio_set_filter_cutoff(dn_audio_instance_handle_t handle, float cutoff);
-FM_LUA_EXPORT void                       dn_audio_set_filter_enabled(dn_audio_instance_handle_t handle, bool enabled);
-FM_LUA_EXPORT dn_audio_instance_handle_t dn_audio_play_sound(const char* name);
-FM_LUA_EXPORT dn_audio_instance_handle_t dn_audio_play_looped(const char* name);
-FM_LUA_EXPORT void                       dn_audio_queue(dn_audio_instance_handle_t current, dn_audio_instance_handle_t next);
-FM_LUA_EXPORT void                       dn_audio_stop(dn_audio_instance_handle_t handle);
-FM_LUA_EXPORT void                       dn_audio_stop_all();
-FM_LUA_EXPORT void                       dn_audio_pause(dn_audio_instance_handle_t handle);
-FM_LUA_EXPORT void                       dn_audio_resume(dn_audio_instance_handle_t handle);
-FM_LUA_EXPORT bool                       dn_audio_is_playing(dn_audio_instance_handle_t handle);
-FM_LUA_EXPORT bool                       dn_audio_is_any_playing();
-FM_LUA_EXPORT void                       dn_audio_load(const char* file_path, const char* file_name);
-FM_LUA_EXPORT void                       dn_low_pass_filter_set_cutoff(dn_low_pass_filter_t* filter, float cutoff);
-FM_LUA_EXPORT float                      dn_low_pass_filter_apply(dn_low_pass_filter_t* filter, float input);
+typedef struct {
+	dn_compressor_t compressor;
+	dn_low_pass_filter_t filter;
+	float sample_frequency;
+	float master_volume;
+	float master_volume_mod;
+	FileMonitor* file_monitor;
+	Array<float> sample_buffer;
+} dn_audio_t;
+dn_audio_t dn_audio;
+std::recursive_mutex dn_audio_mutex;
+
+DN_API void                       dn_audio_set_compressor_threshold(float t);
+DN_API void                       dn_audio_set_compressor_ratio(float v);
+DN_API void                       dn_audio_set_compressor_attack(float v);
+DN_API void                       dn_audio_set_compressor_release(float v);
+DN_API void                       dn_audio_set_sample_rate(float v);
+DN_API float                      dn_audio_get_master_volume();
+DN_API void                       dn_audio_set_master_volume(float v);
+DN_API float                      dn_audio_get_master_volume_mod();
+DN_API void                       dn_audio_set_master_volume_mod(float v);
+DN_API float                      dn_audio_get_master_filter_cutoff();
+DN_API void                       dn_audio_set_master_filter_cutoff(float v);
+DN_API void                       dn_audio_set_master_filter_cutoff_enabled(bool enabled);
+DN_API void                       dn_audio_set_master_filter_mode(dn_audio_filter_mode_t mode);
+DN_API void                       dn_audio_set_volume(dn_audio_instance_handle_t handle, float volume);
+DN_API void                       dn_audio_set_filter_cutoff(dn_audio_instance_handle_t handle, float cutoff);
+DN_API void                       dn_audio_set_filter_enabled(dn_audio_instance_handle_t handle, bool enabled);
+DN_API dn_audio_instance_handle_t dn_audio_play_sound(const char* name);
+DN_API dn_audio_instance_handle_t dn_audio_play_looped(const char* name);
+DN_API void                       dn_audio_queue(dn_audio_instance_handle_t current, dn_audio_instance_handle_t next);
+DN_API void                       dn_audio_stop(dn_audio_instance_handle_t handle);
+DN_API void                       dn_audio_stop_all();
+DN_API void                       dn_audio_pause(dn_audio_instance_handle_t handle);
+DN_API void                       dn_audio_resume(dn_audio_instance_handle_t handle);
+DN_API bool                       dn_audio_is_playing(dn_audio_instance_handle_t handle);
+DN_API bool                       dn_audio_is_any_playing();
+DN_API void                       dn_audio_load(const char* file_path, const char* file_name);
+DN_API void                       dn_low_pass_filter_set_cutoff(dn_low_pass_filter_t* filter, float cutoff);
+DN_API float                      dn_low_pass_filter_apply(dn_low_pass_filter_t* filter, float input);
 
 // @dn: You should be able to specify a directory when you initialize the audio
 void dn_audio_init();
@@ -115,15 +112,39 @@ void dn_audio_stop_ex(dn_audio_instance_t* active_sound);
 using sound_iterator = std::function<void(const char*)>;
 
 void dn_audio_init() {
+	dn_audio = {
+		.compressor = {
+			.threshold = 0.5f,
+			.ratio = 2.0f,
+			.attack_time = 0.95f,
+			.release_time = 1.0f,
+		},
+		.filter = {
+			.mode = DN_AUDIO_FILTER_MODE_BUTTERWORTH,
+			.enabled = false,
+			.cutoff_frequency = 10000,
+			.cutoff_alpha = 0,
+			.a0 = 0.f, .a1 = 0.f, .a2 = 0.f, .b1 = 0.f, .b2 = 0.f,
+			.input_history = { 0 },
+			.output_history = { 0 },
+		},
+		.sample_frequency = 44100,
+		.master_volume = 1.0f,
+		.master_volume_mod = 1.0f,
+		.file_monitor = arr_push(&file_monitors),
+		.sample_buffer = {0}
+	};
+
+	dn_low_pass_filter_set_cutoff(&dn_audio.filter, 10000);
+
 	auto on_file_event = [](FileMonitor* monitor, FileChange* event, void* userdata) {
-		std::unique_lock lock(audio_mutex);
+		std::unique_lock lock(dn_audio_mutex);
 		
 		dn_audio_load(event->file_path, event->file_name);
 	};
 
 	auto events = FileChangeEvent::Added | FileChangeEvent::Modified;
-	audio_monitor = arr_push(&file_monitors);
-	audio_monitor->init(on_file_event, events, nullptr);
+	dn_audio.file_monitor->init(on_file_event, events, nullptr);
 	
 	// Load all sounds from WAV files
 	sound_iterator check_directory = [&](const char* directory) {
@@ -132,7 +153,7 @@ void dn_audio_init() {
 				auto subdirectory = it->path().string();
 				normalize_path(subdirectory);
 
-				audio_monitor->add_directory(subdirectory.c_str());
+				dn_audio.file_monitor->add_directory(subdirectory.c_str());
 				
 				check_directory(subdirectory.c_str());
 			}
@@ -149,19 +170,18 @@ void dn_audio_init() {
 	auto audio_dir = dn_paths_resolve("audio");
 	check_directory(audio_dir);
 
-	// Initialize Sokol
+	// Initialize the audio backend
 	saudio_desc descriptor = { 0 };
 	descriptor.num_channels = 2;
 	descriptor.buffer_frames = 2048;
 	descriptor.logger.func = slog_func;
 	descriptor.stream_cb = dn_audio_update;
-	
 	saudio_setup(&descriptor);
 
-	// Set up a sample buffer based on how much data Sokol expects
 	auto max_samples_requested = saudio_expect() * saudio_channels() * 2;
-	arr_init(&sample_buffer, max_samples_requested);
-	sample_buffer.size = sample_buffer.capacity;
+	arr_init(&dn_audio.sample_buffer, max_samples_requested);
+	dn_audio.sample_buffer.size = dn_audio.sample_buffer.capacity;
+
 
 	// We use this array like a free list, so it is always full and we determine which elements are current
 	// based on a flag in the element itself.
@@ -170,8 +190,7 @@ void dn_audio_init() {
 		active_sound->occupied = false;
 	}
 
-	low_pass.enabled = true;
-	dn_audio_set_master_filter_cutoff(low_pass.cutoff_frequency);
+
 }
 
 void dn_audio_add_samples(dn_audio_instance_t* active_sound, int samples_requested, int offset) {
@@ -200,7 +219,7 @@ void dn_audio_add_samples(dn_audio_instance_t* active_sound, int samples_request
 		sample = sample * active_sound->volume;
 		sample = dn_low_pass_filter_apply(&active_sound->filter, sample);
 
-		*sample_buffer[i + offset] += sample;
+		*dn_audio.sample_buffer[i + offset] += sample;
 	}
 	
 }
@@ -211,9 +230,9 @@ void dn_audio_update(float* buffer, int frames_requested, int num_channels) {
 
 	// Cap the number of samples so we don't overwrite the buffer
 	int32 samples_requested = frames_requested * num_channels;
-	if (samples_requested > sample_buffer.capacity) {
+	if (samples_requested > dn_audio.sample_buffer.capacity) {
 		tdns_log.write("requested too many audio samples: %d", samples_requested);
-		samples_requested = sample_buffer.capacity;
+		samples_requested = dn_audio.sample_buffer.capacity;
 	}
 
 	// You must write zeros, or else whatever the last requested samples were will linger
@@ -222,7 +241,7 @@ void dn_audio_update(float* buffer, int frames_requested, int num_channels) {
 		return;
 	}
 
-	std::unique_lock lock(audio_mutex);
+	std::unique_lock lock(dn_audio_mutex);
 
 	arr_for(active_sounds, active_sound) {
 		if (!active_sound->occupied) continue;
@@ -265,32 +284,32 @@ void dn_audio_update(float* buffer, int frames_requested, int num_channels) {
 	float envelope = 0.0f;
 	float gain = 1.0f;
 	for (int i = 0; i < samples_requested; i++) {
-		auto sample = *sample_buffer[i];
-		sample *= master_volume * master_volume_mod;
+		auto sample = *dn_audio.sample_buffer[i];
+		sample *= dn_audio.master_volume * dn_audio.master_volume_mod;
 
 		auto abs_sample = std::abs(sample);
-		envelope = fm_lerp(envelope, abs_sample, attack_time);
+		envelope = fm_lerp(envelope, abs_sample, dn_audio.compressor.attack_time);
 
-		if (envelope > threshold) {
-			auto decibel = 10 * std::log10(envelope / threshold);
-			auto target_decibel = decibel / ratio;
+		if (envelope > dn_audio.compressor.threshold) {
+			auto decibel = 10 * std::log10(envelope / dn_audio.compressor.threshold);
+			auto target_decibel = decibel / dn_audio.compressor.ratio;
 			auto target_bel = target_decibel / 10;
-			auto target_envelope = std::pow(10, target_bel) * threshold;
+			auto target_envelope = std::pow(10, target_bel) * dn_audio.compressor.threshold;
 			gain = target_envelope / envelope;
 		}
 		else {
-			gain = fm_lerp(gain, 1.0f, release_time);
+			gain = fm_lerp(gain, 1.0f, dn_audio.compressor.release_time);
 		}
 
 		sample *= gain;
-		sample = dn_low_pass_filter_apply(&low_pass, sample);
+		sample = dn_low_pass_filter_apply(&dn_audio.filter, sample);
 		sample = clamp(sample, -1.f, 1.f);
 		
-		*sample_buffer[i] = sample;
+		*dn_audio.sample_buffer[i] = sample;
 	}
 
-	memcpy(buffer, sample_buffer.data, samples_requested * sizeof(float));
-	arr_fill(&sample_buffer, 0.f);
+	memcpy(buffer, dn_audio.sample_buffer.data, samples_requested * sizeof(float));
+	arr_fill(&dn_audio.sample_buffer, 0.f);
 }
 
 void dn_audio_shutdown() {
@@ -298,7 +317,7 @@ void dn_audio_shutdown() {
 }
 
 bool dn_audio_is_any_playing() {
-	std::unique_lock lock(audio_mutex);
+	std::unique_lock lock(dn_audio_mutex);
 	
 	arr_for(active_sounds, active_sound) {
 		if (active_sound->occupied) return true;
@@ -308,7 +327,7 @@ bool dn_audio_is_any_playing() {
 }
 
 dn_audio_info_t* dn_audio_find_no_default(const char* name) {
-	std::unique_lock lock(audio_mutex);
+	std::unique_lock lock(dn_audio_mutex);
 
 	auto hash = hash_label(name);
 	arr_for(sound_infos, info) {
@@ -325,7 +344,7 @@ dn_audio_info_t* dn_audio_find(const char* name) {
 }
 
 dn_audio_instance_handle_t dn_audio_reserve() {
-	std::unique_lock lock(audio_mutex);
+	std::unique_lock lock(dn_audio_mutex);
 	
 	for (u32 index = 0; index < active_sounds.size; index++) {
 		auto active_sound = active_sounds[index];
@@ -342,7 +361,7 @@ dn_audio_instance_handle_t dn_audio_reserve() {
 }
 
 dn_audio_instance_t* dn_audio_resolve(dn_audio_instance_handle_t handle) {
-	std::unique_lock lock(audio_mutex);
+	std::unique_lock lock(dn_audio_mutex);
 
 	if (!dn_gen_arena_handle_valid(handle)) return nullptr;
 	
@@ -353,7 +372,7 @@ dn_audio_instance_t* dn_audio_resolve(dn_audio_instance_handle_t handle) {
 }
 
 dn_audio_instance_handle_t dn_audio_play_sound_ex(dn_audio_info_t* sound, bool loop) { 
-	std::unique_lock lock(audio_mutex);
+	std::unique_lock lock(dn_audio_mutex);
 	
 	auto handle = dn_audio_reserve();
 	if (!dn_gen_arena_handle_valid(handle)) return handle;
@@ -380,7 +399,7 @@ dn_audio_instance_handle_t dn_audio_play_sound_ex(dn_audio_info_t* sound, bool l
 }
 
 void dn_audio_stop_ex(dn_audio_instance_t* active_sound) {
-	std::unique_lock lock(audio_mutex);	
+	std::unique_lock lock(dn_audio_mutex);	
 
 	if (!active_sound) return;
 	
@@ -400,7 +419,7 @@ dn_audio_info_t* alloc_sound(const char* file_name) {
 
 void dn_audio_load(const char* file_path, const char* file_name) {
 	auto sound = alloc_sound(file_name);
-	strncpy(sound->name, file_name, dn_audio_info_t::name_len);
+	strncpy(sound->name, file_name, DN_ASSET_NAME_LEN);
 	sound->hash = hash_label(sound->name);
 	
 	sound->samples = drwav_open_file_and_read_pcm_frames_f32(file_path, &sound->num_channels, &sound->sample_rate, &sound->num_frames, NULL);
@@ -417,11 +436,11 @@ void dn_audio_load(const char* file_path, const char* file_name) {
 void dn_low_pass_filter_set_cutoff(dn_low_pass_filter_t* filter, float cutoff) {
 	// The low pass filters are unstable at frequencies higher than the Nyquist frequency, so clamp. Add a little wiggle room
 	// to make sure we're not close to it, because it sounds a little bad that high anyway.
-	float nyquist = sample_frequency / 2.1;
+	float nyquist = dn_audio.sample_frequency / 2.1;
 	filter->cutoff_frequency = std::min(cutoff, nyquist);
 
 	// Butterworth filter
-	float omega = 2.0f * 3.14159 * filter->cutoff_frequency / sample_frequency;
+	float omega = 2.0f * 3.14159 * filter->cutoff_frequency / dn_audio.sample_frequency;
 	float cos_omega = cos(omega);
 	float sin_omega = sin(omega);
 	float alpha = sin_omega / sqrt(2.0f); // Butterworth filter (sqrt(2) damping factor)
@@ -440,7 +459,7 @@ void dn_low_pass_filter_set_cutoff(dn_low_pass_filter_t* filter, float cutoff) {
 	filter->b2 *= a0_inv;
 
 	// Simple first order low pass filter
-	filter->cutoff_alpha = 2.0f * 3.14159 * filter->cutoff_frequency / (sample_frequency + 2.0f * 3.14159 * filter->cutoff_frequency);
+	filter->cutoff_alpha = 2.0f * 3.14159 * filter->cutoff_frequency / (dn_audio.sample_frequency + 2.0f * 3.14159 * filter->cutoff_frequency);
 
 }
 
@@ -508,7 +527,7 @@ void dn_audio_set_volume(dn_audio_instance_handle_t handle, float volume) {
 	auto active_sound = dn_audio_resolve(handle);
 	if (!active_sound) return;
 
-	std::unique_lock lock(audio_mutex);
+	std::unique_lock lock(dn_audio_mutex);
 
 	active_sound->volume = clamp(volume, 0.f, 1.f);
 }
@@ -517,7 +536,7 @@ void dn_audio_set_filter_cutoff(dn_audio_instance_handle_t handle, float cutoff)
 	auto active_sound = dn_audio_resolve(handle);
 	if (!active_sound) return;
 
-	std::unique_lock lock(audio_mutex);
+	std::unique_lock lock(dn_audio_mutex);
 	dn_low_pass_filter_set_cutoff(&active_sound->filter, cutoff);
 }
 
@@ -525,71 +544,70 @@ void dn_audio_set_filter_enabled(dn_audio_instance_handle_t handle, bool enabled
 	auto active_sound = dn_audio_resolve(handle);
 	if (!active_sound) return;
 
-	std::unique_lock lock(audio_mutex);
+	std::unique_lock lock(dn_audio_mutex);
 	active_sound->filter.enabled = enabled;
 }
 
 void dn_audio_set_compressor_threshold(float threshold) {
-	std::unique_lock lock(audio_mutex);
-	threshold = threshold;
+	std::unique_lock lock(dn_audio_mutex);
+	dn_audio.compressor.threshold = threshold;
 }
 
 void dn_audio_set_compressor_ratio(float ratio) {
-	std::unique_lock lock(audio_mutex);
-	ratio = ratio;
+	std::unique_lock lock(dn_audio_mutex);
+	dn_audio.compressor.ratio = ratio;
 }
 
 void dn_audio_set_compressor_attack(float attack) {
-	std::unique_lock lock(audio_mutex);
-	attack_time = attack;
+	std::unique_lock lock(dn_audio_mutex);
+	dn_audio.compressor.attack_time = attack;
 }
 
 void dn_audio_set_compressor_release(float release) {
-	std::unique_lock lock(audio_mutex);
-	release_time = release;
+	std::unique_lock lock(dn_audio_mutex);
+	dn_audio.compressor.release_time = release;
 }
 
 void dn_audio_set_sample_rate(float rate) {
-	std::unique_lock lock(audio_mutex);
-	sample_frequency = rate;
+	std::unique_lock lock(dn_audio_mutex);
+	dn_audio.sample_frequency = rate;
 }
 
 void dn_audio_set_master_volume(float volume) {
-	std::unique_lock lock(audio_mutex);
-	master_volume = volume;
+	std::unique_lock lock(dn_audio_mutex);
+	dn_audio.master_volume = volume;
 }
 
 void dn_audio_set_master_volume_mod(float volume_mod) {
-	std::unique_lock lock(audio_mutex);
-	master_volume_mod = volume_mod;
+	std::unique_lock lock(dn_audio_mutex);
+	dn_audio.master_volume_mod = volume_mod;
 }
 
 void dn_audio_set_master_filter_cutoff(float frequency) {
-	std::unique_lock lock(audio_mutex);
-	dn_low_pass_filter_set_cutoff(&low_pass, frequency);
+	std::unique_lock lock(dn_audio_mutex);
+	dn_low_pass_filter_set_cutoff(&dn_audio.filter, frequency);
 }
 
 void dn_audio_set_master_filter_cutoff_enabled(bool enabled) {
-	std::unique_lock lock(audio_mutex);
-	low_pass.enabled = enabled;
+	std::unique_lock lock(dn_audio_mutex);
+	dn_audio.filter.enabled = enabled;
 }
 
 void dn_audio_set_master_filter_mode(dn_audio_filter_mode_t mode) {
-	std::unique_lock lock(audio_mutex);
-	low_pass.mode = mode;
+	std::unique_lock lock(dn_audio_mutex);
+	dn_audio.filter.mode = mode;
 }
 
-
 float dn_audio_get_master_filter_cutoff() {
-	return low_pass.cutoff_frequency;
+	return dn_audio.filter.cutoff_frequency;
 }
 
 float dn_audio_get_master_volume() {
-	return master_volume;
+	return dn_audio.master_volume;
 }
 
 float dn_audio_get_master_volume_mod() {
-	return master_volume_mod;
+	return dn_audio.master_volume_mod;
 }
 
 bool dn_audio_is_playing(dn_audio_instance_handle_t handle) {

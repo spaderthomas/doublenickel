@@ -26,7 +26,7 @@ struct FileMonitor {
 	};
 
 	struct CacheEntry {
-		hash_t hash;
+		dn_hash_t hash;
 		float64 last_event_time = 0;
 	};
 

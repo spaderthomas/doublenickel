@@ -21,13 +21,13 @@ void dn_time_metrics_init();
 void dn_time_metrics_update();
 
 
-FM_LUA_EXPORT void dn_time_metric_add(const char* name);
-FM_LUA_EXPORT void dn_time_metric_begin(const char* name);
-FM_LUA_EXPORT void dn_time_metric_end(const char* name);
-FM_LUA_EXPORT double dn_time_metric_average(const char* name);
-FM_LUA_EXPORT double dn_time_metric_last(const char* name);
-FM_LUA_EXPORT double dn_time_metric_largest(const char* name);
-FM_LUA_EXPORT double dn_time_metric_smallest(const char* name);
+DN_API void dn_time_metric_add(const char* name);
+DN_API void dn_time_metric_begin(const char* name);
+DN_API void dn_time_metric_end(const char* name);
+DN_API double dn_time_metric_average(const char* name);
+DN_API double dn_time_metric_last(const char* name);
+DN_API double dn_time_metric_largest(const char* name);
+DN_API double dn_time_metric_smallest(const char* name);
 #endif
 
 

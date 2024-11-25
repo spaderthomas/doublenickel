@@ -189,7 +189,7 @@ void FileMonitor::emit_changes() {
 }
 
 FileMonitor::CacheEntry* FileMonitor::find_cache_entry(char* file_path) {
-	hash_t file_hash = hash_label(file_path);
+	dn_hash_t file_hash = hash_label(file_path);
 	
 	CacheEntry* found = nullptr;
 	arr_for(this->cache, entry) {

@@ -29,4 +29,7 @@ typedef double float64;
 typedef float f32;
 typedef double f64;
 
-typedef size_t hash_t;
+typedef size_t dn_hash_t;
+
+#define DN_ASSET_NAME_LEN 64
+typedef char dn_asset_name_t [DN_ASSET_NAME_LEN];

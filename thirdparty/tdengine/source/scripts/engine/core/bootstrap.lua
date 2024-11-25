@@ -144,10 +144,11 @@ dn_os_date_time_t dn_os_get_date_time();
 
 typedef struct dn_allocator_t dn_allocator_t;
 
-void dn_allocator_add(const char* name, dn_allocator_t* allocator);
-dn_allocator_t* dn_allocator_find(const char* name);
-void* dn_allocator_alloc(dn_allocator_t* allocator, u32 size);
-void dn_allocator_free(dn_allocator_t* allocator, void* buffer);
+void             dn_allocator_add(const char* name, dn_allocator_t* allocator);
+dn_allocator_t*  dn_allocator_find(const char* name);
+void*            dn_allocator_alloc(dn_allocator_t* allocator, u32 size);
+void*            dn_allocator_realloc(dn_allocator_t* allocator, void* memory, u32 size);
+void             dn_allocator_free(dn_allocator_t* allocator, void* buffer);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -158,6 +159,7 @@ void dn_allocator_free(dn_allocator_t* allocator, void* buffer);
 // ╚██████╗╚██████╔╝██║ ╚████║   ██║   ██║  ██║██║██║ ╚████║███████╗██║  ██║███████║ //
 //  ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚══════╝ //
 ///////////////////////////////////////////////////////////////////////////////////////
+
 typedef struct {
     u32 size;
     u32 capacity;

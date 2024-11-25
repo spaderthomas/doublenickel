@@ -30,8 +30,8 @@ void init_steam();
 void update_steam();
 void shutdown_steam();
 
-FM_LUA_EXPORT void open_steam_page(const char* utm);
-FM_LUA_EXPORT void show_text_input(const char* description, const char* existing_text);
-FM_LUA_EXPORT bool is_text_input_dirty();
-FM_LUA_EXPORT const char* read_text_input();
-FM_LUA_EXPORT bool is_steam_deck();
+DN_API void open_steam_page(const char* utm);
+DN_API void show_text_input(const char* description, const char* existing_text);
+DN_API bool is_text_input_dirty();
+DN_API const char* read_text_input();
+DN_API bool is_steam_deck();

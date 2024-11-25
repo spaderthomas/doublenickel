@@ -30,8 +30,8 @@ char* copy_string(const_string str, dn_allocator_t* allocator = nullptr);
 char* copy_string(const std::string& str, dn_allocator_t* allocator = nullptr);
 char* copy_string_u8(const u8* str, u32 length, dn_allocator_t* allocator = nullptr);
 
-FM_LUA_EXPORT void copy_string(const_string str, string buffer, u32 buffer_length);
-FM_LUA_EXPORT void copy_string_n(const_string str, u32 length, string buffer, u32 buffer_length);
+DN_API void copy_string(const_string str, string buffer, u32 buffer_length);
+DN_API void copy_string_n(const_string str, u32 length, string buffer, u32 buffer_length);
 void copy_string_std(const std::string& str, string buffer);
 
 bool is_memory_equal(void* a, void* b, size_t len) {

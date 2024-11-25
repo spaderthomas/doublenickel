@@ -1,5 +1,5 @@
 struct Texture {
-	hash_t hash;
+	dn_hash_t hash;
 	u32 handle;
 	i32 width;
 	i32 height;
@@ -10,13 +10,13 @@ struct Texture {
 	void unload_from_gpu();
 };
 Texture* find_texture(const char* name);
-Texture* find_texture(hash_t hash);
-FM_LUA_EXPORT u32 find_texture_handle(const char* name);
+Texture* find_texture(dn_hash_t hash);
+DN_API u32 find_texture_handle(const char* name);
 
 struct Sprite {
 	char file_path [TD_MAX_PATH_LEN];
-	hash_t hash;
-	hash_t texture;
+	dn_hash_t hash;
+	dn_hash_t texture;
 	Vector2* uv;
 	Vector2I size;
 };
@@ -48,8 +48,8 @@ struct TextureAtlas {
 	char name [64];
 	double cfg_mod_time;
 	double mod_time;
-	hash_t cfg_files_hash;
-	hash_t files_hash;
+	dn_hash_t cfg_files_hash;
+	dn_hash_t files_hash;
 	bool high_priority;
 	Array<string> directories;
 	Texture* texture = nullptr;
@@ -101,5 +101,5 @@ void create_sprite_ex(Sprite* sprite, const char* id, unsigned char* data, i32 w
 std::mutex image_mutex;
 std::mutex image_config_mutex;
 
-FM_LUA_EXPORT void take_screenshot();
-FM_LUA_EXPORT void write_screenshot_to_png(const char* file_name);
+DN_API void take_screenshot();
+DN_API void write_screenshot_to_png(const char* file_name);

@@ -14,12 +14,12 @@ Engine engine;
 void dn_engine_init();
 void dn_engine_update();
 
-FM_LUA_EXPORT void dn_engine_set_exit_game();
-FM_LUA_EXPORT const char* dn_engine_get_game_hash();
-FM_LUA_EXPORT void dn_engine_set_target_fps(double fps);
-FM_LUA_EXPORT double dn_engine_get_target_fps();
-FM_LUA_EXPORT bool dn_engine_exceeded_frame_time();
-FM_LUA_EXPORT bool dn_engine_should_exit();
+DN_API void dn_engine_set_exit_game();
+DN_API const char* dn_engine_get_game_hash();
+DN_API void dn_engine_set_target_fps(double fps);
+DN_API double dn_engine_get_target_fps();
+DN_API bool dn_engine_exceeded_frame_time();
+DN_API bool dn_engine_should_exit();
 #endif
 
 

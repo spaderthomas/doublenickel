@@ -46,9 +46,9 @@ struct dn_prepared_text {
 	ArrayView<char> get_line(i32 index);
 };
 
-FM_LUA_EXPORT dn_prepared_text* dn_prepare_text(const char* text, float px, float py, const char* font);
-FM_LUA_EXPORT dn_prepared_text* dn_prepare_text_wrap(const char* text, float px, float py, const char* font, float wrap);
-FM_LUA_EXPORT dn_prepared_text* dn_prepare_text_ex(const char* text, float px, float py, const char* font, float wrap, Vector4 color, bool precise);
+DN_API dn_prepared_text* dn_prepare_text(const char* text, float px, float py, const char* font);
+DN_API dn_prepared_text* dn_prepare_text_wrap(const char* text, float px, float py, const char* font, float wrap);
+DN_API dn_prepared_text* dn_prepare_text_ex(const char* text, float px, float py, const char* font, float wrap, Vector4 color, bool precise);
 
 struct LineBreakContext {
 	// Input

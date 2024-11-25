@@ -48,7 +48,7 @@ void update_game();
 i32 handle_error(lua_State* l);
 
 
-FM_LUA_EXPORT void add_script_directory(const char* directory);
+DN_API void add_script_directory(const char* directory);
 
 #define DEFER_POP(l) defer { lua_pop(l, 1); };
 

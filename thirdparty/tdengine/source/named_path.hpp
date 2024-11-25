@@ -8,14 +8,14 @@ struct dn_named_path_result_t {
 	u32 size;
 };
 
-FM_LUA_EXPORT dn_named_path_result_t dn_paths_find_all();
-FM_LUA_EXPORT void dn_paths_add_install_subpath(const char* name, const char* relative_path);
-FM_LUA_EXPORT void dn_paths_add_write_subpath(const char* name, const char* relative_path);
-FM_LUA_EXPORT void dn_paths_add_engine_subpath(const char* name, const char* relative_path);
-FM_LUA_EXPORT void dn_paths_add_subpath(const char* name, const char* parent_name, const char* relative_path);
-FM_LUA_EXPORT tstring dn_paths_resolve(const char* name);
-FM_LUA_EXPORT tstring dn_paths_resolve_format(const char* name, const char* file_name);
-FM_LUA_EXPORT tstring dn_paths_strip(const char* name, const char* absolute_path);
+DN_API dn_named_path_result_t dn_paths_find_all();
+DN_API void dn_paths_add_install_subpath(const char* name, const char* relative_path);
+DN_API void dn_paths_add_write_subpath(const char* name, const char* relative_path);
+DN_API void dn_paths_add_engine_subpath(const char* name, const char* relative_path);
+DN_API void dn_paths_add_subpath(const char* name, const char* parent_name, const char* relative_path);
+DN_API tstring dn_paths_resolve(const char* name);
+DN_API tstring dn_paths_resolve_format(const char* name, const char* file_name);
+DN_API tstring dn_paths_strip(const char* name, const char* absolute_path);
 
 void dn_paths_add_ex(const char* name, const char* absolute_path);
 string dn_paths_resolve_ex(const char* name, dn_allocator_t* allocator);

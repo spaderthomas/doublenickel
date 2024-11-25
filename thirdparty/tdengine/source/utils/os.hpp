@@ -10,12 +10,12 @@ struct dn_os_date_time_t {
 	int millisecond;
 };
 
-FM_LUA_EXPORT bool dn_os_does_path_exist(const char* path);
-FM_LUA_EXPORT bool dn_os_is_regular_file(const char* path);
-FM_LUA_EXPORT bool dn_os_is_directory(const char* path);
-FM_LUA_EXPORT void dn_os_remove_directory(const char* path);
-FM_LUA_EXPORT void dn_os_create_directory(const char* path);
-FM_LUA_EXPORT dn_os_date_time_t dn_os_get_date_time();
+DN_API bool dn_os_does_path_exist(const char* path);
+DN_API bool dn_os_is_regular_file(const char* path);
+DN_API bool dn_os_is_directory(const char* path);
+DN_API void dn_os_remove_directory(const char* path);
+DN_API void dn_os_create_directory(const char* path);
+DN_API dn_os_date_time_t dn_os_get_date_time();
 #endif
 
 #ifdef DN_OS_IMPLEMENTATION

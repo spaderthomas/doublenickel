@@ -9,12 +9,12 @@ typedef struct {
 	u32 vertex_size;
 } dn_fixed_array_t;
 
-FM_LUA_EXPORT void dn_fixed_array_init(dn_fixed_array_t* vertex_buffer, u32 max_vertices, u32 vertex_size);
-FM_LUA_EXPORT u8*  dn_fixed_array_push(dn_fixed_array_t* vertex_buffer, void* data, u32 count);
-FM_LUA_EXPORT u8*  dn_fixed_array_reserve(dn_fixed_array_t* vertex_buffer, u32 count);
-FM_LUA_EXPORT void dn_fixed_array_clear(dn_fixed_array_t* vertex_buffer);
-FM_LUA_EXPORT u32  dn_fixed_array_byte_size(dn_fixed_array_t* vertex_buffer);
-FM_LUA_EXPORT u8*  dn_fixed_array_at(dn_fixed_array_t* vertex_buffer, u32 index);
+DN_API void dn_fixed_array_init(dn_fixed_array_t* vertex_buffer, u32 max_vertices, u32 vertex_size);
+DN_API u8*  dn_fixed_array_push(dn_fixed_array_t* vertex_buffer, void* data, u32 count);
+DN_API u8*  dn_fixed_array_reserve(dn_fixed_array_t* vertex_buffer, u32 count);
+DN_API void dn_fixed_array_clear(dn_fixed_array_t* vertex_buffer);
+DN_API u32  dn_fixed_array_byte_size(dn_fixed_array_t* vertex_buffer);
+DN_API u8*  dn_fixed_array_at(dn_fixed_array_t* vertex_buffer, u32 index);
 #endif
 
 

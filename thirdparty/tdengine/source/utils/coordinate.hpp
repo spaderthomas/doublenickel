@@ -27,10 +27,10 @@ typedef struct {
 } Coordinates;
 Coordinates coordinates;
 
-FM_LUA_EXPORT Coordinates  coord_get();
-FM_LUA_EXPORT void         coord_set_camera(float x, float y);
-FM_LUA_EXPORT void         coord_set_framebuffer_position(float x, float y);
-FM_LUA_EXPORT void         coord_set_framebuffer_size(float x, float y);
+DN_API Coordinates  coord_get();
+DN_API void         coord_set_camera(float x, float y);
+DN_API void         coord_set_framebuffer_position(float x, float y);
+DN_API void         coord_set_framebuffer_size(float x, float y);
 
 Vector2 coord_screen_to_window(float x, float y);
 Vector2 coord_screen_to_game(float x, float y);

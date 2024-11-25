@@ -34,11 +34,11 @@ struct  dn_allocator_t {
 };
 std::unordered_map<std::string, dn_allocator_t*> allocators;
 
-FM_LUA_EXPORT void             dn_allocator_add(const char* name, dn_allocator_t* allocator);
-FM_LUA_EXPORT dn_allocator_t*  dn_allocator_find(const char* name);
-FM_LUA_EXPORT void*            dn_allocator_alloc(dn_allocator_t* allocator, u32 size);
-FM_LUA_EXPORT void*            dn_allocator_realloc(dn_allocator_t* allocator, void* memory, u32 size);
-FM_LUA_EXPORT void             dn_allocator_free(dn_allocator_t* allocator, void* buffer);
+DN_API void             dn_allocator_add(const char* name, dn_allocator_t* allocator);
+DN_API dn_allocator_t*  dn_allocator_find(const char* name);
+DN_API void*            dn_allocator_alloc(dn_allocator_t* allocator, u32 size);
+DN_API void*            dn_allocator_realloc(dn_allocator_t* allocator, void* memory, u32 size);
+DN_API void             dn_allocator_free(dn_allocator_t* allocator, void* buffer);
 
 struct dn_bump_allocator_t : dn_allocator_t {
 	u8* buffer;

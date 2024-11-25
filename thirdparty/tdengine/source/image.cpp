@@ -89,7 +89,7 @@ void TextureAtlas::calc_hash_and_mod_time() {
 				normalize_path(file_path);
 
 				// 1: We hash all the names of the files, so new files will trigger regardless of their modtime.
-				hash_t file_name_hash = hash_label(file_name.c_str());
+				dn_hash_t file_name_hash = hash_label(file_name.c_str());
 				files_hash = files_hash ^ file_name_hash;
 
 				// 2: We check modtime for files that exist
@@ -678,7 +678,7 @@ u32 find_texture_handle(const char* name) {
 	return texture->handle;
 }
 
-Texture* find_texture(hash_t hash) {
+Texture* find_texture(dn_hash_t hash) {
 	std::lock_guard lock(image_mutex);
 	
 	arr_for(image_infos, image) {

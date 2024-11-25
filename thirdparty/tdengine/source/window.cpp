@@ -177,7 +177,7 @@ void set_display_mode(DisplayMode mode) {
 	glfwSetWindowSize(window.handle, window.requested_area.x, window.requested_area.y);
 }
 
-FM_LUA_EXPORT void set_window_size(int x, int y) {
+DN_API void set_window_size(int x, int y) {
 	glfwSetWindowSize(window.handle, x, y);
 }
 

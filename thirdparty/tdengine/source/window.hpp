@@ -37,16 +37,16 @@ void shutdown_glfw();
 void set_native_resolution(float width, float height);
 float get_display_scale();
 
-FM_LUA_EXPORT Vector2 get_content_area();
-FM_LUA_EXPORT Vector2 get_game_area_size();
-FM_LUA_EXPORT Vector2 get_native_resolution();
+DN_API Vector2 get_content_area();
+DN_API Vector2 get_game_area_size();
+DN_API Vector2 get_native_resolution();
 
-FM_LUA_EXPORT void set_game_area_size(float x, float y);
-FM_LUA_EXPORT void set_game_area_position(float x, float y);
+DN_API void set_game_area_size(float x, float y);
+DN_API void set_game_area_position(float x, float y);
 
-FM_LUA_EXPORT void create_window(const char* title, u32 x, u32 y, WindowFlags flags);
-FM_LUA_EXPORT void set_window_icon(const char* path);
-FM_LUA_EXPORT void set_display_mode(DisplayMode mode);
-FM_LUA_EXPORT DisplayMode get_display_mode();
-FM_LUA_EXPORT void hide_cursor();
-FM_LUA_EXPORT void show_cursor();
+DN_API void create_window(const char* title, u32 x, u32 y, WindowFlags flags);
+DN_API void set_window_icon(const char* path);
+DN_API void set_display_mode(DisplayMode mode);
+DN_API DisplayMode get_display_mode();
+DN_API void hide_cursor();
+DN_API void show_cursor();

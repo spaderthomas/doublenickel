@@ -97,17 +97,17 @@ typedef struct {
   GpuPipeline* pipeline;
 } SdfRenderer;
 
-FM_LUA_EXPORT SdfRenderer       sdf_renderer_create(u32 buffer_size);
-FM_LUA_EXPORT void              sdf_renderer_draw(SdfRenderer* renderer, GpuCommandBuffer* command_buffer);
-FM_LUA_EXPORT void              sdf_renderer_push_instance(SdfRenderer* renderer, SdfShape shape);
-FM_LUA_EXPORT void              sdf_renderer_push_header(SdfRenderer* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness);
-FM_LUA_EXPORT SdfCombineHeader* sdf_combination_begin(SdfRenderer* renderer);
-FM_LUA_EXPORT void              sdf_combination_append(SdfRenderer* renderer, SdfCombineHeader* header, SdfShape shape, SdfCombineOp op, SdfSmoothingKernel kernel);
-FM_LUA_EXPORT void              sdf_combination_commit(SdfRenderer* renderer);
-FM_LUA_EXPORT void              sdf_circle_ex(SdfRenderer* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float radius);
-FM_LUA_EXPORT void              sdf_ring_ex(SdfRenderer* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float inner_radius, float outer_radius);
-FM_LUA_EXPORT void              sdf_oriented_box_ex(SdfRenderer* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float dx, float dy);
-FM_LUA_EXPORT void              sdf_grid(SdfRenderer* renderer, u32 grid_width, u32 grid_size);
+DN_API SdfRenderer       sdf_renderer_create(u32 buffer_size);
+DN_API void              sdf_renderer_draw(SdfRenderer* renderer, GpuCommandBuffer* command_buffer);
+DN_API void              sdf_renderer_push_instance(SdfRenderer* renderer, SdfShape shape);
+DN_API void              sdf_renderer_push_header(SdfRenderer* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness);
+DN_API SdfCombineHeader* sdf_combination_begin(SdfRenderer* renderer);
+DN_API void              sdf_combination_append(SdfRenderer* renderer, SdfCombineHeader* header, SdfShape shape, SdfCombineOp op, SdfSmoothingKernel kernel);
+DN_API void              sdf_combination_commit(SdfRenderer* renderer);
+DN_API void              sdf_circle_ex(SdfRenderer* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float radius);
+DN_API void              sdf_ring_ex(SdfRenderer* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float inner_radius, float outer_radius);
+DN_API void              sdf_oriented_box_ex(SdfRenderer* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float dx, float dy);
+DN_API void              sdf_grid(SdfRenderer* renderer, u32 grid_width, u32 grid_size);
 #endif
 
 #ifdef SDF_IMPLEMENTATION

@@ -4,9 +4,9 @@ void shutdown_imgui();
 
 // Set this string from a script, and we will pick up a new layout next tick
 string layout_to_load;
-FM_LUA_EXPORT void use_editor_layout(const char* file_name);
-FM_LUA_EXPORT void save_editor_layout(const char* file_name);
-FM_LUA_EXPORT void render_imgui();
+DN_API void use_editor_layout(const char* file_name);
+DN_API void save_editor_layout(const char* file_name);
+DN_API void render_imgui();
 
 	ImGui::FileBrowser im_file_browser;
 	bool open_file_browser;
@@ -44,10 +44,10 @@ namespace ImGuiColors {
 	}
 };
 
-FM_LUA_EXPORT void IGE_PushGameFont(const char* font_name);
-FM_LUA_EXPORT void IGE_GameImage(const char* image, float sx, float sy);
-FM_LUA_EXPORT void IGE_OpenFileBrowser();
-FM_LUA_EXPORT void IGE_CloseFileBrowser();
-FM_LUA_EXPORT void IGE_SetFileBrowserWorkDir(const char* directory);
-FM_LUA_EXPORT bool IGE_IsAnyFileSelected();
-FM_LUA_EXPORT tstring IGE_GetSelectedFile();
+DN_API void IGE_PushGameFont(const char* font_name);
+DN_API void IGE_GameImage(const char* image, float sx, float sy);
+DN_API void IGE_OpenFileBrowser();
+DN_API void IGE_CloseFileBrowser();
+DN_API void IGE_SetFileBrowserWorkDir(const char* directory);
+DN_API bool IGE_IsAnyFileSelected();
+DN_API tstring IGE_GetSelectedFile();
