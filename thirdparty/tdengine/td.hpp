@@ -72,7 +72,8 @@
 #include "source/draw.cpp"
 #define DN_ENGINE_IMPLEMENTATION
 #include "source/engine.hpp"
-#include "source/font.cpp"
+#define DN_FONT_IMPLEMENTATION
+#include "source/font.hpp"
 #include "source/image.cpp" // HALF (Screenshots should be reworked, probably? I'm referencing a named path when I initialize)
 #define DN_INPUT_IMPLEMENTATION
 #include "source/input.hpp"
@@ -119,6 +120,7 @@ int td_main(TdAppDescriptor app) {
 	dn_engine_init();
 	dn_input_init();
 	dn_time_metrics_init();
+	dn_font_init();
 	init_steam();
 	init_file_monitors();
 	init_assets();

@@ -1,4 +1,3 @@
-#define TD_MAX_PATH_LEN 256
 
 typedef int GLFW_KEY_TYPE;
 typedef GLFW_KEY_TYPE key_t;

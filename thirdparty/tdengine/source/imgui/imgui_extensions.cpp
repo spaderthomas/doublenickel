@@ -76,7 +76,7 @@ void save_editor_layout(const char* file_name) {
 
 
 void IGE_PushGameFont(const char* font_name) {
-	auto font = font_find(font_name);
+	auto font = dn_font_find(font_name);
 	if (font && font->imfont) {
 		ImGui::PushFont(font->imfont);
 	}

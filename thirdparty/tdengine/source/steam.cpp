@@ -107,10 +107,10 @@ void open_steam_page(const char* utm) {
 
 	auto url = bump_allocator.alloc_path();
 	if (utm) {
-		snprintf(url, TD_MAX_PATH_LEN, url_utm, utm);
+		snprintf(url, DN_MAX_PATH_LEN, url_utm, utm);
 	}
 	else {
-		snprintf(url, TD_MAX_PATH_LEN, url_plain);
+		snprintf(url, DN_MAX_PATH_LEN, url_plain);
 	}
 
 

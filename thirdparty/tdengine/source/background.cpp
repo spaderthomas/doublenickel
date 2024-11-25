@@ -182,7 +182,7 @@ bool Background::add_tile() {
 		
 	char** tile_full_path = arr_push(&tile_full_paths);
 	*tile_full_path = standard_allocator.alloc_path();
-	snprintf(*tile_full_path, TD_MAX_PATH_LEN, "%s/%s", tile_output_full_path, *tile);
+	snprintf(*tile_full_path, DN_MAX_PATH_LEN, "%s/%s", tile_output_full_path, *tile);
 
 	return true;
 }
@@ -326,7 +326,7 @@ void Background::load_tiles() {
 			
 		// Create a sprite so the tile can be drawn with the draw_image() API
 		auto sprite = alloc_sprite();
-		strncpy(sprite->file_path, tile, TD_MAX_PATH_LEN);
+		strncpy(sprite->file_path, tile, DN_MAX_PATH_LEN);
 		sprite->texture = texture->hash;
 		sprite->hash = texture->hash;
 		sprite->size = { texture->width, texture->height };

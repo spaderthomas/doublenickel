@@ -1,4 +1,12 @@
 return {
+	{
+		id = 'merriweather',
+		
+	}
+}
+
+
+return {
 	['game'] = {
 		font = 'Merriweather-Regular',
 		size = 24,

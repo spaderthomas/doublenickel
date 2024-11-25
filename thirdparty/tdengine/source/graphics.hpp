@@ -761,7 +761,7 @@ u8* gpu_backed_buffer_push(GpuBackedBuffer* buffer, void* data, u32 num_elements
 }
 
 void gpu_backed_buffer_sync(GpuBackedBuffer* buffer) {
-  gpu_buffer_sync(buffer->gpu_buffer, buffer->buffer.data, buffer->buffer.size * buffer->buffer.vertex_size);
+  gpu_buffer_sync(buffer->gpu_buffer, buffer->buffer.data, buffer->buffer.size * buffer->buffer.element_size);
 }
 
 
@@ -776,7 +776,7 @@ GpuShader* gpu_shader_create(GpuShaderDescriptor descriptor) {
 
 GpuShader* gpu_shader_find(const char* name) {
 	arr_for(td_gpu.shaders, shader) {
-		if (!strncmp(shader->name, name, TD_MAX_PATH_LEN)) return shader;
+		if (!strncmp(shader->name, name, DN_MAX_PATH_LEN)) return shader;
 	}
 
 	return nullptr;

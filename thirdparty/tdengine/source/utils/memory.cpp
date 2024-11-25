@@ -40,7 +40,7 @@ void dn_allocator_t::free_array(Array<T>* array) {
 }
 
 char* dn_allocator_t::alloc_path() {
-	return alloc<char>(TD_MAX_PATH_LEN);
+	return alloc<char>(DN_MAX_PATH_LEN);
 }
 
 

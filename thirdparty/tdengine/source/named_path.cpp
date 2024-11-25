@@ -14,7 +14,7 @@ void dn_paths_add_subpath(const char* name, const char* parent_name, const char*
 	
 	auto parent_path = dn_paths_resolve(parent_name);
 	auto absolute_path = bump_allocator.alloc_path();
-	snprintf(absolute_path, TD_MAX_PATH_LEN, "%s/%s", parent_path, relative_path);
+	snprintf(absolute_path, DN_MAX_PATH_LEN, "%s/%s", parent_path, relative_path);
 	
 	dn_paths_add_ex(name, absolute_path);
 }
@@ -80,7 +80,7 @@ string dn_paths_resolve_format_ex(const char* name, const char* file_name, dn_al
 	auto& path = named_paths[name];
 	
 	auto resolved_path = allocator->alloc_path();
-	snprintf(resolved_path, TD_MAX_PATH_LEN, path.c_str(), file_name);
+	snprintf(resolved_path, DN_MAX_PATH_LEN, path.c_str(), file_name);
 	return resolved_path;
 }
 
@@ -102,7 +102,7 @@ dn_named_path_result_t dn_paths_find_all() {
 
 tstring build_path(const char* relative_path) {
 	auto executable_file = bump_allocator.alloc_path();
-	GetModuleFileNameA(NULL, executable_file, TD_MAX_PATH_LEN);
+	GetModuleFileNameA(NULL, executable_file, DN_MAX_PATH_LEN);
 
 	std::filesystem::path executable_filepath = std::filesystem::path(executable_file);
 	auto executable_dir = executable_filepath.parent_path() / relative_path;
@@ -135,7 +135,7 @@ void set_write_path() {
 	SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, appdata_dir);
 	
 	// Normalize
-	for (int32 i = 0; i < TD_MAX_PATH_LEN; i++) {
+	for (int32 i = 0; i < DN_MAX_PATH_LEN; i++) {
 		if (appdata_dir[i] == 0) break;
 		if (appdata_dir[i] == '\\') appdata_dir[i] = '/';
 	}

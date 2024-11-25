@@ -36,7 +36,6 @@ namespace API {
 void register_api();
 
 const struct luaL_Reg api [] = {
-	{ "chsize",                   &API::get_character_size },
 	{ "scandir_impl",             &API::scandir_impl },
 	{ "log",                      &API::log },
 	{ "screen_dimensions",        &API::screen_dimensions },

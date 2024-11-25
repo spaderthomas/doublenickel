@@ -78,40 +78,6 @@ int API::scandir_impl(lua_State* lua) {
 	return 1;
 }
 
-int API::get_character_size(lua_State* l) {
-	fm_assert(lua_gettop(l) >= 1);
-
-	// Parse arguments
-	char c = lua_tointeger(l, 1);
-
-	// Find the font, or just use the editor by default
-	FontInfo* font = nullptr;
-	if (lua_gettop(l) == 2) font = font_find(lua_tostring(l, 2));
-	if (!font) font = font_find("inconsolata-32");
-
-	// If the font is an ImGui font, ask ImGui. Otherwise, calculate it ourself.
-	float32 x;
-	float32 y;
-	if (font->imfont) {
-		auto size = font->imfont->CalcTextSizeA(
-                 (float32)font->size,
-				 FLT_MAX, FLT_MAX,
-				 (const char*)&c, (const char*)&c + 1,
-				 NULL);
-		x = size.x / window.content_area.x;
-		y = size.y / window.content_area.y;
-	} 
-	else {
-		auto glyph = font->glyphs[c];
-		x = glyph->advance.x / get_display_scale();
-		y = font->max_advance.y / get_display_scale();
-	}
-
-	lua_pushnumber(l, x);
-	lua_pushnumber(l, y);
-	return 2;
-}
-
 int API::get_window_scale(lua_State* l) {
 	fm_assert(lua_gettop(l) == 0);
 

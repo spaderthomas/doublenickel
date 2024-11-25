@@ -14,7 +14,7 @@ Texture* find_texture(dn_hash_t hash);
 DN_API u32 find_texture_handle(const char* name);
 
 struct Sprite {
-	char file_path [TD_MAX_PATH_LEN];
+	char file_path [DN_MAX_PATH_LEN];
 	dn_hash_t hash;
 	dn_hash_t texture;
 	Vector2* uv;
@@ -25,7 +25,7 @@ Sprite* find_sprite_no_default(const char* name);
 
 
 struct Path {
-	char path [TD_MAX_PATH_LEN];
+	char path [DN_MAX_PATH_LEN];
 };
 
 struct RectPackId {

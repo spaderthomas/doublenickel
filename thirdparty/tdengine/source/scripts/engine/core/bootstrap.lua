@@ -338,21 +338,17 @@ typedef enum {
 	DN_INPUT_DEVICE_CONTROLLER = 1,
 } dn_input_device_t;
 
-bool dn_input_pressed(int key);
-bool dn_input_released(int key);
-bool dn_input_down(int key);
-bool dn_input_mod_down(int mod);
-bool dn_input_chord_pressed(int mod, int key);
-u32 dn_input_shift_key(u32 key);
-Vector2 dn_input_scroll();
+bool              dn_input_pressed(int key);
+bool              dn_input_released(int key);
+bool              dn_input_down(int key);
+bool              dn_input_mod_down(int mod);
+bool              dn_input_chord_pressed(int mod, int key);
+Vector2           dn_input_scroll();
+Vector2           dn_input_mouse(dn_coord_t unit);
+Vector2           dn_input_mouse_delta(dn_coord_t unit);
+u32               dn_input_shift_key(u32 key);
 dn_input_device_t dn_input_get_device();
 
-Vector2 dn_input_mouse(dn_coord_t unit);
-Vector2 dn_input_mouse_delta(dn_coord_t unit);
-
-void show_text_input(const char* description, const char* existing_text);
-bool is_text_input_dirty();
-const char* read_text_input();
 
 ////////////////////////////////////////
 // ████████╗███████╗██╗  ██╗████████╗ //
@@ -380,13 +376,13 @@ typedef struct {
 	float baseline_offset_imprecise;
 	float height_imprecise;
 	bool precise;
-} dn_prepared_text;
+} dn_prepared_text_t;
 
-dn_prepared_text* dn_prepare_text(const char* text, f32 px, f32 py, const char* font);
-dn_prepared_text* dn_prepare_text_wrap(const char* text, f32 px, f32 py, const char* font, f32 wrap);
-dn_prepared_text* dn_prepare_text_ex(const char* text, f32 px, f32 py, const char* font, f32 wrap, Vector4 color, bool precise);
-void create_font(const char* id, const char* family, u32 size);
-void add_imgui_font(const char* id);
+dn_prepared_text_t* dn_prepare_text(const char* text, f32 px, f32 py, const char* font);
+dn_prepared_text_t* dn_prepare_text_wrap(const char* text, f32 px, f32 py, const char* font, f32 wrap);
+dn_prepared_text_t* dn_prepare_text_ex(const char* text, f32 px, f32 py, const char* font, f32 wrap, Vector4 color, bool precise);
+void dn_font_create(const char* id, const char* family, u32 size);
+void dn_font_add_to_imgui(const char* id);
 
 
 
@@ -1005,6 +1001,9 @@ void write_screenshot_to_png(const char* file_name);
 // STEAM
 void open_steam_page(const char* utm);
 bool is_steam_deck();
+void show_text_input(const char* description, const char* existing_text);
+bool is_text_input_dirty();
+const char* read_text_input();
 
 //
 // DRAW
@@ -1028,7 +1027,7 @@ void draw_image_ex(const char* name, float px, float py, float dx, float dy, flo
 void draw_image_pro(u32 texture, f32 px, f32 py, f32 dx, f32 dy, Vector2* uv, f32 opacity);
 void draw_text(const char* text, f32 px, f32 py);
 void draw_text_ex(const char* text, f32 px, f32 py, Vector4 color, const char* font, f32 wrap);
-void draw_prepared_text(dn_prepared_text* text);
+void draw_prepared_text(dn_prepared_text_t* text);
 
 u32 find_texture_handle(const char* name);
 

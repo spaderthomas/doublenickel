@@ -1,8 +1,8 @@
 // Infos: chunks of contiguous memory that are initialized and then static
 #define FONT_INFO_SIZE 64
-Array<FontInfo> font_infos;
+Array<dn_font_t> font_infos;
 #define GLYPH_INFO_SIZE FONT_INFO_SIZE * 128
-Array<GlyphInfo> glyph_infos;
+Array<dn_glyph_t> glyph_infos;
 #define VX_INFO_SIZE GLYPH_INFO_SIZE * 6
 Array<Vector2>   text_vx_data;
 #define TEXT_UV_DATA_SIZE GLYPH_INFO_SIZE * 6

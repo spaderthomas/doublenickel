@@ -1,12 +1,12 @@
-struct dn_named_path_t {
+typedef struct {
 	const char* name;
 	const char* path;
-};
+} dn_named_path_t;
 
-struct dn_named_path_result_t {
+typedef struct {
 	dn_named_path_t* data;
 	u32 size;
-};
+} dn_named_path_result_t;
 
 DN_API dn_named_path_result_t dn_paths_find_all();
 DN_API void dn_paths_add_install_subpath(const char* name, const char* relative_path);

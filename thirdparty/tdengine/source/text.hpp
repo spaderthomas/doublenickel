@@ -1,13 +1,13 @@
 #define MAX_TEXT_LEN 1024
 #define MAX_LINE_BREAKS 32
 
-struct dn_prepared_text {
+struct dn_prepared_text_t {
 	// @dn: This should be temporary storage 99% of the time
 	char text [MAX_TEXT_LEN] = { 0 };
 	Vector2 position;
 	Vector2 padding;
 	Vector4 color;
-	FontInfo* font;
+	dn_font_t* font;
 	float wrap;
 	float offset;
 	bool world_space = false;
@@ -46,18 +46,18 @@ struct dn_prepared_text {
 	ArrayView<char> get_line(i32 index);
 };
 
-DN_API dn_prepared_text* dn_prepare_text(const char* text, float px, float py, const char* font);
-DN_API dn_prepared_text* dn_prepare_text_wrap(const char* text, float px, float py, const char* font, float wrap);
-DN_API dn_prepared_text* dn_prepare_text_ex(const char* text, float px, float py, const char* font, float wrap, Vector4 color, bool precise);
+DN_API dn_prepared_text_t* dn_prepare_text(const char* text, float px, float py, const char* font);
+DN_API dn_prepared_text_t* dn_prepare_text_wrap(const char* text, float px, float py, const char* font, float wrap);
+DN_API dn_prepared_text_t* dn_prepare_text_ex(const char* text, float px, float py, const char* font, float wrap, Vector4 color, bool precise);
 
 struct LineBreakContext {
 	// Input
-	dn_prepared_text* info;
+	dn_prepared_text_t* info;
 
 	// Calculated
 	float point = 0;
 	float point_max;
 
-	void set_info(dn_prepared_text* info);
+	void set_info(dn_prepared_text_t* info);
 	void calculate();
 };

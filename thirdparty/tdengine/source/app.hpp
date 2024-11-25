@@ -8,10 +8,10 @@ typedef struct {
 } TdAppDescriptor;
 
 typedef struct {
-  char install_path [TD_MAX_PATH_LEN];
-  char engine_path [TD_MAX_PATH_LEN];
-  char write_path [TD_MAX_PATH_LEN];
-  char app_path [TD_MAX_PATH_LEN];
+  char install_path [DN_MAX_PATH_LEN];
+  char engine_path [DN_MAX_PATH_LEN];
+  char write_path [DN_MAX_PATH_LEN];
+  char app_path [DN_MAX_PATH_LEN];
 } TdApp;
 TdApp app;
 
@@ -20,9 +20,9 @@ void init_app(TdAppDescriptor descriptor);
 
 #ifdef APP_IMPLEMENTATION
 void init_app(TdAppDescriptor descriptor) {
-  copy_string(descriptor.engine_path, app.engine_path, TD_MAX_PATH_LEN);
-  copy_string(descriptor.install_path, app.install_path, TD_MAX_PATH_LEN);
-  copy_string(descriptor.write_path, app.write_path, TD_MAX_PATH_LEN);
-  copy_string(descriptor.app_path, app.app_path, TD_MAX_PATH_LEN);
+  copy_string(descriptor.engine_path, app.engine_path, DN_MAX_PATH_LEN);
+  copy_string(descriptor.install_path, app.install_path, DN_MAX_PATH_LEN);
+  copy_string(descriptor.write_path, app.write_path, DN_MAX_PATH_LEN);
+  copy_string(descriptor.app_path, app.app_path, DN_MAX_PATH_LEN);
 }
 #endif

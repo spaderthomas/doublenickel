@@ -30,8 +30,8 @@ bool FileMonitor::add_directory(const char* directory_path) {
 	info->overlapped.hEvent = event;
 	info->overlapped.Offset = 0;
 	info->handle = handle;
-	info->path = (char*)malloc(TD_MAX_PATH_LEN * sizeof(char));
-	strncpy(info->path, directory_path, TD_MAX_PATH_LEN);
+	info->path = (char*)malloc(DN_MAX_PATH_LEN * sizeof(char));
+	strncpy(info->path, directory_path, DN_MAX_PATH_LEN);
 	info->notify_information = calloc(BUFFER_SIZE, 1);
 
 	issue_one_read(info);
@@ -65,8 +65,8 @@ bool FileMonitor::add_file(const char* file_path) {
     info->overlapped.hEvent = event;
     info->overlapped.Offset = 0;
     info->handle = handle;
-    info->path = (char*)malloc(TD_MAX_PATH_LEN * sizeof(char));
-    strncpy(info->path, file_path, TD_MAX_PATH_LEN);
+    info->path = (char*)malloc(DN_MAX_PATH_LEN * sizeof(char));
+    strncpy(info->path, file_path, DN_MAX_PATH_LEN);
     info->notify_information = calloc(BUFFER_SIZE, 1);
 
     // Issue the first read to monitor changes
@@ -128,7 +128,7 @@ void FileMonitor::process_changes() {
 			// Construct the full path
 			char* full_path = bump_allocator.alloc_path();
 			char* partial_path = wide_to_utf8((uint16*)&notify->FileName[0], notify->FileNameLength / 2);
-			snprintf(full_path, TD_MAX_PATH_LEN, "%s/%s", info->path, partial_path);
+			snprintf(full_path, DN_MAX_PATH_LEN, "%s/%s", info->path, partial_path);
 			normalize_path(full_path);
 			char* file_name = extract_file_name(full_path);
 
