@@ -25,7 +25,7 @@ void zero_gpu_buffer(u32 handle, u32 size) {
 //////////////////////////
 namespace LagrangianFluidSim {
 	void inspect(LagrangianFluidSim::System& system) {
-		gpu_error_clear();
+		dn_gpu_error_clear();
 		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, system.particles);
@@ -68,7 +68,7 @@ namespace LagrangianFluidSim {
 }
 
 dn_gen_arena_handle_t lf_create(u32 num_particles) {
-	gpu_error_clear();
+	dn_gpu_error_clear();
 	auto handle = LagrangianFluidSim::systems.insert();
 	auto system = LagrangianFluidSim::systems[handle];
 	
@@ -231,7 +231,7 @@ void lf_update(dn_gen_arena_handle_t handle) {
 ////////////////////////
 namespace EulerianFluidSim {	
 	void inspect(EulerianFluidSim::System& system) {
-		gpu_error_clear();
+		dn_gpu_error_clear();
 		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, system.fluid);

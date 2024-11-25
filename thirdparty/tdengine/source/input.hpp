@@ -199,7 +199,7 @@ void dn_input_callback_window_size(GLFWwindow* window_handle, int width, int hei
 	window.content_area.x = width;
 	window.content_area.y = height;
 
-	auto swapchain = gpu_acquire_swapchain();
+	auto swapchain = dn_gpu_acquire_swapchain();
 	swapchain->size = window.content_area;
 
 	// In the editor, the game are is specified by some editor code that figures out the best size

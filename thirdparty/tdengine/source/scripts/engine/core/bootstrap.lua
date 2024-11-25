@@ -459,9 +459,6 @@ void              dn_window_set_cursor_visible(bool visible);
 ////////////////////////////////
                           
 
-typedef struct GpuShader GpuShader;
-typedef struct GpuBuffer GpuBuffer;
-typedef struct GpuVertexLayout GpuVertexLayout;
 
 typedef enum {
   GPU_COMMAND_OP_BIND_BUFFERS = 10,
@@ -563,22 +560,23 @@ typedef enum {
 
 typedef enum {
 	GPU_SHADER_GRAPHICS = 0,
-	GPU_SHADER_COMPUTE = 0,
-} GpuShaderKind;
+	GPU_SHADER_COMPUTE = 1,
+} dn_gpu_shader_kind_t;
 
+/////////////
+// SHADERS //
+/////////////
 
-////////////
-// SHADER //
-////////////
 typedef struct {
 	const char* name;
 	const char* vertex_shader;
 	const char* fragment_shader;
 	const char* compute_shader;
 
-	GpuShaderKind kind;
-} GpuShaderDescriptor;
+	dn_gpu_shader_kind_t kind;
+} dn_gpu_shader_descriptor_t;
 
+typedef struct dn_gpu_shader_t dn_gpu_shader_t;
 
 //////////////
 // UNIFORMS //
@@ -601,7 +599,7 @@ typedef struct {
 } dn_gpu_uniform_descriptor_t;
 
 typedef struct {
-  char name [64];
+  dn_asset_name_t name;
   dn_gpu_uniform_kind_t kind;
 } dn_gpu_uniform_t;
 
@@ -610,24 +608,24 @@ typedef struct {
 // GPU BUFFERS //
 /////////////////
 typedef struct {
-  char name [64];
+  dn_asset_name_t name;
 	dn_gpu_buffer_kind_t kind;
   dn_gpu_buffer_usage_t usage;
 	u32 capacity;
   u32 element_size;
-} GpuBufferDescriptor;
+} dn_gpu_buffer_descriptor_t;
 
-struct GpuBuffer {
-  char name [64];
+typedef struct {
+  dn_asset_name_t name;
 	dn_gpu_buffer_kind_t kind;
   dn_gpu_buffer_usage_t usage;
 	u32 size;
 	u32 handle;
-};
+} dn_gpu_buffer_t;
 
 typedef struct {
   dn_fixed_array_t buffer;
-  GpuBuffer* gpu_buffer;
+  dn_gpu_buffer_t* gpu_buffer;
 } dn_gpu_backed_buffer_t;
 
 
@@ -636,13 +634,13 @@ typedef struct {
 ///////////////////////
 typedef struct {
 	Vector2 size;
-} GpuRenderTargetDescriptor;
+} dn_gpu_render_target_descriptor_t;
 
 typedef struct {
 	u32 handle;
 	u32 color_buffer;
 	Vector2 size;
-} GpuRenderTarget;
+} dn_gpu_render_target_t;
 
 
 /////////////////////
@@ -651,45 +649,48 @@ typedef struct {
 typedef struct {
   struct {
     dn_gpu_load_op_t load;
-    GpuRenderTarget* attachment;
+    dn_gpu_render_target_t* attachment;
   } color;
-} GpuRenderPass;
+} dn_gpu_render_pass_t;
 
 
 ////////////////////////
 // GPU BUFFER BINDING //
 ////////////////////////
 typedef struct {
-  GpuBuffer* buffer;
-} GpuVertexBufferBinding;
+  dn_gpu_buffer_t* buffer;
+} dn_gpu_vertex_buffer_binding_t;
 
 typedef struct {
-  GpuBuffer* buffer;
+  dn_gpu_buffer_t* buffer;
   u32 base;
-} GpuStorageBufferBinding;
+} dn_gpu_storage_buffer_binding_t;
 
 typedef struct {
   dn_gpu_uniform_data_t data;
-  GpuUniform* uniform;
+  dn_gpu_uniform_t* uniform;
   u32 binding_index;
-} GpuUniformBinding;
+} dn_gpu_uniform_binding_t;
 
 typedef struct {
   __declspec(align(16)) struct {
-    GpuVertexBufferBinding bindings [8];
+    dn_gpu_vertex_buffer_binding_t bindings [8];
     u32 count;
   } vertex;
 
   __declspec(align(16)) struct {
-    GpuUniformBinding bindings [8];
+    dn_gpu_uniform_binding_t bindings [8];
     u32 count;
   } uniforms;
 
   __declspec(align(16)) struct {
-    GpuStorageBufferBinding bindings [8];
+    dn_gpu_storage_buffer_binding_t bindings [8];
     u32 count;
   } storage;
-} GpuBufferBinding;
+
+  // UBO
+  // SSBO
+} dn_gpu_buffer_binding_t;
 
 
 //////////////////
@@ -702,7 +703,7 @@ typedef struct {
 } dn_gpu_blend_state_t;
 
 typedef struct {
-  GpuShader* shader;
+  dn_gpu_shader_t* shader;
   dn_gpu_draw_primitive_t primitive;
 } dn_gpu_raster_state_t;
 
@@ -716,6 +717,7 @@ typedef struct {
   u32 layer;
   bool world_space;
   Vector2 camera;
+  Matrix4 projection;
 } dn_gpu_renderer_state_t;
 
 typedef struct {
@@ -727,23 +729,21 @@ typedef struct {
 typedef struct {
 	dn_gpu_vertex_attribute_t vertex_attributes [8];
 	u32 num_vertex_attributes;
-} GpuBufferLayout;
+} dn_gpu_buffer_layout_t;
+
+typedef struct {
+	u32 size;
+	u32 value;
+} dn_gpu_vertex_attr_info_t;
 
 typedef struct {
   dn_gpu_blend_state_t blend;
   dn_gpu_raster_state_t raster;
-	GpuBufferLayout buffer_layouts [8];
+	dn_gpu_buffer_layout_t buffer_layouts [8];
 	u32 num_buffer_layouts;
 } dn_gpu_pipeline_descriptor_t;
 
-typedef struct {
-  dn_gpu_blend_state_t blend;
-  dn_gpu_raster_state_t raster;
-	GpuBufferLayout buffer_layouts [8];
-	u32 num_buffer_layouts;
-} dn_gpu_pipeline_t;
-
-
+typedef struct dn_gpu_pipeline_t dn_gpu_pipeline_t;
 
 ////////////////////////
 // GPU COMMAND BUFFER //
@@ -755,55 +755,55 @@ typedef struct {
   u32 num_instances;
 } dn_gpu_draw_call_t;
 
-typedef struct dn_gpu_command_buffer_t dn_gpu_command_buffer_t;
-
 typedef struct {
   u32 max_commands;
 } dn_gpu_command_buffer_descriptor_t;
 
+typedef struct dn_gpu_command_buffer_t dn_gpu_command_buffer_t;
 
-///////////////////
-// GPU FUNCTIONS //
-///////////////////
-dn_gpu_command_buffer_t*  gpu_command_buffer_create(dn_gpu_command_buffer_descriptor_t descriptor);
-void               gpu_command_buffer_draw(dn_gpu_command_buffer_t* command_buffer, dn_gpu_draw_call_t draw_call);
-void               gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer);
-void               gpu_bind_pipeline(dn_gpu_command_buffer_t* command_buffer, dn_gpu_pipeline_t* pipeline);
-void               gpu_begin_render_pass(dn_gpu_command_buffer_t* command_buffer, GpuRenderPass render_pass);
-void               gpu_end_render_pass(dn_gpu_command_buffer_t* command_buffer);
-void               gpu_apply_bindings(dn_gpu_command_buffer_t* command_buffer, GpuBufferBinding bindings);
-void               gpu_bind_render_state(dn_gpu_command_buffer_t* command_buffer, dn_gpu_renderer_state_t render);
-void               gpu_set_layer(dn_gpu_command_buffer_t* command_buffer, u32 layer);
-void               gpu_set_world_space(dn_gpu_command_buffer_t* command_buffer, bool world_space);
-void               gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, Vector2 camera);
-dn_gpu_pipeline_t*       gpu_pipeline_create(dn_gpu_pipeline_descriptor_t descriptor);
-GpuUniform*        gpu_uniform_create(dn_gpu_uniform_descriptor_t descriptor);
-GpuBuffer*         gpu_buffer_create(GpuBufferDescriptor descriptor);
-void               gpu_buffer_bind(GpuBuffer* buffer);
-void               gpu_buffer_bind_base(GpuBuffer* buffer, u32 base);
-void               gpu_buffer_sync(GpuBuffer* buffer, void* data, u32 size);
-void               gpu_buffer_sync_subdata(GpuBuffer* buffer, void* data, u32 byte_size, u32 byte_offset);
-void               gpu_buffer_zero(GpuBuffer* buffer, u32 size);
-dn_gpu_backed_buffer_t    gpu_backed_buffer_create(GpuBufferDescriptor descriptor);
-u32                gpu_backed_buffer_size(dn_gpu_backed_buffer_t* buffer);
-void               gpu_backed_buffer_clear(dn_gpu_backed_buffer_t* buffer);
-u8*                gpu_backed_buffer_push(dn_gpu_backed_buffer_t* buffer, void* data, u32 num_elements);
-void               gpu_backed_buffer_sync(dn_gpu_backed_buffer_t* buffer);
-GpuShader*         gpu_shader_create(GpuShaderDescriptor descriptor);
-GpuShader*         gpu_shader_find(const char* name);
-GpuRenderTarget*   gpu_render_target_create(GpuRenderTargetDescriptor descriptor);
-GpuRenderTarget*   gpu_acquire_swapchain();
-void               gpu_render_target_bind(GpuRenderTarget* target);
-void               gpu_render_target_clear(GpuRenderTarget* target);
-void               gpu_render_target_blit(GpuRenderTarget* source, GpuRenderTarget* destination);
-void               gpu_memory_barrier(dn_gpu_memory_barrier_t barrier);
-void               gpu_dispatch_compute(GpuBuffer* buffer, u32 size);
-void               gpu_swap_buffers();
-void               gpu_error_clear();
-tstring            gpu_error_read();
-void               gpu_error_log_one();
-void               gpu_error_log_all();
-void               gpu_set_resource_name(dn_gpu_resource_id_t id, u32 handle, u32 name_len, const char* name);
+
+///////////////
+// FUNCTIONS //
+///////////////
+dn_gpu_command_buffer_t*       dn_gpu_command_buffer_create(dn_gpu_command_buffer_descriptor_t descriptor);
+void                           dn_gpu_command_buffer_draw(dn_gpu_command_buffer_t* command_buffer, dn_gpu_draw_call_t draw_call);
+void                           dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer);
+void                           dn_gpu_bind_pipeline(dn_gpu_command_buffer_t* command_buffer, dn_gpu_pipeline_t* pipeline);
+void                           dn_gpu_begin_render_pass(dn_gpu_command_buffer_t* command_buffer, dn_gpu_render_pass_t render_pass);
+void                           dn_gpu_end_render_pass(dn_gpu_command_buffer_t* command_buffer);
+void                           dn_gpu_apply_bindings(dn_gpu_command_buffer_t* command_buffer, dn_gpu_buffer_binding_t bindings);
+void                           dn_gpu_bind_render_state(dn_gpu_command_buffer_t* command_buffer, dn_gpu_renderer_state_t render);
+void                           dn_gpu_set_layer(dn_gpu_command_buffer_t* command_buffer, u32 layer);
+void                           dn_gpu_set_world_space(dn_gpu_command_buffer_t* command_buffer, bool world_space);
+void                           dn_gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, Vector2 camera);
+dn_gpu_pipeline_t*             dn_gpu_pipeline_create(dn_gpu_pipeline_descriptor_t descriptor);
+dn_gpu_uniform_t*              dn_gpu_uniform_create(dn_gpu_uniform_descriptor_t descriptor);
+dn_gpu_buffer_t*               dn_gpu_buffer_create(dn_gpu_buffer_descriptor_t descriptor);
+void                           dn_gpu_buffer_bind(dn_gpu_buffer_t* buffer);
+void                           dn_gpu_buffer_bind_base(dn_gpu_buffer_t* buffer, u32 base);
+void                           dn_gpu_buffer_sync(dn_gpu_buffer_t* buffer, void* data, u32 size);
+void                           dn_gpu_buffer_sync_subdata(dn_gpu_buffer_t* buffer, void* data, u32 byte_size, u32 byte_offset);
+void                           dn_gpu_buffer_zero(dn_gpu_buffer_t* buffer, u32 size);
+dn_gpu_backed_buffer_t         dn_gpu_backed_buffer_create(dn_gpu_buffer_descriptor_t descriptor);
+u32                            dn_gpu_backed_buffer_size(dn_gpu_backed_buffer_t* buffer);
+void                           dn_gpu_backed_buffer_clear(dn_gpu_backed_buffer_t* buffer);
+u8*                            dn_gpu_backed_buffer_push(dn_gpu_backed_buffer_t* buffer, void* data, u32 num_elements);
+void                           dn_gpu_backed_buffer_sync(dn_gpu_backed_buffer_t* buffer);
+dn_gpu_shader_t*               dn_gpu_shader_create(dn_gpu_shader_descriptor_t descriptor);
+dn_gpu_shader_t*               dn_gpu_shader_find(const char* name);
+dn_gpu_render_target_t*        dn_gpu_render_target_create(dn_gpu_render_target_descriptor_t descriptor);
+dn_gpu_render_target_t*        dn_gpu_acquire_swapchain();
+void                           dn_gpu_render_target_bind(dn_gpu_render_target_t* target);
+void                           dn_gpu_render_target_clear(dn_gpu_render_target_t* target);
+void                           dn_gpu_render_target_blit(dn_gpu_render_target_t* source, dn_gpu_render_target_t* destination);
+void                           dn_gpu_memory_barrier(dn_gpu_memory_barrier_t barrier);
+void                           dn_gpu_dispatch_compute(dn_gpu_buffer_t* buffer, u32 size);
+void                           dn_gpu_swap_buffers();
+void                           dn_gpu_error_clear();
+tstring                        dn_gpu_error_read();
+void                           dn_gpu_error_log_one();
+void                           dn_gpu_error_log_all();
+void                           dn_gpu_set_resource_name(dn_gpu_resource_id_t id, u32 handle, u32 name_len, const char* name);
 
 
 
@@ -904,7 +904,7 @@ typedef struct {
   dn_gpu_backed_buffer_t instances;
   dn_gpu_backed_buffer_t combinations;
   dn_gpu_backed_buffer_t shape_data;
-  GpuBufferBinding bindings;
+  dn_gpu_buffer_binding_t bindings;
   dn_gpu_pipeline_t* pipeline;
 } SdfRenderer;
 

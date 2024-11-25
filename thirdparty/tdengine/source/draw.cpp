@@ -6,32 +6,6 @@ i32 find_uniform_index(const char* name) {
 	glGetIntegerv(GL_CURRENT_PROGRAM, &program);
 	return glGetUniformLocation(program, name);
 }
-void set_uniform_immediate(const Uniform& uniform) {
-	if (uniform.kind == UniformKind::Matrix4) {
-		set_uniform_immediate_mat4(uniform.name, uniform.mat4);
-	}
-	else if (uniform.kind == UniformKind::Matrix3) {
-		set_uniform_immediate_mat3(uniform.name, uniform.mat3);
-	}
-	else if (uniform.kind == UniformKind::Vector4) {
-		set_uniform_immediate_vec4(uniform.name, uniform.vec4);
-	}
-	else if (uniform.kind == UniformKind::Vector3) {
-		set_uniform_immediate_vec3(uniform.name, uniform.vec3);
-	}
-	else if (uniform.kind == UniformKind::Vector2) {
-		set_uniform_immediate_vec2(uniform.name, uniform.vec2);
-	}
-	else if (uniform.kind == UniformKind::I32) { 
-		set_uniform_immediate_i32(uniform.name, uniform.as_i32);
-	}
-	else if (uniform.kind == UniformKind::F32) {
-		set_uniform_immediate_f32(uniform.name, uniform.f32);
-	}
-	else if (uniform.kind == UniformKind::Texture) {
-		set_uniform_immediate_i32(uniform.name, uniform.texture);
-	}
-}
 
 void set_uniform_immediate_vec4(const char* name, HMM_Vec4 vec) {
 	i32 index = find_uniform_index(name);

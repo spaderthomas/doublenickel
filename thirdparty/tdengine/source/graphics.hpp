@@ -4,7 +4,6 @@
 #define GPU_NEAR_PLANE -100.0
 #define GPU_FAR_PLANE 100.0
 
-#define MAX_UNIFORM_NAME 64
 
 typedef enum {
   GPU_COMMAND_OP_BIND_BUFFERS = 10,
@@ -104,6 +103,44 @@ typedef enum {
 	GPU_MEMORY_BARRIER_BUFFER_UPDATE = 1,
 } dn_gpu_memory_barrier_t;
 
+typedef enum {
+	GPU_SHADER_GRAPHICS = 0,
+	GPU_SHADER_COMPUTE = 1,
+} dn_gpu_shader_kind_t;
+
+/////////////
+// SHADERS //
+/////////////
+
+typedef struct {
+	const char* name;
+	const char* vertex_shader;
+	const char* fragment_shader;
+	const char* compute_shader;
+
+	dn_gpu_shader_kind_t kind;
+} dn_gpu_shader_descriptor_t;
+
+typedef struct {
+  dn_gpu_shader_kind_t kind;
+  dn_asset_name_t name;
+  u32 program;
+	
+  union {
+    struct {
+      string vertex_path;
+	    string fragment_path;
+	    u32 vertex_shader;
+	    u32 fragment_shader;
+    } graphics;
+
+    struct {
+      string path;
+      u32 shader;
+    } compute;
+  };
+} dn_gpu_shader_t;
+
 //////////////
 // UNIFORMS //
 //////////////
@@ -141,13 +178,13 @@ typedef struct {
   u32 element_size;
 } dn_gpu_buffer_descriptor_t;
 
-struct dn_gpu_buffer_t {
-  char name [64];
+typedef struct {
+  dn_asset_name_t name;
 	dn_gpu_buffer_kind_t kind;
   dn_gpu_buffer_usage_t usage;
 	u32 size;
 	u32 handle;
-};
+} dn_gpu_buffer_t;
 
 typedef struct {
   dn_fixed_array_t buffer;
@@ -229,7 +266,7 @@ typedef struct {
 } dn_gpu_blend_state_t;
 
 typedef struct {
-  GpuShader* shader;
+  dn_gpu_shader_t* shader;
   dn_gpu_draw_primitive_t primitive;
 } dn_gpu_raster_state_t;
 
@@ -260,7 +297,7 @@ typedef struct {
 typedef struct {
 	u32 size;
 	u32 value;
-} dn_gpu_vertex_attribute_tInfo;
+} dn_gpu_vertex_attr_info_t;
 
 typedef struct {
   dn_gpu_blend_state_t blend;
@@ -317,45 +354,65 @@ typedef struct {
 ///////////////
 // FUNCTIONS //
 ///////////////
-DN_API dn_gpu_command_buffer_t* gpu_command_buffer_create(dn_gpu_command_buffer_descriptor_t descriptor);
-DN_API void              gpu_command_buffer_draw(dn_gpu_command_buffer_t* command_buffer, dn_gpu_draw_call_t draw_call);
-DN_API void              gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer);
-DN_API void              gpu_bind_pipeline(dn_gpu_command_buffer_t* command_buffer, dn_gpu_pipeline_t* pipeline);
-DN_API void              gpu_begin_render_pass(dn_gpu_command_buffer_t* command_buffer, dn_gpu_render_pass_t render_pass);
-DN_API void              gpu_end_render_pass(dn_gpu_command_buffer_t* command_buffer);
-DN_API void              gpu_apply_bindings(dn_gpu_command_buffer_t* command_buffer, dn_gpu_buffer_binding_t bindings);
-DN_API void              gpu_bind_render_state(dn_gpu_command_buffer_t* command_buffer, dn_gpu_renderer_state_t render);
-DN_API void              gpu_set_layer(dn_gpu_command_buffer_t* command_buffer, u32 layer);
-DN_API void              gpu_set_world_space(dn_gpu_command_buffer_t* command_buffer, bool world_space);
-DN_API void              gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, Vector2 camera);
-DN_API dn_gpu_pipeline_t*      gpu_pipeline_create(dn_gpu_pipeline_descriptor_t descriptor);
-DN_API dn_gpu_uniform_t*       gpu_uniform_create(dn_gpu_uniform_descriptor_t descriptor);
-DN_API dn_gpu_buffer_t*        gpu_buffer_create(dn_gpu_buffer_descriptor_t descriptor);
-DN_API void              gpu_buffer_bind(dn_gpu_buffer_t* buffer);
-DN_API void              gpu_buffer_bind_base(dn_gpu_buffer_t* buffer, u32 base);
-DN_API void              gpu_buffer_sync(dn_gpu_buffer_t* buffer, void* data, u32 size);
-DN_API void              gpu_buffer_sync_subdata(dn_gpu_buffer_t* buffer, void* data, u32 byte_size, u32 byte_offset);
-DN_API void              gpu_buffer_zero(dn_gpu_buffer_t* buffer, u32 size);
-DN_API dn_gpu_backed_buffer_t   gpu_backed_buffer_create(dn_gpu_buffer_descriptor_t descriptor);
-DN_API u32               gpu_backed_buffer_size(dn_gpu_backed_buffer_t* buffer);
-DN_API void              gpu_backed_buffer_clear(dn_gpu_backed_buffer_t* buffer);
-DN_API u8*               gpu_backed_buffer_push(dn_gpu_backed_buffer_t* buffer, void* data, u32 num_elements);
-DN_API void              gpu_backed_buffer_sync(dn_gpu_backed_buffer_t* buffer);
-DN_API GpuShader*        gpu_shader_create(GpuShaderDescriptor descriptor);
-DN_API GpuShader*        gpu_shader_find(const char* name);
-DN_API dn_gpu_render_target_t*  gpu_render_target_create(dn_gpu_render_target_descriptor_t descriptor);
-DN_API dn_gpu_render_target_t*  gpu_acquire_swapchain();
-DN_API void              gpu_render_target_bind(dn_gpu_render_target_t* target);
-DN_API void              gpu_render_target_clear(dn_gpu_render_target_t* target);
-DN_API void              gpu_render_target_blit(dn_gpu_render_target_t* source, dn_gpu_render_target_t* destination);
-DN_API void              gpu_memory_barrier(dn_gpu_memory_barrier_t barrier);
-DN_API void              gpu_dispatch_compute(dn_gpu_buffer_t* buffer, u32 size);
-DN_API void              gpu_swap_buffers();
-DN_API void              gpu_error_clear();
-DN_API tstring           gpu_error_read();
-DN_API void              gpu_error_log_one();
-DN_API void              gpu_error_log_all();
-DN_API void              gpu_set_resource_name(dn_gpu_resource_id_t id, u32 handle, u32 name_len, const char* name);
+DN_API dn_gpu_command_buffer_t*       dn_gpu_command_buffer_create(dn_gpu_command_buffer_descriptor_t descriptor);
+DN_API void                           dn_gpu_command_buffer_draw(dn_gpu_command_buffer_t* command_buffer, dn_gpu_draw_call_t draw_call);
+DN_API void                           dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer);
+DN_API void                           dn_gpu_bind_pipeline(dn_gpu_command_buffer_t* command_buffer, dn_gpu_pipeline_t* pipeline);
+DN_API void                           dn_gpu_begin_render_pass(dn_gpu_command_buffer_t* command_buffer, dn_gpu_render_pass_t render_pass);
+DN_API void                           dn_gpu_end_render_pass(dn_gpu_command_buffer_t* command_buffer);
+DN_API void                           dn_gpu_apply_bindings(dn_gpu_command_buffer_t* command_buffer, dn_gpu_buffer_binding_t bindings);
+DN_API void                           dn_gpu_bind_render_state(dn_gpu_command_buffer_t* command_buffer, dn_gpu_renderer_state_t render);
+DN_API void                           dn_gpu_set_layer(dn_gpu_command_buffer_t* command_buffer, u32 layer);
+DN_API void                           dn_gpu_set_world_space(dn_gpu_command_buffer_t* command_buffer, bool world_space);
+DN_API void                           dn_gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, Vector2 camera);
+DN_API dn_gpu_pipeline_t*             dn_gpu_pipeline_create(dn_gpu_pipeline_descriptor_t descriptor);
+DN_API dn_gpu_uniform_t*              dn_gpu_uniform_create(dn_gpu_uniform_descriptor_t descriptor);
+DN_API dn_gpu_buffer_t*               dn_gpu_buffer_create(dn_gpu_buffer_descriptor_t descriptor);
+DN_API void                           dn_gpu_buffer_bind(dn_gpu_buffer_t* buffer);
+DN_API void                           dn_gpu_buffer_bind_base(dn_gpu_buffer_t* buffer, u32 base);
+DN_API void                           dn_gpu_buffer_sync(dn_gpu_buffer_t* buffer, void* data, u32 size);
+DN_API void                           dn_gpu_buffer_sync_subdata(dn_gpu_buffer_t* buffer, void* data, u32 byte_size, u32 byte_offset);
+DN_API void                           dn_gpu_buffer_zero(dn_gpu_buffer_t* buffer, u32 size);
+DN_API dn_gpu_backed_buffer_t         dn_gpu_backed_buffer_create(dn_gpu_buffer_descriptor_t descriptor);
+DN_API u32                            dn_gpu_backed_buffer_size(dn_gpu_backed_buffer_t* buffer);
+DN_API void                           dn_gpu_backed_buffer_clear(dn_gpu_backed_buffer_t* buffer);
+DN_API u8*                            dn_gpu_backed_buffer_push(dn_gpu_backed_buffer_t* buffer, void* data, u32 num_elements);
+DN_API void                           dn_gpu_backed_buffer_sync(dn_gpu_backed_buffer_t* buffer);
+DN_API dn_gpu_shader_t*               dn_gpu_shader_create(dn_gpu_shader_descriptor_t descriptor);
+DN_API dn_gpu_shader_t*               dn_gpu_shader_find(const char* name);
+DN_API dn_gpu_render_target_t*        dn_gpu_render_target_create(dn_gpu_render_target_descriptor_t descriptor);
+DN_API dn_gpu_render_target_t*        dn_gpu_acquire_swapchain();
+DN_API void                           dn_gpu_render_target_bind(dn_gpu_render_target_t* target);
+DN_API void                           dn_gpu_render_target_clear(dn_gpu_render_target_t* target);
+DN_API void                           dn_gpu_render_target_blit(dn_gpu_render_target_t* source, dn_gpu_render_target_t* destination);
+DN_API void                           dn_gpu_memory_barrier(dn_gpu_memory_barrier_t barrier);
+DN_API void                           dn_gpu_dispatch_compute(dn_gpu_buffer_t* buffer, u32 size);
+DN_API void                           dn_gpu_swap_buffers();
+DN_API void                           dn_gpu_error_clear();
+DN_API tstring                        dn_gpu_error_read();
+DN_API void                           dn_gpu_error_log_one();
+DN_API void                           dn_gpu_error_log_all();
+DN_API void                           dn_gpu_set_resource_name(dn_gpu_resource_id_t id, u32 handle, u32 name_len, const char* name);
+DN_IMP void                           dn_gpu_shader_build_source(const char* file_path);
+DN_IMP void                           dn_gpu_shader_init(dn_gpu_shader_t* shader, dn_gpu_shader_descriptor_t descriptor);
+DN_IMP void                           dn_gpu_shader_init_graphics(dn_gpu_shader_t* shader, const char* name);
+DN_IMP void                           dn_gpu_shader_init_graphics_ex(dn_gpu_shader_t* shader, const char* name, const char* vertex_path, const char* fragment_path);
+DN_IMP void                           dn_gpu_shader_init_compute(dn_gpu_shader_t* shader, const char* name);
+DN_IMP void                           dn_gpu_shader_init_compute_ex(dn_gpu_shader_t* shader, const char* name, const char* compute_path);
+DN_IMP void                           dn_gpu_shader_reload(dn_gpu_shader_t* shader);	
+DN_IMP void                           dn_gpu_init();
+DN_IMP void                           dn_gpu_command_buffer_clear_cached_state(dn_gpu_command_buffer_t* command_buffer);
+DN_IMP u32                            dn_gpu_vertex_layout_calculate_stride(dn_gpu_buffer_layout_t* layout);
+DN_IMP u32                            dn_gpu_draw_primitive_to_gl_draw_primitive(dn_gpu_draw_primitive_t primitive);
+DN_IMP dn_gpu_vertex_attr_info_t      dn_gpu_vertex_attribute_info(dn_gpu_vertex_attribute_kind_t kind);
+DN_IMP void*                          dn_gpu_u32_to_gl_void_pointer(u32 value);
+DN_IMP u32                            dn_gpu_buffer_kind_to_gl_buffer_kind(dn_gpu_buffer_kind_t kind);
+DN_IMP u32                            dn_gpu_buffer_usage_to_gl_buffer_usage(dn_gpu_buffer_usage_t usage);
+DN_IMP u32                            dn_gpu_buffer_kind_to_gl_barrier(dn_gpu_buffer_kind_t kind);
+DN_IMP u32                            dn_gpu_blend_func_to_gl_blend_func(dn_gpu_blend_func_t func);
+DN_IMP u32                            dn_gpu_blend_mode_to_gl_blend_mode(dn_gpu_blend_mode_t mode);
+DN_IMP u32                            dn_gpu_resource_id_to_gl_id(dn_gpu_resource_id_t id);
+DN_IMP u32                            dn_gpu_memory_barrier_to_gl_barrier(dn_gpu_memory_barrier_t barrier);
 
 //////////////
 // INTERNAL //
@@ -366,25 +423,12 @@ typedef struct {
   Array<dn_gpu_pipeline_t, 64> pipelines;
 	Array<dn_gpu_buffer_t, 128>  gpu_buffers;
   Array<dn_gpu_render_target_t, 32>  targets;
-	Array<GpuShader, 128> shaders;
+	Array<dn_gpu_shader_t, 128> shaders;
 
 	FileMonitor* shader_monitor;
 } GpuInfo;
 GpuInfo td_gpu;
 
-void                   gpu_init();
-void                   gpu_command_buffer_clear_cached_state(dn_gpu_command_buffer_t* command_buffer);
-u32                    gpu_vertex_layout_calculate_stride(dn_gpu_buffer_layout_t* layout);
-u32                    gpu_draw_primitive_to_gl_draw_primitive(dn_gpu_draw_primitive_t primitive);
-dn_gpu_vertex_attribute_tInfo gpu_vertex_attribute_info(dn_gpu_vertex_attribute_kind_t kind);
-void*                  gpu_u32_to_gl_void_pointer(u32 value);
-u32                    gpu_buffer_kind_to_gl_buffer_kind(dn_gpu_buffer_kind_t kind);
-u32                    gpu_buffer_usage_to_gl_buffer_usage(dn_gpu_buffer_usage_t usage);
-u32                    gpu_buffer_kind_to_gl_barrier(dn_gpu_buffer_kind_t kind);
-u32                    gpu_blend_func_to_gl_blend_func(dn_gpu_blend_func_t func);
-u32                    gpu_blend_mode_to_gl_blend_mode(dn_gpu_blend_mode_t mode);
-u32                    gpu_resource_id_to_gl_id(dn_gpu_resource_id_t id);
-u32                    gpu_memory_barrier_to_gl_barrier(dn_gpu_memory_barrier_t barrier);
 #endif // GRAPHICS_H
 
 
@@ -398,7 +442,7 @@ u32                    gpu_memory_barrier_to_gl_barrier(dn_gpu_memory_barrier_t 
 ////////////////////
 // COMMAND BUFFER //
 ////////////////////
-dn_gpu_command_buffer_t* gpu_command_buffer_create(dn_gpu_command_buffer_descriptor_t descriptor) {
+dn_gpu_command_buffer_t* dn_gpu_command_buffer_create(dn_gpu_command_buffer_descriptor_t descriptor) {
   auto command_buffer = arr_push(&td_gpu.command_buffers);
   arr_init(&command_buffer->commands, descriptor.max_commands);
   glGenVertexArrays(1, &command_buffer->vao);
@@ -407,7 +451,7 @@ dn_gpu_command_buffer_t* gpu_command_buffer_create(dn_gpu_command_buffer_descrip
   return command_buffer;
 }
 
-void gpu_command_buffer_clear_cached_state(dn_gpu_command_buffer_t* command_buffer) {
+void dn_gpu_command_buffer_clear_cached_state(dn_gpu_command_buffer_t* command_buffer) {
   command_buffer->pipeline = nullptr;
   zero_memory(&command_buffer->bindings, sizeof(dn_gpu_buffer_binding_t));
   zero_memory(&command_buffer->render_pass, sizeof(dn_gpu_render_pass_t));
@@ -415,8 +459,8 @@ void gpu_command_buffer_clear_cached_state(dn_gpu_command_buffer_t* command_buff
   zero_memory(&command_buffer->scissor, sizeof(dn_gpu_scissor_state_t));
 }
 
-void gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
-  gpu_command_buffer_clear_cached_state(command_buffer);
+void dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
+  dn_gpu_command_buffer_clear_cached_state(command_buffer);
   glBindVertexArray(command_buffer->vao);
 
   arr_for(command_buffer->commands, it) {
@@ -427,11 +471,11 @@ void gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
       case GPU_COMMAND_OP_BEGIN_RENDER_PASS: {
         switch (command.render_pass.color.load) {
           case GPU_LOAD_OP_CLEAR: {
-            gpu_render_target_clear(command.render_pass.color.attachment);
+            dn_gpu_render_target_clear(command.render_pass.color.attachment);
           }
         }
 
-        gpu_render_target_bind(command.render_pass.color.attachment);
+        dn_gpu_render_target_bind(command.render_pass.color.attachment);
         command_buffer->render_pass = command.render_pass;
       } break;
 
@@ -455,10 +499,10 @@ void gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
         }
         else {
           glEnable(GL_BLEND);
-          glBlendEquation(gpu_blend_func_to_gl_blend_func(command.pipeline->blend.fn));
+          glBlendEquation(dn_gpu_blend_func_to_gl_blend_func(command.pipeline->blend.fn));
           glBlendFunc(
-            gpu_blend_mode_to_gl_blend_mode(command.pipeline->blend.source), 
-            gpu_blend_mode_to_gl_blend_mode(command.pipeline->blend.destination)
+            dn_gpu_blend_mode_to_gl_blend_mode(command.pipeline->blend.source), 
+            dn_gpu_blend_mode_to_gl_blend_mode(command.pipeline->blend.destination)
           );
 
         }
@@ -478,9 +522,9 @@ void gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
           auto buffer_layout = pipeline.buffer_layouts[buffer_index];
           auto buffer = vertex_buffers.bindings[buffer_index].buffer;
 
-          gpu_buffer_bind(buffer);
+          dn_gpu_buffer_bind(buffer);
 
-          u32 stride = gpu_vertex_layout_calculate_stride(&buffer_layout);
+          u32 stride = dn_gpu_vertex_layout_calculate_stride(&buffer_layout);
 
           u64 offset = 0;
           for (u32 i = 0; i < buffer_layout.num_vertex_attributes; i++) {
@@ -489,8 +533,8 @@ void gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
             auto attribute = buffer_layout.vertex_attributes[i];
             
             switch(attribute.kind) {
-              case GPU_VERTEX_ATTRIBUTE_FLOAT: glVertexAttribPointer(attribute_index, attribute.count, GL_FLOAT,        GL_FALSE, stride, gpu_u32_to_gl_void_pointer(offset)); break;
-              case GPU_VERTEX_ATTRIBUTE_U32:   glVertexAttribIPointer(attribute_index, attribute.count, GL_UNSIGNED_INT,           stride, gpu_u32_to_gl_void_pointer(offset)); break;
+              case GPU_VERTEX_ATTRIBUTE_FLOAT: glVertexAttribPointer(attribute_index, attribute.count, GL_FLOAT,        GL_FALSE, stride, dn_gpu_u32_to_gl_void_pointer(offset)); break;
+              case GPU_VERTEX_ATTRIBUTE_U32:   glVertexAttribIPointer(attribute_index, attribute.count, GL_UNSIGNED_INT,           stride, dn_gpu_u32_to_gl_void_pointer(offset)); break;
               default: {
                 assert(false);
               } break;
@@ -498,7 +542,7 @@ void gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
 
             glVertexAttribDivisor(attribute_index, attribute.divisor);
 
-            auto type_info = gpu_vertex_attribute_info(attribute.kind);
+            auto type_info = dn_gpu_vertex_attribute_info(attribute.kind);
             offset += attribute.count * type_info.size;
             attribute_index++;
           }
@@ -571,7 +615,7 @@ void gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
         set_uniform_immediate_mat4("view", view_transform);
         set_uniform_immediate_vec2("camera", command_buffer->render.camera);
 
-        auto primitive = gpu_draw_primitive_to_gl_draw_primitive(pipeline.raster.primitive);
+        auto primitive = dn_gpu_draw_primitive_to_gl_draw_primitive(pipeline.raster.primitive);
         switch (command.draw.mode) {
           case GPU_DRAW_MODE_ARRAYS: glDrawArrays(primitive, command.draw.vertex_offset, command.draw.num_vertices); break;
           case GPU_DRAW_MODE_INSTANCE: glDrawArraysInstanced(primitive, command.draw.vertex_offset, command.draw.num_vertices, command.draw.num_instances); break;
@@ -581,12 +625,12 @@ void gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
   }
 
   glBindVertexArray(0);
-  gpu_command_buffer_clear_cached_state(command_buffer);
+  dn_gpu_command_buffer_clear_cached_state(command_buffer);
   arr_clear(&command_buffer->commands);
 }
 
 
-void gpu_command_buffer_draw(dn_gpu_command_buffer_t* command_buffer, dn_gpu_draw_call_t draw_call) {
+void dn_gpu_command_buffer_draw(dn_gpu_command_buffer_t* command_buffer, dn_gpu_draw_call_t draw_call) {
   arr_push(&command_buffer->commands, {
     .op = GPU_COMMAND_OP_DRAW,
     .draw = draw_call
@@ -597,7 +641,7 @@ void gpu_command_buffer_draw(dn_gpu_command_buffer_t* command_buffer, dn_gpu_dra
 //////////////
 // PIPELINE //
 //////////////
-dn_gpu_pipeline_t* gpu_pipeline_create(dn_gpu_pipeline_descriptor_t descriptor) {
+dn_gpu_pipeline_t* dn_gpu_pipeline_create(dn_gpu_pipeline_descriptor_t descriptor) {
   dn_gpu_pipeline_t* pipeline = arr_push(&td_gpu.pipelines);
   pipeline->raster = descriptor.raster;
   pipeline->blend = descriptor.blend;
@@ -607,7 +651,7 @@ dn_gpu_pipeline_t* gpu_pipeline_create(dn_gpu_pipeline_descriptor_t descriptor) 
   return pipeline;
 }
 
-void gpu_bind_pipeline(dn_gpu_command_buffer_t* command_buffer, dn_gpu_pipeline_t* pipeline) {
+void dn_gpu_bind_pipeline(dn_gpu_command_buffer_t* command_buffer, dn_gpu_pipeline_t* pipeline) {
   arr_push(&command_buffer->commands, {
     .op = GPU_COMMAND_OP_BIND_PIPELINE,
     .pipeline = pipeline
@@ -618,20 +662,20 @@ void gpu_bind_pipeline(dn_gpu_command_buffer_t* command_buffer, dn_gpu_pipeline_
 /////////////
 // BINDING //
 /////////////
-void gpu_begin_render_pass(dn_gpu_command_buffer_t* command_buffer, dn_gpu_render_pass_t render_pass) {
+void dn_gpu_begin_render_pass(dn_gpu_command_buffer_t* command_buffer, dn_gpu_render_pass_t render_pass) {
   arr_push(&command_buffer->commands, {
     .op = GPU_COMMAND_OP_BEGIN_RENDER_PASS,
     .render_pass = render_pass
   });
 }
 
-void gpu_end_render_pass(dn_gpu_command_buffer_t* command_buffer) {
+void dn_gpu_end_render_pass(dn_gpu_command_buffer_t* command_buffer) {
   arr_push(&command_buffer->commands, {
     .op = GPU_COMMAND_OP_END_RENDER_PASS,
   });
 }
 
-void gpu_apply_bindings(dn_gpu_command_buffer_t* command_buffer, dn_gpu_buffer_binding_t bindings) {
+void dn_gpu_apply_bindings(dn_gpu_command_buffer_t* command_buffer, dn_gpu_buffer_binding_t bindings) {
   if (is_memory_equal(&command_buffer->bindings, &bindings, sizeof(dn_gpu_buffer_binding_t))) return;
 
   arr_push(&command_buffer->commands, {
@@ -644,7 +688,7 @@ void gpu_apply_bindings(dn_gpu_command_buffer_t* command_buffer, dn_gpu_buffer_b
 //////////////////
 // RENDER STATE //
 //////////////////
-void gpu_set_layer(dn_gpu_command_buffer_t* command_buffer, u32 layer) {
+void dn_gpu_set_layer(dn_gpu_command_buffer_t* command_buffer, u32 layer) {
   if (command_buffer->render.layer == layer) return;
 
   arr_push(&command_buffer->commands, {
@@ -655,7 +699,7 @@ void gpu_set_layer(dn_gpu_command_buffer_t* command_buffer, u32 layer) {
   });
 }
 
-void gpu_set_world_space(dn_gpu_command_buffer_t* command_buffer, bool world_space) {
+void dn_gpu_set_world_space(dn_gpu_command_buffer_t* command_buffer, bool world_space) {
   if (command_buffer->render.world_space == world_space) return;
 
   arr_push(&command_buffer->commands, {
@@ -666,7 +710,7 @@ void gpu_set_world_space(dn_gpu_command_buffer_t* command_buffer, bool world_spa
   });
 }
 
-void gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, Vector2 camera) {
+void dn_gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, Vector2 camera) {
   if (is_memory_equal(&command_buffer->render.camera,  &camera, sizeof(Vector2))) return;
 
   arr_push(&command_buffer->commands, {
@@ -677,19 +721,19 @@ void gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, Vector2 camera) {
   });
 }
 
-void gpu_bind_render_state(dn_gpu_command_buffer_t* command_buffer, dn_gpu_renderer_state_t render) {
-  gpu_set_layer(command_buffer, render.layer);
-  gpu_set_camera(command_buffer, render.camera);
-  gpu_set_world_space(command_buffer, render.world_space);
+void dn_gpu_bind_render_state(dn_gpu_command_buffer_t* command_buffer, dn_gpu_renderer_state_t render) {
+  dn_gpu_set_layer(command_buffer, render.layer);
+  dn_gpu_set_camera(command_buffer, render.camera);
+  dn_gpu_set_world_space(command_buffer, render.world_space);
 }
 
 
 //////////////
 // UNIFORMS //
 //////////////
-dn_gpu_uniform_t* gpu_uniform_create(dn_gpu_uniform_descriptor_t descriptor) {
+dn_gpu_uniform_t* dn_gpu_uniform_create(dn_gpu_uniform_descriptor_t descriptor) {
   auto uniform = arr_push(&td_gpu.uniforms);
-  copy_string_n(descriptor.name, MAX_UNIFORM_NAME, uniform->name, MAX_UNIFORM_NAME);
+  copy_string_n(descriptor.name, DN_ASSET_NAME_LEN, uniform->name, DN_ASSET_NAME_LEN);
   uniform->kind = descriptor.kind;
   
   return uniform;
@@ -699,7 +743,7 @@ dn_gpu_uniform_t* gpu_uniform_create(dn_gpu_uniform_descriptor_t descriptor) {
 /////////////////
 // GPU BUFFERS //
 /////////////////
-dn_gpu_buffer_t* gpu_buffer_create(dn_gpu_buffer_descriptor_t descriptor) {
+dn_gpu_buffer_t* dn_gpu_buffer_create(dn_gpu_buffer_descriptor_t descriptor) {
 	auto buffer = arr_push(&td_gpu.gpu_buffers);
   copy_string_n(descriptor.name, 64, buffer->name, 64);
 	buffer->kind = descriptor.kind;
@@ -707,74 +751,74 @@ dn_gpu_buffer_t* gpu_buffer_create(dn_gpu_buffer_descriptor_t descriptor) {
 	buffer->size = descriptor.capacity * descriptor.element_size;
 	glGenBuffers(1, &buffer->handle);
 	
-	gpu_buffer_sync(buffer, nullptr, buffer->size);
+	dn_gpu_buffer_sync(buffer, nullptr, buffer->size);
 
 	return buffer;
 }
 
-void gpu_memory_barrier(dn_gpu_memory_barrier_t barrier) {
-	glMemoryBarrier(gpu_memory_barrier_to_gl_barrier(barrier));
+void dn_gpu_memory_barrier(dn_gpu_memory_barrier_t barrier) {
+	glMemoryBarrier(dn_gpu_memory_barrier_to_gl_barrier(barrier));
 }
 
-void gpu_buffer_bind(dn_gpu_buffer_t* buffer) {
-	glBindBuffer(gpu_buffer_kind_to_gl_buffer_kind(buffer->kind), buffer->handle);
+void dn_gpu_buffer_bind(dn_gpu_buffer_t* buffer) {
+	glBindBuffer(dn_gpu_buffer_kind_to_gl_buffer_kind(buffer->kind), buffer->handle);
 }
 
-void gpu_buffer_bind_base(dn_gpu_buffer_t* buffer, u32 base) {
-	glBindBufferBase(gpu_buffer_kind_to_gl_buffer_kind(buffer->kind), base, buffer->handle);
+void dn_gpu_buffer_bind_base(dn_gpu_buffer_t* buffer, u32 base) {
+	glBindBufferBase(dn_gpu_buffer_kind_to_gl_buffer_kind(buffer->kind), base, buffer->handle);
 }
 
-void gpu_buffer_sync(dn_gpu_buffer_t* buffer, void* data, u32 size) {
-	gpu_buffer_bind(buffer);
-	glBufferData(gpu_buffer_kind_to_gl_buffer_kind(buffer->kind), size, data, gpu_buffer_usage_to_gl_buffer_usage(buffer->usage));
-	glMemoryBarrier(gpu_buffer_kind_to_gl_barrier(buffer->kind));
+void dn_gpu_buffer_sync(dn_gpu_buffer_t* buffer, void* data, u32 size) {
+	dn_gpu_buffer_bind(buffer);
+	glBufferData(dn_gpu_buffer_kind_to_gl_buffer_kind(buffer->kind), size, data, dn_gpu_buffer_usage_to_gl_buffer_usage(buffer->usage));
+	glMemoryBarrier(dn_gpu_buffer_kind_to_gl_barrier(buffer->kind));
 }
 
-void gpu_buffer_sync_subdata(dn_gpu_buffer_t* buffer, void* data, u32 byte_size, u32 byte_offset) {
-	gpu_buffer_bind(buffer);
-	glBufferSubData(gpu_buffer_kind_to_gl_buffer_kind(buffer->kind), byte_offset, byte_size, data);
-	glMemoryBarrier(gpu_buffer_kind_to_gl_barrier(buffer->kind));
+void dn_gpu_buffer_sync_subdata(dn_gpu_buffer_t* buffer, void* data, u32 byte_size, u32 byte_offset) {
+	dn_gpu_buffer_bind(buffer);
+	glBufferSubData(dn_gpu_buffer_kind_to_gl_buffer_kind(buffer->kind), byte_offset, byte_size, data);
+	glMemoryBarrier(dn_gpu_buffer_kind_to_gl_barrier(buffer->kind));
 }
 
-void gpu_buffer_zero(dn_gpu_buffer_t* buffer, u32 size) {
+void dn_gpu_buffer_zero(dn_gpu_buffer_t* buffer, u32 size) {
 	auto data = bump_allocator.alloc<u8>(size);
-	gpu_buffer_sync(buffer, data, size);
+	dn_gpu_buffer_sync(buffer, data, size);
 }
 
-dn_gpu_backed_buffer_t gpu_backed_buffer_create(dn_gpu_buffer_descriptor_t descriptor) {
+dn_gpu_backed_buffer_t dn_gpu_backed_buffer_create(dn_gpu_buffer_descriptor_t descriptor) {
   dn_gpu_backed_buffer_t backed_buffer;
-  backed_buffer.gpu_buffer = gpu_buffer_create(descriptor);
+  backed_buffer.gpu_buffer = dn_gpu_buffer_create(descriptor);
   dn_fixed_array_init(&backed_buffer.buffer, descriptor.capacity, descriptor.element_size);
   return backed_buffer;
 }
 
-void gpu_backed_buffer_clear(dn_gpu_backed_buffer_t* buffer) {
+void dn_gpu_backed_buffer_clear(dn_gpu_backed_buffer_t* buffer) {
   buffer->buffer.size = 0;
 }
 
-u32 gpu_backed_buffer_size(dn_gpu_backed_buffer_t* buffer) {
+u32 dn_gpu_backed_buffer_size(dn_gpu_backed_buffer_t* buffer) {
   return buffer->buffer.size;
 }
 
-u8* gpu_backed_buffer_push(dn_gpu_backed_buffer_t* buffer, void* data, u32 num_elements) {
+u8* dn_gpu_backed_buffer_push(dn_gpu_backed_buffer_t* buffer, void* data, u32 num_elements) {
   return dn_fixed_array_push(&buffer->buffer, data, num_elements);
 }
 
-void gpu_backed_buffer_sync(dn_gpu_backed_buffer_t* buffer) {
-  gpu_buffer_sync(buffer->gpu_buffer, buffer->buffer.data, buffer->buffer.size * buffer->buffer.element_size);
+void dn_gpu_backed_buffer_sync(dn_gpu_backed_buffer_t* buffer) {
+  dn_gpu_buffer_sync(buffer->gpu_buffer, buffer->buffer.data, buffer->buffer.size * buffer->buffer.element_size);
 }
 
 
 ////////////////
 // GPU SHADER //
 ////////////////
-GpuShader* gpu_shader_create(GpuShaderDescriptor descriptor) {
+dn_gpu_shader_t* dn_gpu_shader_create(dn_gpu_shader_descriptor_t descriptor) {
 	auto shader = arr_push(&td_gpu.shaders);
-	shader->init(descriptor);
+	dn_gpu_shader_init(shader, descriptor);
 	return shader;
 }
 
-GpuShader* gpu_shader_find(const char* name) {
+dn_gpu_shader_t* dn_gpu_shader_find(const char* name) {
 	arr_for(td_gpu.shaders, shader) {
 		if (!strncmp(shader->name, name, DN_MAX_PATH_LEN)) return shader;
 	}
@@ -782,11 +826,171 @@ GpuShader* gpu_shader_find(const char* name) {
 	return nullptr;
 }
 
+////////////////////
+// SHADER LOADING //
+////////////////////
+tstring build_shader_source(const char* file_path) {
+	auto shader_file = copy_string(file_path, &bump_allocator);
+	auto shader_directory =  dn_paths_resolve("shaders");
+	auto error = bump_allocator.alloc<char>(256);
+	
+	IncludeContext context = {
+		.file_path = file_path,
+		.include_dirs = {
+			.data = { dn_paths_resolve("shaders"), dn_paths_resolve("shader_includes") },
+			.count = 2
+		}
+	};
+	td_include(&context);
+
+	if (!context.result) {
+		tdns_log.write("shader preprocessor error; shader = %s, err = %s", shader_file, context.error);
+		return copy_string("YOUR_SHADER_FAILED_TO_COMPILE", &bump_allocator);
+	}
+	
+	auto source = copy_string(context.result, &bump_allocator);
+	
+	return source;
+}
+
+void check_shader_compilation(u32 shader, const char* file_path) {
+	i32 success;
+	
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+	if (!success) {
+		static constexpr u32 error_size = 512;
+		auto compilation_status = bump_allocator.alloc<char>(error_size);
+		
+		glGetShaderInfoLog(shader, error_size, NULL, compilation_status);
+
+		tdns_log.write("shader compile error; shader = %s, err = %s", file_path, compilation_status);
+	}
+}
+
+void check_shader_linkage(u32 program, const char* file_path) {
+	i32 success;
+	
+	glGetProgramiv(program, GL_LINK_STATUS, &success);
+	if (!success) {
+		static constexpr u32 error_size = 512;
+		auto compilation_status = bump_allocator.alloc<char>(error_size);
+		
+		glGetProgramInfoLog(program, error_size, NULL, compilation_status);
+		tdns_log.write("shader link error; shader = %s, err = %s", file_path, compilation_status);
+	}
+}
+
+
+////////////////
+// GPU SHADER //
+////////////////
+void dn_gpu_shader_init(dn_gpu_shader_t* shader, dn_gpu_shader_descriptor_t descriptor) {
+	if (descriptor.kind == GPU_SHADER_COMPUTE) {
+		auto compute_path = dn_paths_resolve_format_ex("compute_shader", descriptor.compute_shader, &bump_allocator);
+		dn_gpu_shader_init_compute_ex(shader, descriptor.name, compute_path);
+	}
+	else if (descriptor.kind == GPU_SHADER_GRAPHICS) {
+		auto vertex_path = dn_paths_resolve_format_ex("vertex_shader", descriptor.vertex_shader, &bump_allocator);
+		auto fragment_path = dn_paths_resolve_format_ex("fragment_shader", descriptor.fragment_shader, &bump_allocator);
+		dn_gpu_shader_init_graphics_ex(shader, descriptor.name, vertex_path, fragment_path);
+	}
+}
+
+void dn_gpu_shader_init_graphics(dn_gpu_shader_t* shader, const char* name) {
+	auto vertex_path = dn_paths_resolve_format_ex("vertex_shader", name, &bump_allocator);
+	auto fragment_path = dn_paths_resolve_format_ex("fragment_shader", name, &bump_allocator);
+	dn_gpu_shader_init_graphics_ex(shader, name, vertex_path, fragment_path);
+}
+
+void dn_gpu_shader_init_graphics_ex(dn_gpu_shader_t* shader, const char* name, const char* vertex_shader, const char* fragment_shader) {
+	shader->kind = GPU_SHADER_GRAPHICS;
+	copy_string(name, shader->name, DN_ASSET_NAME_LEN);
+	shader->graphics.vertex_path = copy_string(vertex_shader);
+	shader->graphics.fragment_path = copy_string(fragment_shader);
+	
+
+	const char* paths[] = {
+		vertex_shader,
+		fragment_shader
+	};
+
+	shader->program = glCreateProgram();
+	
+  for (u32 index = 0; index < 2; index++) {
+		auto file_path = paths[index];
+		auto source = build_shader_source(file_path);
+		if (!source) return;
+		
+		// Compile the shader
+		unsigned int shader_kind = (index == 0) ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER;
+		unsigned int shader_id = glCreateShader(shader_kind);
+		if (shader_kind == GL_VERTEX_SHADER) {
+			shader->graphics.vertex_shader = shader_id;
+		}
+		else if (shader_kind == GL_FRAGMENT_SHADER) {
+			shader->graphics.fragment_shader = shader_id;
+		}
+
+		u32 num_shaders = 1;
+		glShaderSource(shader_id, num_shaders, &source, NULL);
+		glCompileShader(shader_id);
+		check_shader_compilation(shader_id, file_path);
+
+		glAttachShader(shader->program, shader_id);
+	}
+		
+	// Link into a shader program
+	glLinkProgram(shader->program);
+	check_shader_linkage(shader->program, shader->graphics.vertex_path);
+	dn_gpu_set_resource_name(GPU_RESOURCE_PROGRAM, shader->program, strlen(name), name);
+}
+
+void dn_gpu_shader_init_compute(dn_gpu_shader_t* shader, const char* name) {
+	dn_gpu_shader_init_compute_ex(shader, name, dn_paths_resolve_format_ex("compute_shader", name, &bump_allocator));
+}
+
+void dn_gpu_shader_init_compute_ex(dn_gpu_shader_t* shader, const char* name, const char* compute_path) {
+	shader->kind = GPU_SHADER_COMPUTE;
+	copy_string(name, shader->name, DN_ASSET_NAME_LEN);
+	shader->compute.path = copy_string(compute_path);
+	auto source = build_shader_source(shader->compute.path);
+	
+	u32 num_shaders = 1;
+	shader->compute.shader = glCreateShader(GL_COMPUTE_SHADER);
+	glShaderSource(shader->compute.shader, num_shaders, &source, NULL);
+	glCompileShader(shader->compute.shader);
+	check_shader_compilation(shader->compute.shader, shader->compute.path);
+
+	shader->program = glCreateProgram();
+	glAttachShader(shader->program, shader->compute.shader);
+	glLinkProgram(shader->program);
+	check_shader_linkage(shader->program, shader->compute.path);
+}
+
+void dn_gpu_shader_reload(dn_gpu_shader_t* shader) {
+	glDeleteProgram(shader->program);
+
+  switch (shader->kind) {
+    case GPU_SHADER_GRAPHICS: {
+      glDeleteShader(shader->graphics.vertex_shader);
+      glDeleteShader(shader->graphics.fragment_shader);
+		  dn_gpu_shader_init_graphics_ex(shader, shader->name, copy_string(shader->graphics.vertex_path, &bump_allocator), copy_string(shader->graphics.fragment_path, &bump_allocator));
+    } break;
+    case GPU_SHADER_COMPUTE: {
+      glDeleteShader(shader->compute.shader);
+      dn_gpu_shader_init_compute_ex(shader, shader->name, copy_string(shader->compute.path, &bump_allocator));
+    } break;
+    default: {
+      TD_ASSERT(false);
+    }
+  }
+}
+
 
 ///////////////////
 // RENDER TARGET //
 ///////////////////
-dn_gpu_render_target_t* gpu_render_target_create(dn_gpu_render_target_descriptor_t descriptor) {
+dn_gpu_render_target_t* dn_gpu_render_target_create(dn_gpu_render_target_descriptor_t descriptor) {
 	auto target = arr_push(&td_gpu.targets);
 	target->size = descriptor.size;
 	
@@ -812,12 +1016,12 @@ dn_gpu_render_target_t* gpu_render_target_create(dn_gpu_render_target_descriptor
 	return target;
 }
 
-void gpu_destroy_target(dn_gpu_render_target_t* target) {
+void dn_gpu_destroy_target(dn_gpu_render_target_t* target) {
 	glDeleteTextures(1, &target->color_buffer);
 	glDeleteFramebuffers(1, &target->handle);
 }
 
-void gpu_render_target_bind(dn_gpu_render_target_t* target) {
+void dn_gpu_render_target_bind(dn_gpu_render_target_t* target) {
 	if (!target) {
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		return;
@@ -827,33 +1031,33 @@ void gpu_render_target_bind(dn_gpu_render_target_t* target) {
 	glViewport(0, 0, target->size.x, target->size.y);
 }
 
-dn_gpu_render_target_t* gpu_acquire_swapchain() {
+dn_gpu_render_target_t* dn_gpu_acquire_swapchain() {
 	return td_gpu.targets[0];
 }
 
-void gpu_render_target_clear(dn_gpu_render_target_t* target) {
+void dn_gpu_render_target_clear(dn_gpu_render_target_t* target) {
 	if (!target) return;
 	
-	gpu_render_target_bind(target);
+	dn_gpu_render_target_bind(target);
 	glClearColor(0.f, 0.f, 0.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void gpu_render_target_blit(dn_gpu_render_target_t* source, dn_gpu_render_target_t* destination) {
+void dn_gpu_render_target_blit(dn_gpu_render_target_t* source, dn_gpu_render_target_t* destination) {
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, source->handle);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, destination->handle);
 	glBlitFramebuffer(0, 0, source->size.x, source->size.y, 0, 0, destination->size.x, destination->size.y,  GL_COLOR_BUFFER_BIT, GL_NEAREST);
 	glMemoryBarrier(GL_FRAMEBUFFER_BARRIER_BIT);
 }
 
-void gpu_swap_buffers() {
+void dn_gpu_swap_buffers() {
 	glfwSwapBuffers(window.handle);
 }
 
 /////////////////////
 // ENUM CONVERSION //
 /////////////////////
-u32 gpu_draw_primitive_to_gl_draw_primitive(dn_gpu_draw_primitive_t primitive) {
+u32 dn_gpu_draw_primitive_to_gl_draw_primitive(dn_gpu_draw_primitive_t primitive) {
   switch (primitive) {
     case GPU_PRIMITIVE_TRIANGLES: return GL_TRIANGLES;
   }
@@ -862,7 +1066,7 @@ u32 gpu_draw_primitive_to_gl_draw_primitive(dn_gpu_draw_primitive_t primitive) {
   return 0;
 }
 
-u32 gpu_blend_func_to_gl_blend_func(dn_gpu_blend_func_t func) {
+u32 dn_gpu_blend_func_to_gl_blend_func(dn_gpu_blend_func_t func) {
   switch (func) {
     case GPU_BLEND_FUNC_NONE:             return 0; break;
     case GPU_BLEND_FUNC_ADD:              return GL_FUNC_ADD; break;
@@ -876,7 +1080,7 @@ u32 gpu_blend_func_to_gl_blend_func(dn_gpu_blend_func_t func) {
   return 0;
 }
 
-u32 gpu_blend_mode_to_gl_blend_mode(dn_gpu_blend_mode_t mode) {
+u32 dn_gpu_blend_mode_to_gl_blend_mode(dn_gpu_blend_mode_t mode) {
   switch (mode) {
     case GPU_BLEND_MODE_ZERO: return GL_ZERO; break;
     case GPU_BLEND_MODE_ONE: return GL_ONE; break;
@@ -898,7 +1102,7 @@ u32 gpu_blend_mode_to_gl_blend_mode(dn_gpu_blend_mode_t mode) {
   return 0;
 }
 
-u32 gpu_resource_id_to_gl_id(dn_gpu_resource_id_t id) {
+u32 dn_gpu_resource_id_to_gl_id(dn_gpu_resource_id_t id) {
   switch (id) {
     case GPU_RESOURCE_FRAMEBUFFER: return GL_FRAMEBUFFER; break;
     case GPU_RESOURCE_SHADER: return GL_SHADER; break;
@@ -909,7 +1113,7 @@ u32 gpu_resource_id_to_gl_id(dn_gpu_resource_id_t id) {
   return 0;
 }
 
-u32 gpu_memory_barrier_to_gl_barrier(dn_gpu_memory_barrier_t barrier) {
+u32 dn_gpu_memory_barrier_to_gl_barrier(dn_gpu_memory_barrier_t barrier) {
   switch (barrier) {
     case GPU_MEMORY_BARRIER_STORAGE: return GL_SHADER_STORAGE_BARRIER_BIT; break;
     case GPU_MEMORY_BARRIER_BUFFER_UPDATE: return GL_BUFFER_UPDATE_BARRIER_BIT; break;
@@ -919,7 +1123,7 @@ u32 gpu_memory_barrier_to_gl_barrier(dn_gpu_memory_barrier_t barrier) {
   return 0;
 }
 
-u32 gpu_buffer_kind_to_gl_buffer_kind(dn_gpu_buffer_kind_t kind) {
+u32 dn_gpu_buffer_kind_to_gl_buffer_kind(dn_gpu_buffer_kind_t kind) {
   switch (kind) {
     case GPU_BUFFER_KIND_STORAGE: return GL_SHADER_STORAGE_BUFFER; break;
     case GPU_BUFFER_KIND_ARRAY: return GL_ARRAY_BUFFER; break;
@@ -929,7 +1133,7 @@ u32 gpu_buffer_kind_to_gl_buffer_kind(dn_gpu_buffer_kind_t kind) {
 	return 0;
 }
 
-u32 gpu_buffer_usage_to_gl_buffer_usage(dn_gpu_buffer_usage_t usage) {
+u32 dn_gpu_buffer_usage_to_gl_buffer_usage(dn_gpu_buffer_usage_t usage) {
   switch (usage) {
     case GPU_BUFFER_USAGE_STATIC: return GL_STATIC_DRAW; break;
     case GPU_BUFFER_USAGE_DYNAMIC: return GL_DYNAMIC_DRAW; break;
@@ -940,7 +1144,7 @@ u32 gpu_buffer_usage_to_gl_buffer_usage(dn_gpu_buffer_usage_t usage) {
 	return 0;
 }
 
-u32 gpu_buffer_kind_to_gl_barrier(dn_gpu_buffer_kind_t kind) {
+u32 dn_gpu_buffer_kind_to_gl_barrier(dn_gpu_buffer_kind_t kind) {
   switch (kind) {
     case GPU_BUFFER_KIND_STORAGE: return GL_SHADER_STORAGE_BARRIER_BIT; break;
     case GPU_BUFFER_KIND_ARRAY: return GL_BUFFER_UPDATE_BARRIER_BIT; break;
@@ -950,7 +1154,7 @@ u32 gpu_buffer_kind_to_gl_barrier(dn_gpu_buffer_kind_t kind) {
 	return 0;
 }
 
-dn_gpu_vertex_attribute_tInfo gpu_vertex_attribute_info(dn_gpu_vertex_attribute_kind_t kind) {
+dn_gpu_vertex_attr_info_t dn_gpu_vertex_attribute_info(dn_gpu_vertex_attribute_kind_t kind) {
   switch (kind) {
     case GPU_VERTEX_ATTRIBUTE_FLOAT: {
       return {
@@ -970,18 +1174,18 @@ dn_gpu_vertex_attribute_tInfo gpu_vertex_attribute_info(dn_gpu_vertex_attribute_
   return {0};
 }
 
-void* gpu_u32_to_gl_void_pointer(u32 value) {
+void* dn_gpu_u32_to_gl_void_pointer(u32 value) {
   return (void*)(uintptr_t)value;
 }
 
-u32 gpu_vertex_layout_calculate_stride(dn_gpu_buffer_layout_t* layout) {
+u32 dn_gpu_vertex_layout_calculate_stride(dn_gpu_buffer_layout_t* layout) {
   assert(layout);
 
   u32 stride = 0;
 
   for (u32 i = 0; i < layout->num_vertex_attributes; i++) {
     auto attribute = layout->vertex_attributes[i];
-    auto type_info = gpu_vertex_attribute_info(attribute.kind);
+    auto type_info = dn_gpu_vertex_attribute_info(attribute.kind);
     stride += attribute.count * type_info.size;
   }
 
@@ -992,7 +1196,7 @@ u32 gpu_vertex_layout_calculate_stride(dn_gpu_buffer_layout_t* layout) {
 //////////////
 // INTERNAL //
 //////////////
-void gpu_init() {
+void dn_gpu_init() {
   arr_init(&td_gpu.command_buffers);
   arr_init(&td_gpu.uniforms);
   arr_init(&td_gpu.pipelines);
@@ -1008,7 +1212,7 @@ void gpu_init() {
 	auto reload_all_shaders = [](FileMonitor* file_monitor, FileChange* event, void* userdata) {
 		tdns_log.write("SHADER_RELOAD");
 		arr_for(td_gpu.shaders, shader) {
-			shader->reload();
+			dn_gpu_shader_reload(shader);
 		}
 	};
 	td_gpu.shader_monitor = arr_push(&file_monitors);
@@ -1020,11 +1224,11 @@ void gpu_init() {
 ///////////////////
 // OPENGL ERRORS //
 ///////////////////
-void gpu_error_clear() {
+void dn_gpu_error_clear() {
 	while (glGetError() != GL_NO_ERROR) {}
 }
 
-tstring gpu_error_read() {
+tstring dn_gpu_error_read() {
 	auto error = glGetError();
 	if (error == GL_INVALID_ENUM) {
 		return copy_string("GL_INVALID_ENUM", &bump_allocator);
@@ -1042,13 +1246,13 @@ tstring gpu_error_read() {
 	return nullptr;
 }
 
-void gpu_error_log_one() {
-	tdns_log.write(gpu_error_read());
+void dn_gpu_error_log_one() {
+	tdns_log.write(dn_gpu_error_read());
 }
 
-void gpu_error_log_all() {
+void dn_gpu_error_log_all() {
 	while (true) {
-		auto error = gpu_error_read();
+		auto error = dn_gpu_error_read();
 		if (!error) break;
 		if (!strcmp(error, "GL_NO_ERROR")) break;
 
@@ -1158,7 +1362,7 @@ void gl_error_callback(GLenum source, GLenum type, GLuint id,GLenum severity, GL
 	int x = 0;
 }
 
-void gpu_set_resource_name(dn_gpu_resource_id_t id, u32 handle, u32 name_len, const char* name) {
-	glObjectLabel(gpu_resource_id_to_gl_id(id), handle, name_len, name);
+void dn_gpu_set_resource_name(dn_gpu_resource_id_t id, u32 handle, u32 name_len, const char* name) {
+	glObjectLabel(dn_gpu_resource_id_to_gl_id(id), handle, name_len, name);
 }
 #endif // GRAPHICS_IMPL

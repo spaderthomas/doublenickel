@@ -130,7 +130,7 @@ void dn_window_create(dn_window_descriptor_t descriptor) {
 
 	init_noise();
 	dn_imgui_init();
-	gpu_init();
+	dn_gpu_init();
 	init_texture_atlas(); // Invert control
 	init_backgrounds(); // Invert control
 	init_screenshots(); // Use the asset loader

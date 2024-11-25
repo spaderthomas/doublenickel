@@ -1,7 +1,7 @@
 -------------
 -- STRUCTS --
 -------------
-GpuShaderDescriptor = tdengine.class.metatype('GpuShaderDescriptor')
+GpuShaderDescriptor = tdengine.class.metatype('dn_gpu_shader_descriptor_t')
 function GpuShaderDescriptor:init(params)
   params.kind = tdengine.enum.load(params.kind)
   self.kind = params.kind:to_number()
@@ -24,7 +24,7 @@ function GpuRenderTargetDescriptor:init(params)
   end
 end
 
-GpuBufferDescriptor = tdengine.class.metatype('GpuBufferDescriptor')
+GpuBufferDescriptor = tdengine.class.metatype('dn_gpu_buffer_descriptor_t')
 function GpuBufferDescriptor:init(params)
   self.kind = tdengine.enum.load(params.kind):to_number()
   self.usage = tdengine.enum.load(params.usage):to_number()
@@ -88,7 +88,7 @@ function GpuRenderPass:init(params)
   end
 end
 
-GpuUniformBinding = tdengine.class.metatype('GpuUniformBinding')
+GpuUniformBinding = tdengine.class.metatype('dn_gpu_uniform_binding_t')
 function GpuUniformBinding:init(params)
   self.uniform = params.uniform
   self.binding_index = params.binding_index or 0
@@ -106,7 +106,7 @@ function GpuUniformBinding:init(params)
   else   tdengine.debug.assert(false) end
 end
 
-GpuVertexBufferBinding = tdengine.class.metatype('GpuVertexBufferBinding')
+GpuVertexBufferBinding = tdengine.class.metatype('dn_gpu_vertex_buffer_binding_t')
 function GpuVertexBufferBinding:init(buffer)
   if type(buffer) == 'cdata' then
     self.buffer = buffer
@@ -115,7 +115,7 @@ function GpuVertexBufferBinding:init(buffer)
   end
 end
 
-GpuStorageBufferBinding = tdengine.class.metatype('GpuStorageBufferBinding')
+GpuStorageBufferBinding = tdengine.class.metatype('dn_gpu_storage_buffer_binding_t')
 function GpuStorageBufferBinding:init(params)
   if type(params.buffer) == 'cdata' then
     self.buffer = params.buffer
@@ -126,13 +126,13 @@ function GpuStorageBufferBinding:init(params)
   self.base = params.base
 end
 
-GpuBufferBinding = tdengine.class.metatype('GpuBufferBinding')
+GpuBufferBinding = tdengine.class.metatype('dn_gpu_buffer_binding_t')
 function GpuBufferBinding:init(params)
   local allocator = tdengine.ffi.dn_allocator_find('standard')
 
   if params.vertex then
     self.vertex.count = #params.vertex
-    self.vertex.bindings = allocator:alloc_array('GpuVertexBufferBinding', self.vertex.count)
+    self.vertex.bindings = allocator:alloc_array('dn_gpu_vertex_buffer_binding_t', self.vertex.count)
     for i = 1, self.vertex.count do
       self.vertex.bindings[i - 1] = GpuVertexBufferBinding:new(params.vertex[i])
     end
@@ -140,7 +140,7 @@ function GpuBufferBinding:init(params)
 
   if params.uniforms then
     self.uniforms.count = #params.uniforms
-    self.uniforms.bindings = allocator:alloc_array('GpuUniformBinding', self.uniforms.count)
+    self.uniforms.bindings = allocator:alloc_array('dn_gpu_uniform_binding_t', self.uniforms.count)
     for i = 1, self.uniforms.count do
       self.uniforms.bindings[i - 1] = GpuUniformBinding:new(params.uniforms[i])
     end
@@ -148,7 +148,7 @@ function GpuBufferBinding:init(params)
 
   if params.storage then
     self.storage.count = #params.storage
-    self.storage.bindings = allocator:alloc_array('GpuStorageBufferBinding', self.storage.count)
+    self.storage.bindings = allocator:alloc_array('dn_gpu_storage_binding_t', self.storage.count)
     for i = 1, self.storage.count do
       self.storage.bindings[i - 1] = GpuStorageBufferBinding:new(params.storage[i])
     end
@@ -210,11 +210,11 @@ function tdengine.gpu.render()
   tdengine.lifecycle.run_callback(tdengine.lifecycle.callbacks.on_render_scene)
   tdengine.lifecycle.run_callback(tdengine.lifecycle.callbacks.on_scene_rendered)
 
-  local swapchain = tdengine.ffi.gpu_acquire_swapchain()
-  tdengine.ffi.gpu_render_target_bind(swapchain)
-  tdengine.ffi.gpu_render_target_clear(swapchain)
+  local swapchain = tdengine.ffi.dn_gpu_acquire_swapchain()
+  tdengine.ffi.dn_gpu_render_target_bind(swapchain)
+  tdengine.ffi.dn_gpu_render_target_clear(swapchain)
   tdengine.app:on_swapchain_ready()
-  tdengine.ffi.gpu_swap_buffers()
+  tdengine.ffi.dn_gpu_swap_buffers()
 
   tdengine.ffi.dn_time_metric_end('render')
 end
@@ -237,7 +237,7 @@ end
 -- RENDER TARGET -- 
 -------------------
 function tdengine.gpu.add_render_target(id, descriptor)
-  local target = tdengine.ffi.gpu_render_target_create(descriptor)
+  local target = tdengine.ffi.dn_gpu_render_target_create(descriptor)
   self.render_targets[id:to_string()] = target
   self.assets[id:to_qualified_string()] = target
 end
@@ -255,7 +255,7 @@ end
 -- GPU BUFFER --
 ----------------
 function tdengine.gpu.add_buffer(id, descriptor)
-  local buffer = tdengine.ffi.gpu_buffer_create(descriptor)
+  local buffer = tdengine.ffi.dn_gpu_buffer_create(descriptor)
   self.buffers[id:to_string()] = buffer
   self.assets[id:to_qualified_string()] = buffer
 end
@@ -270,7 +270,7 @@ end
 -- SHADER --
 ------------
 function tdengine.gpu.add_shader(id, descriptor)
-  local shader = tdengine.ffi.gpu_shader_create(descriptor)
+  local shader = tdengine.ffi.dn_gpu_shader_create(descriptor)
   self.shaders[id:to_string()] = shader
   self.assets[id:to_qualified_string()] = shader
 end

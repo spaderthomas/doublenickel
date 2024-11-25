@@ -63,14 +63,14 @@ function App:on_init_game()
 	self.sdf_renderer = ffi.new('SdfRenderer [1]');
   self.sdf_renderer = tdengine.ffi.sdf_renderer_create(1024 * 1024)
 
-  self.command_buffer = tdengine.ffi.gpu_command_buffer_create(GpuCommandBufferDescriptor:new({
+  self.command_buffer = tdengine.ffi.dn_gpu_command_buffer_create(GpuCommandBufferDescriptor:new({
     max_commands = 1024
   }))
 
   self.render_pass = GpuRenderPass:new({
     color = {
       attachment = RenderTarget.Native,
-      load = dn_gpu_load_op_t.Clear
+      load = GpuLoadOp.Clear
     }
   })
 
@@ -101,14 +101,14 @@ function App:on_start_game()
 end
 
 function App:on_scene_rendered()
-	tdengine.ffi.gpu_begin_render_pass(self.command_buffer, self.render_pass)
-  tdengine.ffi.gpu_set_world_space(self.command_buffer, true)
-  tdengine.ffi.gpu_set_camera(self.command_buffer, tdengine.editor.find('EditorCamera').offset:to_ctype())
+	tdengine.ffi.dn_gpu_begin_render_pass(self.command_buffer, self.render_pass)
+  tdengine.ffi.dn_gpu_set_world_space(self.command_buffer, true)
+  tdengine.ffi.dn_gpu_set_camera(self.command_buffer, tdengine.editor.find('EditorCamera').offset:to_ctype())
   tdengine.ffi.sdf_renderer_draw(self.sdf_renderer, self.command_buffer)
-  tdengine.ffi.gpu_end_render_pass(self.command_buffer)
-  tdengine.ffi.gpu_command_buffer_submit(self.command_buffer)
+  tdengine.ffi.dn_gpu_end_render_pass(self.command_buffer)
+  tdengine.ffi.dn_gpu_command_buffer_submit(self.command_buffer)
 
-	tdengine.ffi.gpu_render_target_blit(
+	tdengine.ffi.dn_gpu_render_target_blit(
     tdengine.gpu.find(RenderTarget.Native),
     tdengine.gpu.find(RenderTarget.Upscaled)
 	)

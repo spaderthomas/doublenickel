@@ -40,7 +40,6 @@
 #include "source/font.hpp"
 #include "source/image.hpp"
 #include "source/background.hpp"
-#include "source/shader.hpp"
 #include "source/fluid.hpp"
 #include "source/text.hpp"
 #include "source/draw.hpp"
@@ -85,7 +84,6 @@
 #include "source/particle.cpp"
 #define SDF_IMPLEMENTATION
 #include "source/sdf.hpp"
-#include "source/shader.cpp"
 #include "source/steam.cpp"
 #include "source/text.cpp"
 #define DN_TIME_METRICS_IMPLEMENTATION
