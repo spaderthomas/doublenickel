@@ -99,6 +99,7 @@ function tdengine.dialogue.list()
     table.insert(dialogues, dialogue)
   end
 
+  my_cool_new_bird = 69
   return dialogues
 end
 
