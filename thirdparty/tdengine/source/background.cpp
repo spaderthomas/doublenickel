@@ -1,6 +1,7 @@
 void init_backgrounds() {
-	auto& lua = get_lua();
-	lua_State* l = get_lua().state;
+	return;
+	auto& lua = dn_lua;
+	lua_State* l = dn_lua.state;
 
 	arr_init(&backgrounds, 64);
 			
@@ -22,10 +23,10 @@ void init_backgrounds() {
 		background->load_paths();
 		
 		// Load the background's priority
-		lua.parse_bool("high_priority", &background->high_priority);
+		//lua.parse_bool("high_priority", &background->high_priority);
 
 		// Figure out whether the source has been modified since we tiled it
-		lua.parse_float64("mod_time", &background->mod_time);
+		//lua.parse_float64("mod_time", &background->mod_time);
 		background->filesystem_mod_time = file_mod_time(background->source_image_full_path);
 
 		if (background->is_dirty()) {
@@ -124,15 +125,15 @@ void Background::deinit() {
 }
 
 void Background::load_paths() {
-	auto& lua = get_lua();
-	auto l = get_lua().state;
+	auto& lua = dn_lua;
+	auto l = dn_lua.state;
 		
 	// Find the path to the source image, i.e. the full size background
-	lua.parse_string("source", &source_image);
+	//lua.parse_string("source", &source_image);
 	this->source_image_full_path = dn_paths_resolve_format_ex("image", source_image, &standard_allocator);
 
 	// Find the folder we're going to write tiles to
-	lua.parse_string(-2, &tile_output_folder);
+	//lua.parse_string(-2, &tile_output_folder);
 	this->tile_output_full_path = dn_paths_resolve_format_ex("atlas", tile_output_folder, &standard_allocator);
 		
 	// The name of the background is the folder we use for tiling
@@ -227,7 +228,7 @@ void Background::build_from_source() {
 }
 
 void Background::update_config() {
-	lua_State* l = get_lua().state;
+	lua_State* l = dn_lua.state;
 
 	lua_getglobal(l, "tdengine");
 	DEFER_POP(l);

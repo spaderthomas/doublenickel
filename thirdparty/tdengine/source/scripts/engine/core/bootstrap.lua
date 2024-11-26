@@ -1178,7 +1178,7 @@ void set_particle_master_opacity(ParticleSystemHandle handle, float opacity);
 //  ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝╚══════╝╚══════╝╚═════╝  //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void add_script_directory(const char* name);
+void dn_lua_add_dir(const char* name);
 
 typedef enum {
 	DN_LOG_FLAG_CONSOLE = 1,

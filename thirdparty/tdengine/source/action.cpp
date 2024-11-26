@@ -81,7 +81,7 @@ void update_actions() {
 void SteamInputManager::register_actions() {
 	steam->RunFrame();
 
-	auto l = get_lua().state;
+	auto l = dn_lua.state;
 	lua_getglobal(l, "tdengine");
 	lua_pushstring(l, "action");
 	lua_gettable(l, -2);

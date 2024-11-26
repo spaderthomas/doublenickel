@@ -113,7 +113,7 @@ void TextureAtlas::build_from_config() {
 	this->buffer = Array<u32>();
 	arr_init(&this->buffer, TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE);
 
-	lua_State* l = get_lua().state;
+	lua_State* l = dn_lua.state;
 	// Push global texture data onto the stack
 	lua_getglobal(l, "tdengine");
 	DEFER_POP(l);
@@ -129,7 +129,7 @@ void TextureAtlas::build_from_config() {
 
 	// Populate UVs and size for each sprite
 	image_iterator add_directory = [&](const char* directory) {
-		lua_State* l = get_lua().state;
+		lua_State* l = dn_lua.state;
 		
 		if (!std::filesystem::exists(directory)) return;
 
@@ -296,7 +296,7 @@ void TextureAtlas::write_to_config() {
 	// atlas loader thread also tries to serialize to the same config. 
 	std::lock_guard lock(image_config_mutex);
 	
-	lua_State* l = get_lua().state;
+	lua_State* l = dn_lua.state;
 
 	// Push global texture data onto the stack
 	lua_getglobal(l, "tdengine");
@@ -481,7 +481,7 @@ void Texture::unload_from_gpu() {
 // LIFECYCLE //
 ///////////////
 void init_texture_atlas() {
-	lua_State* l = get_lua().state;
+	lua_State* l = dn_lua.state;
 
 	// Push global texture data onto the stack
 	lua_getglobal(l, "tdengine");
