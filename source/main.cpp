@@ -1,5 +1,5 @@
 #define DN_IMPLEMENTATIONEMENTATION
-#include "td.hpp"
+#include "dn.hpp"
 
 int main(int num_args, char** args) {
   dn_app_descriptor_t app = {
@@ -8,5 +8,5 @@ int main(int num_args, char** args) {
     .write_path = "../../../../source/app/data",
     .app_path = "../../../../source/app",
   };
-  td_main(app);  
+  dn_main(app);  
 }

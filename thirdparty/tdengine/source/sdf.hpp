@@ -105,7 +105,7 @@ DN_API void                     dn_sdf_oriented_box_ex(dn_sdf_renderer_t* render
 DN_API void                     dn_sdf_grid(dn_sdf_renderer_t* renderer, u32 grid_width, u32 grid_size);
 #endif
 
-#ifdef SDF_IMPLEMENTATION
+#ifdef DN_SDF_IMPLEMENTATION
 dn_sdf_renderer_t dn_sdf_renderer_create(u32 buffer_size) {
   dn_sdf_renderer_t renderer = {
     .state = SDF_RENDERER_STATE_NONE,

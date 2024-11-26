@@ -1,5 +1,5 @@
-#ifndef TD_H
-#define TD_H
+#ifndef DN_HPP
+#define DN_HPP
 #include "external/include/libs.hpp"
 
 #include "source/utils/types.hpp"
@@ -59,60 +59,60 @@
 #include "source/glad.c"
 #include "source/imgui/imgui_compilation_unit.cpp"
 
-#include "source/action.cpp" // HALF
 #define APP_IMPLEMENTATION
 #include "source/app.hpp"
-#include "source/asset.cpp"
 #define DN_AUDIO_IMPLEMENTATION
 #include "source/audio.hpp"
-#include "source/background.cpp" // INVERT (I need something to load large images though, in general)
-#include "source/draw.cpp"
 #define DN_ENGINE_IMPLEMENTATION
 #include "source/engine.hpp"
 #define DN_FONT_IMPLEMENTATION
 #include "source/font.hpp"
-#include "source/image.cpp" // HALF (Screenshots should be reworked, probably? I'm referencing a named path when I initialize)
 #define DN_INPUT_IMPLEMENTATION
 #include "source/input.hpp"
-#include "source/fluid.cpp" // GAME
 #define GRAPHICS_IMPLEMENTATION
 #include "source/graphics.hpp"
 #define DN_LUA_IMPLEMENTATION
 #include "source/dn_lua.hpp"
-#include "source/named_path.cpp"
-#include "source/particle.cpp"
-#define SDF_IMPLEMENTATION
+#define DN_SDF_IMPLEMENTATION
 #include "source/sdf.hpp"
-#include "source/steam.cpp"
-#include "source/text.cpp"
 #define DN_TIME_METRICS_IMPLEMENTATION
 #include "source/time_metrics.hpp"
 #define DN_WINDOW_IMPLEMENTATION
 #include "source/window.hpp"
 #define DN_IMGUI_IMPLEMENTATION
 #include "source/imgui/dn_imgui.hpp"
-#include "source/utils/array.cpp"
 #define COORDINATE_IMPLEMENTATION
 #include "source/utils/coordinate.hpp"
 #define DN_DYNAMIC_ARRAY_IMPLEMENTATION
 #include "source/utils/dynamic_array.hpp"
-#include "source/utils/file_monitor.cpp"
 #define DN_FIXED_ARRAY_IMPLEMENTATION
 #include "source/utils/fixed_array.hpp"
 #define DN_LOG_IMPLEMENTATION
 #include "source/utils/log.hpp"
-#include "source/utils/memory.cpp"
 #define DN_NOISE_IMPLEMENTATION
 #include "source/utils/noise.hpp"
 #define DN_OS_IMPLEMENTATION
 #include "source/utils/os.hpp"
-#include "source/utils/path.cpp"
 #define PREPROCESSOR_IMPLEMENTATION
 #include "source/utils/preprocessor.hpp"
+
+#include "source/named_path.cpp"
+#include "source/particle.cpp"
+#include "source/steam.cpp"
+#include "source/text.cpp"
+#include "source/utils/memory.cpp"
+#include "source/utils/file_monitor.cpp"
+#include "source/utils/array.cpp"
+#include "source/action.cpp" // HALF
+#include "source/asset.cpp"
+#include "source/background.cpp" // INVERT (I need something to load large images though, in general)
+#include "source/draw.cpp"
+#include "source/image.cpp" // HALF (Screenshots should be reworked, probably? I'm referencing a named path when I initialize)
+#include "source/fluid.cpp" // GAME
 #include "source/utils/string.cpp"
+#include "source/utils/path.cpp"
 
-
-int td_main(dn_app_descriptor_t app) {
+int dn_main(dn_app_descriptor_t app) {
 	init_allocators();
 	init_random();
 	dn_app_init(app);
