@@ -28,12 +28,9 @@ function tdengine.save.read(file_name)
 end
 
 function tdengine.save.list()
-  local saves = {}
-
-  local save_dir = tdengine.ffi.dn_paths_resolve('saves'):to_interned()
-  local files = tdengine.ffi.dn_os_scan_directory(save_dir)
-  for index, file_name in pairs(files) do
-    table.insert(saves, tdengine.save.open(file_name))
+  local saves = tdengine.filesystem.collect_named_directory('saves')
+  for index in tdengine.iterator.keys(saves) do
+    saves[index] = tdengine.save.read(saves[index])
   end
 
   return saves
@@ -41,8 +38,8 @@ end
 
 function tdengine.save.count()
   local save_dir = tdengine.ffi.dn_paths_resolve('saves'):to_interned()
-  local files = tdengine.scandir(save_dir)
-  return #files
+  local entries = tdengine.ffi.dn_os_scan_directory(save_dir)
+  return tdengine.ffi.dn_dynamiuc_array_size(entries)
 end
 
 function tdengine.save.get_save_name(data)

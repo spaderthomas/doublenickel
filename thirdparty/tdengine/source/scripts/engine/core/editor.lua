@@ -122,7 +122,7 @@ end
 
 
 function tdengine.editor.center_next_window(size)
-  local screen = tdengine.vec2(tdengine.screen_dimensions())
+  local screen = tdengine.vec2(tdengine.ffi.dn_window_get_content_area())
   local position = screen:scale(.5):subtract(size:scale(.5))
   imgui.SetNextWindowPos(position:unpack())
   imgui.SetNextWindowSize(size:unpack())

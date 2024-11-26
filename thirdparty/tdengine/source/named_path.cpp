@@ -120,14 +120,14 @@ tstring build_path(const char* relative_path) {
 }
 
 void set_install_paths() {
-	dn_paths_add_ex("install", build_path(app.install_path));
-	dn_paths_add_ex("engine", build_path(app.engine_path));
-	dn_paths_add_ex("app", build_path(app.app_path));
+	dn_paths_add_ex("install", build_path(dn_app.install_path));
+	dn_paths_add_ex("engine", build_path(dn_app.engine_path));
+	dn_paths_add_ex("app", build_path(dn_app.app_path));
 }
 
 void set_write_path() {	
 #if defined(FM_EDITOR)
-	dn_paths_add_ex("write", build_path(app.write_path));
+	dn_paths_add_ex("write", build_path(dn_app.write_path));
 #else
 	auto appdata_dir = bump_allocator.alloc_path();
 

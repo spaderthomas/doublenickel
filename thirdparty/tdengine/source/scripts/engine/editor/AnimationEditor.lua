@@ -98,7 +98,7 @@ function AnimationEditor:popup()
 	local done = false
 
 	local window = tdengine.vec2(450, 600)
-	local wx = tdengine.screen_dimensions().x
+	local wx = tdengine.ffi.dn_window_get_content_area().x
 	imgui.SetCursorPosX((wx / 2) - (window.x / 2))
 	imgui.SetNextWindowSize(window:unpack())
 
@@ -163,9 +163,14 @@ function AnimationEditor:popup()
 			self.data.speed = .25
 
 			table.clear(self.data.frames)
-			local files = tdengine.scandir(import_path)
+			
+			local files = {}
+			for file in tdengine.filesystem.iterate_directory(import_path) do
+				table.insert(files, file.path:to_interned())
+			end
 			table.sort(files)
-			for index, file in pairs(files) do
+
+			for file in tdengine.iterator.values(files) do
 				local frame = {
 					image = file,
 					time = 0

@@ -89,17 +89,12 @@ function tdengine.dialogue.find_node(graph, fid)
 end
 
 function tdengine.dialogue.list()
+  local dialogues = {}
+  
   local directory = tdengine.ffi.dn_paths_resolve('dialogues'):to_interned()
 	for entry in tdengine.filesystem.iterate_directory(directory) do
-		print(entry.path)
+    table.insert(dialogues, entry.path:to_interned())
 	end
-
-  local dialogues = {}
-  for index, dialogue in ipairs(tdengine.scandir(directory)) do
-    table.insert(dialogues, dialogue)
-  end
-
-  my_cool_new_bird = 69
   return dialogues
 end
 

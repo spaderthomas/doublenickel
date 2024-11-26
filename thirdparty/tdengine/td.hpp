@@ -44,7 +44,6 @@
 #include "source/text.hpp"
 #include "source/draw.hpp"
 #include "source/audio.hpp"
-#include "source/api.hpp"
 #include "source/action.hpp"
 #include "source/particle.hpp"
 #include "source/buffers.hpp"
@@ -56,12 +55,11 @@
 #include "source/app.hpp"
 #endif
 
-#ifdef TD_IMPLEMENTATION
+#ifdef DN_IMPLEMENTATIONEMENTATION
 #include "source/glad.c"
 #include "source/imgui/imgui_compilation_unit.cpp"
 
 #include "source/action.cpp" // HALF
-#include "source/api.cpp"
 #define APP_IMPLEMENTATION
 #include "source/app.hpp"
 #include "source/asset.cpp"
@@ -113,10 +111,10 @@
 #include "source/utils/string.cpp"
 
 
-int td_main(TdAppDescriptor app) {
+int td_main(dn_app_descriptor_t app) {
 	init_allocators();
 	init_random();
-	init_app(app);
+	dn_app_init(app);
 	init_paths();
 	dn_log_init();
 	dn_engine_init();

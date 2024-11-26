@@ -331,7 +331,6 @@ void LuaState::init_phase_0() {
 	}
 	
 	// Bind all C functions, constants, enums, &c.
-	register_api();
 
 	// PHASE 1:
 	// With the base tables created, we can now do things like define classes

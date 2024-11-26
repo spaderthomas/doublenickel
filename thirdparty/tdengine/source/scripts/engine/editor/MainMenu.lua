@@ -241,8 +241,8 @@ function MainMenu:Window()
 		if imgui.BeginMenu('Layout') then
 			if imgui.BeginMenu('Open') then
 				local layout_dir = tdengine.ffi.dn_paths_resolve('layouts'):to_interned()
-				local layouts = tdengine.scandir(layout_dir)
-				for i, layout in pairs(layouts) do
+				for file in tdengine.filesystem.iterate_directory(layout_dir) do
+					local layout = file.path:to_interned()
 					if imgui.MenuItem(tdengine.strip_extension(layout)) then
 						local file_name = tdengine.strip_extension(layout)
 						tdengine.ffi.dn_imgui_load_layout(file_name)
@@ -411,8 +411,7 @@ function MainMenu:Scene()
 		local scene_editor = tdengine.find_entity_editor('SceneEditor')
 
 		if imgui.BeginMenu('Open') then
-			local scene_dir = tdengine.ffi.dn_paths_resolve('scenes'):to_interned()
-			local scenes = tdengine.scandir(scene_dir)
+			local scenes = tdengine.filesystem.collect_named_directory('scenes')
 			for index, name in pairs(scenes) do
 				scenes[index] = string.gsub(name, '.lua', '')
 			end

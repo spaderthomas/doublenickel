@@ -1,8 +1,8 @@
-#define TD_IMPLEMENTATION
+#define DN_IMPLEMENTATIONEMENTATION
 #include "td.hpp"
 
 int main(int num_args, char** args) {
-  TdAppDescriptor app = {
+  dn_app_descriptor_t app = {
     .install_path = "../../../..",
     .engine_path = "../../../../thirdparty/tdengine",
     .write_path = "../../../../source/app/data",

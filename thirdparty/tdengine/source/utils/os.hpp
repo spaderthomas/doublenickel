@@ -21,14 +21,19 @@ typedef struct {
   dn_os_file_attr_t attributes;
 } dn_os_directory_entry_t;
 
-DN_API bool                     dn_os_does_path_exist(const char* path);
-DN_API bool                     dn_os_is_regular_file(const char* path);
-DN_API bool                     dn_os_is_directory(const char* path);
-DN_API void                     dn_os_remove_directory(const char* path);
-DN_API void                     dn_os_create_directory(const char* path);
-DN_API dn_os_directory_entry_t* dn_os_scan_directory(const char* path);
-DN_API dn_os_date_time_t        dn_os_get_date_time();
-DN_IMP dn_os_file_attr_t        dn_os_winapi_attr_to_dn_attr(u32 attr);
+typedef struct {
+  dn_os_directory_entry_t* entries;
+  u32 num_entries;
+} dn_os_directory_entry_list_t;
+
+DN_API bool                         dn_os_does_path_exist(const char* path);
+DN_API bool                         dn_os_is_regular_file(const char* path);
+DN_API bool                         dn_os_is_directory(const char* path);
+DN_API void                         dn_os_remove_directory(const char* path);
+DN_API void                         dn_os_create_directory(const char* path);
+DN_API dn_os_directory_entry_list_t dn_os_scan_directory(const char* path);
+DN_API dn_os_date_time_t            dn_os_get_date_time();
+DN_IMP dn_os_file_attr_t            dn_os_winapi_attr_to_dn_attr(u32 attr);
 #endif
 
 #ifdef DN_OS_IMPLEMENTATION
@@ -58,35 +63,35 @@ void dn_os_create_directory(const char* path) {
 	}
 }
 
-dn_os_directory_entry_t* dn_os_scan_directory(const char* path) {
-  dn_path_t glob = dn_zero_initialize();
-  snprintf(glob, DN_MAX_PATH_LEN, "%s/*", path);
-  auto entries = dn_dynamic_array_create_t<dn_os_directory_entry_t>(&bump_allocator);
+dn_os_directory_entry_list_t dn_os_scan_directory(const char* path) {
+  dn_fixed_array<dn_os_directory_entry_t, 256> entries;
+  dn_fixed_array_init_t(&entries);
 
   WIN32_FIND_DATA find_data;
+  dn_path_t glob = dn_zero_initialize();
+  snprintf(glob, DN_MAX_PATH_LEN, "%s/*", path);
   auto handle = FindFirstFile(glob, &find_data);
 	if (handle == INVALID_HANDLE_VALUE) {
-    return entries;
+    return dn_zero_initialize();
   }
 
-  dn_dynamic_array_push_t(entries, {
-	.path = copy_string(find_data.cFileName, &bump_allocator),
-	.attributes = dn_os_winapi_attr_to_dn_attr(GetFileAttributesA(find_data.cFileName)),
-	});
-
-  while (FindNextFile(handle, &find_data)) {
+  do {
     if (!strcmp(find_data.cFileName, ".")) continue;
 		if (!strcmp(find_data.cFileName, "..")) continue;
 
-    dn_dynamic_array_push_t(entries, {
-	  .path = copy_string(find_data.cFileName, &bump_allocator),
-	  .attributes = dn_os_winapi_attr_to_dn_attr(GetFileAttributesA(find_data.cFileName)),
-		});
-  }
+    dn_os_directory_entry_t entry = {
+	    .path = copy_string(find_data.cFileName, &bump_allocator),
+	    .attributes = dn_os_winapi_attr_to_dn_attr(GetFileAttributesA(find_data.cFileName)),
+		};
+    dn_fixed_array_push_t(&entries, &entry, 1);
+  } while (FindNextFile(handle, &find_data));
 
   FindClose(handle);
 
-  return entries;
+  return {
+    .entries = (dn_os_directory_entry_t*)entries.data,
+    .num_entries = entries.size
+  };
 }
 
 dn_os_date_time_t dn_os_get_date_time() {

@@ -142,18 +142,22 @@ typedef struct dn_os_date_time_t {
 } dn_os_date_time_t;
 
 typedef struct {
-  const char* path;
+  tstring path;
   dn_os_file_attr_t attributes;
 } dn_os_directory_entry_t;
 
+typedef struct {
+  dn_os_directory_entry_t* entries;
+  u32 num_entries;
+} dn_os_directory_entry_list_t;
 
-bool                     dn_os_does_path_exist(const char* path);
-bool                     dn_os_is_regular_file(const char* path);
-bool                     dn_os_is_directory(const char* path);
-void                     dn_os_remove_directory(const char* path);
-void                     dn_os_create_directory(const char* path);
-dn_os_directory_entry_t* dn_os_scan_directory(const char* path);
-dn_os_date_time_t        dn_os_get_date_time();
+bool                         dn_os_does_path_exist(const char* path);
+bool                         dn_os_is_regular_file(const char* path);
+bool                         dn_os_is_directory(const char* path);
+void                         dn_os_remove_directory(const char* path);
+void                         dn_os_create_directory(const char* path);
+dn_os_directory_entry_list_t dn_os_scan_directory(const char* path);
+dn_os_date_time_t            dn_os_get_date_time();
 
 typedef struct dn_allocator_t dn_allocator_t;
 

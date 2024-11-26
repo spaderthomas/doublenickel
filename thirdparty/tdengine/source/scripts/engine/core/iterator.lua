@@ -29,3 +29,13 @@ function tdengine.iterator.keys(t, filter)
 
   return coroutine.wrap(iterator)
 end
+
+function tdengine.iterator.carray(array, length)
+  local function iterator()
+    for i = 0, length - 1 do
+      coroutine.yield(array[i])
+    end
+  end
+
+  return coroutine.wrap(iterator)
+end
