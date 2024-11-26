@@ -151,7 +151,7 @@ function AnimationEditor:popup()
 		end
 
 		imgui.InputText(self.ids.import, self, 'import_dir')
-		local import_path = tdengine.ffi.dn_paths_resolve_format('image', self.import_dir):to_interned()
+		local import_path = tdengine.ffi.dn_paths_resolve_format('dn_image', self.import_dir):to_interned()
 		local import_valid = tdengine.ffi.dn_os_does_path_exist(import_path) and #self.import_dir > 0
 		imgui.SameLine()
 
@@ -165,8 +165,8 @@ function AnimationEditor:popup()
 			table.clear(self.data.frames)
 			
 			local files = {}
-			for file in tdengine.filesystem.iterate_directory(import_path) do
-				table.insert(files, file.path:to_interned())
+			for entry in tdengine.filesystem.iterate_directory(import_path) do
+				table.insert(files, entry.file_path:to_interned())
 			end
 			table.sort(files)
 

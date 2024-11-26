@@ -241,8 +241,8 @@ function MainMenu:Window()
 		if imgui.BeginMenu('Layout') then
 			if imgui.BeginMenu('Open') then
 				local layout_dir = tdengine.ffi.dn_paths_resolve('layouts'):to_interned()
-				for file in tdengine.filesystem.iterate_directory(layout_dir) do
-					local layout = file.path:to_interned()
+				for entry in tdengine.filesystem.iterate_directory(layout_dir) do
+					local layout = entry.file_path:to_interned()
 					if imgui.MenuItem(tdengine.strip_extension(layout)) then
 						local file_name = tdengine.strip_extension(layout)
 						tdengine.ffi.dn_imgui_load_layout(file_name)

@@ -93,7 +93,7 @@ function tdengine.dialogue.list()
   
   local directory = tdengine.ffi.dn_paths_resolve('dialogues'):to_interned()
 	for entry in tdengine.filesystem.iterate_directory(directory) do
-    table.insert(dialogues, entry.path:to_interned())
+    table.insert(dialogues, entry.file_path:to_interned())
 	end
   return dialogues
 end

@@ -34,6 +34,7 @@ function tdengine.ffi.init()
 	local string_metatable = {
 		__index = {
 			to_interned = function(self)
+				if tdengine.ffi.is_nil(self.data) then dbg() end
 				return ffi.string(self.data)
 			end,
 		}
@@ -766,11 +767,57 @@ function GpuBuffer:bind_base(base)
 end
 
 
-WindowDescriptor = tdengine.class.metatype('dn_window_descriptor_t')
-function WindowDescriptor:init(params)
-	self.title = params.title or 'doublenickel'
-	self.size = params.size or Vector2:new(1920, 1080)
-	self.flags = params.flags
+WindowConfig = tdengine.class.metatype('dn_window_config_t')
+function WindowConfig:init(params)
+	local default = tdengine.ffi.dn_window_config_default();
+	self.title = params.title or default.title
+	self.icon = params.icon or default.icon
+	self.native_resolution = params.native_resolution or default.native_resolution
+	self.flags = params.flags or default.flags
+end
+
+AudioConfig = tdengine.class.metatype('dn_audio_config_t')
+function AudioConfig:init(params)
+	local allocator = tdengine.ffi.dn_allocator_find('bump')
+
+	self.num_dirs = #params.dirs
+	self.dirs = allocator:alloc_array('dn_path_t', #params.dirs)
+	for i = 0, #params.dirs - 1 do
+		self.dirs[i] = params.dirs[i + 1]
+	end
+end
+
+FontDescriptor = tdengine.class.metatype('dn_font_descriptor_t')
+function FontDescriptor:init(params)
+  self.id = params.id
+  self.file_name = params.file_name
+
+  self.sizes = {0}
+  for i in tdengine.iterator.keys(params.sizes) do
+    self.sizes[i - 1] = params.sizes[i]
+  end
+  self.flags = 0
+  if params.default       then self.flags = bit.bor(self.flags, ffi.C.DN_FONT_FLAG_DEFAULT) end
+  if params.imgui         then self.flags = bit.bor(self.flags, ffi.C.DN_FONT_FLAG_IMGUI) end
+end
+
+FontConfig = tdengine.class.metatype('dn_font_config_t')
+function FontConfig:init(params)
+	local allocator = tdengine.ffi.dn_allocator_find('bump')
+
+	self.num_fonts = #params.fonts
+	self.fonts = allocator:alloc_array('dn_font_descriptor_t', #params.fonts)
+	for i = 0, #params.fonts - 1 do
+		self.fonts[i] = FontDescriptor:new(params.fonts[i + 1])
+	end
+end
+
+
+AppConfig = tdengine.class.metatype('dn_app_config_t')
+function AppConfig:init(params)
+	self.window = params.window or tdengine.ffi.dn_window_config_default()
+	self.audio = params.audio or tdengine.ffi.dn_audio_config_default()
+	self.font = params.font or tdengine.ffi.dn_font_config_default()
 end
 
 ------------------

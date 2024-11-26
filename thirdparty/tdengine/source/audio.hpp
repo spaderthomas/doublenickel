@@ -21,6 +21,7 @@ typedef struct {
 	float ratio;
 	float attack_time;
 	float release_time;
+	bool enabled;
 } dn_compressor_t;
 
 typedef dn_gen_arena_handle_t dn_audio_info_handle_t;
@@ -51,6 +52,16 @@ typedef struct {
 	bool occupied;
 	u32 generation;
 } dn_audio_instance_t;
+
+typedef struct {
+	dn_path_t* dirs;
+	u32 num_dirs;
+	dn_compressor_t compressor;
+	dn_low_pass_filter_t filter;
+	float sample_frequency;
+	float master_volume;
+	float master_volume_mod;
+} dn_audio_config_t;
 
 typedef struct {
 	dn_compressor_t compressor;
@@ -91,10 +102,12 @@ DN_API void                       dn_audio_resume(dn_audio_instance_handle_t han
 DN_API bool                       dn_audio_is_playing(dn_audio_instance_handle_t handle);
 DN_API bool                       dn_audio_is_any_playing();
 DN_API void                       dn_audio_load(const char* file_path, const char* file_name);
+DN_API void                       dn_audio_load_dir(const char* path);
 DN_API void                       dn_low_pass_filter_set_mode(dn_low_pass_filter_t* filter, dn_audio_filter_mode_t mode);
 DN_API void                       dn_low_pass_filter_set_cutoff(dn_low_pass_filter_t* filter, float cutoff);
 DN_API float                      dn_low_pass_filter_apply(dn_low_pass_filter_t* filter, float input);
-DN_IMP void                       dn_audio_init(); // @dn: You should be able to specify a directory when you initialize the audio
+DN_API dn_audio_config_t          dn_audio_config_default();
+DN_API void                       dn_audio_init(dn_audio_config_t config);
 DN_IMP void                       dn_audio_update(float* buffer, int frames_requested, int num_channels);
 DN_IMP void                       dn_audio_shutdown();
 DN_IMP dn_audio_info_t*           dn_audio_find(const char* name);
@@ -110,13 +123,16 @@ DN_IMP void                       dn_audio_stop_ex(dn_audio_instance_t* active_s
 #ifdef DN_AUDIO_IMPLEMENTATION
 using sound_iterator = std::function<void(const char*)>;
 
-void dn_audio_init() {
-	dn_audio = {
+dn_audio_config_t dn_audio_config_default() {
+	return {
+		.dirs = NULL,
+		.num_dirs = 0,
 		.compressor = {
 			.threshold = 0.5f,
 			.ratio = 2.0f,
 			.attack_time = 0.95f,
 			.release_time = 1.0f,
+			.enabled = true
 		},
 		.filter = {
 			.mode = DN_AUDIO_FILTER_MODE_BUTTERWORTH,
@@ -130,6 +146,16 @@ void dn_audio_init() {
 		.sample_frequency = 44100,
 		.master_volume = 1.0f,
 		.master_volume_mod = 1.0f,
+	};
+}
+
+void dn_audio_init(dn_audio_config_t config) {
+	dn_audio = {
+		.compressor = config.compressor,
+		.filter = config.filter,
+		.sample_frequency = config.sample_frequency,
+		.master_volume = config.master_volume,
+		.master_volume_mod = config.master_volume_mod,
 		.file_monitor = arr_push(&file_monitors),
 		.sample_buffer = {0}
 	};
@@ -137,37 +163,16 @@ void dn_audio_init() {
 	dn_low_pass_filter_set_cutoff(&dn_audio.filter, 10000);
 
 	auto on_file_event = [](FileMonitor* monitor, FileChange* event, void* userdata) {
-		std::unique_lock lock(dn_audio_mutex);
-		
 		dn_audio_load(event->file_path, event->file_name);
 	};
 
 	auto events = FileChangeEvent::Added | FileChangeEvent::Modified;
 	dn_audio.file_monitor->init(on_file_event, events, nullptr);
 	
-	// Load all sounds from WAV files
-	sound_iterator check_directory = [&](const char* directory) {
-		for (directory_iterator it(directory); it != directory_iterator(); it++) {
-			if (it->is_directory()) {
-				auto subdirectory = it->path().string();
-				normalize_path(subdirectory);
-
-				dn_audio.file_monitor->add_directory(subdirectory.c_str());
-				
-				check_directory(subdirectory.c_str());
-			}
-			else {
-				auto file_name = it->path().filename().string();
-				auto file_path = it->path().string();
-				normalize_path(file_path);
-
-				dn_audio_load(file_path.c_str(), file_name.c_str());
-			}
-		}
-	};
-
-	auto audio_dir = dn_paths_resolve("audio");
-	check_directory(audio_dir);
+	dn_audio_load_dir(dn_paths_resolve("dn_audio"));
+	for (u32 i = 0; i < config.num_dirs; i++) {
+		dn_audio_load_dir(config.dirs[i]);
+	}
 
 	// Initialize the audio backend
 	saudio_desc descriptor = { 0 };
@@ -287,17 +292,19 @@ void dn_audio_update(float* buffer, int frames_requested, int num_channels) {
 		sample *= dn_audio.master_volume * dn_audio.master_volume_mod;
 
 		auto abs_sample = std::abs(sample);
-		envelope = fm_lerp(envelope, abs_sample, dn_audio.compressor.attack_time);
+		if (dn_audio.compressor.enabled) {
+			envelope = fm_lerp(envelope, abs_sample, dn_audio.compressor.attack_time);
 
-		if (envelope > dn_audio.compressor.threshold) {
-			auto decibel = 10 * std::log10(envelope / dn_audio.compressor.threshold);
-			auto target_decibel = decibel / dn_audio.compressor.ratio;
-			auto target_bel = target_decibel / 10;
-			auto target_envelope = std::pow(10, target_bel) * dn_audio.compressor.threshold;
-			gain = target_envelope / envelope;
-		}
-		else {
-			gain = fm_lerp(gain, 1.0f, dn_audio.compressor.release_time);
+			if (envelope > dn_audio.compressor.threshold) {
+				auto decibel = 10 * std::log10(envelope / dn_audio.compressor.threshold);
+				auto target_decibel = decibel / dn_audio.compressor.ratio;
+				auto target_bel = target_decibel / 10;
+				auto target_envelope = std::pow(10, target_bel) * dn_audio.compressor.threshold;
+				gain = target_envelope / envelope;
+			}
+			else {
+				gain = fm_lerp(gain, 1.0f, dn_audio.compressor.release_time);
+			}
 		}
 
 		sample *= gain;
@@ -416,7 +423,23 @@ dn_audio_info_t* alloc_sound(const char* file_name) {
 	return sound;
 }
 
+void dn_audio_load_dir(const char* path) {
+	dn_os_directory_entry_list_t entries = dn_os_scan_directory(path);
+	for (u32 i = 0; i < entries.count; i++) {
+		dn_os_directory_entry_t entry = entries.data[i];
+		if (entry.attributes & DN_OS_FILE_ATTR_DIRECTORY) {
+			dn_audio.file_monitor->add_directory(entry.file_path);
+			dn_audio_load_dir(entry.file_path);
+		}
+		else {
+			dn_audio_load(entry.file_path, entry.file_name);
+		}
+	}
+}
+
 void dn_audio_load(const char* file_path, const char* file_name) {
+	std::unique_lock lock(dn_audio_mutex);
+
 	auto sound = alloc_sound(file_name);
 	strncpy(sound->name, file_name, DN_ASSET_NAME_LEN);
 	sound->hash = hash_label(sound->name);

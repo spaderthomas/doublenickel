@@ -25,6 +25,13 @@ return {
 				engine_libs = 'third_party',
 			}
 		},
+		dn_assets = {
+			path = 'asset',
+			children = {
+				dn_audio = 'audio',
+			}
+
+		}
 	},
 	install_paths = {
 		asset = {
@@ -36,12 +43,12 @@ return {
 						font = '%s.ttf'
 					}
 				},
-				images = {
+				dn_images = {
 					path = 'images',
 					children = {
-						image = '%s',
-						atlases = 'atlas',
-						atlas = 'atlas/%s'
+						dn_image = '%s',
+						dn_atlases = 'atlas',
+						dn_atlas = 'atlas/%s'
 					},
 				},
 				shaders = {

@@ -1,4 +1,5 @@
 function tdengine.save.init()
+  tdengine.ffi.dn_log('tdengine.save.init')
   local directory = tdengine.ffi.dn_paths_resolve('saves'):to_interned()
   log.info('Initializing save directory; directory = %s', directory)
 
@@ -39,7 +40,7 @@ end
 function tdengine.save.count()
   local save_dir = tdengine.ffi.dn_paths_resolve('saves'):to_interned()
   local entries = tdengine.ffi.dn_os_scan_directory(save_dir)
-  return tdengine.ffi.dn_dynamiuc_array_size(entries)
+  return entries.count
 end
 
 function tdengine.save.get_save_name(data)

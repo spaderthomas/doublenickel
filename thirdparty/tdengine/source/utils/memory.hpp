@@ -1,5 +1,3 @@
-typedef char* tstring;
-
 typedef enum {
 	DN_ALLOCATOR_MODE_ALLOC,
 	DN_ALLOCATOR_MODE_FREE,
@@ -32,8 +30,14 @@ struct  dn_allocator_t {
 
 	char* alloc_path();
 };
-std::unordered_map<std::string, dn_allocator_t*> allocators;
 
+typedef struct {
+	dn_bump_allocator_t bump;
+	dn_standard_allocator_t standard;
+} dn_allocators_t;
+dn_allocators_t dn_allocators;
+
+DN_API void             dn_allocators_init();
 DN_API void             dn_allocator_add(const char* name, dn_allocator_t* allocator);
 DN_API dn_allocator_t*  dn_allocator_find(const char* name);
 DN_API void*            dn_allocator_alloc(dn_allocator_t* allocator, u32 size);

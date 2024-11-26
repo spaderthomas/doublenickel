@@ -120,19 +120,14 @@ void dn_standard_allocator_t::init() {
 // LUA API
 void dn_allocator_add(const char* name, dn_allocator_t* allocator) {
 	if (!allocator) return;
-
-	allocators[name] = allocator;
 }
 
 dn_allocator_t* dn_allocator_find(const char* name) {
 	if (!name) return nullptr;
 
-	if (!allocators.contains(name)) {
-		dn_log("Tried to find allocator, but name was not registered; name = %s", name);
-		return nullptr;
-	}
-
-	return allocators[name];
+	if (!strcmp(name, "bump")) return &dn_allocators.bump;
+	if (!strcmp(name, "standard")) return &dn_allocators.standard;
+	return nullptr;
 }
 
 void* dn_allocator_alloc(dn_allocator_t* allocator, u32 size) {
@@ -158,14 +153,11 @@ void dn_allocator_free(dn_allocator_t* allocator, void* buffer) {
 
 
 // ENGINE
-void init_allocators() {
+void dn_allocators_init() {
 	standard_allocator.init();
 	bump_allocator.init(50 * 1024 * 1024);
-
-	dn_allocator_add("bump", &bump_allocator);
-	dn_allocator_add("standard", &standard_allocator);
 }
 
-void update_allocators() {
+void dn_allocators_update() {
 	bump_allocator.clear();
 }

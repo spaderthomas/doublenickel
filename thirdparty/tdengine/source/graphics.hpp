@@ -788,7 +788,7 @@ void dn_gpu_buffer_zero(dn_gpu_buffer_t* buffer, u32 size) {
 dn_gpu_backed_buffer_t dn_gpu_backed_buffer_create(dn_gpu_buffer_descriptor_t descriptor) {
   dn_gpu_backed_buffer_t backed_buffer;
   backed_buffer.gpu_buffer = dn_gpu_buffer_create(descriptor);
-  dn_fixed_array_init(&backed_buffer.buffer, descriptor.capacity, descriptor.element_size);
+  dn_fixed_array_init(&backed_buffer.buffer, descriptor.capacity, descriptor.element_size, &standard_allocator);
   return backed_buffer;
 }
 

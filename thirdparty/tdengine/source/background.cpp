@@ -130,11 +130,11 @@ void Background::load_paths() {
 		
 	// Find the path to the source image, i.e. the full size background
 	//lua.parse_string("source", &source_image);
-	this->source_image_full_path = dn_paths_resolve_format_ex("image", source_image, &standard_allocator);
+	this->source_image_full_path = dn_paths_resolve_format_ex("dn_image", source_image, &standard_allocator);
 
 	// Find the folder we're going to write tiles to
 	//lua.parse_string(-2, &tile_output_folder);
-	this->tile_output_full_path = dn_paths_resolve_format_ex("atlas", tile_output_folder, &standard_allocator);
+	this->tile_output_full_path = dn_paths_resolve_format_ex("dn_atlas", tile_output_folder, &standard_allocator);
 		
 	// The name of the background is the folder we use for tiling
 	name = tile_output_folder;

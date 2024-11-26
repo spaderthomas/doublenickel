@@ -45,6 +45,11 @@ typedef struct {
 } dn_font_descriptor_t;
 
 typedef struct {
+	dn_font_descriptor_t* fonts;
+	u32 num_fonts;
+} dn_font_config_t;
+
+typedef struct {
 	dn_fixed_array<dn_baked_font_t, 64> baked_fonts;
 	dn_fixed_array<dn_baked_glyph_t, 8192> baked_glyphs;
 	dn_fixed_array<Vector2, 65536> vertex_data;
@@ -54,10 +59,12 @@ typedef struct {
 } dn_fonts_t;
 dn_fonts_t dn_fonts;
 
-DN_IMP void             dn_font_init();
 DN_IMP dn_hash_t        dn_font_hash(const char* id, u32 size);
+
+DN_API void             dn_font_init(dn_font_config_t config);
 DN_API void             dn_font_bake_n(dn_font_descriptor_t* descriptors, u32 num_descriptors);
 DN_API void             dn_font_bake(dn_font_descriptor_t descriptor);
+DN_API dn_font_config_t dn_font_config_default();
 DN_API dn_baked_font_t* dn_font_default();
 DN_API dn_baked_font_t* dn_font_find(const char* id, u32 size);
 
@@ -66,14 +73,24 @@ DN_API dn_baked_font_t* dn_font_find(const char* id, u32 size);
 
 
 #ifdef DN_FONT_IMPLEMENTATION
+dn_font_config_t dn_font_config_default() {
+	return {
+		.fonts = NULL,
+		.num_fonts = 0
+	};
+}
 
-void dn_font_init() {
+void dn_font_init(dn_font_config_t config) {
 	dn_fonts = {0};
 
-	dn_fixed_array_init_t(&dn_fonts.baked_fonts);
-	dn_fixed_array_init_t(&dn_fonts.baked_glyphs);
-	dn_fixed_array_init_t(&dn_fonts.vertex_data);
-	dn_fixed_array_init_t(&dn_fonts.uv_data);
+	dn_fixed_array_init_t(&dn_fonts.baked_fonts, &standard_allocator);
+	dn_fixed_array_init_t(&dn_fonts.baked_glyphs, &standard_allocator);
+	dn_fixed_array_init_t(&dn_fonts.vertex_data, &standard_allocator);
+	dn_fixed_array_init_t(&dn_fonts.uv_data, &standard_allocator);
+
+	for (u32 i = 0; i < config.num_fonts; i++) {
+		dn_font_bake(config.fonts[i]);
+	}
 }
 
 dn_baked_font_t* dn_font_default() {

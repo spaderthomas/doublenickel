@@ -42,7 +42,7 @@ void dn_noise_init() {
   }
 
 	const char* file_name = "perlin.png";
-	auto file_path = dn_paths_resolve_format("image", file_name);
+	auto file_path = dn_paths_resolve_format("dn_image", file_name);
 	create_sprite(file_name , file_path);
 
 	auto rx = static_cast<u32>(window.native_resolution.x);

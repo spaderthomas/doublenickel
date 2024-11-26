@@ -115,7 +115,6 @@ tstring                dn_paths_resolve(const char* name);
 tstring                dn_paths_resolve_format(const char* name, const char* file_name);
 
 
-
 ///////////////////////
 //  ██████╗ ███████╗ //
 // ██╔═══██╗██╔════╝ //
@@ -142,13 +141,15 @@ typedef struct dn_os_date_time_t {
 } dn_os_date_time_t;
 
 typedef struct {
-  tstring path;
+  tstring file_path;
+  tstring file_name;
   dn_os_file_attr_t attributes;
 } dn_os_directory_entry_t;
 
+
 typedef struct {
-  dn_os_directory_entry_t* entries;
-  u32 num_entries;
+  dn_os_directory_entry_t* data;
+  u32 count;
 } dn_os_directory_entry_list_t;
 
 bool                         dn_os_does_path_exist(const char* path);
@@ -201,11 +202,11 @@ typedef struct {
 	u8* data;
 	u32 size;
 	u32 capacity;
-
 	u32 vertex_size;
+  dn_allocator_t* allocator;
 } dn_fixed_array_t;
 
-void dn_fixed_array_init(dn_fixed_array_t* vertex_buffer, u32 max_vertices, u32 vertex_size);
+void dn_fixed_array_init(dn_fixed_array_t* vertex_buffer, u32 max_vertices, u32 vertex_size, dn_allocator_t* allocator);
 u8*  dn_fixed_array_push(dn_fixed_array_t* vertex_buffer, void* data, u32 count);
 u8*  dn_fixed_array_reserve(dn_fixed_array_t* vertex_buffer, u32 count);
 void dn_fixed_array_clear(dn_fixed_array_t* vertex_buffer);
@@ -250,7 +251,18 @@ typedef struct {
 	float ratio;
 	float attack_time;
 	float release_time;
+	bool enabled;
 } dn_compressor_t;
+
+typedef struct {
+	dn_path_t* dirs;
+	u32 num_dirs;
+	dn_compressor_t compressor;
+	dn_low_pass_filter_t filter;
+	float sample_frequency;
+	float master_volume;
+	float master_volume_mod;
+} dn_audio_config_t;
 
 typedef dn_gen_arena_handle_t dn_audio_instance_handle_t;
 
@@ -284,6 +296,8 @@ void                       dn_audio_load(const char* file_path, const char* file
 void                       dn_low_pass_filter_set_mode(dn_low_pass_filter_t* filter, dn_audio_filter_mode_t mode);
 void                       dn_low_pass_filter_set_cutoff(dn_low_pass_filter_t* filter, float cutoff);
 float                      dn_low_pass_filter_apply(dn_low_pass_filter_t* filter, float input);
+dn_audio_config_t          dn_audio_config_default();
+void                       dn_audio_init(dn_audio_config_t config);
 
 
 /////////////////////////////////////////////
@@ -413,12 +427,19 @@ typedef struct {
 	dn_font_flags_t flags;
 } dn_font_descriptor_t;
 
+typedef struct {
+	dn_font_descriptor_t* fonts;
+	u32 num_fonts;
+} dn_font_config_t;
+
 typedef struct dn_baked_font_t dn_baked_font_t;
 
+void             dn_font_init(dn_font_config_t config);
 void             dn_font_bake_n(dn_font_descriptor_t* descriptors, u32 num_descriptors);
 void             dn_font_bake(dn_font_descriptor_t descriptor);
 dn_baked_font_t* dn_font_default();
 dn_baked_font_t* dn_font_find(const char* id, u32 size);
+dn_font_config_t dn_font_config_default();
 
 
 ////////////////////////////////////////////////////////
@@ -438,31 +459,75 @@ typedef enum {
 } dn_window_flags_t;
 
 typedef enum {
+	DN_DISPLAY_MODE_AUTO,
+
+	// 16:9
+	DN_DISPLAY_MODE_180,
 	DN_DISPLAY_MODE_480,
 	DN_DISPLAY_MODE_720,
 	DN_DISPLAY_MODE_1080,
 	DN_DISPLAY_MODE_1440,
 	DN_DISPLAY_MODE_2160,
+
+	// 16:10
 	DN_DISPLAY_MODE_1280_800,
+
+	// Fullscreen
 	DN_DISPLAY_MODE_FULLSCREEN
 } dn_display_mode_t;
 
 typedef struct {
 	const char* title;
-	Vector2 size;
+	const char* icon;
+	dn_display_mode_t display_mode;
+	Vector2 native_resolution;
 	dn_window_flags_t flags;
-} dn_window_descriptor_t;
+} dn_window_config_t;
 
-void              dn_window_create(dn_window_descriptor_t descriptor);
-void              dn_window_set_native_resolution(float width, float height);
-Vector2           dn_window_get_content_area();
-Vector2           dn_window_get_native_resolution();
-void              dn_window_set_icon(const char* path);
-void              dn_window_set_display_mode(dn_display_mode_t mode);
-dn_display_mode_t dm_window_get_display_mode();
-void              dn_window_set_cursor_visible(bool visible);
+dn_window_config_t dn_window_config_default();
+void               dn_window_init(dn_window_config_t descriptor);
+void               dn_window_set_native_resolution(float width, float height);
+Vector2            dn_window_get_content_area();
+Vector2            dn_window_get_native_resolution();
+void               dn_window_set_icon(const char* path);
+void               dn_window_set_display_mode(dn_display_mode_t mode);
+dn_display_mode_t  dm_window_get_display_mode();
+void               dn_window_set_cursor_visible(bool visible);
 
 
+//////////////////////////////
+// █████╗ ██████╗ ██████╗   //
+// ██╔══██╗██╔══██╗██╔══██╗ //
+// ███████║██████╔╝██████╔╝ //
+// ██╔══██║██╔═══╝ ██╔═══╝  //
+// ██║  ██║██║     ██║      //
+// ╚═╝  ╚═╝╚═╝     ╚═╝      //
+//////////////////////////////                        
+
+typedef struct {
+  const char* install_path;
+  const char* engine_path;
+  const char* write_path;
+  const char* app_path;
+} dn_app_descriptor_t;
+
+typedef struct {
+  dn_window_config_t window;
+  dn_audio_config_t audio;
+  dn_font_config_t font;
+  u32 target_fps;
+} dn_app_config_t;
+
+typedef struct {
+  dn_path_t install_path;
+  dn_path_t engine_path;
+  dn_path_t write_path;
+  dn_path_t app_path;
+} dn_app_t;
+dn_app_t dn_app;
+
+void dn_app_init(dn_app_descriptor_t descriptor);
+void dn_app_configure(dn_app_config_t config);
 
 ////////////////////////////////
 //  ██████╗ ██████╗ ██╗   ██╗ //
@@ -1506,13 +1571,14 @@ function tdengine.init_phase_2()
   tdengine.subsystem.init()
   tdengine.app = tdengine.subsystem.find('App')
 
+  tdengine.ffi.dn_log('App:on_init_game')
   tdengine.app:on_init_game()
 
   tdengine.window.init()
-  tdengine.shaders.init()
   tdengine.save.init()
   tdengine.editor.init()
   tdengine.persistent.init()
 
+  tdengine.ffi.dn_log('lifecycle.on_start_game')
   tdengine.lifecycle.run_callback(tdengine.lifecycle.callbacks.on_start_game)
 end

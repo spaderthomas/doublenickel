@@ -25,7 +25,7 @@ end
 function tdengine.filesystem.iterate_directory(path)
   local function iterator()
     local entry_list = tdengine.ffi.dn_os_scan_directory(path)
-    for entry in tdengine.iterator.carray(entry_list.entries, entry_list.num_entries) do
+    for entry in tdengine.iterator.carray(entry_list.data, entry_list.count) do
       coroutine.yield(entry)
     end
   end
@@ -35,8 +35,8 @@ end
 
 function tdengine.filesystem.collect_directory(path)
   local files = {}
-  for file in tdengine.filesystem.iterate_directory(path) do
-    table.insert(files, file.path:to_interned())
+  for entry in tdengine.filesystem.iterate_directory(path) do
+    table.insert(files, entry.file_name:to_interned())
   end
 
   return files

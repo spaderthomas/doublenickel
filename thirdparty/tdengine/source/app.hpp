@@ -8,14 +8,22 @@ typedef struct {
 } dn_app_descriptor_t;
 
 typedef struct {
-  char install_path [DN_MAX_PATH_LEN];
-  char engine_path [DN_MAX_PATH_LEN];
-  char write_path [DN_MAX_PATH_LEN];
-  char app_path [DN_MAX_PATH_LEN];
+  dn_window_config_t window;
+  dn_audio_config_t audio;
+  dn_font_config_t font;
+  u32 target_fps;
+} dn_app_config_t;
+
+typedef struct {
+  dn_path_t install_path;
+  dn_path_t engine_path;
+  dn_path_t write_path;
+  dn_path_t app_path;
 } dn_app_t;
 dn_app_t dn_app;
 
-void dn_app_init(dn_app_descriptor_t descriptor);
+DN_API void dn_app_init(dn_app_descriptor_t descriptor);
+DN_API void dn_app_configure(dn_app_config_t config);
 #endif
 
 #ifdef APP_IMPLEMENTATION
@@ -25,4 +33,11 @@ void dn_app_init(dn_app_descriptor_t descriptor) {
   copy_string(descriptor.write_path, dn_app.write_path, DN_MAX_PATH_LEN);
   copy_string(descriptor.app_path, dn_app.app_path, DN_MAX_PATH_LEN);
 }
+
+void dn_app_configure(dn_app_config_t config) {
+  dn_window_init(config.window);
+  dn_audio_init(config.audio);
+  dn_font_init(config.font);
+}
+
 #endif

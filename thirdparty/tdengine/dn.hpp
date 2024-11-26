@@ -6,6 +6,7 @@
 #include "source/utils/assert.hpp"
 #include "source/utils/error.hpp"
 #include "source/utils/macros.hpp"
+#include "source/utils/path.hpp"
 #include "source/utils/log.hpp"
 #include "source/utils/enum.hpp"
 #include "source/utils/os.hpp"
@@ -16,7 +17,6 @@
 #include "source/utils/ring_buffer.hpp"
 #include "source/utils/string.hpp"
 #include "source/utils/arena.hpp"
-#include "source/utils/path.hpp"
 #include "source/utils/vector.hpp"
 #include "source/utils/quad.hpp"
 #include "source/utils/colors.hpp"
@@ -93,6 +93,8 @@
 #include "source/utils/noise.hpp"
 #define DN_OS_IMPLEMENTATION
 #include "source/utils/os.hpp"
+#define DN_PATH_IMPLEMENTATION
+#include "source/utils/path.hpp"
 #define PREPROCESSOR_IMPLEMENTATION
 #include "source/utils/preprocessor.hpp"
 
@@ -110,7 +112,6 @@
 #include "source/image.cpp" // HALF (Screenshots should be reworked, probably? I'm referencing a named path when I initialize)
 #include "source/fluid.cpp" // GAME
 #include "source/utils/string.cpp"
-#include "source/utils/path.cpp"
 
 int dn_main(dn_app_descriptor_t app) {
 	init_allocators();
@@ -121,14 +122,12 @@ int dn_main(dn_app_descriptor_t app) {
 	dn_engine_init();
 	dn_input_init();
 	dn_time_metrics_init();
-	dn_font_init();
 	init_steam();
 	init_file_monitors();
 	init_assets();
 	init_buffers();
 	dn_lua_init();
 	init_actions();
-	dn_audio_init();
 	dn_lua_init_game();
 
 	while(!dn_engine_should_exit()) {

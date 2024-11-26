@@ -6,12 +6,13 @@ typedef struct {
 	u32 size;
 	u32 capacity;
 	u32 element_size;
+	dn_allocator_t* allocator;
 } dn_fixed_array_t;
 
 template<typename T, u32 N>
 struct dn_fixed_array : dn_fixed_array_t {};
 
-DN_API void dn_fixed_array_init(dn_fixed_array_t* vertex_buffer, u32 max_vertices, u32 element_size);
+DN_API void dn_fixed_array_init(dn_fixed_array_t* vertex_buffer, u32 max_vertices, u32 element_size, dn_allocator_t* allocator);
 DN_API u8*  dn_fixed_array_push(dn_fixed_array_t* vertex_buffer, void* data, u32 count);
 DN_API u8*  dn_fixed_array_reserve(dn_fixed_array_t* vertex_buffer, u32 count);
 DN_API void dn_fixed_array_clear(dn_fixed_array_t* vertex_buffer);
@@ -19,8 +20,8 @@ DN_API u32  dn_fixed_array_byte_size(dn_fixed_array_t* vertex_buffer);
 DN_API u8*  dn_fixed_array_at(dn_fixed_array_t* vertex_buffer, u32 index);
 
 template<typename T, u32 N>
-void dn_fixed_array_init_t(dn_fixed_array<T, N>* vertex_buffer) {
-	return dn_fixed_array_init(vertex_buffer, N, sizeof(T));
+void dn_fixed_array_init_t(dn_fixed_array<T, N>* vertex_buffer, dn_allocator_t* allocator) {
+	return dn_fixed_array_init(vertex_buffer, N, sizeof(T), allocator);
 }
 
 template<typename T, u32 N>
@@ -42,13 +43,14 @@ T* dn_fixed_array_at_t(dn_fixed_array<T, N>* fixed_array, u32 index) {
 
 #ifdef DN_FIXED_ARRAY_IMPLEMENTATION
 
-void dn_fixed_array_init(dn_fixed_array_t* buffer, u32 max_vertices, u32 element_size) {
+void dn_fixed_array_init(dn_fixed_array_t* buffer, u32 max_vertices, u32 element_size, dn_allocator_t* allocator) {
 	TD_ASSERT(buffer);
 
 	buffer->size = 0;
 	buffer->capacity = max_vertices;
 	buffer->element_size = element_size;
-	buffer->data = (u8*)dn_allocator_alloc(&standard_allocator, max_vertices * element_size);
+	buffer->data = (u8*)dn_allocator_alloc(allocator, max_vertices * element_size);
+	buffer->allocator = allocator;
 }
 
 u8* dn_fixed_array_at(dn_fixed_array_t* buffer, u32 index) {

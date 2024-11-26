@@ -145,6 +145,8 @@ end
 -- INTERNALS --
 ---------------
 function tdengine.audio.init()
+  tdengine.ffi.dn_log('tdengine.audio.init')
+  
   tdengine.audio.internal = {
     deferred_stop = {},
     interpolating = {},

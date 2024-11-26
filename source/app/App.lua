@@ -44,20 +44,55 @@ function App:init()
 end
 
 function App:on_init_game()
-	tdengine.ffi.dn_window_create(WindowDescriptor:new({
-		title = 'SDF Clock',
-		size = Vector2:new(320, 180),
-		flags = tdengine.enum.bitwise_or(
-			tdengine.enums.WindowFlags.Windowed,
-			tdengine.enums.WindowFlags.Border
-		)
-	}))
+	local dn_config = AppConfig:new({
+		target_fps = 144,
+		window = WindowConfig:new({
+			title = 'SDF Clock',
+			native_resolution = Vector2:new(320, 180),
+			flags = tdengine.enum.bitwise_or(
+				tdengine.enums.WindowFlags.Windowed,
+				tdengine.enums.WindowFlags.Border
+			),
+			icon = tdengine.ffi.dn_paths_resolve_format('dn_image', 'logo/icon.png'):to_interned(),
+		}),
+		audio = AudioConfig:new({
+			dirs = {
+				tdengine.ffi.dn_paths_resolve('audio'):to_interned()
+			},
+		}),
+		font = FontConfig:new({
+			fonts = {
+				{
+					id = 'merriweather',
+					file_name = 'Merriweather-Regular',
+					sizes = { 16, 24, 28, 32},
+					imgui = false
+				},
+				{
+					id = 'tiny5',
+					file_name = 'Tiny5-Regular',
+					sizes = { 16, 24, 32 },
+					imgui = false
+				},
+				{
+					id = 'inconsolata',
+					file_name = 'Inconsolata-Regular',
+					sizes = { 16, 12, 20, 24, 32, 36, 48, 64 },
+					imgui = true
+				},
+				{
+					id = 'inconsolata-extrabold',
+					file_name = 'Inconsolata-ExtraBold',
+					sizes = { 16, 24, 32, 48, 64 },
+					imgui = true
+				},
+			}
+		}),
+	})
 
-	tdengine.ffi.dn_window_set_icon(tdengine.ffi.dn_paths_resolve_format('image', 'logo/icon.png'):to_interned())
-	tdengine.ffi.dn_engine_set_target_fps(144)
+	tdengine.ffi.dn_app_configure(dn_config)
 
 	tdengine.gpu.build(tdengine.module.read_from_named_path('gpu_info'))
-	tdengine.fonts.build(tdengine.module.read_from_named_path('font_info'))
 
 	self.sdf_renderer = ffi.new('dn_sdf_renderer_t [1]');
   self.sdf_renderer = tdengine.ffi.dn_sdf_renderer_create(1024 * 1024)

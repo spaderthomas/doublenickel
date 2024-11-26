@@ -9,6 +9,7 @@ tdengine.window.states = tdengine.enum.define(
 )
 
 function tdengine.window.init()
+  tdengine.ffi.dn_log('tdengine.window.init')
   self.state = self.states.Idle
 
   self.display_mode = tdengine.ffi.dm_window_get_display_mode()
@@ -29,18 +30,6 @@ function tdengine.window.update()
       tdengine.ffi.dn_window_set_display_mode(self.display_mode)
       self.state = self.states.Idle
     end
-  end
-
-  local display_mode = tdengine.ffi.dm_window_get_display_mode()
-  if display_mode == tdengine.enums.DisplayMode.p1280_800 then
-    local content_area       = tdengine.ffi.dn_window_get_content_area()
-    local ratio              = content_area.x / content_area.y
-    local sixteen_nine_width = content_area.y * 16 / 9
-
-    local delta              = sixteen_nine_width - content_area.x
-    local left               = 0 + (delta / 2)
-    local right              = window.content_area.x - (delta / 2)
-    tdengine.ffi.set_orthographic_projection(left, right, 0, 800, -1, 1)
   end
 end
 

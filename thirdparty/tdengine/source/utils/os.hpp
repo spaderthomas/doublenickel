@@ -17,13 +17,14 @@ typedef struct {
 } dn_os_date_time_t;
 
 typedef struct {
-  const char* path;
+  tstring file_path;
+  tstring file_name;
   dn_os_file_attr_t attributes;
 } dn_os_directory_entry_t;
 
 typedef struct {
-  dn_os_directory_entry_t* entries;
-  u32 num_entries;
+  dn_os_directory_entry_t* data;
+  u32 count;
 } dn_os_directory_entry_list_t;
 
 DN_API bool                         dn_os_does_path_exist(const char* path);
@@ -64,12 +65,17 @@ void dn_os_create_directory(const char* path) {
 }
 
 dn_os_directory_entry_list_t dn_os_scan_directory(const char* path) {
-  dn_fixed_array<dn_os_directory_entry_t, 256> entries;
-  dn_fixed_array_init_t(&entries);
+  if (!dn_os_is_directory(path) || !dn_os_does_path_exist(path)) {
+    return dn_zero_initialize();
+  }
 
-  WIN32_FIND_DATA find_data;
+  dn_fixed_array<dn_os_directory_entry_t, 256> entries;
+  dn_fixed_array_init_t(&entries, &bump_allocator);
+
   dn_path_t glob = dn_zero_initialize();
   snprintf(glob, DN_MAX_PATH_LEN, "%s/*", path);
+
+  WIN32_FIND_DATA find_data;
   auto handle = FindFirstFile(glob, &find_data);
 	if (handle == INVALID_HANDLE_VALUE) {
     return dn_zero_initialize();
@@ -78,10 +84,13 @@ dn_os_directory_entry_list_t dn_os_scan_directory(const char* path) {
   do {
     if (!strcmp(find_data.cFileName, ".")) continue;
 		if (!strcmp(find_data.cFileName, "..")) continue;
-
+    
+    dn_path_t file_path;
+    dn_path_join(file_path, path, find_data.cFileName);
     dn_os_directory_entry_t entry = {
-	    .path = copy_string(find_data.cFileName, &bump_allocator),
-	    .attributes = dn_os_winapi_attr_to_dn_attr(GetFileAttributesA(find_data.cFileName)),
+	    .file_path = copy_string(file_path, &bump_allocator),
+      .file_name = copy_string(find_data.cFileName, &bump_allocator),
+	    .attributes = dn_os_winapi_attr_to_dn_attr(GetFileAttributesA(file_path)),
 		};
     dn_fixed_array_push_t(&entries, &entry, 1);
   } while (FindNextFile(handle, &find_data));
@@ -89,8 +98,8 @@ dn_os_directory_entry_list_t dn_os_scan_directory(const char* path) {
   FindClose(handle);
 
   return {
-    .entries = (dn_os_directory_entry_t*)entries.data,
-    .num_entries = entries.size
+    .data = (dn_os_directory_entry_t*)entries.data,
+    .count = entries.size
   };
 }
 

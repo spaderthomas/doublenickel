@@ -65,7 +65,7 @@ function TextureAtlasEditor:create_popup()
 		for index, directory in self.directories:iterate() do
 			local label = string.format('%s:%s', directory, index)
 
-			local full_path = tdengine.ffi.dn_paths_resolve_format('image', directory):to_interned()
+			local full_path = tdengine.ffi.dn_paths_resolve_format('dn_image', directory):to_interned()
 
 			imgui.Text(directory)
 
@@ -98,7 +98,7 @@ function TextureAtlasEditor:create_popup()
 		-- An input to add a directory
 		imgui.InputText(self.ids.folder, self, 'folder', ffi.C.ImGuiInputTextFlags_EnterReturnsTrue)
 
-		local path = tdengine.ffi.dn_paths_resolve_format('image', self.folder):to_interned()
+		local path = tdengine.ffi.dn_paths_resolve_format('dn_image', self.folder):to_interned()
 		local folder_empty = #self.folder == 0
 		local folder_valid = tdengine.ffi.dn_os_does_path_exist(path)
 		imgui.SameLine()
@@ -119,7 +119,7 @@ function TextureAtlasEditor:create_popup()
 		imgui.Dummy(10, 10)
 		if not dirs_valid then
 			message = string.format('- All directories must exist under %s',
-				tdengine.ffi.dn_paths_resolve('images'):to_interned())
+				tdengine.ffi.dn_paths_resolve('dn_images'):to_interned())
 			imgui.Text(message)
 		end
 		if name_empty then

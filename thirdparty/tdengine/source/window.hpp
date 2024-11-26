@@ -8,7 +8,10 @@ typedef enum {
 } dn_window_flags_t;
 
 typedef enum {
+	DN_DISPLAY_MODE_AUTO,
+
 	// 16:9
+	DN_DISPLAY_MODE_180,
 	DN_DISPLAY_MODE_480,
 	DN_DISPLAY_MODE_720,
 	DN_DISPLAY_MODE_1080,
@@ -24,9 +27,11 @@ typedef enum {
 
 typedef struct {
 	const char* title;
-	Vector2 size;
+	const char* icon;
+	dn_display_mode_t display_mode;
+	Vector2 native_resolution;
 	dn_window_flags_t flags;
-} dn_window_descriptor_t;
+} dn_window_config_t;
 
 typedef struct {
 	GLFWwindow* handle;
@@ -39,15 +44,16 @@ typedef struct {
 } dn_window_t;
 dn_window_t window;
 
-DN_IMP void              dn_window_shutdown();
-DN_API void              dn_window_create(dn_window_descriptor_t descriptor);
-DN_API void              dn_window_set_native_resolution(float width, float height);
-DN_API Vector2           dn_window_get_content_area();
-DN_API Vector2           dn_window_get_native_resolution();
-DN_API void              dn_window_set_icon(const char* path);
-DN_API void              dn_window_set_display_mode(dn_display_mode_t mode);
-DN_API dn_display_mode_t dm_window_get_display_mode();
-DN_API void              dn_window_set_cursor_visible(bool visible);
+DN_IMP void               dn_window_shutdown();
+DN_API dn_window_config_t dn_window_config_default();
+DN_API void               dn_window_init(dn_window_config_t config);
+DN_API void               dn_window_set_native_resolution(float width, float height);
+DN_API Vector2            dn_window_get_content_area();
+DN_API Vector2            dn_window_get_native_resolution();
+DN_API void               dn_window_set_icon(const char* path);
+DN_API void               dn_window_set_display_mode(dn_display_mode_t mode);
+DN_API dn_display_mode_t  dm_window_get_display_mode();
+DN_API void               dn_window_set_cursor_visible(bool visible);
 #endif
 
 #ifdef DN_WINDOW_IMPLEMENTATION
@@ -56,8 +62,21 @@ void dn_window_shutdown() {
 	glfwTerminate();
 }
 
-void dn_window_create(dn_window_descriptor_t descriptor) {
-	dn_window_set_native_resolution(descriptor.size.x, descriptor.size.y);
+dn_window_config_t dn_window_config_default() {
+	return {
+		.title = "doublenickel",
+		.icon = dn_paths_resolve_format("dn_image", "logo/icon.png"),
+		.display_mode = DN_DISPLAY_MODE_AUTO,
+		.native_resolution = {
+			.x = 1920, 
+			.y = 1080 
+		},
+		.flags = (dn_window_flags_t)(DN_WINDOW_FLAG_BORDER | DN_WINDOW_FLAG_WINDOWED | DN_WINDOW_FLAG_VSYNC)
+	};
+}
+
+void dn_window_init(dn_window_config_t config) {
+	dn_window_set_native_resolution(config.native_resolution.x, config.native_resolution.y);
 	
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -80,25 +99,25 @@ void dn_window_create(dn_window_descriptor_t descriptor) {
 	glfwWindowHint(GLFW_SAMPLES, 4);
 
 	// Translate the window flags into GLFW stuff that'll set up the window correctly	
-	if (descriptor.flags & DN_WINDOW_FLAG_WINDOWED) {
+	if (config.flags & DN_WINDOW_FLAG_WINDOWED) {
 		monitor = nullptr;
 	}
 	
-	if (!(descriptor.flags & DN_WINDOW_FLAG_BORDER)) {
+	if (!(config.flags & DN_WINDOW_FLAG_BORDER)) {
 		glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 	}
 
 	dn_log("creating window: native_resolution = [%.0f, %.0f], content_area = [%.0f, %.0f], windowed = %d, border = %d, vsync = %d, refresh_rate = %d, monitor = %d",
 				   window.native_resolution.x, window.native_resolution.y,
 				   window.content_area.x, window.content_area.y,
-				   descriptor.flags & DN_WINDOW_FLAG_WINDOWED,
-				   descriptor.flags & DN_WINDOW_FLAG_BORDER,
-				   descriptor.flags & DN_WINDOW_FLAG_VSYNC,
+				   config.flags & DN_WINDOW_FLAG_WINDOWED,
+				   config.flags & DN_WINDOW_FLAG_BORDER,
+				   config.flags & DN_WINDOW_FLAG_VSYNC,
 				   mode->refreshRate,
 				   monitor != nullptr);
 
 	// Init the window, give it a GL context, and load OpenGL. Don't bother passing in the real size here, because we're going to set it later.
-	window.handle = glfwCreateWindow(1, 1, descriptor.title, monitor, NULL);
+	window.handle = glfwCreateWindow(1, 1, config.title, monitor, NULL);
 	glfwMakeContextCurrent(window.handle);
 
 	// Initialize OpenGL
@@ -115,7 +134,7 @@ void dn_window_create(dn_window_descriptor_t descriptor) {
 	glDebugMessageCallback(gl_error_callback, 0);
 
 	// This has to be done after context creation
-	if (descriptor.flags & DN_WINDOW_FLAG_VSYNC) {
+	if (config.flags & DN_WINDOW_FLAG_VSYNC) {
 		glfwSwapInterval(1);
 	}
 	else {
@@ -158,6 +177,8 @@ void dn_window_create(dn_window_descriptor_t descriptor) {
 		dn_window_set_display_mode(DN_DISPLAY_MODE_1080);
 	}
 #endif
+
+	dn_window_set_icon(config.icon);
 }
 
 void dn_window_set_icon(const char* path) {
@@ -202,6 +223,7 @@ void dn_window_set_display_mode(dn_display_mode_t mode) {
 
 			return;
 		} break;
+		case DN_DISPLAY_MODE_180: window.requested_area = { .x = 320, .y = 180 }; break;
 		case DN_DISPLAY_MODE_480: window.requested_area = { .x = 854, .y = 480 }; break;
 		case DN_DISPLAY_MODE_720: window.requested_area = { .x = 1280, .y = 720 }; break;
 		case DN_DISPLAY_MODE_1080: window.requested_area = { .x = 1920, .y = 1080 }; break;

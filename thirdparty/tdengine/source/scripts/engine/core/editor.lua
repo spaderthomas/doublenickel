@@ -250,6 +250,7 @@ tdengine.editor.layers = {
 -- INTERNAL --
 --------------
 function tdengine.editor.init()
+  tdengine.ffi.dn_log('tdengine.editor.init')
   self.focus_state = {}
   self.hover_state = {}
   self.window_stack = tdengine.data_types.stack:new()
