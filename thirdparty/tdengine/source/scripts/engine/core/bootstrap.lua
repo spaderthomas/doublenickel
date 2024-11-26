@@ -125,6 +125,12 @@ tstring                dn_paths_resolve_format(const char* name, const char* fil
 //  ╚═════╝ ╚══════╝ //
 ///////////////////////
  
+typedef enum {
+  DN_OS_FILE_ATTR_NONE = 0,
+  DN_OS_FILE_ATTR_REGULAR_FILE = 1,
+  DN_OS_FILE_ATTR_DIRECTORY = 2,
+} dn_os_file_attr_t;
+
 typedef struct dn_os_date_time_t {
 	int year;
 	int month;
@@ -135,12 +141,19 @@ typedef struct dn_os_date_time_t {
 	int millisecond;
 } dn_os_date_time_t;
 
-bool              dn_os_does_path_exist(const char* path);
-bool              dn_os_is_regular_file(const char* path);
-bool              dn_os_is_directory(const char* path);
-void              dn_os_create_directory(const char* path);
-void              dn_os_remove_directory(const char* path);
-dn_os_date_time_t dn_os_get_date_time();
+typedef struct {
+  const char* path;
+  dn_os_file_attr_t attributes;
+} dn_os_directory_entry_t;
+
+
+bool                     dn_os_does_path_exist(const char* path);
+bool                     dn_os_is_regular_file(const char* path);
+bool                     dn_os_is_directory(const char* path);
+void                     dn_os_remove_directory(const char* path);
+void                     dn_os_create_directory(const char* path);
+dn_os_directory_entry_t* dn_os_scan_directory(const char* path);
+dn_os_date_time_t        dn_os_get_date_time();
 
 typedef struct dn_allocator_t dn_allocator_t;
 
@@ -167,7 +180,7 @@ typedef struct {
   dn_allocator_t* allocator;
 } dn_dynamic_array_header_t;
 
-void*                      dn_dynamic_array_alloc(u32 element_size, dn_allocator_t* allocator);
+void*                      dn_dynamic_array_create(u32 element_size, dn_allocator_t* allocator);
 void                       dn_dynamic_array_push_n(void** array, void* data, u32 num_elements);
 void*                      dn_dynamic_array_reserve(void** array, u32 num_elements);
 dn_dynamic_array_header_t* dn_dynamic_array_head(void** array);
@@ -447,8 +460,6 @@ void              dn_window_set_cursor_visible(bool visible);
 
 
 
-
-
 ////////////////////////////////
 //  ██████╗ ██████╗ ██╗   ██╗ //
 // ██╔════╝ ██╔══██╗██║   ██║ //
@@ -457,8 +468,6 @@ void              dn_window_set_cursor_visible(bool visible);
 // ╚██████╔╝██║     ╚██████╔╝ //
 //  ╚═════╝ ╚═╝      ╚═════╝  //
 ////////////////////////////////
-                          
-
 
 typedef enum {
   GPU_COMMAND_OP_BIND_BUFFERS = 10,
@@ -920,46 +929,6 @@ void                     dn_sdf_oriented_box_ex(dn_sdf_renderer_t* renderer, flo
 void                     dn_sdf_grid(dn_sdf_renderer_t* renderer, u32 grid_width, u32 grid_size);
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-// ██╗███╗   ██╗██████╗ ██╗   ██╗████████╗     █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗ //
-// ██║████╗  ██║██╔══██╗██║   ██║╚══██╔══╝    ██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝ //
-// ██║██╔██╗ ██║██████╔╝██║   ██║   ██║       ███████║██║        ██║   ██║██║   ██║██╔██╗ ██║███████╗ //
-// ██║██║╚██╗██║██╔═══╝ ██║   ██║   ██║       ██╔══██║██║        ██║   ██║██║   ██║██║╚██╗██║╚════██║ //
-// ██║██║ ╚████║██║     ╚██████╔╝   ██║       ██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║ //
-// ╚═╝╚═╝  ╚═══╝╚═╝      ╚═════╝    ╚═╝       ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝ //
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-typedef enum {
-  KEY_ACTION_PRESS = 0,
-  KEY_ACTION_DOWN = 1,
-} KeyAction;
-
-void register_action(const char* name, u32 key, u32 key_event, const char* action_set);
-void register_action_set(const char* name);
-void activate_action_set(const char* name);
-bool is_digital_active(const char* name);
-bool was_digital_active(const char* name);
-bool was_digital_pressed(const char* name);
-i32 get_action_set_cooldown();
-const char* get_active_action_set();
-
-
-
-
-
-////////////////////////////////////////////
-// ███╗   ██╗ ██████╗ ██╗███████╗███████╗ //
-// ████╗  ██║██╔═══██╗██║██╔════╝██╔════╝ //
-// ██╔██╗ ██║██║   ██║██║███████╗█████╗   //
-// ██║╚██╗██║██║   ██║██║╚════██║██╔══╝   //
-// ██║ ╚████║╚██████╔╝██║███████║███████╗ //
-// ╚═╝  ╚═══╝ ╚═════╝ ╚═╝╚══════╝╚══════╝ //
-////////////////////////////////////////////
-
-double dn_noise_perlin(double x, double y);
-double dn_noise_perlin_scaled(double x, double y, double vmin, double vmax);
-double dn_noise_chaotic(double x, double y);
-double dn_noise_chaotic_scaled(double x, double y, double vmin, double vmax);
 
 /////////////////////////////////////////
 // ██╗███╗   ███╗ ██████╗ ██╗   ██╗██╗ //
@@ -988,6 +957,48 @@ tstring dn_imgui_file_browser_get_selected_file();
 void    dn_imgui_load_layout(const char* file_name);
 void    dn_imgui_save_layout(const char* file_name);
 void    dn_imgui_load_colors(dn_imgui_colors_t colors);
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ██╗███╗   ██╗██████╗ ██╗   ██╗████████╗     █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗ //
+// ██║████╗  ██║██╔══██╗██║   ██║╚══██╔══╝    ██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝ //
+// ██║██╔██╗ ██║██████╔╝██║   ██║   ██║       ███████║██║        ██║   ██║██║   ██║██╔██╗ ██║███████╗ //
+// ██║██║╚██╗██║██╔═══╝ ██║   ██║   ██║       ██╔══██║██║        ██║   ██║██║   ██║██║╚██╗██║╚════██║ //
+// ██║██║ ╚████║██║     ╚██████╔╝   ██║       ██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║ //
+// ╚═╝╚═╝  ╚═══╝╚═╝      ╚═════╝    ╚═╝       ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝ //
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+typedef enum {
+  KEY_ACTION_PRESS = 0,
+  KEY_ACTION_DOWN = 1,
+} KeyAction;
+
+void register_action(const char* name, u32 key, u32 key_event, const char* action_set);
+void register_action_set(const char* name);
+void activate_action_set(const char* name);
+bool is_digital_active(const char* name);
+bool was_digital_active(const char* name);
+bool was_digital_pressed(const char* name);
+i32 get_action_set_cooldown();
+const char* get_active_action_set();
+
+
+
+////////////////////////////////////////////
+// ███╗   ██╗ ██████╗ ██╗███████╗███████╗ //
+// ████╗  ██║██╔═══██╗██║██╔════╝██╔════╝ //
+// ██╔██╗ ██║██║   ██║██║███████╗█████╗   //
+// ██║╚██╗██║██║   ██║██║╚════██║██╔══╝   //
+// ██║ ╚████║╚██████╔╝██║███████║███████╗ //
+// ╚═╝  ╚═══╝ ╚═════╝ ╚═╝╚══════╝╚══════╝ //
+////////////////////////////////////////////
+
+double dn_noise_perlin(double x, double y);
+double dn_noise_perlin_scaled(double x, double y, double vmin, double vmax);
+double dn_noise_chaotic(double x, double y);
+double dn_noise_chaotic_scaled(double x, double y, double vmin, double vmax);
+
 
 
 
@@ -1151,6 +1162,8 @@ void set_particle_gravity_source(ParticleSystemHandle handle, float x, float y);
 void set_particle_gravity_intensity(ParticleSystemHandle handle, float intensity);
 void set_particle_gravity_enabled(ParticleSystemHandle handle, bool enabled);
 void set_particle_master_opacity(ParticleSystemHandle handle, float opacity);
+
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ██╗   ██╗███╗   ██╗ ██████╗ █████╗ ████████╗███████╗ ██████╗  ██████╗ ██████╗ ██╗███████╗███████╗██████╗  //
@@ -1369,6 +1382,8 @@ function tdengine.init_phase_0()
   tdengine.subsystem.types = {}
 
   tdengine.math = {}
+
+  tdengine.filesystem = {}
 
   tdengine.draw = {}
   tdengine.draw.internal = {}

@@ -22,40 +22,14 @@ function tdengine.strip_extension(path)
   return path:sub(1, extension - 1)
 end
 
-function tdengine.scandir(dir)
-  local platform = tdengine.platform()
-  if platform == 'Windows' then
-    local dir = string.format('%s/*', dir)
-    return tdengine.scandir_impl(dir)
-  end
-
-  local command = 'ls -a "' .. dir .. '"'
-
-  local i, t, popen = 0, {}, io.popen
-  local pfile = popen(command)
-  for filename in pfile:lines() do
-    if filename ~= '.' and filename ~= '..' then
-      i = i + 1
-      t[i] = filename
+function tdengine.filesystem.iterate_directory(path)
+  local function iterator()
+    local entries = tdengine.ffi.dn_os_scan_directory(path)
+    local num_entries = tdengine.ffi.dn_dynamic_array_size(entries)
+    for i = 0, num_entries - 1 do
+      coroutine.yield(entries + i)
     end
   end
-  pfile:close()
-  return t
-end
 
-function tdengine.create_dir(dir)
-  local command = string.format('mkdir "%s"', dir)
-  os.execute(command)
-end
-
-function tdengine.ffi.dn_os_does_path_exist(path)
-  return tdengine.ffi.dn_os_does_path_exist(path)
-end
-
-function tdengine.ffi.dn_os_is_regular_file(path)
-  return tdengine.ffi.dn_os_is_regular_file(path)
-end
-
-function tdengine.is_directory(path)
-  return tdengine.ffi.dn_os_is_regular_file(path)
+  return coroutine.wrap(iterator)
 end

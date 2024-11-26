@@ -42,6 +42,9 @@ function App:init()
 	self.native_resolution = tdengine.vec2(320, 180)
 	self.output_resolution = tdengine.vec2(1024, 576)
 
+	for entry in tdengine.filesystem.iterate_directory('C:/Users/spader/source') do
+		print(entry.path)
+	end
 end
 
 function App:on_init_game()

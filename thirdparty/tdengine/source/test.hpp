@@ -171,7 +171,7 @@ void test_bump_allocator() {
 	assert(bump_allocator.allocations[sizeof(u32) * 8] == sizeof(u32) * 16);
 }
 void test_dyn_array() {
-	auto array = dn_dynamic_array_alloc_t<u32>(dn_allocator_find("bump"));
+	auto array = dn_dynamic_array_create_t<u32>(dn_allocator_find("bump"));
 	assert(dn_dynamic_array_head(array)->size == 0);
 
 	dn_dynamic_array_push(array, 69);

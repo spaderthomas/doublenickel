@@ -90,6 +90,9 @@ end
 
 function tdengine.dialogue.list()
   local directory = tdengine.ffi.dn_paths_resolve('dialogues'):to_interned()
+	for entry in tdengine.filesystem.iterate_directory(directory) do
+		print(entry.path)
+	end
 
   local dialogues = {}
   for index, dialogue in ipairs(tdengine.scandir(directory)) do

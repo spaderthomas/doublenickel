@@ -31,7 +31,7 @@ function tdengine.save.list()
   local saves = {}
 
   local save_dir = tdengine.ffi.dn_paths_resolve('saves'):to_interned()
-  local files = tdengine.scandir(save_dir)
+  local files = tdengine.ffi.dn_os_scan_directory(save_dir)
   for index, file_name in pairs(files) do
     table.insert(saves, tdengine.save.open(file_name))
   end

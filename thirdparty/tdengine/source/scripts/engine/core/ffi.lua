@@ -653,12 +653,12 @@ function DynamicArray:init(ctype, allocator)
 	self.element_size = ffi.sizeof(self.value_type)
 	self.allocator = allocator or tdengine.ffi.dn_allocator_find('bump')
 
-	self.data[0] = tdengine.ffi._dn_dynamic_array_alloc(self.element_size, self.allocator)
+	self.data[0] = tdengine.ffi.dn_dynamic_array_create(self.element_size, self.allocator)
 end
 
 function DynamicArray:push(value)
 	local marshalled_value = ffi.new(self.reference_type, value)
-	tdengine.ffi._dn_dynamic_array_push_n(self.data, marshalled_value, 1)
+	tdengine.ffi.dn_dynamic_array_push_n(self.data, marshalled_value, 1)
 end
 
 function DynamicArray:at(index)
