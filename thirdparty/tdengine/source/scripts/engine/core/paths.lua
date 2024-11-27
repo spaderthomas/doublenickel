@@ -9,22 +9,6 @@ function NamedPath:init(name, path, named_parent)
 	self.parent = named_parent or nil
 end
 
--- local PathRegistry = tdengine.class.define('PathRegistry')
--- function PathRegistry:init(descriptor)
--- 	self.path_info = descriptor.path_info
--- 	self.dialogue = descriptor.dialogue
--- 	self.saves = descriptor.saves
--- 	self.shaders = descriptor.shaders
--- 	self.scenes = descriptor.scenes
--- 	self.layouts = descriptor.layouts
--- 	self.ffi = descriptor.ffi
--- 	self.backgrounds = descriptor.background_info
--- 	self.font_info = descriptor.font_info
--- 	self.animation_info = descriptor.animation_info
--- 	self.texture_info = descriptor.texture_info
--- 	self.character_info = descriptor.character_info
--- end
-
 local function collect_paths(paths, full_parent)
 	local collected_paths = tdengine.data_types.Array:new()
 	if not paths then return collected_paths end
@@ -32,7 +16,7 @@ local function collect_paths(paths, full_parent)
 	for name, data in pairs(paths) do
 		local path = NamedPath:new(name)
 		if full_parent then
-			path.full_path = string.format('%s/%s', full_parent, data.path)
+			path.full_path = string.format('%s/%s', full_parent, data.path or data)
 		elseif data.named_parent then
 			path.named_parent = data.named_parent
 			path.full_path = data.path

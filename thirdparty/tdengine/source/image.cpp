@@ -276,7 +276,7 @@ void TextureAtlas::build_from_source() {
 		u32* image = item->data;
 		u32* atlas = buffer.data + (TEXTURE_ATLAS_SIZE * rect->y) + (rect->x);
 
-		fox_for(row, rect->h - fudge_px) {
+		dn_for(row, rect->h - fudge_px) {
 			memcpy(atlas, image, size.x * sizeof(u32));
 			atlas += TEXTURE_ATLAS_SIZE;
 			image += size.x;

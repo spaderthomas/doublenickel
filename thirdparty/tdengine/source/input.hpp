@@ -108,7 +108,7 @@ void dn_input_update() {
 	auto& input = dn_input;
 
 	// Reset between frames
-	fox_for(key, GLFW_KEY_LAST) {
+	dn_for(key, GLFW_KEY_LAST) {
 		input.was_down[key] = input.is_down[key];
 	}
 
@@ -198,20 +198,14 @@ void dn_input_callback_window_size(GLFWwindow* window_handle, int width, int hei
 	
 	window.content_area.x = width;
 	window.content_area.y = height;
+	glViewport(0, 0, width, height);
 
+	if (!dn_gpu.targets.size) {
+		return;
+	}
 	auto swapchain = dn_gpu_acquire_swapchain();
 	swapchain->size = window.content_area;
-
-	// In the editor, the game are is specified by some editor code that figures out the best size
-	// for it. In the packaged build, it's just the entire screen, so we sync it up with the window.
-#if !defined(FM_EDITOR)
-	dn_log("%s: width = %d, height = %d", __func__, width, height);
-
-	Coord::game_area_size.x = width;
-	Coord::game_area_size.y = height;
-#endif
 	
-	glViewport(0, 0, width, height);
 }
 
 
@@ -272,7 +266,7 @@ Vector2 dn_input_mouse(dn_coord_t unit) {
 		case DN_COORD_UNIT_WORLD:  return dn_coord_screen_to_world(input.mouse.x, input.mouse.y); break;
 	}
 
-	TD_ASSERT(false);
+	DN_ASSERT(false);
 	return {0};
 }
 
@@ -285,7 +279,7 @@ Vector2 dn_input_mouse_delta(dn_coord_t unit) {
 		case DN_COORD_UNIT_WORLD:  return dn_coord_screen_to_world_mag(input.mouse_delta.x, input.mouse_delta.y); break;
 	}
 
-	TD_ASSERT(false);
+	DN_ASSERT(false);
 	return {0};
 }
 

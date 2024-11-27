@@ -496,39 +496,6 @@ dn_display_mode_t  dm_window_get_display_mode();
 void               dn_window_set_cursor_visible(bool visible);
 
 
-//////////////////////////////
-// █████╗ ██████╗ ██████╗   //
-// ██╔══██╗██╔══██╗██╔══██╗ //
-// ███████║██████╔╝██████╔╝ //
-// ██╔══██║██╔═══╝ ██╔═══╝  //
-// ██║  ██║██║     ██║      //
-// ╚═╝  ╚═╝╚═╝     ╚═╝      //
-//////////////////////////////                        
-
-typedef struct {
-  const char* install_path;
-  const char* engine_path;
-  const char* write_path;
-  const char* app_path;
-} dn_app_descriptor_t;
-
-typedef struct {
-  dn_window_config_t window;
-  dn_audio_config_t audio;
-  dn_font_config_t font;
-  u32 target_fps;
-} dn_app_config_t;
-
-typedef struct {
-  dn_path_t install_path;
-  dn_path_t engine_path;
-  dn_path_t write_path;
-  dn_path_t app_path;
-} dn_app_t;
-dn_app_t dn_app;
-
-void dn_app_init(dn_app_descriptor_t descriptor);
-void dn_app_configure(dn_app_config_t config);
 
 ////////////////////////////////
 //  ██████╗ ██████╗ ██╗   ██╗ //
@@ -712,10 +679,12 @@ typedef struct {
 // GPU RENDER TARGET //
 ///////////////////////
 typedef struct {
+  dn_asset_name_t name;
 	Vector2 size;
 } dn_gpu_render_target_descriptor_t;
 
 typedef struct {
+  dn_asset_name_t name;
 	u32 handle;
 	u32 color_buffer;
 	Vector2 size;
@@ -840,6 +809,18 @@ typedef struct {
 
 typedef struct dn_gpu_command_buffer_t dn_gpu_command_buffer_t;
 
+////////////
+// DN GPU //
+////////////
+typedef struct {
+  const char* shader_path;
+  dn_gpu_shader_descriptor_t* shaders;
+  u32 num_shaders;
+  const char** search_paths;
+  u32 num_search_paths;
+  dn_gpu_render_target_descriptor_t* render_targets;
+  u32 num_render_targets;
+} dn_gpu_config_t;
 ///////////////
 // FUNCTIONS //
 ///////////////
@@ -871,6 +852,7 @@ dn_gpu_shader_t*         dn_gpu_shader_create(dn_gpu_shader_descriptor_t descrip
 dn_gpu_shader_t*         dn_gpu_shader_find(const char* name);
 dn_gpu_render_target_t*  dn_gpu_render_target_create(dn_gpu_render_target_descriptor_t descriptor);
 dn_gpu_render_target_t*  dn_gpu_acquire_swapchain();
+dn_gpu_render_target_t*  dn_gpu_render_target_find(const char* name);
 void                     dn_gpu_render_target_bind(dn_gpu_render_target_t* target);
 void                     dn_gpu_render_target_clear(dn_gpu_render_target_t* target);
 void                     dn_gpu_render_target_blit(dn_gpu_render_target_t* source, dn_gpu_render_target_t* destination);
@@ -1069,6 +1051,42 @@ double dn_noise_perlin_scaled(double x, double y, double vmin, double vmax);
 double dn_noise_chaotic(double x, double y);
 double dn_noise_chaotic_scaled(double x, double y, double vmin, double vmax);
 
+
+
+//////////////////////////////
+// █████╗ ██████╗ ██████╗   //
+// ██╔══██╗██╔══██╗██╔══██╗ //
+// ███████║██████╔╝██████╔╝ //
+// ██╔══██║██╔═══╝ ██╔═══╝  //
+// ██║  ██║██║     ██║      //
+// ╚═╝  ╚═╝╚═╝     ╚═╝      //
+//////////////////////////////                        
+
+typedef struct {
+  const char* install_path;
+  const char* engine_path;
+  const char* write_path;
+  const char* app_path;
+} dn_app_descriptor_t;
+
+typedef struct {
+  dn_window_config_t window;
+  dn_audio_config_t audio;
+  dn_font_config_t font;
+  dn_gpu_config_t gpu;
+  u32 target_fps;
+} dn_app_config_t;
+
+typedef struct {
+  dn_path_t install_path;
+  dn_path_t engine_path;
+  dn_path_t write_path;
+  dn_path_t app_path;
+} dn_app_t;
+dn_app_t dn_app;
+
+void dn_app_init(dn_app_descriptor_t descriptor);
+void dn_app_configure(dn_app_config_t config);
 
 
 

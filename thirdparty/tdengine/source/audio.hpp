@@ -519,7 +519,7 @@ float dn_low_pass_filter_apply(dn_low_pass_filter_t* filter, float input) {
 		} break;
 
 		default: {
-			TD_ASSERT(false);
+			DN_ASSERT(false);
 			return input;
 		}
 	}

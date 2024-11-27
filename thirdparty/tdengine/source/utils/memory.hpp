@@ -7,7 +7,7 @@ typedef enum {
 typedef std::function<void*(dn_allocator_mode_t, u32, void*)> dn_alloc_fn_t;
 
 
-struct dn_allocator_t {
+struct  dn_allocator_t {
 	dn_alloc_fn_t on_alloc;
 
 	template<typename T>
@@ -30,14 +30,7 @@ struct dn_allocator_t {
 
 	char* alloc_path();
 };
-
-
-DN_API void             dn_allocators_init();
-DN_API void             dn_allocator_add(const char* name, dn_allocator_t* allocator);
-DN_API dn_allocator_t*  dn_allocator_find(const char* name);
-DN_API void*            dn_allocator_alloc(dn_allocator_t* allocator, u32 size);
-DN_API void*            dn_allocator_realloc(dn_allocator_t* allocator, void* memory, u32 size);
-DN_API void             dn_allocator_free(dn_allocator_t* allocator, void* buffer);
+std::unordered_map<std::string, dn_allocator_t*> allocators;
 
 struct dn_bump_allocator_t : dn_allocator_t {
 	u8* buffer;
@@ -57,8 +50,12 @@ struct dn_standard_allocator_t : dn_allocator_t {
 
 dn_standard_allocator_t standard_allocator;
 
-//typedef struct {
-//	dn_bump_allocator_t bump;
-//	dn_standard_allocator_t standard;
-//} dn_allocators_t;
-//dn_allocators_t dn_allocators;
+DN_API void             dn_allocator_add(const char* name, dn_allocator_t* allocator);
+DN_API dn_allocator_t*  dn_allocator_find(const char* name);
+DN_API void*            dn_allocator_alloc(dn_allocator_t* allocator, u32 size);
+DN_API void*            dn_allocator_realloc(dn_allocator_t* allocator, void* memory, u32 size);
+DN_API void             dn_allocator_free(dn_allocator_t* allocator, void* buffer);
+
+DN_IMP void dn_allocators_init();
+DN_IMP void dn_allocators_update();
+

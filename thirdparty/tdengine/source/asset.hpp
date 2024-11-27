@@ -50,10 +50,115 @@ struct AssetLoader {
 };
 AssetLoader asset_loader;
 
-struct BinaryAssets {
-    uint8_t* data;
-    uint32_t size;
-};
-BinaryAssets binary_assets;
+typedef struct {
+    void* user_data;
+} dn_asset_import_request_t;
+
+typedef enum {
+    DN_ASSET_IMPORT_STATUS_RUNNING,
+    DN_ASSET_IMPORT_STATUS_DONE,
+} dn_asset_import_status_t;
+
+typedef enum {
+    DN_BACKGROUND_IMPORT_STATUS_UPDATE_CONFIG,
+    DN_BACKGROUND_IMPORT_STATUS_LOAD_TILES,
+    DN_BACKGROUND_IMPORT_STATUS_DONE,
+} dn_background_import_status_t;
+typedef struct {
+    dn_background_import_status_t status;
+    Background* background;
+} dn_background_import_request_t;
+
+typedef void(*dn_asset_import_fn)(dn_asset_import_request_t* request);
+typedef dn_asset_import_status_t(*dn_asset_completion_fn)(dn_asset_import_request_t* request);
+
+typedef struct {
+    dn_asset_import_fn on_import;
+    dn_asset_completion_fn on_complete;
+} dn_asset_importer_t;
+
+typedef void* dn_asset_data_t;
+
+typedef struct {
+    dn_asset_name_t name;
+    dn_asset_data_t data;
+} dn_asset_t;
+
+typedef struct {
+    std::thread thread;
+    std::condition_variable condition;
+    std::mutex mutex;
+
+    std::unordered_map<std::string, dn_asset_t> assets;
+
+    RingBuffer<AssetLoadRequest> load_requests;
+    RingBuffer<AssetLoadRequest> completion_queue;
+} dn_assets_t;
+dn_assets_t dn_assets;
+
+
+void dn_background_import(dn_asset_import_request_t* request) {
+    auto background_request = (dn_background_import_request_t*)request->user_data;
+    auto background = background_request->background;
+    if (background->need_async_build) {
+        background->build_from_source();
+    }
+    if (background->need_async_load) {
+        background->load_tiles();
+    }
+}
+
+dn_asset_import_status_t dn_background_complete(dn_asset_import_request_t* request) {
+    auto background_request = (dn_background_import_request_t*)request->user_data;
+    auto background = background_request->background;
+
+    switch (background_request->status) {
+        case DN_BACKGROUND_IMPORT_STATUS_UPDATE_CONFIG: {
+            if (background->is_dirty()) {
+               background->update_config();
+            }
+
+            background_request->status = DN_BACKGROUND_IMPORT_STATUS_LOAD_TILES;
+            return DN_ASSET_IMPORT_STATUS_RUNNING;
+        } break;
+
+        case DN_BACKGROUND_IMPORT_STATUS_LOAD_TILES: {
+            background->load_one_to_gpu();
+            if (background->gpu_done) {
+                background_request->status = DN_BACKGROUND_IMPORT_STATUS_DONE;
+                return DN_ASSET_IMPORT_STATUS_DONE;
+            }
+
+            return DN_ASSET_IMPORT_STATUS_RUNNING;
+        } break;
+
+        default: {
+            DN_ASSERT(false);
+            return DN_ASSET_IMPORT_STATUS_DONE;
+        }
+    }
+}
+
+void dn_assets_init() {
+    dn_asset_importer_t background_importer = {
+        .on_import = &dn_background_import,
+        .on_complete = &dn_background_complete
+    };
+}
+
+void dn_assets_add(const char* name, dn_asset_t asset) {
+    dn_assets.assets[name] = asset;
+}
+
+dn_asset_data_t dn_assets_find(const char* name) {
+    DN_ASSERT(name);
+
+    if (!dn_assets.assets.contains(name)) {
+		dn_log("Tried to find asset, but name was not registered; name = %s", name);
+        return NULL;
+    }
+
+    return dn_assets.assets[name].data;
+}
 
 void init_assets();

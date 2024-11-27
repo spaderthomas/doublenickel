@@ -44,7 +44,7 @@ T* dn_fixed_array_at_t(dn_fixed_array<T, N>* fixed_array, u32 index) {
 #ifdef DN_FIXED_ARRAY_IMPLEMENTATION
 
 void dn_fixed_array_init(dn_fixed_array_t* buffer, u32 max_vertices, u32 element_size, dn_allocator_t* allocator) {
-	TD_ASSERT(buffer);
+	DN_ASSERT(buffer);
 
 	buffer->size = 0;
 	buffer->capacity = max_vertices;
@@ -54,13 +54,13 @@ void dn_fixed_array_init(dn_fixed_array_t* buffer, u32 max_vertices, u32 element
 }
 
 u8* dn_fixed_array_at(dn_fixed_array_t* buffer, u32 index) {
-	TD_ASSERT(buffer);
+	DN_ASSERT(buffer);
 	return buffer->data + (index * buffer->element_size);
 }
 
 u8* dn_fixed_array_push(dn_fixed_array_t* buffer, void* data, u32 count) {
-	TD_ASSERT(buffer);
-	TD_ASSERT(buffer->size < buffer->capacity);
+	DN_ASSERT(buffer);
+	DN_ASSERT(buffer->size < buffer->capacity);
 
 	auto vertices = dn_fixed_array_reserve(buffer, count);
 	if (data) copy_memory(data, vertices, buffer->element_size * count);
@@ -68,7 +68,7 @@ u8* dn_fixed_array_push(dn_fixed_array_t* buffer, void* data, u32 count) {
 }
 
 u8* dn_fixed_array_reserve(dn_fixed_array_t* buffer, u32 count) {
-	TD_ASSERT(buffer);
+	DN_ASSERT(buffer);
 	
 	auto vertex = dn_fixed_array_at(buffer, buffer->size);
 	buffer->size += count;
@@ -76,13 +76,13 @@ u8* dn_fixed_array_reserve(dn_fixed_array_t* buffer, u32 count) {
 }
 
 void dn_fixed_array_clear(dn_fixed_array_t* buffer) {
-	TD_ASSERT(buffer);
+	DN_ASSERT(buffer);
 
 	buffer->size = 0;
 }
 
 u32 dn_fixed_array_byte_size(dn_fixed_array_t* buffer) {
-	TD_ASSERT(buffer);
+	DN_ASSERT(buffer);
 
 	return buffer->size * buffer->element_size;
 }

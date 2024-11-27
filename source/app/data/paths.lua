@@ -27,7 +27,15 @@ return {
 					children = {
 						font = '%s'
 					}
-				}
+				},
+				shaders = {
+					path = 'shaders',
+					children = {
+						shader_includes = 'include',
+						shader = '%s',
+					}
+				},
+
 			}
 		}
 	},

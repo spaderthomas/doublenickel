@@ -527,7 +527,10 @@ function dn_allocator_t:free(pointer)
 end
 
 function dn_allocator_t:alloc_array(ctype, n)
-	return ffi.cast(tdengine.ffi.ptr_type(ctype), tdengine.ffi.dn_allocator_alloc(self, ffi.sizeof(ctype) * n))
+	return ffi.cast(
+		tdengine.ffi.ptr_type(ctype), 
+		tdengine.ffi.dn_allocator_alloc(self, ffi.sizeof(ctype) * n)
+	)
 end
 
 
@@ -766,6 +769,29 @@ function GpuBuffer:bind_base(base)
   tdengine.ffi.gpu_buffer_bind_base(self.buffer, base)
 end
 
+GpuShaderDescriptor = tdengine.class.metatype('dn_gpu_shader_descriptor_t')
+function GpuShaderDescriptor:init(params)
+  params.kind = tdengine.enum.load(params.kind)
+  self.kind = params.kind:to_number()
+  self.name = params.name
+
+  if params.kind == tdengine.enums.GpuShaderKind.Graphics then
+    self.vertex_shader = params.vertex_shader
+    self.fragment_shader = params.fragment_shader
+  elseif params.kind == tdengine.enums.GpuShaderKind.Compute then
+    self.compute_shader = params.compute_shader
+  end
+end
+
+GpuRenderTargetDescriptor = tdengine.class.metatype('dn_gpu_render_target_descriptor_t')
+function GpuRenderTargetDescriptor:init(params)
+	self.name = params.name
+  if params.resolution then
+    self.size = tdengine.gpu.find(params.resolution)
+  else
+    self.size = Vector2:new(params.size.x, params.size.y)
+  end
+end
 
 WindowConfig = tdengine.class.metatype('dn_window_config_t')
 function WindowConfig:init(params)
@@ -774,6 +800,7 @@ function WindowConfig:init(params)
 	self.icon = params.icon or default.icon
 	self.native_resolution = params.native_resolution or default.native_resolution
 	self.flags = params.flags or default.flags
+	self.display_mode = params.display_mode or default.display_mode
 end
 
 AudioConfig = tdengine.class.metatype('dn_audio_config_t')
@@ -814,12 +841,38 @@ function FontConfig:init(params)
 	self.font_dir = params.font_dir or nil
 end
 
+GpuConfig = tdengine.class.metatype('dn_gpu_config_t')
+function GpuConfig:init(params)
+	local allocator = tdengine.ffi.dn_allocator_find('bump')
+
+	self.shader_path = params.shader_path or nil
+
+	self.num_search_paths = params.search_paths and #params.search_paths or 0
+	self.search_paths = allocator:alloc_array('const char*', self.num_search_paths)
+	for i = 0, self.num_search_paths - 1 do
+		self.search_paths[i] = params.search_paths[i + 1]
+	end
+
+	self.num_shaders = params.shaders and #params.shaders or 0
+	self.shaders = allocator:alloc_array('dn_gpu_shader_descriptor_t', self.num_shaders)
+	for i = 0, self.num_shaders - 1 do
+		self.shaders[i] = GpuShaderDescriptor:new(params.shaders[i + 1])
+	end
+
+	self.num_render_targets = params.render_targets and #params.render_targets or 0
+	self.render_targets = allocator:alloc_array('dn_gpu_render_target_descriptor_t', self.num_render_targets)
+	for i = 0, self.num_render_targets - 1 do
+		self.render_targets[i] = GpuRenderTargetDescriptor:new(params.render_targets[i + 1])
+	end
+
+end
 
 AppConfig = tdengine.class.metatype('dn_app_config_t')
 function AppConfig:init(params)
 	self.window = params.window or tdengine.ffi.dn_window_config_default()
 	self.audio = params.audio or tdengine.ffi.dn_audio_config_default()
 	self.font = params.font or tdengine.ffi.dn_font_config_default()
+	self.gpu = params.gpu or ffi.new('dn_gpu_config_t')
 end
 
 ------------------

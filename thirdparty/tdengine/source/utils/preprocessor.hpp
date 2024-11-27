@@ -4,7 +4,7 @@
 typedef struct {
   const char* file_path;
   struct {
-    const char* data [8];
+    dn_path_t* data;
     u32 count;
   } include_dirs;
 

@@ -16,10 +16,15 @@ namespace path_util {
 
 
 DN_API void dn_path_join(dn_path_t path, const char* a, const char* b);
+DN_API void dn_path_from_cstr(dn_path_t path, const char* a);
 #endif
 
 #ifdef DN_PATH_IMPLEMENTATION
-DN_API void dn_path_join(dn_path_t path, const char* a, const char* b) {
+void dn_path_from_cstr(dn_path_t path, const char* a) {
+	snprintf(path, DN_MAX_PATH_LEN, "%s", a);
+}
+
+void dn_path_join(dn_path_t path, const char* a, const char* b) {
 	snprintf(path, DN_MAX_PATH_LEN, "%s/%s", a, b);
 }
 

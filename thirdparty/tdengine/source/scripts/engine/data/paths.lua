@@ -25,9 +25,7 @@ return {
 					path = 'shaders',
 					children = {
 						dn_shader_includes = 'include',
-						dn_vertex_shader = '%s',
-						dn_fragment_shader = '%s',
-						dn_compute_shader = '%s',
+						dn_shader = '%s',
 					}
 				},
 			}
@@ -56,12 +54,6 @@ return {
 		},
 	},
 	install_paths = {
-		asset = {
-			path = 'asset',
-			children = {
-				audio = 'audio',
-			}
-		},
 	},
 	app_paths = {
 		app_entry_point = 'App.lua',

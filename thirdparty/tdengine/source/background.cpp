@@ -213,7 +213,7 @@ void Background::build_from_source() {
 	arr_init(&tile_processors, nthreads, TileProcessor());
 
 	// Use a thread per-tile, up to the maximum number of threads in the pool.
-	auto use_threads = fox_min(tiles.size, nthreads);
+	auto use_threads = DN_MIN(tiles.size, nthreads);
 	for (u32 i = 0; i < use_threads; i++) {
 		auto tile_processor = tile_processors[i];
 		tile_processor->init(source_data);
@@ -398,8 +398,8 @@ void TileProcessor::process(Background* background) {
 		// Blit a single tile to its own texture
 		u32 tile_offset = 0;
 		u32 source_offset = (background->width * source_position.y) + source_position.x;
-		u32 cols = fox_min(Background::TILE_SIZE, background->width - source_position.x);
-		u32 rows = fox_min(Background::TILE_SIZE, background->height - source_position.y);
+		u32 cols = DN_MIN(Background::TILE_SIZE, background->width - source_position.x);
+		u32 rows = DN_MIN(Background::TILE_SIZE, background->height - source_position.y);
 		for (u32 row = 0; row < rows; row++) {
 			memcpy(tile_data + tile_offset, source_data + source_offset, cols * sizeof(u32));
 			source_offset += background->width;

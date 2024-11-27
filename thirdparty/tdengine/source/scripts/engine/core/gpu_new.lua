@@ -1,28 +1,6 @@
 -------------
 -- STRUCTS --
 -------------
-GpuShaderDescriptor = tdengine.class.metatype('dn_gpu_shader_descriptor_t')
-function GpuShaderDescriptor:init(params)
-  params.kind = tdengine.enum.load(params.kind)
-  self.kind = params.kind:to_number()
-  self.name = params.name
-
-  if params.kind == tdengine.enums.GpuShaderKind.Graphics then
-    self.vertex_shader = params.vertex_shader
-    self.fragment_shader = params.fragment_shader
-  elseif params.kind == tdengine.enums.GpuShaderKind.Compute then
-    self.compute_shader = params.compute_shader
-  end
-end
-
-GpuRenderTargetDescriptor = tdengine.class.metatype('dn_gpu_render_target_descriptor_t')
-function GpuRenderTargetDescriptor:init(params)
-  if params.resolution then
-    self.size = tdengine.gpu.find(params.resolution)
-  else
-    self.size = Vector2:new(params.size.x, params.size.y)
-  end
-end
 
 GpuBufferDescriptor = tdengine.class.metatype('dn_gpu_buffer_descriptor_t')
 function GpuBufferDescriptor:init(params)
@@ -82,8 +60,10 @@ end
 
 GpuRenderPass = tdengine.class.metatype('dn_gpu_render_pass_t')
 function GpuRenderPass:init(params)
+  dbg()
   if params.color then
-    self.color.attachment = tdengine.gpu.find(params.color.attachment)
+    params.color.attachment = tdengine.enum.load(params.color.attachment)
+    self.color.attachment = tdengine.ffi.dn_gpu_render_target_find(params.color.attachment:to_string())
     self.color.load = tdengine.enum.load(params.color.load):to_number()
   end
 end
@@ -153,44 +133,8 @@ function GpuBufferBinding:init(params)
       self.storage.bindings[i - 1] = GpuStorageBufferBinding:new(params.storage[i])
     end
   end
-
 end
 
-local todo = [[
-- Draw an SDF circle using the other buffer
-  - Make a GL_ARRAY_BUFFER from Lua to hold the vertex data (position and UV, just reuse Vertex)
-  - Upload vertices for a quad to the buffer (once at startup)
-  - Create another GL_ARRAY_BUFFER to hold the instance-specific data (dn_sdf_vertex_t)
-  - Create a VAO which first specifies the vertex layout, then the instance data layout. It uses the divisor to tell OpenGL to only advance the instance data once per instance, rather than once per vertex.
-  - Every frame, update a CPU buffer with instance data. Sync that to the GPU buffer when you're ready to render.
-  - Call glDrawArraysInstanced, telling it to start at instance 0, draw 6 vertices per instance, and however many instances you have
-
-
-- Render component should draw to the correct pipeline
-- Reimplement all of the post processing stuff
-  - Reimplement ping-pong
-- Figure out the actual minimum number of command buffers you need
-- Make the benchmark timer API better (e.g. local timer = tdengine.ffi.dn_time_metric_begin(Timer.Render); timer:end())
-- Fully remove gpu.lua
-- Merge into the base engine...?
-]]
-
-local done = [[
-- find_resource() -> find()
-  - Move the named assets thing into the right place in the user folder
-- Properly clear render targets on load
-- Clean up push_vertex() so the call stack isn't four deep
-- Make sure the old draw API works and mawe sure the GPU setup for that is included in the base engine
-  - Why is the grid totally filling up the vertex buffer? Are the sizes correct?
-- What is a store op?
-- UniformBinding is still a mess of unimplemented and messy uniforms; fix those up
-  - Can I just move all the union-uniform stuff into Lua? I think that'd mean moving all of your current draw stuff into Lua, which 
-  isn't necessarily a problem. It's more that your whole immediate mode API doesn't make as much sense here. Or does it...? That's
-  something else. What is actually my bottleneck in drawing? I definitely want, for example, all the grid draw calls to get batched
-  together. I want *some* kind of auto-batching.
-- Rename GraphicsPipeline enum -> GraphicsPipeline
-
-]]
 
 ----------------
 -- GPU MODULE --
@@ -230,71 +174,4 @@ end
 
 function tdengine.gpu.find(id)
   return self.assets[id:to_qualified_string()]
-end
-
-
--------------------
--- RENDER TARGET -- 
--------------------
-function tdengine.gpu.add_render_target(id, descriptor)
-  local target = tdengine.ffi.dn_gpu_render_target_create(descriptor)
-  self.render_targets[id:to_string()] = target
-  self.assets[id:to_qualified_string()] = target
-end
-
-function tdengine.gpu.add_render_targets(targets)
-  for target in tdengine.iterator.values(targets) do
-		self.add_render_target(
-			target.id,
-			GpuRenderTargetDescriptor:new(target.descriptor)
-		)
-	end
-end
-
-----------------
--- GPU BUFFER --
-----------------
-function tdengine.gpu.add_buffer(id, descriptor)
-  local buffer = tdengine.ffi.dn_gpu_buffer_create(descriptor)
-  self.buffers[id:to_string()] = buffer
-  self.assets[id:to_qualified_string()] = buffer
-end
-
-function tdengine.gpu.add_buffers(buffers)
-  for buffer in tdengine.iterator.values(buffers) do
-		self.add_buffer(buffer.id, GpuBufferDescriptor:new(buffer.descriptor))
-	end
-end
-
-------------
--- SHADER --
-------------
-function tdengine.gpu.add_shader(id, descriptor)
-  local shader = tdengine.ffi.dn_gpu_shader_create(descriptor)
-  self.shaders[id:to_string()] = shader
-  self.assets[id:to_qualified_string()] = shader
-end
-
-function tdengine.gpu.add_shaders(shaders)
-  for shader in tdengine.iterator.values(shaders) do
-		self.add_shader(
-			shader.id,
-			GpuShaderDescriptor:new(shader.descriptor)
-		)
-	end
-end
-
-----------------
--- RESOLUTION --
-----------------
-function tdengine.gpu.add_resolution(id, size)
-  local resolution = Vector2:new(size.x, size.y)
-  self.resolutions[id:to_string()] = resolution
-  self.assets[id:to_qualified_string()] = resolution
-end
-
-function tdengine.gpu.add_resolutions(resolutions)
-  for resolution in tdengine.iterator.values(resolutions) do
-    self.add_resolution(resolution.id, resolution.size)
-	end
 end

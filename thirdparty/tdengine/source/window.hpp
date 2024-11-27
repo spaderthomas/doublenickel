@@ -147,36 +147,25 @@ void dn_window_init(dn_window_config_t config) {
 	glfwSetScrollCallback(window.handle, dn_input_callback_scroll);
 	glfwSetWindowSizeCallback(window.handle, dn_input_callback_window_size);
 
-	dn_noise_init();
-	dn_imgui_init();
-	dn_gpu_init();
-	init_texture_atlas(); // Invert control
-	init_backgrounds(); // Invert control
-	init_screenshots(); // Use the asset loader
-	init_particles();
-	init_fluid();
-
-#ifdef FM_EDITOR
-	// Set a best guess for our default output resolution based on the monitor
-	if (mode->width == 3840) {
-		dn_window_set_display_mode(DN_DISPLAY_MODE_2160);
-	}
-	else if (mode->width == 2560) {
-		dn_window_set_display_mode(DN_DISPLAY_MODE_1440);
-	}
-	else if (mode->width == 1920) {
-		dn_window_set_display_mode(DN_DISPLAY_MODE_1080);
+	if (config.display_mode == DN_DISPLAY_MODE_AUTO) {
+		// Set a best guess for our default output resolution based on the monitor
+		if (mode->width == 3840) {
+			dn_window_set_display_mode(DN_DISPLAY_MODE_2160);
+		}
+		else if (mode->width == 2560) {
+			dn_window_set_display_mode(DN_DISPLAY_MODE_1440);
+		}
+		else if (mode->width == 1920) {
+			dn_window_set_display_mode(DN_DISPLAY_MODE_1080);
+		}
+		else {
+			dn_window_set_display_mode(DN_DISPLAY_MODE_1080);
+		}
 	}
 	else {
-		dn_window_set_display_mode(DN_DISPLAY_MODE_1080);
-	}
-#else
-	if (SteamUtils()->IsSteamRunningOnSteamDeck()) {
-		dn_window_set_display_mode(DN_DISPLAY_MODE_1280_800);
-	} else {
-		dn_window_set_display_mode(DN_DISPLAY_MODE_1080);
-	}
-#endif
+		dn_window_set_display_mode(config.display_mode);
+	}																			
+
 
 	dn_window_set_icon(config.icon);
 }

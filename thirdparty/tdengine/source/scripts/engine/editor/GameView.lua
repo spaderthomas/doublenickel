@@ -46,8 +46,9 @@ function GameView:update()
 
   end
 
+  local render_target = tdengine.ffi.dn_gpu_render_target_find(self.render_target:to_string())
   imgui.Image(
-    self.render_target.color_buffer,
+    render_target.color_buffer,
     imgui.ImVec2(self.size.x, self.size.y),
     imgui.ImVec2(0, 1), imgui.ImVec2(1, 0))
 

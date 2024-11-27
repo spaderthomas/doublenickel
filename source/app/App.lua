@@ -65,17 +65,40 @@ function App:on_init_game()
 			fonts = {
 				{
 					id = 'tiny5',
-					file_name = 'Tiny5-Regular.ttf',
+					file_path = tdengine.ffi.dn_paths_resolve_format('font', 'Tiny5-Regular.ttf'):to_interned(),
 					sizes = { 16, 24, 32 },
 					imgui = false
 				},
 			}
 		}),
+	gpu = GpuConfig:new({
+			shader_path = tdengine.ffi.dn_paths_resolve('shaders'):to_interned(),
+			search_paths = {
+					tdengine.ffi.dn_paths_resolve('shader_includes'):to_interned()
+			},
+			shaders = {
+				{
+					name = 'sample',
+					kind = tdengine.enums.GpuShaderKind.Graphics,
+					vertex_shader = tdengine.ffi.dn_paths_resolve_format('shader', 'shader.vertex'):to_interned(),
+					fragment_shader = tdengine.ffi.dn_paths_resolve_format('shader', 'shader.fragment'):to_interned(),
+				}
+			},
+			render_targets = {
+				{
+					name = RenderTarget.Native:to_string(),
+					size = self.native_resolution,
+				},
+				{
+					name = RenderTarget.Upscaled:to_string(),
+					size = self.output_resolution,
+				}
+			}
+		}),
 	})
 
 	tdengine.ffi.dn_app_configure(dn_config)
-
-	tdengine.gpu.build(tdengine.module.read_from_named_path('gpu_info'))
+	-- tdengine.gpu.build(tdengine.module.read_from_named_path('gpu_info'))
 
 	self.sdf_renderer = ffi.new('dn_sdf_renderer_t [1]');
   self.sdf_renderer = tdengine.ffi.dn_sdf_renderer_create(1024 * 1024)
@@ -90,7 +113,6 @@ function App:on_init_game()
       load = GpuLoadOp.Clear
     }
   })
-
 end
 
 function App:on_start_game()
@@ -101,12 +123,12 @@ function App:on_start_game()
 		game_views = {
 			GameView:new(
 				'Native View',
-				tdengine.gpu.find(RenderTarget.Native),
+				RenderTarget.Native,
 				tdengine.enums.GameViewSize.ExactSize, self.native_resolution,
 				tdengine.enums.GameViewPriority.Main),
 			GameView:new(
 				'Upscaled View',
-				tdengine.gpu.find(RenderTarget.Upscaled),
+				RenderTarget.Upscaled,
 				tdengine.enums.GameViewSize.ExactSize, self.output_resolution,
 				tdengine.enums.GameViewPriority.Standard)
 		},
@@ -125,9 +147,11 @@ function App:on_scene_rendered()
   tdengine.ffi.dn_gpu_end_render_pass(self.command_buffer)
   tdengine.ffi.dn_gpu_command_buffer_submit(self.command_buffer)
 
+
 	tdengine.ffi.dn_gpu_render_target_blit(
-    tdengine.gpu.find(RenderTarget.Native),
-    tdengine.gpu.find(RenderTarget.Upscaled)
+		tdengine.ffi.dn_asset_find(RenderTarget.Native:to_string()),
+    -- tdengine.gpu.find(RenderTarget.Native),
+    -- tdengine.gpu.find(RenderTarget.Upscaled)
 	)
 end
 
