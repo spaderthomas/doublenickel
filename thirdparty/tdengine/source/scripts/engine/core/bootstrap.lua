@@ -422,12 +422,13 @@ typedef enum {
 
 typedef struct {
 	const char* id;
-	const char* file_name;
+	const char* file_path;
 	u32 sizes [16];
 	dn_font_flags_t flags;
 } dn_font_descriptor_t;
 
 typedef struct {
+  const char* font_dir;
 	dn_font_descriptor_t* fonts;
 	u32 num_fonts;
 } dn_font_config_t;

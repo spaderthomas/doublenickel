@@ -16,3 +16,5 @@
 //#define TD_ASSERT(condition)
 
 #define dn_zero_initialize() { 0 };
+
+#define DN_ARR_LEN(carray) (sizeof((carray)) / sizeof((carray)[0]))

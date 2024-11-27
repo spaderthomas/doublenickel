@@ -790,7 +790,7 @@ end
 FontDescriptor = tdengine.class.metatype('dn_font_descriptor_t')
 function FontDescriptor:init(params)
   self.id = params.id
-  self.file_name = params.file_name
+  self.file_path = params.file_path
 
   self.sizes = {0}
   for i in tdengine.iterator.keys(params.sizes) do
@@ -810,6 +810,8 @@ function FontConfig:init(params)
 	for i = 0, #params.fonts - 1 do
 		self.fonts[i] = FontDescriptor:new(params.fonts[i + 1])
 	end
+
+	self.font_dir = params.font_dir or nil
 end
 
 

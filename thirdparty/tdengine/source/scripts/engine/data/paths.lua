@@ -3,6 +3,35 @@ return {
 		app_write = 'boonbane',
 	},
 	engine_paths = {
+		dn_assets = {
+			path = 'asset',
+			children = {
+				dn_audio = 'audio',
+				dn_fonts = {
+					path = 'fonts',
+					children = {
+						dn_font = '%s'
+					}
+				},
+				dn_images = {
+					path = 'images',
+					children = {
+						dn_image = '%s',
+						dn_atlases = 'atlas',
+						dn_atlas = 'atlas/%s'
+					},
+				},
+				dn_shaders = {
+					path = 'shaders',
+					children = {
+						dn_shader_includes = 'include',
+						dn_vertex_shader = '%s',
+						dn_fragment_shader = '%s',
+						dn_compute_shader = '%s',
+					}
+				},
+			}
+		},
 		engine_scripts = {
 			path = 'source/scripts/engine',
 			children = {
@@ -25,41 +54,11 @@ return {
 				engine_libs = 'third_party',
 			}
 		},
-		dn_assets = {
-			path = 'asset',
-			children = {
-				dn_audio = 'audio',
-			}
-
-		}
 	},
 	install_paths = {
 		asset = {
 			path = 'asset',
 			children = {
-				fonts = {
-					path = 'fonts',
-					children = {
-						font = '%s.ttf'
-					}
-				},
-				dn_images = {
-					path = 'images',
-					children = {
-						dn_image = '%s',
-						dn_atlases = 'atlas',
-						dn_atlas = 'atlas/%s'
-					},
-				},
-				shaders = {
-					path = 'shaders',
-					children = {
-						shader_includes = 'include',
-						vertex_shader = '%s',
-						fragment_shader = '%s',
-						compute_shader = '%s',
-					}
-				},
 				audio = 'audio',
 			}
 		},

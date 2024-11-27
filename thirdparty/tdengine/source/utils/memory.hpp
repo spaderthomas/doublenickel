@@ -7,7 +7,7 @@ typedef enum {
 typedef std::function<void*(dn_allocator_mode_t, u32, void*)> dn_alloc_fn_t;
 
 
-struct  dn_allocator_t {
+struct dn_allocator_t {
 	dn_alloc_fn_t on_alloc;
 
 	template<typename T>
@@ -31,11 +31,6 @@ struct  dn_allocator_t {
 	char* alloc_path();
 };
 
-typedef struct {
-	dn_bump_allocator_t bump;
-	dn_standard_allocator_t standard;
-} dn_allocators_t;
-dn_allocators_t dn_allocators;
 
 DN_API void             dn_allocators_init();
 DN_API void             dn_allocator_add(const char* name, dn_allocator_t* allocator);
@@ -61,3 +56,9 @@ struct dn_standard_allocator_t : dn_allocator_t {
 };
 
 dn_standard_allocator_t standard_allocator;
+
+//typedef struct {
+//	dn_bump_allocator_t bump;
+//	dn_standard_allocator_t standard;
+//} dn_allocators_t;
+//dn_allocators_t dn_allocators;

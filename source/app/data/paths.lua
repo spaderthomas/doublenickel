@@ -18,7 +18,19 @@ return {
 			}
 		}
 	},
-	install_paths = {},
+	install_paths = {
+		asset = {
+			path = 'asset',
+			children = {
+				fonts = {
+					path = 'fonts',
+					children = {
+						font = '%s'
+					}
+				}
+			}
+		}
+	},
 	app_paths = {
 			skeletal_animations = {
 			named_parent = 'data',

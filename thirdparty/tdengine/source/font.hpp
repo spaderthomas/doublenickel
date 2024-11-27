@@ -39,12 +39,13 @@ typedef struct {
 
 typedef struct {
 	const char* id;
-	const char* file_name;
+	const char* file_path;
 	u32 sizes [16];
 	dn_font_flags_t flags;
 } dn_font_descriptor_t;
 
 typedef struct {
+	const char* font_dir;
 	dn_font_descriptor_t* fonts;
 	u32 num_fonts;
 } dn_font_config_t;
@@ -75,6 +76,7 @@ DN_API dn_baked_font_t* dn_font_find(const char* id, u32 size);
 #ifdef DN_FONT_IMPLEMENTATION
 dn_font_config_t dn_font_config_default() {
 	return {
+		.font_dir = NULL,
 		.fonts = NULL,
 		.num_fonts = 0
 	};
@@ -88,31 +90,50 @@ void dn_font_init(dn_font_config_t config) {
 	dn_fixed_array_init_t(&dn_fonts.vertex_data, &standard_allocator);
 	dn_fixed_array_init_t(&dn_fonts.uv_data, &standard_allocator);
 
-	for (u32 i = 0; i < config.num_fonts; i++) {
-		dn_font_bake(config.fonts[i]);
-	}
+	dn_paths_add_ex("dn_user_fonts", config.font_dir);
+
+	dn_font_descriptor_t engine_fonts [] = {
+		{
+			.id = "merriweather",
+			.file_path = dn_paths_resolve_format("dn_font", "Merriweather-Regular.ttf"),
+			.sizes = { 16, 24, 28, 32 },
+			.flags = DN_FONT_FLAG_NONE
+		},
+		{
+			.id = "inconsolata",
+			.file_path = dn_paths_resolve_format("dn_font", "Inconsolata-Regular.ttf"),
+			.sizes = { 16, 12, 20, 24, 28, 32, 36, 48, 64 },
+			.flags = DN_FONT_FLAG_IMGUI
+		},
+		{
+			.id = "inconsolata-extrabold",
+			.file_path = dn_paths_resolve_format("dn_font", "Inconsolata-ExtraBold.ttf"),
+			.sizes = { 12, 16, 20, 24, 28, 32, 36, 48, 64 },
+			.flags = DN_FONT_FLAG_IMGUI
+		}
+	};
+	dn_font_bake_n(engine_fonts, DN_ARR_LEN(engine_fonts));
+	dn_font_bake_n(config.fonts, config.num_fonts);
 }
 
 dn_baked_font_t* dn_font_default() {
 	return dn_fonts.default_font;
 }
 
-void dn_font_bake_n(dn_font_descriptor_t* descriptors, u32 num_descriptors) {
-	for (u32 i = 0; i < num_descriptors; i++) {
-		dn_font_bake(descriptors[i]);
+void dn_font_bake_n(dn_font_descriptor_t* fonts, u32 num_fonts) {
+	for (u32 i = 0; i < num_fonts; i++) {
+		dn_font_bake(fonts[i]);
 	}
 }
 
 void dn_font_bake(dn_font_descriptor_t desc) {
-	auto file_path = dn_paths_resolve_format("font", desc.file_name);
-
 	for (u32 i = 0; i < 16; i++) {
 		auto size = desc.sizes[i];
 		if (!size) break;
 
 		FT_Library ft;
 
-		dn_log_flags(DN_LOG_FLAG_FILE, "%s: %s, %s, %d", __func__, desc.id, file_path, size);
+		dn_log_flags(DN_LOG_FLAG_FILE, "%s: %s, %s, %d", __func__, desc.id, desc.file_path, size);
 		
 		if (FT_Init_FreeType(&ft)) {
 			dn_log("%s: failed to initialize FreeType", __func__);
@@ -120,15 +141,15 @@ void dn_font_bake(dn_font_descriptor_t desc) {
 		}
 		
 		FT_Face face = nullptr;
-		if (FT_New_Face(ft, file_path, 0, &face)) {
-			dn_log("%s: failed to load font, font = %s", __func__, file_path);
+		if (FT_New_Face(ft, desc.file_path, 0, &face)) {
+			dn_log("%s: failed to load font, font = %s", __func__, desc.file_path);
 			return;
 		}
 
 		dn_baked_font_t* font = dn_fixed_array_reserve_t(&dn_fonts.baked_fonts, 1);
 		font->hash = dn_font_hash(desc.id, size);
 		copy_string(desc.id, font->name, DN_ASSET_NAME_LEN);
-		copy_string(file_path, font->path, DN_MAX_PATH_LEN);
+		copy_string(desc.file_path, font->path, DN_MAX_PATH_LEN);
 		font->size = size;
 		font->flags = desc.flags;
 		

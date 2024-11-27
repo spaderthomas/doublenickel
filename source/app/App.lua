@@ -61,30 +61,13 @@ function App:on_init_game()
 			},
 		}),
 		font = FontConfig:new({
+			font_dir = tdengine.ffi.dn_paths_resolve('fonts'):to_interned(),
 			fonts = {
 				{
-					id = 'merriweather',
-					file_name = 'Merriweather-Regular',
-					sizes = { 16, 24, 28, 32},
-					imgui = false
-				},
-				{
 					id = 'tiny5',
-					file_name = 'Tiny5-Regular',
+					file_name = 'Tiny5-Regular.ttf',
 					sizes = { 16, 24, 32 },
 					imgui = false
-				},
-				{
-					id = 'inconsolata',
-					file_name = 'Inconsolata-Regular',
-					sizes = { 16, 12, 20, 24, 32, 36, 48, 64 },
-					imgui = true
-				},
-				{
-					id = 'inconsolata-extrabold',
-					file_name = 'Inconsolata-ExtraBold',
-					sizes = { 16, 24, 32, 48, 64 },
-					imgui = true
 				},
 			}
 		}),

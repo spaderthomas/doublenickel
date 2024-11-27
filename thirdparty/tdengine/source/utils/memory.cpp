@@ -125,8 +125,8 @@ void dn_allocator_add(const char* name, dn_allocator_t* allocator) {
 dn_allocator_t* dn_allocator_find(const char* name) {
 	if (!name) return nullptr;
 
-	if (!strcmp(name, "bump")) return &dn_allocators.bump;
-	if (!strcmp(name, "standard")) return &dn_allocators.standard;
+	if (!strcmp(name, "bump")) return &bump_allocator;
+	if (!strcmp(name, "standard")) return &standard_allocator;
 	return nullptr;
 }
 

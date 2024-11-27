@@ -114,7 +114,7 @@
 #include "source/utils/string.cpp"
 
 int dn_main(dn_app_descriptor_t app) {
-	init_allocators();
+	dn_allocators_init();
 	init_random();
 	dn_app_init(app);
 	init_paths();
@@ -133,7 +133,7 @@ int dn_main(dn_app_descriptor_t app) {
 	while(!dn_engine_should_exit()) {
 		dn_engine_update();
 		update_steam();
-		update_allocators();
+		dn_allocators_update();
 		update_file_monitors();
 		update_assets();
 		dn_imgui_update();
