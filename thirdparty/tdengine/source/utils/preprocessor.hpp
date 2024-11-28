@@ -1,5 +1,5 @@
-#ifndef PREPROCESSOR_H
-#define PREPROCESSOR_H
+#ifndef DN_PREPROCESSOR_H
+#define DN_PREPROCESSOR_H
 
 typedef struct {
   const char* file_path;
@@ -12,14 +12,14 @@ typedef struct {
   char error [256];
 
   FILE* file;
-  String file_data;
+  dn_string_t file_data;
   char* result;
 } dn_preprocessor_context_t;
 
 void dn_preprocess(dn_preprocessor_context_t* context);
 #endif
 
-#ifdef PREPROCESSOR_IMPLEMENTATION
+#ifdef DN_PREPROCESSOR_IMPLEMENTATION
 
 void dn_preprocess(dn_preprocessor_context_t* context) {
   context->result = nullptr;

@@ -8,7 +8,7 @@ typedef lua_State* dn_lua_interpreter_t;
 typedef struct {
   dn_lua_interpreter_t state;
   FileMonitor* file_monitor;
-  Array<string, 32> script_dirs;
+  Array<char*, 32> script_dirs;
 } dn_lua_t;
 dn_lua_t dn_lua;
 

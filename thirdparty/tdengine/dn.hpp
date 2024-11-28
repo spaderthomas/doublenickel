@@ -99,8 +99,10 @@
 #include "source/utils/os.hpp"
 #define DN_PATH_IMPLEMENTATION
 #include "source/utils/path.hpp"
-#define PREPROCESSOR_IMPLEMENTATION
+#define DN_PREPROCESSOR_IMPLEMENTATION
 #include "source/utils/preprocessor.hpp"
+#define DN_STRING_IMPLEMENTATION
+#include "source/utils/string.hpp"
 
 
 #include "source/particle.cpp"
@@ -114,7 +116,6 @@
 #include "source/draw.cpp"
 #include "source/image.cpp" // HALF (Screenshots should be reworked, probably? I'm referencing a named path when I initialize)
 #include "source/fluid.cpp" // GAME
-#include "source/utils/string.cpp"
 
 int dn_main(dn_app_descriptor_t app) {
   dn_allocators_init();

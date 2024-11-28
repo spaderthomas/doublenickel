@@ -128,14 +128,14 @@ typedef struct {
   
   union {
     struct {
-      string vertex_path;
-      string fragment_path;
+      char* vertex_path;
+      char* fragment_path;
       u32 vertex_shader;
       u32 fragment_shader;
     } graphics;
 
     struct {
-      string path;
+      char* path;
       u32 shader;
     } compute;
   };
