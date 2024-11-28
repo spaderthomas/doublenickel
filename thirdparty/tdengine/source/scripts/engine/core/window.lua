@@ -9,7 +9,7 @@ tdengine.window.states = tdengine.enum.define(
 )
 
 function tdengine.window.init()
-  tdengine.ffi.dn_log('tdengine.window.init')
+  tdengine.dn_log('tdengine.window.init')
   self.state = self.states.Idle
 
   self.display_mode = tdengine.ffi.dn_window_get_display_mode()

@@ -645,32 +645,6 @@ end
 
 
 
--------------------
--- DYNAMIC ARRAY --
--------------------
-DynamicArray = tdengine.class.define('DynamicArray')
-function DynamicArray:init(ctype, allocator)
-  self.data = ffi.new('void* [1]')
-  self.value_type = ctype
-  self.reference_type = string.format('%s [1]', ctype)
-  self.pointer_type = string.format('%s*', ctype)
-  self.element_size = ffi.sizeof(self.value_type)
-  self.allocator = allocator or tdengine.ffi.dn_allocator_find('bump')
-
-  self.data[0] = tdengine.ffi.dn_dynamic_array_create(self.element_size, self.allocator)
-end
-
-function DynamicArray:push(value)
-  local marshalled_value = ffi.new(self.reference_type, value)
-  tdengine.ffi.dn_dynamic_array_push_n(self.data, marshalled_value, 1)
-end
-
-function DynamicArray:at(index)
-  local pointer = ffi.cast(self.pointer_type, self.data[0])
-  return pointer[index]
-end
-
-
 CpuBuffer = tdengine.class.define('CpuBuffer')
 
 function CpuBuffer:init(ctype, capacity)
@@ -774,26 +748,31 @@ end
 ---------------------
 GpuShaderDescriptor = tdengine.class.metatype('dn_gpu_shader_descriptor_t')
 function GpuShaderDescriptor:init(params)
-  params.kind = tdengine.enum.load(params.kind)
-  self.kind = params.kind:to_number()
-  self.name = params.name
+  if tdengine.enum.is_enum(params.name) then
+    self.name = params.name:to_qualified_string()
+  else
+    self.name = params.name
+  end
 
-  if params.kind == tdengine.enums.GpuShaderKind.Graphics then
+  if GpuShaderKind.Graphics:match(params.kind) then
+    self.kind = GpuShaderKind.Graphics:to_number()
     self.vertex_shader = params.vertex_shader
     self.fragment_shader = params.fragment_shader
-  elseif params.kind == tdengine.enums.GpuShaderKind.Compute then
+  elseif GpuShaderKind.Compute:match(params.kind) then
+    self.kind = GpuShaderKind.Compute:to_number()
     self.compute_shader = params.compute_shader
   end
 end
 
 GpuRenderTargetDescriptor = tdengine.class.metatype('dn_gpu_render_target_descriptor_t')
 function GpuRenderTargetDescriptor:init(params)
-  self.name = params.name
-  if params.resolution then
-    self.size = tdengine.gpu.find(params.resolution)
+  if tdengine.enum.is_enum(params.name) then
+    self.name = params.name:to_qualified_string()
   else
-    self.size = Vector2:new(params.size.x, params.size.y)
+    self.name = params.name
   end
+
+  self.size = params.size
 end
 
 GpuBufferDescriptor = tdengine.class.metatype('dn_gpu_buffer_descriptor_t')
@@ -854,12 +833,14 @@ end
 
 GpuRenderPass = tdengine.class.metatype('dn_gpu_render_pass_t')
 function GpuRenderPass:init(params)
-  dbg()
   if params.color then
     params.color.attachment = tdengine.enum.load(params.color.attachment)
-    self.color.attachment = tdengine.ffi.dn_gpu_render_target_find(params.color.attachment:to_string())
+    self.color.attachment = tdengine.asset.find(params.color.attachment)
     self.color.load = tdengine.enum.load(params.color.load):to_number()
+
+    tdengine.debug.assert(not tdengine.ffi.is_nil(self.color.attachment))
   end
+
 end
 
 GpuUniformBinding = tdengine.class.metatype('dn_gpu_uniform_binding_t')
@@ -956,7 +937,12 @@ end
 
 FontDescriptor = tdengine.class.metatype('dn_font_descriptor_t')
 function FontDescriptor:init(params)
-  self.id = params.id
+  if tdengine.enum.is_enum(params.id) then
+    self.id = params.id:to_qualified_string()
+  else
+    self.id = params.id
+  end
+
   self.file_path = params.file_path
 
   self.sizes = {0}
@@ -977,8 +963,6 @@ function FontConfig:init(params)
   for i = 0, #params.fonts - 1 do
     self.fonts[i] = FontDescriptor:new(params.fonts[i + 1])
   end
-
-  self.font_dir = params.font_dir or nil
 end
 
 GpuConfig = tdengine.class.metatype('dn_gpu_config_t')
@@ -1014,6 +998,7 @@ function AppConfig:init(params)
   self.font = params.font or tdengine.ffi.dn_font_config_default()
   self.gpu = params.gpu or ffi.new('dn_gpu_config_t')
   self.asset = params.asset or ffi.new('dn_asset_config_t')
+  self.target_fps = params.target_fps or 60
 end
 
 
@@ -1034,12 +1019,3 @@ function tdengine.ffi.push_fullscreen_quad()
   local opacity = 1.0
   ffi.C.push_quad(0, n.y, n.x, n.y, uvs, opacity);
 end
-
-
-InputDevice = tdengine.enum.define(
-  'InputDevice',
-  {
-    MouseAndKeyboard = 0,
-    Controller = 1
-  }
-)

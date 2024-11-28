@@ -166,6 +166,8 @@ dn_asset_completion_status_t dn_background_complete(dn_asset_import_request_t* r
 }
 
 void dn_assets_init(dn_asset_config_t user_config) {
+  dn_log("%s", __func__);
+
   dn_asset_importer_t default_importers [] = {
     {
       .id = dn_type_name(Background),
@@ -186,7 +188,13 @@ void dn_assets_init(dn_asset_config_t user_config) {
    
   dn_for_each(configs, config) {
     dn_for_each_n(config->importers.data, importer, config->importers.count) {
-       dn_assets.importers[importer->id] = *importer;
+      dn_log("%s: Registered importer; id = %s, on_import = %d, on_complete = %d", 
+        __func__, 
+        importer->id, 
+        importer->on_import, importer->on_complete
+      );
+
+      dn_assets.importers[importer->id] = *importer;
     }
   }
   
@@ -194,12 +202,13 @@ void dn_assets_init(dn_asset_config_t user_config) {
   rb_init(&asset_loader.load_requests, 2048);
   rb_init(&asset_loader.completion_queue, 2048);
   
-  asset_loader.thread = std::thread(&AssetLoader::process_requests, &asset_loader);
-  asset_loader.thread.detach();
+  // asset_loader.thread = std::thread(&AssetLoader::process_requests, &asset_loader);
+  // asset_loader.thread.detach();
 
 }
 
 void dn_assets_add(const char* name, dn_asset_data_t data) {
+  dn_log("%s: name = %s, data = %p", __func__, name, data);
   dn_asset_t asset;
   dn_asset_copy_name(name, asset.name);
   asset.data = data;

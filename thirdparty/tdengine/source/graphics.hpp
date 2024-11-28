@@ -455,6 +455,7 @@ DN_IMP u32                       dn_gpu_memory_barrier_to_gl_barrier(dn_gpu_memo
 ////////////////////
 #ifdef GRAPHICS_IMPLEMENTATION
 void dn_gpu_init(dn_gpu_config_t config) {
+  dn_log("%s", __func__);
   arr_init(&dn_gpu.command_buffers);
   arr_init(&dn_gpu.uniforms);
   arr_init(&dn_gpu.pipelines);
@@ -468,6 +469,7 @@ void dn_gpu_init(dn_gpu_config_t config) {
   swapchain->color_buffer = 0;
   swapchain->size = window.content_area;
 
+  dn_log("%s: Initializing shader file monitor", __func__);
   auto reload_all_shaders = [](FileMonitor* file_monitor, FileChange* event, void* userdata) {
     dn_log("SHADER_RELOAD");
     arr_for(dn_gpu.shaders, shader) {
@@ -479,6 +481,7 @@ void dn_gpu_init(dn_gpu_config_t config) {
   dn_gpu.shader_monitor->add_directory(config.shader_path);
 
   // Add default search paths and shaders
+  dn_log("%s: Initializing default shader include directories", __func__);
   const char* default_include_paths [] = {
     dn_paths_resolve("dn_shaders"),
     dn_paths_resolve("dn_shader_includes"),
@@ -488,6 +491,7 @@ void dn_gpu_init(dn_gpu_config_t config) {
     dn_path_from_cstr(*path, default_include_paths[i]);
   }
 
+  dn_log("%s: Initializing default shaders", __func__);
   dn_gpu_shader_descriptor_t default_shaders [] = {
     {
       .name = "shape",
@@ -910,6 +914,11 @@ void dn_gpu_backed_buffer_sync(dn_gpu_backed_buffer_t* buffer) {
 // GPU SHADER //
 ////////////////
 dn_gpu_shader_t* dn_gpu_shader_create(dn_gpu_shader_descriptor_t descriptor) {
+  switch (descriptor.kind) {
+    case GPU_SHADER_GRAPHICS: dn_log("%s: GPU_SHADER_GRAPHICS (%s) (%s)", __func__, descriptor.vertex_shader, descriptor.fragment_shader); break;
+    case GPU_SHADER_COMPUTE: dn_log("%s: GPU_SHADER_COMPUTE (%s)", __func__, descriptor.compute_shader); break;
+  }
+  
   auto shader = arr_push(&dn_gpu.shaders);
   dn_gpu_shader_init(shader, descriptor);
   dn_assets_add(shader->name, shader);
@@ -1105,6 +1114,9 @@ dn_gpu_render_target_t* dn_gpu_render_target_create(dn_gpu_render_target_descrip
   glBindRenderbuffer(GL_RENDERBUFFER, 0);
   glBindTexture(GL_TEXTURE_2D, 0);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+  dn_assets_add(target->name, target);
+
 
   return target;
 }

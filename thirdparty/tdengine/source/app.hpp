@@ -37,14 +37,13 @@ void dn_app_init(dn_app_descriptor_t descriptor) {
 }
 
 void dn_app_configure(dn_app_config_t config) {
+  dn_log("%s", __func__);
   dn_window_init(config.window);
   dn_imgui_init();
-
   dn_assets_init(config.asset);
   dn_audio_init(config.audio);
   dn_font_init(config.font);
   dn_gpu_init(config.gpu);
-
   dn_noise_init();
   init_texture_atlas(); // Invert control
   init_backgrounds(); // Invert control

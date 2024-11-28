@@ -75,6 +75,8 @@
 #include "source/graphics.hpp"
 #define DN_LUA_IMPLEMENTATION
 #include "source/dn_lua.hpp"
+#define DN_NAMED_PATH_IMPLEMENTATION
+#include "source/named_path.hpp"
 #define DN_SDF_IMPLEMENTATION
 #include "source/sdf.hpp"
 #define DN_TIME_METRICS_IMPLEMENTATION
@@ -100,7 +102,7 @@
 #define PREPROCESSOR_IMPLEMENTATION
 #include "source/utils/preprocessor.hpp"
 
-#include "source/named_path.cpp"
+
 #include "source/particle.cpp"
 #include "source/steam.cpp"
 #include "source/text.cpp"

@@ -95,7 +95,7 @@ function tdengine.create_node(name)
   -- Find the matching type in Lua
   class = tdengine.dialogue.node_type[name]
   if not class then
-    tdengine.ffi.dn_log(string.format("could not find node type: type = %s", name))
+    tdengine.dn_log(string.format("could not find node type: type = %s", name))
     return nil
   end
 

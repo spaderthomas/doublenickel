@@ -1,7 +1,8 @@
 function tdengine.save.init()
-  tdengine.ffi.dn_log('tdengine.save.init')
+  tdengine.dn_log('tdengine.save.init')
   local directory = tdengine.ffi.dn_paths_resolve('saves'):to_interned()
-  log.info('Initializing save directory; directory = %s', directory)
+  -- log.info('Initializing save directory; directory = %s', directory)
+  tdengine.dn_log('Initializing save directory; directory = %s', directory)
 
   tdengine.ffi.dn_os_create_directory(tdengine.ffi.dn_paths_resolve('saves'):to_interned())
   tdengine.ffi.dn_os_create_directory(tdengine.ffi.dn_paths_resolve('screenshots'):to_interned())
@@ -19,7 +20,7 @@ function tdengine.save.create()
   local file_path = tdengine.ffi.dn_paths_resolve_format('save', save_name):to_interned()
   tdengine.module.write(file_path, save, tdengine.module.WriteOptions.Pretty)
 
-  tdengine.ffi.dn_log(string.format('Created save file; file_path = %s', file_path))
+  tdengine.dn_log(string.format('Created save file; file_path = %s', file_path))
 end
 
 function tdengine.save.read(file_name)

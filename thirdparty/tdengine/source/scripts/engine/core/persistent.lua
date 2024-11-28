@@ -1,5 +1,5 @@
 function tdengine.persistent.init()
-  tdengine.ffi.dn_log('tdengine.persistent.init')
+  tdengine.dn_log('tdengine.persistent.init')
   for entity in tdengine.entity.iterate_persistent() do
     tdengine.entity.run_update_callback(entity, tdengine.lifecycle.update_callbacks.stop)
     tdengine.entity.run_update_callback(entity, tdengine.lifecycle.update_callbacks.deinit)

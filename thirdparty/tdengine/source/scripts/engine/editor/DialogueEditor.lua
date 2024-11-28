@@ -500,7 +500,7 @@ function DialogueEditor:load(name_or_path)
 		self.nodes = {}
 		self.gnodes = {}
 
-		tdengine.ffi.dn_log('no gui layout for dialogue, path = ' .. layout_path)
+		tdengine.dn_log('no gui layout for dialogue, path = ' .. layout_path)
 		return
 	end
 

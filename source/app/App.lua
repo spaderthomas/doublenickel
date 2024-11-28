@@ -9,6 +9,7 @@ Resolution = tdengine.enum.define(
 Shader = tdengine.enum.define(
   'Shader',
   {
+    Sample = 0,
     Shape = 1,
     Sdf = 2,
     SdfNormal = 3,
@@ -16,6 +17,13 @@ Shader = tdengine.enum.define(
     Sprite = 6,
     Text = 7,
     Blit = 9,
+  }
+)
+
+Font = tdengine.enum.define(
+  'Font',
+  {
+    Tiny5 = 0,
   }
 )
 
@@ -61,10 +69,9 @@ function App:on_init_game()
       },
     }),
     font = FontConfig:new({
-      font_dir = tdengine.ffi.dn_paths_resolve('fonts'):to_interned(),
       fonts = {
         {
-          id = 'tiny5',
+          id = Font.Tiny5,
           file_path = tdengine.ffi.dn_paths_resolve_format('font', 'Tiny5-Regular.ttf'):to_interned(),
           sizes = { 16, 24, 32 },
           imgui = false
@@ -78,19 +85,19 @@ function App:on_init_game()
       },
       shaders = {
         {
-          name = 'sample',
-          kind = tdengine.enums.GpuShaderKind.Graphics,
+          name = Shader.Sample,
+          kind = GpuShaderKind.Graphics,
           vertex_shader = tdengine.ffi.dn_paths_resolve_format('shader', 'shader.vertex'):to_interned(),
           fragment_shader = tdengine.ffi.dn_paths_resolve_format('shader', 'shader.fragment'):to_interned(),
         }
       },
       render_targets = {
         {
-          name = RenderTarget.Native:to_string(),
+          name = RenderTarget.Native,
           size = self.native_resolution,
         },
         {
-          name = RenderTarget.Upscaled:to_string(),
+          name = RenderTarget.Upscaled,
           size = self.output_resolution,
         }
       }
@@ -98,6 +105,10 @@ function App:on_init_game()
   })
 
   tdengine.ffi.dn_app_configure(dn_config)
+
+  tdengine.asset.register_cast(RenderTarget, 'dn_gpu_render_target_t')
+  tdengine.asset.register_cast(Shader, 'dn_gpu_shader_t')
+
   -- tdengine.gpu.build(tdengine.module.read_from_named_path('gpu_info'))
 
   self.sdf_renderer = ffi.new('dn_sdf_renderer_t [1]');
@@ -148,9 +159,10 @@ function App:on_scene_rendered()
   tdengine.ffi.dn_gpu_command_buffer_submit(self.command_buffer)
 
 
+  local target = tdengine.asset.find(RenderTarget.Native)
   tdengine.ffi.dn_gpu_render_target_blit(
-    tdengine.gpu.find(RenderTarget.Native),
-    tdengine.gpu.find(RenderTarget.Upscaled)
+    tdengine.asset.find(RenderTarget.Native),
+    tdengine.asset.find(RenderTarget.Upscaled)
   )
 end
 

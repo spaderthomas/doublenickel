@@ -81,12 +81,24 @@ typedef char dn_path_t [256]; // [DN_MAX_PATH_LEN];
 // ╚══════╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝╚═╝  ╚═══╝╚══════╝ //
 //////////////////////////////////////////////////////
 
-void        dn_engine_set_exit_game();
-const char* dn_engine_get_game_hash();
-void        dn_engine_set_target_fps(double fps);
-double      dn_engine_get_target_fps();
-bool        dn_engine_exceeded_frame_time();
-bool        dn_engine_should_exit();
+typedef struct {
+  const char* name;
+  u32 size;
+} dn_type_info_t;
+
+typedef struct {
+  dn_type_info_t* data;
+  u32 count;
+} dn_type_info_list_t;
+
+void                dn_engine_set_exit_game();
+const char*         dn_engine_get_game_hash();
+void                dn_engine_set_target_fps(double fps);
+double              dn_engine_get_target_fps();
+bool                dn_engine_exceeded_frame_time();
+bool                dn_engine_should_exit();
+dn_type_info_list_t dn_engine_query_types();
+
 
 void   dn_time_metric_add(const char* name);
 void   dn_time_metric_begin(const char* name);
@@ -177,26 +189,6 @@ void             dn_allocator_free(dn_allocator_t* allocator, void* buffer);
 // ╚██████╗╚██████╔╝██║ ╚████║   ██║   ██║  ██║██║██║ ╚████║███████╗██║  ██║███████║ //
 //  ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚══════╝ //
 ///////////////////////////////////////////////////////////////////////////////////////
-
-typedef struct {
-  u32 size;
-  u32 capacity;
-  u32 element_size;
-  dn_allocator_t* allocator;
-} dn_dynamic_array_header_t;
-
-void*                      dn_dynamic_array_create(u32 element_size, dn_allocator_t* allocator);
-void                       dn_dynamic_array_push_n(void** array, void* data, u32 num_elements);
-void*                      dn_dynamic_array_reserve(void** array, u32 num_elements);
-dn_dynamic_array_header_t* dn_dynamic_array_head(void** array);
-u32                        dn_dynamic_array_size(void** array);
-u32                        dn_dynamic_array_capacity(void** array);
-u32                        dn_dynamic_array_element_size(void** array);
-dn_allocator_t*            dn_dynamic_array_allocator(void** array);
-bool                       dn_dynamic_array_full(void** array);
-bool                       dn_dynamic_array_need_grow(void** array, u32 num_elements);
-void                       dn_dynamic_array_grow(void** array, u32 requested_size);
-u32                        dn_dynamic_array_byte_size(void** array);
 
 typedef struct {
   u8* data;
@@ -334,7 +326,6 @@ typedef struct {
   Vector2 framebuffer_position;
   Vector2 framebuffer_size;
 } dn_coord_data_t;
-dn_coord_data_t dn_coord_data;
 
 dn_coord_data_t dn_coord_get();
 void            dn_coord_set_camera(float x, float y);
@@ -428,7 +419,6 @@ typedef struct {
 } dn_font_descriptor_t;
 
 typedef struct {
-  const char* font_dir;
   dn_font_descriptor_t* fonts;
   u32 num_fonts;
 } dn_font_config_t;
@@ -951,11 +941,6 @@ typedef struct {
 typedef struct {
   dn_sdf_header_t header;
   Vector2 size;
-} SdfBox;
-
-typedef struct {
-  dn_sdf_header_t header;
-  Vector2 size;
 } dn_sdf_oriented_box_t;
 
 typedef struct {
@@ -1101,7 +1086,7 @@ void dn_asset_copy_name(const char* source, dn_asset_name_t dest);
 
 
 //////////////////////////////
-// █████╗ ██████╗ ██████╗   //
+//  █████╗ ██████╗ ██████╗  //
 // ██╔══██╗██╔══██╗██╔══██╗ //
 // ███████║██████╔╝██████╔╝ //
 // ██╔══██║██╔═══╝ ██╔═══╝  //
@@ -1318,8 +1303,8 @@ typedef enum {
   DN_LOG_FLAG_DEFAULT = 3,
 } dn_log_flags_t;
 
-void dn_log(const char* fmt, ...);
-void dn_log_flags(dn_log_flags_t flags, const char* fmt, ...);
+//void dn_log(const char* fmt, ...);
+//void dn_log_flags(dn_log_flags_t flags, const char* fmt, ...);
 
 ]]
 
@@ -1363,8 +1348,8 @@ bit = require('bit')
 --   tdengine.debug.last_error = error_message
 --   tdengine.debug.last_trace = trace_message
 
---   tdengine.ffi.dn_log(error_message)
---   tdengine.ffi.dn_log(trace_message)
+--   tdengine.dn_log(error_message)
+--   tdengine.dn_log(trace_message)
 
 --   tdengine.debug.open_debugger(1)
 --   --tdengine.analytics.submit_crash(error_message, trace_message)
@@ -1392,7 +1377,7 @@ function tdengine.handle_error()
   stack_trace = stack_trace:gsub(pattern, '')
 
   local trace_message = string.format('stack trace:\n%s', stack_trace)
-  tdengine.ffi.dn_log(trace_message)
+  tdengine.dn_log(trace_message)
 
   tdengine.debug.open_debugger(1)
 end
@@ -1521,6 +1506,8 @@ function tdengine.init_phase_0()
 
   tdengine.filesystem = {}
 
+  tdengine.asset = {}
+
   tdengine.draw = {}
   tdengine.draw.internal = {}
 
@@ -1539,6 +1526,26 @@ function tdengine.init_phase_0()
   tdengine.ffi = {}
   ffi.cdef(ffi_header)
   
+  -- Run a sanity check on the compiled size of all types and what the parser inside LuaJIT generates.
+  -- This is nothing more than a sanity check; i.e. we don't do anything besides bail violently if
+  -- we see a mismatch.
+  --
+  -- The only reason this is here is because I *have* seen MSVC generate a different size than what 
+  -- the FFI reports. See the types in the header which are force aligned to 16 bytes.
+  local type_infos = ffi.C.dn_engine_query_types()
+  for i = 0, type_infos.count - 1 do
+    local type_info = type_infos.data[i]
+    local ffi_size = ffi.sizeof(ffi.string(type_info.name))
+    
+    if ffi_size ~= type_info.size then
+      print(string.format(
+        'Found type mismatch; type = %s, ffi_size = %d, compiled_size = %d',
+        ffi.string(type_info.name),
+        ffi_size, type_info.size)
+      )
+    end
+  end
+
   -- Bootstrap the engine paths, so we can load the rest of the scripts
   local function collect_paths(paths, full_parent)
     local collected_paths = {}
@@ -1619,6 +1626,7 @@ function tdengine.init_phase_1()
   tdengine.enum.init()
   tdengine.ffi.init()
   tdengine.paths.init()
+  tdengine.math.init()
   tdengine.time_metric.init()
   tdengine.input.init()
   tdengine.gpu.init()
@@ -1630,15 +1638,14 @@ function tdengine.init_phase_1()
   tdengine.audio.init()
   tdengine.gui.init()
   tdengine.scene.init()
-  tdengine.math.init()
-
+  tdengine.asset.init()
 end
 
 function tdengine.init_phase_2()
   tdengine.subsystem.init()
   tdengine.app = tdengine.subsystem.find('App')
 
-  tdengine.ffi.dn_log('App:on_init_game')
+  tdengine.dn_log('App:on_init_game')
   tdengine.app:on_init_game()
 
   tdengine.window.init()
@@ -1646,6 +1653,10 @@ function tdengine.init_phase_2()
   tdengine.editor.init()
   tdengine.persistent.init()
 
-  tdengine.ffi.dn_log('lifecycle.on_start_game')
+  tdengine.dn_log('lifecycle.on_start_game')
   tdengine.lifecycle.run_callback(tdengine.lifecycle.callbacks.on_start_game)
+end
+
+function tdengine.dn_log(...)
+  print(string.format(...))
 end

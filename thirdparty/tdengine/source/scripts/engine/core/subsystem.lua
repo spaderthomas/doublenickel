@@ -1,7 +1,7 @@
 local module = tdengine.subsystem
 
 function tdengine.subsystem.init()
-  tdengine.ffi.dn_log('tdengine.subsystem.init')
+  tdengine.dn_log('tdengine.subsystem.init')
   module.subsystems = {}
   for name, class in pairs(tdengine.subsystem.types) do
     module.subsystems[name] = class:new()
