@@ -12,7 +12,7 @@ function tdengine.window.init()
   tdengine.ffi.dn_log('tdengine.window.init')
   self.state = self.states.Idle
 
-  self.display_mode = tdengine.ffi.dm_window_get_display_mode()
+  self.display_mode = tdengine.ffi.dn_window_get_display_mode()
   self.interpolation = {
     window_size = tdengine.interpolation.EaseInOut2:new({ time = 1, exponent = 3 })
   }

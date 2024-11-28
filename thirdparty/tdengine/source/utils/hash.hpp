@@ -80,3 +80,16 @@ dn_hash_t dn_hash_bytes_ex(const void *p, size_t len, size_t seed) {
 dn_hash_t dn_combine_hashes(dn_hash_t a, dn_hash_t b) {
   return a ^ (b + 0x9e3779b9 + (a << 6) + (a >> 2));
 }
+
+dn_hash_t dn_hash_string_dumb(const char* str) {
+  constexpr size_t prime = 31;
+  
+  size_t result = 0;
+  size_t len = strlen(str);
+  for (int i = 0; i < len; i++) {
+        result = str[i] + (result * prime);
+    }
+    return result;
+}
+
+#define dn_hash_type(t) dn_hash_string_dumb((const char*)(#t))

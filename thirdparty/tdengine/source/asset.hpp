@@ -1,17 +1,19 @@
+#ifndef DN_ASSET_H
+#define DN_ASSET_H
 enum class AssetKind {
-	Background,
-	TextureAtlas
+  Background,
+  TextureAtlas
 };
 
 struct AssetLoadRequest {
-    int32 id;
-    static int32 next_id;
+  int32 id;
+  static int32 next_id;
 
-    AssetKind kind;
-    union {
-        Background* background;
-        TextureAtlas* atlas;
-    };
+  AssetKind kind;
+  union {
+    Background* background;
+    TextureAtlas* atlas;
+  };
 };
 int32 AssetLoadRequest::next_id = 0;
 
@@ -37,44 +39,35 @@ so they're just loaded sync. If you need to add more asset types to this, it sho
        loading data to the GPU or using the Lua state). You can do those things in AssetLoader::process_completion_queue().
 */
 struct AssetLoader {
-    std::thread thread;
-    std::condition_variable condition;
-    std::mutex mutex;
+  std::thread thread;
+  std::condition_variable condition;
+  std::mutex mutex;
 
-    RingBuffer<AssetLoadRequest> load_requests;
-    RingBuffer<AssetLoadRequest> completion_queue;
+  RingBuffer<AssetLoadRequest> load_requests;
+  RingBuffer<AssetLoadRequest> completion_queue;
 
-    void process_requests();
-    void process_completion_queue();
-    void submit(AssetLoadRequest request);
+  void process_requests();
+  void process_completion_queue();
+  void submit(AssetLoadRequest request);
 };
 AssetLoader asset_loader;
 
 typedef struct {
-    void* user_data;
+  void* user_data;
 } dn_asset_import_request_t;
 
 typedef enum {
-    DN_ASSET_IMPORT_STATUS_RUNNING,
-    DN_ASSET_IMPORT_STATUS_DONE,
-} dn_asset_import_status_t;
+  DN_ASSET_COMPLETION_STATUS_RUNNING,
+  DN_ASSET_COMPLETION_STATUS_DONE,
+} dn_asset_completion_status_t;
 
-typedef enum {
-    DN_BACKGROUND_IMPORT_STATUS_UPDATE_CONFIG,
-    DN_BACKGROUND_IMPORT_STATUS_LOAD_TILES,
-    DN_BACKGROUND_IMPORT_STATUS_DONE,
-} dn_background_import_status_t;
-typedef struct {
-    dn_background_import_status_t status;
-    Background* background;
-} dn_background_import_request_t;
-
-typedef void(*dn_asset_import_fn)(dn_asset_import_request_t* request);
-typedef dn_asset_import_status_t(*dn_asset_completion_fn)(dn_asset_import_request_t* request);
+dn_typedef_fn(void,                         dn_asset_import_fn,     dn_asset_import_request_t* request);
+dn_typedef_fn(dn_asset_completion_status_t, dn_asset_completion_fn, dn_asset_import_request_t* request);
 
 typedef struct {
-    dn_asset_import_fn on_import;
-    dn_asset_completion_fn on_complete;
+  dn_asset_name_t id;
+  dn_asset_import_fn on_import;
+  dn_asset_completion_fn on_complete;
 } dn_asset_importer_t;
 
 typedef void* dn_asset_data_t;
@@ -85,18 +78,51 @@ typedef struct {
 } dn_asset_t;
 
 typedef struct {
-    std::thread thread;
-    std::condition_variable condition;
-    std::mutex mutex;
+  struct {
+    dn_asset_importer_t* data;
+    u32 count;
+  } importers;
+} dn_asset_config_t;
 
-    std::unordered_map<std::string, dn_asset_t> assets;
+//////////////
+// INTERNAL //
+//////////////
+typedef enum {
+  DN_BACKGROUND_COMPLETION_STATUS_UPDATE_CONFIG,
+  DN_BACKGROUND_COMPLETION_STATUS_LOAD_TILES,
+  DN_BACKGROUND_COMPLETION_STATUS_DONE,
+} dn_background_completion_status_t;
 
-    RingBuffer<AssetLoadRequest> load_requests;
-    RingBuffer<AssetLoadRequest> completion_queue;
+typedef struct {
+  dn_background_completion_status_t status;
+  Background* background;
+} dn_background_import_request_t;
+
+typedef struct {
+  std::thread thread;
+  std::condition_variable condition;
+  std::mutex mutex;
+
+  std::unordered_map<std::string, dn_asset_t> assets;
+  std::unordered_map<std::string, dn_asset_importer_t> importers;
+
+  RingBuffer<AssetLoadRequest> load_requests;
+  RingBuffer<AssetLoadRequest> completion_queue;
 } dn_assets_t;
 dn_assets_t dn_assets;
 
 
+DN_API void dn_assets_init(dn_asset_config_t config);
+DN_API dn_asset_data_t dn_assets_find(const char* name);
+DN_API void dn_assets_add(const char* name, dn_asset_data_t data);
+DN_API void dn_asset_copy_name(const char* source, dn_asset_name_t dest);
+
+DN_IMP void dn_assets_update();
+DN_IMP void dn_background_import(dn_asset_import_request_t* request);
+DN_IMP dn_asset_completion_status_t dn_background_complete(dn_asset_import_request_t* request);
+#endif
+
+#ifdef DN_ASSET_IMPLEMENTATION
 void dn_background_import(dn_asset_import_request_t* request) {
     auto background_request = (dn_background_import_request_t*)request->user_data;
     auto background = background_request->background;
@@ -108,57 +134,214 @@ void dn_background_import(dn_asset_import_request_t* request) {
     }
 }
 
-dn_asset_import_status_t dn_background_complete(dn_asset_import_request_t* request) {
+dn_asset_completion_status_t dn_background_complete(dn_asset_import_request_t* request) {
     auto background_request = (dn_background_import_request_t*)request->user_data;
     auto background = background_request->background;
 
     switch (background_request->status) {
-        case DN_BACKGROUND_IMPORT_STATUS_UPDATE_CONFIG: {
+        case DN_BACKGROUND_COMPLETION_STATUS_UPDATE_CONFIG: {
             if (background->is_dirty()) {
                background->update_config();
             }
 
-            background_request->status = DN_BACKGROUND_IMPORT_STATUS_LOAD_TILES;
-            return DN_ASSET_IMPORT_STATUS_RUNNING;
+            background_request->status = DN_BACKGROUND_COMPLETION_STATUS_LOAD_TILES;
+            return DN_ASSET_COMPLETION_STATUS_RUNNING;
         } break;
 
-        case DN_BACKGROUND_IMPORT_STATUS_LOAD_TILES: {
+        case DN_BACKGROUND_COMPLETION_STATUS_LOAD_TILES: {
             background->load_one_to_gpu();
             if (background->gpu_done) {
-                background_request->status = DN_BACKGROUND_IMPORT_STATUS_DONE;
-                return DN_ASSET_IMPORT_STATUS_DONE;
+                background_request->status = DN_BACKGROUND_COMPLETION_STATUS_DONE;
+                return DN_ASSET_COMPLETION_STATUS_DONE;
             }
 
-            return DN_ASSET_IMPORT_STATUS_RUNNING;
+            return DN_ASSET_COMPLETION_STATUS_RUNNING;
         } break;
 
         default: {
             DN_ASSERT(false);
-            return DN_ASSET_IMPORT_STATUS_DONE;
+            return DN_ASSET_COMPLETION_STATUS_DONE;
         }
     }
 }
 
-void dn_assets_init() {
-    dn_asset_importer_t background_importer = {
-        .on_import = &dn_background_import,
-        .on_complete = &dn_background_complete
-    };
+void dn_assets_init(dn_asset_config_t user_config) {
+  dn_asset_importer_t default_importers [] = {
+    {
+      .id = dn_type_name(Background),
+      .on_import = &dn_background_import,
+      .on_complete = &dn_background_complete
+    }
+  };
+
+  dn_asset_config_t configs [] = {
+    {
+      .importers = {
+        .data = default_importers,
+        .count = DN_ARR_LEN(default_importers)
+      }
+    },
+    user_config
+  };
+   
+  dn_for_each(configs, config) {
+    dn_for_each_n(config->importers.data, importer, config->importers.count) {
+       dn_assets.importers[importer->id] = *importer;
+    }
+  }
+  
+
+  rb_init(&asset_loader.load_requests, 2048);
+  rb_init(&asset_loader.completion_queue, 2048);
+  
+  asset_loader.thread = std::thread(&AssetLoader::process_requests, &asset_loader);
+  asset_loader.thread.detach();
+
 }
 
-void dn_assets_add(const char* name, dn_asset_t asset) {
-    dn_assets.assets[name] = asset;
+void dn_assets_add(const char* name, dn_asset_data_t data) {
+  dn_asset_t asset;
+  dn_asset_copy_name(name, asset.name);
+  asset.data = data;
+  dn_assets.assets[name] = asset;
 }
 
 dn_asset_data_t dn_assets_find(const char* name) {
     DN_ASSERT(name);
 
     if (!dn_assets.assets.contains(name)) {
-		dn_log("Tried to find asset, but name was not registered; name = %s", name);
+    dn_log("Tried to find asset, but name was not registered; name = %s", name);
         return NULL;
     }
 
     return dn_assets.assets[name].data;
 }
 
-void init_assets();
+void dn_asset_copy_name(const char* source, dn_asset_name_t dest) {
+  copy_string(source, dest, DN_ASSET_NAME_LEN);
+}
+
+
+void dn_assets_update() {
+  asset_loader.process_completion_queue();
+
+  arr_for(backgrounds, background) {
+    if (background->gpu_ready && !background->gpu_done) {
+      background->load_one_to_gpu();
+
+      if (background->gpu_done) {
+        background->deinit();
+      }
+
+      if (dn_engine_exceeded_frame_time()) break;
+    }
+  }
+}
+
+void AssetLoader::process_requests() {
+  while (true) {
+    std::unique_lock lock(mutex);
+
+    condition.wait(lock, [this] {
+      return load_requests.size > 0;
+      });
+
+    auto request = rb_pop(&load_requests);
+    lock.unlock();
+
+    if (request.kind == AssetKind::TextureAtlas) {
+      auto atlas = request.atlas;
+      if (atlas->need_async_build) {
+        atlas->build_from_source();
+      }
+      if (atlas->need_async_load) {
+        atlas->load_to_memory();
+      }
+
+      lock.lock();
+      rb_push(&completion_queue, request);
+      lock.unlock();
+
+    }
+    else if (request.kind == AssetKind::Background) {
+      auto background = request.background;
+      if (background->need_async_build) {
+        background->build_from_source();
+      }
+      if (background->need_async_load) {
+        background->load_tiles();
+      }
+
+      lock.lock();
+      rb_push(&completion_queue, request);
+      lock.unlock();
+    }
+  }
+}
+
+void AssetLoader::process_completion_queue() {
+  int num_assets_loaded = 0;
+  auto begin = glfwGetTime();
+  while (true) {
+    std::unique_lock lock(mutex);
+    if (!completion_queue.size) {
+      break;
+    }
+
+    auto completion = rb_pop(&completion_queue);
+    lock.unlock();
+
+    num_assets_loaded++;
+
+    if (completion.kind == AssetKind::Background) {
+      auto background = completion.background;
+      dn_log_flags(DN_LOG_FLAG_FILE, "%s: AssetKind = Background, AssetName = %s", __func__, background->name);
+      
+      if (background->is_dirty()) {
+        background->update_config();
+      }
+
+      background->gpu_ready = true;
+    }
+    else if (completion.kind == AssetKind::TextureAtlas) {
+      auto atlas = completion.atlas;
+      dn_log_flags(DN_LOG_FLAG_FILE, "%s: atlas, %s", __func__, atlas->name);
+      
+      if (atlas->need_gl_init) {
+        atlas->load_to_gpu();
+        atlas->need_gl_init = false;
+      }
+
+      if (atlas->need_config_update) {
+        atlas->write_to_config();
+        atlas->need_config_update = false;
+      }
+      
+    }
+
+    if (dn_engine_exceeded_frame_time()) break;
+  }
+
+  if (num_assets_loaded) {
+    std::unique_lock lock(mutex);
+    auto now = glfwGetTime();
+    dn_log_flags(DN_LOG_FLAG_FILE,
+             "AssetLoader: frame = %d, assets_loaded =  %d, assets_remaining = %d, time_ms =  %f",
+             engine.frame,
+             num_assets_loaded, completion_queue.size,
+             (now - begin) * 1000);
+  }
+}
+
+
+void AssetLoader::submit(AssetLoadRequest request) {
+  request.id = AssetLoadRequest::next_id++;
+
+  mutex.lock();
+  rb_push(&load_requests, request);
+  mutex.unlock();
+
+  condition.notify_all();
+}
+
+#endif

@@ -52,7 +52,7 @@ DN_API Vector2            dn_window_get_content_area();
 DN_API Vector2            dn_window_get_native_resolution();
 DN_API void               dn_window_set_icon(const char* path);
 DN_API void               dn_window_set_display_mode(dn_display_mode_t mode);
-DN_API dn_display_mode_t  dm_window_get_display_mode();
+DN_API dn_display_mode_t  dn_window_get_display_mode();
 DN_API void               dn_window_set_cursor_visible(bool visible);
 #endif
 
@@ -228,7 +228,7 @@ DN_API void set_window_size(int x, int y) {
 	glfwSetWindowSize(window.handle, x, y);
 }
 
-dn_display_mode_t dm_window_get_display_mode() {
+dn_display_mode_t dn_window_get_display_mode() {
 	return window.display_mode;
 }
 

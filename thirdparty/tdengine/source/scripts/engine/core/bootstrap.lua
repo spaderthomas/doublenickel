@@ -28,21 +28,21 @@ typedef float f32;
 typedef double f64;
 
 typedef struct {
-	float x;
-	float y;
+  float x;
+  float y;
 } Vector2;
 
 typedef struct {
-	float x;
-	float y;
-	float z;
+  float x;
+  float y;
+  float z;
 } Vector3;
 
 typedef struct {
-	float x;
-	float y;
-	float z;
-	float w;
+  float x;
+  float y;
+  float z;
+  float w;
 } Vector4;
 
 typedef struct {
@@ -102,8 +102,8 @@ typedef struct {
 } dn_named_path_t;
 
 typedef struct {
-	dn_named_path_t* named_paths;
-	u32 size;
+  dn_named_path_t* named_paths;
+  u32 size;
 } dn_named_path_result_t;
 
 dn_named_path_result_t dn_paths_find_all();
@@ -131,13 +131,13 @@ typedef enum {
 } dn_os_file_attr_t;
 
 typedef struct dn_os_date_time_t {
-	int year;
-	int month;
-	int day;
-	int hour;
-	int minute;
-	int second;
-	int millisecond;
+  int year;
+  int month;
+  int day;
+  int hour;
+  int minute;
+  int second;
+  int millisecond;
 } dn_os_date_time_t;
 
 typedef struct {
@@ -199,10 +199,10 @@ void                       dn_dynamic_array_grow(void** array, u32 requested_siz
 u32                        dn_dynamic_array_byte_size(void** array);
 
 typedef struct {
-	u8* data;
-	u32 size;
-	u32 capacity;
-	u32 vertex_size;
+  u8* data;
+  u32 size;
+  u32 capacity;
+  u32 vertex_size;
   dn_allocator_t* allocator;
 } dn_fixed_array_t;
 
@@ -214,8 +214,8 @@ u32  dn_fixed_array_byte_size(dn_fixed_array_t* vertex_buffer);
 u8*  dn_fixed_array_at(dn_fixed_array_t* vertex_buffer, u32 index);
 
 typedef struct {
-	i32 index;
-	i32 generation;
+  i32 index;
+  i32 generation;
 } dn_gen_arena_handle_t;
 
 void copy_string(const char* str, char* buffer, u32 buffer_length);
@@ -232,36 +232,36 @@ void copy_string_n(const char* str, u32 length, char* buffer, u32 buffer_length)
 ///////////////////////////////////////////
 
 typedef enum {
-	DN_AUDIO_FILTER_MODE_FIRST_ORDER = 0,
-	DN_AUDIO_FILTER_MODE_BUTTERWORTH = 1,
+  DN_AUDIO_FILTER_MODE_FIRST_ORDER = 0,
+  DN_AUDIO_FILTER_MODE_BUTTERWORTH = 1,
 } dn_audio_filter_mode_t;
 
 typedef struct {
-	dn_audio_filter_mode_t mode;
-	bool enabled;
-	float cutoff_frequency;
-	float cutoff_alpha;
-	float a0, a1, a2, b1, b2;
-	float input_history [2];
-	float output_history [2];
+  dn_audio_filter_mode_t mode;
+  bool enabled;
+  float cutoff_frequency;
+  float cutoff_alpha;
+  float a0, a1, a2, b1, b2;
+  float input_history [2];
+  float output_history [2];
 } dn_low_pass_filter_t;
 
 typedef struct {
-	float threshold;
-	float ratio;
-	float attack_time;
-	float release_time;
-	bool enabled;
+  float threshold;
+  float ratio;
+  float attack_time;
+  float release_time;
+  bool enabled;
 } dn_compressor_t;
 
 typedef struct {
-	dn_path_t* dirs;
-	u32 num_dirs;
-	dn_compressor_t compressor;
-	dn_low_pass_filter_t filter;
-	float sample_frequency;
-	float master_volume;
-	float master_volume_mod;
+  dn_path_t* dirs;
+  u32 num_dirs;
+  dn_compressor_t compressor;
+  dn_low_pass_filter_t filter;
+  float sample_frequency;
+  float master_volume;
+  float master_volume_mod;
 } dn_audio_config_t;
 
 typedef dn_gen_arena_handle_t dn_audio_instance_handle_t;
@@ -310,29 +310,29 @@ void                       dn_audio_init(dn_audio_config_t config);
 /////////////////////////////////////////////
 
 typedef enum {
-	// Exactly where you are on the monitor. In other words, a fraction of the output resolution
-	// in screen units of [0, 1]
-	DN_COORD_UNIT_SCREEN = 0,
+  // Exactly where you are on the monitor. In other words, a fraction of the output resolution
+  // in screen units of [0, 1]
+  DN_COORD_UNIT_SCREEN = 0,
 
-	// Where you are on the window of the screen displaying the game; the game is rendered
-	// to a framebuffer, which could be displayed as some fraction of the screen in any position.
-	// Window dn_coord_data take into account the position and size of that framebuffer. In the
-	// case where the game is running full screen, this is equivalent to Screen
-	//
-	// In other words, a fraction of the framebuffer resolution in screen units of [0, 1]
-	DN_COORD_UNIT_WINDOW = 1,
+  // Where you are on the window of the screen displaying the game; the game is rendered
+  // to a framebuffer, which could be displayed as some fraction of the screen in any position.
+  // Window dn_coord_data take into account the position and size of that framebuffer. In the
+  // case where the game is running full screen, this is equivalent to Screen
+  //
+  // In other words, a fraction of the framebuffer resolution in screen units of [0, 1]
+  DN_COORD_UNIT_WINDOW = 1,
 
-	// Same as Window, except it's in the range of [0, native_resolution]
-	DN_COORD_UNIT_GAME = 2,
+  // Same as Window, except it's in the range of [0, native_resolution]
+  DN_COORD_UNIT_GAME = 2,
 
-	// Same as Game, except takes the camera into account
-	DN_COORD_UNIT_WORLD = 3,
+  // Same as Game, except takes the camera into account
+  DN_COORD_UNIT_WORLD = 3,
 } dn_coord_t;
 
 typedef struct {
-	Vector2 camera;
-	Vector2 framebuffer_position;
-	Vector2 framebuffer_size;
+  Vector2 camera;
+  Vector2 framebuffer_position;
+  Vector2 framebuffer_size;
 } dn_coord_data_t;
 dn_coord_data_t dn_coord_data;
 
@@ -366,8 +366,8 @@ Vector2         dn_coord_world_to_window_mag(float x, float y);
 Vector2         dn_coord_world_to_game_mag(float x, float y);
 
 typedef enum {
-	DN_INPUT_DEVICE_MOUSE_AND_KEYBOARD = 0,
-	DN_INPUT_DEVICE_CONTROLLER = 1,
+  DN_INPUT_DEVICE_MOUSE_AND_KEYBOARD = 0,
+  DN_INPUT_DEVICE_CONTROLLER = 1,
 } dn_input_device_t;
 
 bool              dn_input_pressed(int key);
@@ -393,21 +393,21 @@ dn_input_device_t dn_input_get_device();
 
 typedef struct {
   char text [1024];
-	Vector2 position;
-	Vector2 padding;
+  Vector2 position;
+  Vector2 padding;
   Vector4 color;
-	void* font;
-	float wrap;
-	float offset;
-	bool world_space;
+  void* font;
+  float wrap;
+  float offset;
+  bool world_space;
 
-	int breaks [32];
-	float width;
-	float height;
-	float baseline_offset;
-	float baseline_offset_imprecise;
-	float height_imprecise;
-	bool precise;
+  int breaks [32];
+  float width;
+  float height;
+  float baseline_offset;
+  float baseline_offset_imprecise;
+  float height_imprecise;
+  bool precise;
 } dn_prepared_text_t;
 
 dn_prepared_text_t* dn_prepare_text(const char* text, f32 px, f32 py, const char* font);
@@ -415,22 +415,22 @@ dn_prepared_text_t* dn_prepare_text_wrap(const char* text, f32 px, f32 py, const
 dn_prepared_text_t* dn_prepare_text_ex(const char* text, f32 px, f32 py, const char* font, f32 wrap, Vector4 color, bool precise);
 
 typedef enum {
-	DN_FONT_FLAG_NONE = 0,
-	DN_FONT_FLAG_IMGUI = 1,
-	DN_FONT_FLAG_DEFAULT = 2,
+  DN_FONT_FLAG_NONE = 0,
+  DN_FONT_FLAG_IMGUI = 1,
+  DN_FONT_FLAG_DEFAULT = 2,
 } dn_font_flags_t;
 
 typedef struct {
-	const char* id;
-	const char* file_path;
-	u32 sizes [16];
-	dn_font_flags_t flags;
+  const char* id;
+  const char* file_path;
+  u32 sizes [16];
+  dn_font_flags_t flags;
 } dn_font_descriptor_t;
 
 typedef struct {
   const char* font_dir;
-	dn_font_descriptor_t* fonts;
-	u32 num_fonts;
+  dn_font_descriptor_t* fonts;
+  u32 num_fonts;
 } dn_font_config_t;
 
 typedef struct dn_baked_font_t dn_baked_font_t;
@@ -453,36 +453,36 @@ dn_font_config_t dn_font_config_default();
 ////////////////////////////////////////////////////////
 
 typedef enum {
-	DN_WINDOW_FLAG_NONE = 0,
-	DN_WINDOW_FLAG_WINDOWED = 1,
-	DN_WINDOW_FLAG_BORDER = 2,
-	DN_WINDOW_FLAG_VSYNC = 4
+  DN_WINDOW_FLAG_NONE = 0,
+  DN_WINDOW_FLAG_WINDOWED = 1,
+  DN_WINDOW_FLAG_BORDER = 2,
+  DN_WINDOW_FLAG_VSYNC = 4
 } dn_window_flags_t;
 
 typedef enum {
-	DN_DISPLAY_MODE_AUTO,
+  DN_DISPLAY_MODE_AUTO,
 
-	// 16:9
-	DN_DISPLAY_MODE_180,
-	DN_DISPLAY_MODE_480,
-	DN_DISPLAY_MODE_720,
-	DN_DISPLAY_MODE_1080,
-	DN_DISPLAY_MODE_1440,
-	DN_DISPLAY_MODE_2160,
+  // 16:9
+  DN_DISPLAY_MODE_180,
+  DN_DISPLAY_MODE_480,
+  DN_DISPLAY_MODE_720,
+  DN_DISPLAY_MODE_1080,
+  DN_DISPLAY_MODE_1440,
+  DN_DISPLAY_MODE_2160,
 
-	// 16:10
-	DN_DISPLAY_MODE_1280_800,
+  // 16:10
+  DN_DISPLAY_MODE_1280_800,
 
-	// Fullscreen
-	DN_DISPLAY_MODE_FULLSCREEN
+  // Fullscreen
+  DN_DISPLAY_MODE_FULLSCREEN
 } dn_display_mode_t;
 
 typedef struct {
-	const char* title;
-	const char* icon;
-	dn_display_mode_t display_mode;
-	Vector2 native_resolution;
-	dn_window_flags_t flags;
+  const char* title;
+  const char* icon;
+  dn_display_mode_t display_mode;
+  Vector2 native_resolution;
+  dn_window_flags_t flags;
 } dn_window_config_t;
 
 dn_window_config_t dn_window_config_default();
@@ -492,7 +492,7 @@ Vector2            dn_window_get_content_area();
 Vector2            dn_window_get_native_resolution();
 void               dn_window_set_icon(const char* path);
 void               dn_window_set_display_mode(dn_display_mode_t mode);
-dn_display_mode_t  dm_window_get_display_mode();
+dn_display_mode_t  dn_window_get_display_mode();
 void               dn_window_set_cursor_visible(bool visible);
 
 
@@ -528,33 +528,33 @@ typedef enum {
 } dn_gpu_draw_mode_t;
 
 typedef enum {
-	GPU_VERTEX_ATTRIBUTE_FLOAT = 0,
-	GPU_VERTEX_ATTRIBUTE_U32 = 1,
+  GPU_VERTEX_ATTRIBUTE_FLOAT = 0,
+  GPU_VERTEX_ATTRIBUTE_U32 = 1,
 } dn_gpu_vertex_attribute_kind_t;
 
 typedef enum {
   GPU_UNIFORM_NONE = 0,
-	GPU_UNIFORM_MATRIX4 = 1,
-	GPU_UNIFORM_MATRIX3 = 2,
-	GPU_UNIFORM_MATRIX2 = 3,
-	GPU_UNIFORM_VECTOR4 = 4,
-	GPU_UNIFORM_VECTOR3 = 5,
-	GPU_UNIFORM_VECTOR2 = 6,
-	GPU_UNIFORM_I32 = 7,
-	GPU_UNIFORM_F32 = 8,
-	GPU_UNIFORM_TEXTURE = 9,
-	GPU_UNIFORM_ENUM = 10,
+  GPU_UNIFORM_MATRIX4 = 1,
+  GPU_UNIFORM_MATRIX3 = 2,
+  GPU_UNIFORM_MATRIX2 = 3,
+  GPU_UNIFORM_VECTOR4 = 4,
+  GPU_UNIFORM_VECTOR3 = 5,
+  GPU_UNIFORM_VECTOR2 = 6,
+  GPU_UNIFORM_I32 = 7,
+  GPU_UNIFORM_F32 = 8,
+  GPU_UNIFORM_TEXTURE = 9,
+  GPU_UNIFORM_ENUM = 10,
 } dn_gpu_uniform_kind_t;
 
 typedef enum {
-	GPU_BUFFER_KIND_STORAGE = 0,
-	GPU_BUFFER_KIND_ARRAY = 1,
+  GPU_BUFFER_KIND_STORAGE = 0,
+  GPU_BUFFER_KIND_ARRAY = 1,
 } dn_gpu_buffer_kind_t;
 
 typedef enum {
-	GPU_BUFFER_USAGE_STATIC = 0,
-	GPU_BUFFER_USAGE_DYNAMIC = 1,
-	GPU_BUFFER_USAGE_STREAM = 2,
+  GPU_BUFFER_USAGE_STATIC = 0,
+  GPU_BUFFER_USAGE_DYNAMIC = 1,
+  GPU_BUFFER_USAGE_STREAM = 2,
 } dn_gpu_buffer_usage_t;
 
 typedef enum {
@@ -567,46 +567,46 @@ typedef enum {
 } dn_gpu_blend_func_t;
 
 typedef enum {
-	GPU_BLEND_MODE_ZERO,
-	GPU_BLEND_MODE_ONE,
-	GPU_BLEND_MODE_SRC_COLOR,
-	GPU_BLEND_MODE_ONE_MINUS_SRC_COLOR,
-	GPU_BLEND_MODE_DST_COLOR,
-	GPU_BLEND_MODE_ONE_MINUS_DST_COLOR,
-	GPU_BLEND_MODE_SRC_ALPHA,
-	GPU_BLEND_MODE_ONE_MINUS_SRC_ALPHA,
-	GPU_BLEND_MODE_DST_ALPHA,
-	GPU_BLEND_MODE_ONE_MINUS_DST_ALPHA,
-	GPU_BLEND_MODE_CONSTANT_COLOR,
-	GPU_BLEND_MODE_ONE_MINUS_CONSTANT_COLOR,
-	GPU_BLEND_MODE_CONSTANT_ALPHA,
-	GPU_BLEND_MODE_ONE_MINUS_CONSTANT_ALPHA,
-	GPU_BLEND_MODE_SRC_ALPHA_SATURATE,
-	GPU_BLEND_MODE_SRC1_COLOR,
-	GPU_BLEND_MODE_ONE_MINUS_SRC1_COLOR,
-	GPU_BLEND_MODE_SRC1_ALPHA,
-	GPU_BLEND_MODE_ONE_MINUS_SRC1_ALPHA
+  GPU_BLEND_MODE_ZERO,
+  GPU_BLEND_MODE_ONE,
+  GPU_BLEND_MODE_SRC_COLOR,
+  GPU_BLEND_MODE_ONE_MINUS_SRC_COLOR,
+  GPU_BLEND_MODE_DST_COLOR,
+  GPU_BLEND_MODE_ONE_MINUS_DST_COLOR,
+  GPU_BLEND_MODE_SRC_ALPHA,
+  GPU_BLEND_MODE_ONE_MINUS_SRC_ALPHA,
+  GPU_BLEND_MODE_DST_ALPHA,
+  GPU_BLEND_MODE_ONE_MINUS_DST_ALPHA,
+  GPU_BLEND_MODE_CONSTANT_COLOR,
+  GPU_BLEND_MODE_ONE_MINUS_CONSTANT_COLOR,
+  GPU_BLEND_MODE_CONSTANT_ALPHA,
+  GPU_BLEND_MODE_ONE_MINUS_CONSTANT_ALPHA,
+  GPU_BLEND_MODE_SRC_ALPHA_SATURATE,
+  GPU_BLEND_MODE_SRC1_COLOR,
+  GPU_BLEND_MODE_ONE_MINUS_SRC1_COLOR,
+  GPU_BLEND_MODE_SRC1_ALPHA,
+  GPU_BLEND_MODE_ONE_MINUS_SRC1_ALPHA
 } dn_gpu_blend_mode_t;
 
 typedef enum {
-	GPU_LOAD_OP_NONE = 0,
-	GPU_LOAD_OP_CLEAR = 1
+  GPU_LOAD_OP_NONE = 0,
+  GPU_LOAD_OP_CLEAR = 1
 } dn_gpu_load_op_t;
 
 typedef enum {
-	GPU_RESOURCE_FRAMEBUFFER = 0,
-	GPU_RESOURCE_SHADER = 1,
-	GPU_RESOURCE_PROGRAM = 2,
+  GPU_RESOURCE_FRAMEBUFFER = 0,
+  GPU_RESOURCE_SHADER = 1,
+  GPU_RESOURCE_PROGRAM = 2,
 } dn_gpu_resource_id_t;
 
 typedef enum {
-	GPU_MEMORY_BARRIER_STORAGE = 0,
-	GPU_MEMORY_BARRIER_BUFFER_UPDATE = 1,
+  GPU_MEMORY_BARRIER_STORAGE = 0,
+  GPU_MEMORY_BARRIER_BUFFER_UPDATE = 1,
 } dn_gpu_memory_barrier_t;
 
 typedef enum {
-	GPU_SHADER_GRAPHICS = 0,
-	GPU_SHADER_COMPUTE = 1,
+  GPU_SHADER_GRAPHICS = 0,
+  GPU_SHADER_COMPUTE = 1,
 } dn_gpu_shader_kind_t;
 
 /////////////
@@ -614,12 +614,12 @@ typedef enum {
 /////////////
 
 typedef struct {
-	const char* name;
-	const char* vertex_shader;
-	const char* fragment_shader;
-	const char* compute_shader;
+  const char* name;
+  const char* vertex_shader;
+  const char* fragment_shader;
+  const char* compute_shader;
 
-	dn_gpu_shader_kind_t kind;
+  dn_gpu_shader_kind_t kind;
 } dn_gpu_shader_descriptor_t;
 
 typedef struct dn_gpu_shader_t dn_gpu_shader_t;
@@ -655,18 +655,18 @@ typedef struct {
 /////////////////
 typedef struct {
   dn_asset_name_t name;
-	dn_gpu_buffer_kind_t kind;
+  dn_gpu_buffer_kind_t kind;
   dn_gpu_buffer_usage_t usage;
-	u32 capacity;
+  u32 capacity;
   u32 element_size;
 } dn_gpu_buffer_descriptor_t;
 
 typedef struct {
   dn_asset_name_t name;
-	dn_gpu_buffer_kind_t kind;
+  dn_gpu_buffer_kind_t kind;
   dn_gpu_buffer_usage_t usage;
-	u32 size;
-	u32 handle;
+  u32 size;
+  u32 handle;
 } dn_gpu_buffer_t;
 
 typedef struct {
@@ -680,14 +680,14 @@ typedef struct {
 ///////////////////////
 typedef struct {
   dn_asset_name_t name;
-	Vector2 size;
+  Vector2 size;
 } dn_gpu_render_target_descriptor_t;
 
 typedef struct {
   dn_asset_name_t name;
-	u32 handle;
-	u32 color_buffer;
-	Vector2 size;
+  u32 handle;
+  u32 color_buffer;
+  Vector2 size;
 } dn_gpu_render_target_t;
 
 
@@ -769,26 +769,26 @@ typedef struct {
 } dn_gpu_renderer_state_t;
 
 typedef struct {
-	dn_gpu_vertex_attribute_kind_t kind;
-	u32 count;
-	u32 divisor;
+  dn_gpu_vertex_attribute_kind_t kind;
+  u32 count;
+  u32 divisor;
 } dn_gpu_vertex_attribute_t;
 
 typedef struct {
-	dn_gpu_vertex_attribute_t vertex_attributes [8];
-	u32 num_vertex_attributes;
+  dn_gpu_vertex_attribute_t vertex_attributes [8];
+  u32 num_vertex_attributes;
 } dn_gpu_buffer_layout_t;
 
 typedef struct {
-	u32 size;
-	u32 value;
+  u32 size;
+  u32 value;
 } dn_gpu_vertex_attr_info_t;
 
 typedef struct {
   dn_gpu_blend_state_t blend;
   dn_gpu_raster_state_t raster;
-	dn_gpu_buffer_layout_t buffer_layouts [8];
-	u32 num_buffer_layouts;
+  dn_gpu_buffer_layout_t buffer_layouts [8];
+  u32 num_buffer_layouts;
 } dn_gpu_pipeline_descriptor_t;
 
 typedef struct dn_gpu_pipeline_t dn_gpu_pipeline_t;
@@ -992,11 +992,11 @@ void                     dn_sdf_grid(dn_sdf_renderer_t* renderer, u32 grid_width
 /////////////////////////////////////////
                                    
 typedef struct {
-	Vector4 light;
-	Vector4 medium_light;
-	Vector4 low_light;
-	Vector4 neutral;
-	Vector4 medium_dark;
+  Vector4 light;
+  Vector4 medium_light;
+  Vector4 low_light;
+  Vector4 neutral;
+  Vector4 medium_dark;
 } dn_imgui_colors_t;
 
 void    dn_imgui_push_font(const char* font_name, u32 size);
@@ -1053,6 +1053,53 @@ double dn_noise_chaotic_scaled(double x, double y, double vmin, double vmax);
 
 
 
+///////////////////////////////////////////////
+//  █████╗ ███████╗███████╗███████╗████████╗ //
+// ██╔══██╗██╔════╝██╔════╝██╔════╝╚══██╔══╝ //
+// ███████║███████╗███████╗█████╗     ██║    //
+// ██╔══██║╚════██║╚════██║██╔══╝     ██║    //
+// ██║  ██║███████║███████║███████╗   ██║    //
+// ╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝   ╚═╝    //
+///////////////////////////////////////////////
+                                         
+typedef struct {
+  void* user_data;
+} dn_asset_import_request_t;
+
+typedef enum {
+  DN_ASSET_COMPLETION_STATUS_RUNNING,
+  DN_ASSET_COMPLETION_STATUS_DONE,
+} dn_asset_completion_status_t;
+
+typedef void(*dn_asset_import_fn)(dn_asset_import_request_t* request);
+typedef dn_asset_completion_status_t(*dn_asset_completion_fn)(dn_asset_import_request_t* request);
+
+typedef struct {
+  dn_asset_name_t id;
+  dn_asset_import_fn on_import;
+  dn_asset_completion_fn on_complete;
+} dn_asset_importer_t;
+
+typedef void* dn_asset_data_t;
+
+typedef struct {
+    dn_asset_name_t name;
+    dn_asset_data_t data;
+} dn_asset_t;
+
+typedef struct {
+  struct {
+    dn_asset_importer_t* data;
+    u32 count;
+  } importers;
+} dn_asset_config_t;
+
+void dn_assets_init(dn_asset_config_t config);
+dn_asset_data_t dn_assets_find(const char* name);
+void dn_assets_add(const char* name, dn_asset_data_t data);
+void dn_asset_copy_name(const char* source, dn_asset_name_t dest);
+
+
 //////////////////////////////
 // █████╗ ██████╗ ██████╗   //
 // ██╔══██╗██╔══██╗██╔══██╗ //
@@ -1074,6 +1121,7 @@ typedef struct {
   dn_audio_config_t audio;
   dn_font_config_t font;
   dn_gpu_config_t gpu;
+  dn_asset_config_t asset;
   u32 target_fps;
 } dn_app_config_t;
 
@@ -1096,16 +1144,16 @@ void dn_app_configure(dn_app_config_t config);
 // ██║   ██║██╔██╗ ██║██████╔╝██║   ██║██████╔╝   ██║   █████╗  ██║  ██║ //
 // ██║   ██║██║╚██╗██║██╔═══╝ ██║   ██║██╔══██╗   ██║   ██╔══╝  ██║  ██║ //
 // ╚██████╔╝██║ ╚████║██║     ╚██████╔╝██║  ██║   ██║   ███████╗██████╔╝ //
-//  ╚═════╝ ╚═╝  ╚═══╝╚═╝      ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═════╝	 //
+//  ╚═════╝ ╚═╝  ╚═══╝╚═╝      ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═════╝  //
 ///////////////////////////////////////////////////////////////////////////
 
 //
 // FLUID
 //
-	typedef struct {
-		u32 next_unprocessed_index;
-		u32 grid_size;
-	} EulerianFluidSystem;
+  typedef struct {
+    u32 next_unprocessed_index;
+    u32 grid_size;
+  } EulerianFluidSystem;
 
 dn_gen_arena_handle_t lf_create(u32 num_particles);
 void lf_destroy(dn_gen_arena_handle_t handle);
@@ -1181,8 +1229,8 @@ u32 find_texture_handle(const char* name);
 // INTERPOLATION
 //
 typedef enum {
-	InterpolationFn_Linear,
-	InterpolationFn_SmoothDamp
+  InterpolationFn_Linear,
+  InterpolationFn_SmoothDamp
 } InterpolationFn;
 
 
@@ -1190,25 +1238,25 @@ typedef enum {
 // PARTICLES
 //
 typedef enum {
-	ParticleKind_Quad,
-	ParticleKind_Circle,
-	ParticleKind_Image,
-	ParticleKind_Invalid,
+  ParticleKind_Quad,
+  ParticleKind_Circle,
+  ParticleKind_Image,
+  ParticleKind_Invalid,
 } ParticleKind;
 
 typedef enum {
-	ParticlePositionMode_Bottom,
+  ParticlePositionMode_Bottom,
 } ParticlePositionMode;
 
 typedef struct {
-	i32 index;
-	i32 generation;
+  i32 index;
+  i32 generation;
 } ParticleSystemHandle;
 
 typedef struct {
-	int spawned;
-	int despawned;
-	int alive;
+  int spawned;
+  int despawned;
+  int alive;
 } ParticleSystemFrame;
 
 ParticleSystemHandle make_particle_system();
@@ -1265,9 +1313,9 @@ void set_particle_master_opacity(ParticleSystemHandle handle, float opacity);
 void dn_lua_add_dir(const char* name);
 
 typedef enum {
-	DN_LOG_FLAG_CONSOLE = 1,
-	DN_LOG_FLAG_FILE = 2,
-	DN_LOG_FLAG_DEFAULT = 3,
+  DN_LOG_FLAG_CONSOLE = 1,
+  DN_LOG_FLAG_FILE = 2,
+  DN_LOG_FLAG_DEFAULT = 3,
 } dn_log_flags_t;
 
 void dn_log(const char* fmt, ...);
@@ -1292,7 +1340,7 @@ bit = require('bit')
 
 --   local stack_trace = debug.traceback()
 --   stack_trace = stack_trace:gsub('stack traceback:\n', '')
---   stack_trace = stack_trace:gsub('\t', '	')
+--   stack_trace = stack_trace:gsub('\t', ' ')
 
 --   -- The stack trace contains absolute paths, which are just hard to read. Also, if the path is long, it is
 --   -- shortened with "...". Remove the absolute part of the path, including the "..."
@@ -1327,7 +1375,7 @@ bit = require('bit')
 function tdengine.handle_error()
   local stack_trace = debug.traceback()
   stack_trace = stack_trace:gsub('stack traceback:\n', '')
-  stack_trace = stack_trace:gsub('\t', '	')
+  stack_trace = stack_trace:gsub('\t', '  ')
 
   -- The stack trace contains absolute paths, which are just hard to read. Also, if the path is long, it is
   -- shortened with "...". Remove the absolute part of the path, including the "..."
@@ -1525,27 +1573,27 @@ function tdengine.init_phase_0()
   end
   
   local file_path = ffi.string(ffi.C.dn_paths_resolve('engine_paths').data)
-	local path_info = dofile(file_path)
+  local path_info = dofile(file_path)
 
-	local engine_paths = collect_paths(path_info.engine_paths)
-	for index, path in pairs(engine_paths) do
-		ffi.C.dn_paths_add_engine_subpath(path.name, path.path)
-	end
+  local engine_paths = collect_paths(path_info.engine_paths)
+  for index, path in pairs(engine_paths) do
+    ffi.C.dn_paths_add_engine_subpath(path.name, path.path)
+  end
 
   local install_paths = collect_paths(path_info.install_paths)
-	for index, path in pairs(install_paths) do
-		ffi.C.dn_paths_add_install_subpath(path.name, path.path)
-	end
+  for index, path in pairs(install_paths) do
+    ffi.C.dn_paths_add_install_subpath(path.name, path.path)
+  end
 
   local app_paths = collect_paths(path_info.app_paths)
-	for index, path in pairs(app_paths) do
-		ffi.C.dn_paths_add_subpath(path.name, 'app', path.path)
-	end
+  for index, path in pairs(app_paths) do
+    ffi.C.dn_paths_add_subpath(path.name, 'app', path.path)
+  end
 
-	local write_paths = collect_paths(path_info.write_paths)
-	for index, path in pairs(write_paths) do
-		ffi.C.dn_paths_add_write_subpath(path.name, path.path)
-	end
+  local write_paths = collect_paths(path_info.write_paths)
+  for index, path in pairs(write_paths) do
+    ffi.C.dn_paths_add_write_subpath(path.name, path.path)
+  end
 
   -- We need a couple of files to even be able to load other files (since they
   -- define classes and enums and such). Order matters here. I consider this to be

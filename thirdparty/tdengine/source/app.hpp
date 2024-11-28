@@ -12,6 +12,7 @@ typedef struct {
   dn_audio_config_t audio;
   dn_font_config_t font;
   dn_gpu_config_t gpu;
+  dn_asset_config_t asset;
   u32 target_fps;
 } dn_app_config_t;
 
@@ -37,19 +38,19 @@ void dn_app_init(dn_app_descriptor_t descriptor) {
 
 void dn_app_configure(dn_app_config_t config) {
   dn_window_init(config.window);
-	dn_imgui_init();
-  
+  dn_imgui_init();
+
+  dn_assets_init(config.asset);
   dn_audio_init(config.audio);
   dn_font_init(config.font);
   dn_gpu_init(config.gpu);
 
   dn_noise_init();
-	init_texture_atlas(); // Invert control
-	init_backgrounds(); // Invert control
-	init_screenshots(); // Use the asset loader
-	init_particles();
-	init_fluid();
-
+  init_texture_atlas(); // Invert control
+  init_backgrounds(); // Invert control
+  init_screenshots(); // Use the asset loader
+  init_particles();
+  init_fluid();
 }
 
 #endif

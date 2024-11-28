@@ -63,6 +63,8 @@
 #include "source/app.hpp"
 #define DN_AUDIO_IMPLEMENTATION
 #include "source/audio.hpp"
+#define DN_ASSET_IMPLEMENTATION
+#include "source/asset.hpp"
 #define DN_ENGINE_IMPLEMENTATION
 #include "source/engine.hpp"
 #define DN_FONT_IMPLEMENTATION
@@ -106,7 +108,6 @@
 #include "source/utils/file_monitor.cpp"
 #include "source/utils/array.cpp"
 #include "source/action.cpp" // HALF
-#include "source/asset.cpp"
 #include "source/background.cpp" // INVERT (I need something to load large images though, in general)
 #include "source/draw.cpp"
 #include "source/image.cpp" // HALF (Screenshots should be reworked, probably? I'm referencing a named path when I initialize)
@@ -114,44 +115,43 @@
 #include "source/utils/string.cpp"
 
 int dn_main(dn_app_descriptor_t app) {
-	dn_allocators_init();
-	init_random();
-	dn_app_init(app);
-	init_paths();
-	dn_log_init();
-	dn_engine_init();
-	dn_input_init();
-	dn_time_metrics_init();
-	init_steam();
-	init_file_monitors();
-	init_assets();
-	init_buffers();
-	dn_lua_init();
-	init_actions();
-	dn_lua_init_game();
+  dn_allocators_init();
+  init_random();
+  dn_app_init(app);
+  init_paths();
+  dn_log_init();
+  dn_engine_init();
+  dn_input_init();
+  dn_time_metrics_init();
+  init_steam();
+  init_file_monitors();
+  init_buffers();
+  dn_lua_init();
+  init_actions();
+  dn_lua_init_game();
 
-	while(!dn_engine_should_exit()) {
-		dn_engine_update();
-		update_steam();
-		dn_allocators_update();
-		update_file_monitors();
-		update_assets();
-		dn_imgui_update();
-		dn_input_update();
-		update_actions();
-		dn_lua_update();
-		dn_time_metrics_update();
-	}
+  while(!dn_engine_should_exit()) {
+    dn_engine_update();
+    update_steam();
+    dn_allocators_update();
+    update_file_monitors();
+    dn_assets_update();
+    dn_imgui_update();
+    dn_input_update();
+    update_actions();
+    dn_lua_update();
+    dn_time_metrics_update();
+  }
 
-	dn_audio_shutdown();
-	shutdown_steam();
-	dn_imgui_shutdown();
-	dn_window_shutdown();
+  dn_audio_shutdown();
+  shutdown_steam();
+  dn_imgui_shutdown();
+  dn_window_shutdown();
 
-	return 0;
+  return 0;
 }
 
 // int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-// 	return main();
+//  return main();
 // }
 #endif

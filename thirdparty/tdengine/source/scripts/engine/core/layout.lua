@@ -1,5 +1,5 @@
 function tdengine.resolution_aware_layout(name)
-	local display_mode = tdengine.ffi.dm_window_get_display_mode()
+	local display_mode = tdengine.ffi.dn_window_get_display_mode()
 
 	if mode == tdengine.enums.DisplayMode.p1080 then
 		local aware_name = string.format('%s-1080', name)
