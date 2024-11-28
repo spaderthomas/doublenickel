@@ -251,7 +251,9 @@ void dn_lua_script_named_dir(const char* name) {
 }
 
 void dn_lua_script_dir(const char* path) {
-  if (!std::filesystem::exists(path)) return;
+  std::error_code error;
+  if (!std::filesystem::exists(path, error)) return;
+
   dn_log_flags(DN_LOG_FLAG_FILE, "Loading scripts from directory; path = %s", path);
 
   dn_lua.file_monitor->add_directory(path);
@@ -274,8 +276,8 @@ void dn_lua_script_dir(const char* path) {
     entry->path = copy_string(dir_path, &bump_allocator);
     normalize_path(entry->path);
 
-    entry->is_regular_file = std::filesystem::is_regular_file(it->status());
-    entry->is_directory = std::filesystem::is_directory(it->status());
+    entry->is_regular_file = dn_os_is_regular_file(entry->path);
+    entry->is_directory = dn_os_is_directory(entry->path);
   }
 
   auto compare_subpaths = [](const void* va, const void* vb) {

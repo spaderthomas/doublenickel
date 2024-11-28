@@ -7,13 +7,13 @@ typedef enum {
 } dn_os_file_attr_t;
 
 typedef struct {
-	int year;
-	int month;
-	int day;
-	int hour;
-	int minute;
-	int second;
-	int millisecond;
+  int year;
+  int month;
+  int day;
+  int hour;
+  int minute;
+  int second;
+  int millisecond;
 } dn_os_date_time_t;
 
 typedef struct {
@@ -39,29 +39,32 @@ DN_IMP dn_os_file_attr_t            dn_os_winapi_attr_to_dn_attr(u32 attr);
 
 #ifdef DN_OS_IMPLEMENTATION
 bool dn_os_does_path_exist(const char* path) {
-	return std::filesystem::exists(path);
+  std::error_code error;
+  return std::filesystem::exists(path, error);
 }
 
 bool dn_os_is_regular_file(const char* path) {
-	auto attribute = GetFileAttributesA(path);
-	if (attribute == INVALID_FILE_ATTRIBUTES) return false;
-	return !(attribute & FILE_ATTRIBUTE_DIRECTORY);
+  auto attribute = GetFileAttributesA(path);
+  if (attribute == INVALID_FILE_ATTRIBUTES) return false;
+  return !(attribute & FILE_ATTRIBUTE_DIRECTORY);
 }
 
 bool dn_os_is_directory(const char* path) {
-	auto attribute = GetFileAttributesA(path);
-	if (attribute == INVALID_FILE_ATTRIBUTES) return false;
-	return attribute & FILE_ATTRIBUTE_DIRECTORY;
+  auto attribute = GetFileAttributesA(path);
+  if (attribute == INVALID_FILE_ATTRIBUTES) return false;
+  return attribute & FILE_ATTRIBUTE_DIRECTORY;
 }
 
 void dn_os_remove_directory(const char* path) {
-	std::filesystem::remove_all(path);
+  std::error_code error;
+  std::filesystem::remove_all(path, error);
 }
 
 void dn_os_create_directory(const char* path) {
-	if (!std::filesystem::exists(path)) {
-		std::filesystem::create_directories(path);
-	}
+  std::error_code error;
+  if (!std::filesystem::exists(path, error)) {
+    std::filesystem::create_directories(path, error);
+  }
 }
 
 dn_os_directory_entry_list_t dn_os_scan_directory(const char* path) {
@@ -77,21 +80,21 @@ dn_os_directory_entry_list_t dn_os_scan_directory(const char* path) {
 
   WIN32_FIND_DATA find_data;
   auto handle = FindFirstFile(glob, &find_data);
-	if (handle == INVALID_HANDLE_VALUE) {
+  if (handle == INVALID_HANDLE_VALUE) {
     return dn_zero_initialize();
   }
 
   do {
     if (!strcmp(find_data.cFileName, ".")) continue;
-		if (!strcmp(find_data.cFileName, "..")) continue;
+    if (!strcmp(find_data.cFileName, "..")) continue;
     
     dn_path_t file_path;
     dn_path_join(file_path, path, find_data.cFileName);
     dn_os_directory_entry_t entry = {
-	    .file_path = copy_string(file_path, &bump_allocator),
+      .file_path = copy_string(file_path, &bump_allocator),
       .file_name = copy_string(find_data.cFileName, &bump_allocator),
-	    .attributes = dn_os_winapi_attr_to_dn_attr(GetFileAttributesA(file_path)),
-		};
+      .attributes = dn_os_winapi_attr_to_dn_attr(GetFileAttributesA(file_path)),
+    };
     dn_fixed_array_push_t(&entries, &entry, 1);
   } while (FindNextFile(handle, &find_data));
 
