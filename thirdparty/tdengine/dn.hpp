@@ -55,7 +55,7 @@
 #include "source/app.hpp"
 #endif
 
-#ifdef DN_IMPLEMENTATIONEMENTATION
+#ifdef DN_IMPLEMENTATION
 #include "source/glad.c"
 #include "source/imgui/imgui_compilation_unit.cpp"
 

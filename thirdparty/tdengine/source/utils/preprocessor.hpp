@@ -14,15 +14,14 @@ typedef struct {
   FILE* file;
   String file_data;
   char* result;
-} IncludeContext;
+} dn_preprocessor_context_t;
 
-void td_include(IncludeContext* context);
-void td_include_free_context(IncludeContext* context);
+void dn_preprocess(dn_preprocessor_context_t* context);
 #endif
 
 #ifdef PREPROCESSOR_IMPLEMENTATION
 
-void td_include(IncludeContext* context) {
+void dn_preprocess(dn_preprocessor_context_t* context) {
   context->result = nullptr;
 
   context->file = fopen(context->file_path, "rb");
@@ -54,24 +53,24 @@ void td_include(IncludeContext* context) {
     if (inc_list[i].filename) {
       char* included_file_data = nullptr;
       for (u32 dir_index = 0; dir_index < context->include_dirs.count; dir_index++) {
-        StringBuilder builder = { 
+        dn_string_builder_t builder = { 
             .buffer = {0}, 
             .allocator = &bump_allocator 
         };
 
-        string_builder_append_cstr(&builder, context->include_dirs.data[dir_index]);
-        string_builder_append_cstr(&builder, "/");
-        string_builder_append_cstr(&builder, inc_list[i].filename);
+        dn_string_builder_append_cstr(&builder, context->include_dirs.data[dir_index]);
+        dn_string_builder_append_cstr(&builder, "/");
+        dn_string_builder_append_cstr(&builder, inc_list[i].filename);
 
-        auto file_path = string_builder_write_cstr(&builder);
+        auto file_path = dn_string_builder_write_cstr(&builder);
         auto file = fopen(file_path, "rb");
         if (file) {
           fclose(file);
-          IncludeContext subcontext = {
+          dn_preprocessor_context_t subcontext = {
             .file_path = file_path,
             .include_dirs = context->include_dirs
           };
-          td_include(&subcontext);
+          dn_preprocess(&subcontext);
           included_file_data = subcontext.result;
           break;
         }
@@ -91,10 +90,6 @@ void td_include(IncludeContext* context) {
   }
   context->result = stb_include_append(context->result, &textlen, str+last, source_len - last + 1); // append '\0'
   stb_include_free_includes(inc_list, num_includes);
-}
-
-void td_include_free_context(IncludeContext* context) {
-   if (context->file_data.data) free(context->file_data.data);
 }
 
 #endif

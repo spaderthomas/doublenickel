@@ -158,8 +158,6 @@ function App:on_scene_rendered()
   tdengine.ffi.dn_gpu_end_render_pass(self.command_buffer)
   tdengine.ffi.dn_gpu_command_buffer_submit(self.command_buffer)
 
-
-  local target = tdengine.asset.find(RenderTarget.Native)
   tdengine.ffi.dn_gpu_render_target_blit(
     tdengine.asset.find(RenderTarget.Native),
     tdengine.asset.find(RenderTarget.Upscaled)

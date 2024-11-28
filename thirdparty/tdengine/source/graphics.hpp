@@ -941,14 +941,14 @@ tstring build_shader_source(const char* file_path) {
   auto shader_file = copy_string(file_path, &bump_allocator);
   auto error = bump_allocator.alloc<char>(256);
   
-  IncludeContext context = {
+  dn_preprocessor_context_t context = {
     .file_path = file_path,
     .include_dirs = {
       .data = dn_fixed_array_at_t(&dn_gpu.search_paths, 0),
       .count = dn_gpu.search_paths.size
     }
   };
-  td_include(&context);
+  dn_preprocess(&context);
 
   if (!context.result) {
     dn_log("shader preprocessor error; shader = %s, err = %s", shader_file, context.error);
