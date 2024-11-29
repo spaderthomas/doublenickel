@@ -158,7 +158,7 @@ void dn_audio_init(dn_audio_config_t config) {
     .sample_frequency = config.sample_frequency,
     .master_volume = config.master_volume,
     .master_volume_mod = config.master_volume_mod,
-    .file_monitor = arr_push(&file_monitors),
+    .file_monitor = dn_file_monitors_add(),
     .sample_buffer = {0}
   };
 

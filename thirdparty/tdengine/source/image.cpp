@@ -25,7 +25,7 @@ void TextureAtlas::init() {
     asset_loader.submit(request);
   };
 
-  this->file_monitor = arr_push(&file_monitors);
+  this->file_monitor = dn_file_monitors_add();
   this->file_monitor->init(on_file_event, events, this);
 }
 

@@ -476,7 +476,7 @@ void dn_gpu_init(dn_gpu_config_t config) {
       dn_gpu_shader_reload(shader);
     }
   };
-  dn_gpu.shader_monitor = arr_push(&file_monitors);
+  dn_gpu.shader_monitor = dn_file_monitors_add();
   dn_gpu.shader_monitor->init(reload_all_shaders, FileChangeEvent::Modified, nullptr);
   dn_gpu.shader_monitor->add_directory(config.shader_path);
 

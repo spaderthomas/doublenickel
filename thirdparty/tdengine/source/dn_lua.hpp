@@ -52,7 +52,7 @@ void dn_lua_init() {
     dn_lua_script_file(event->file_path);
   };
 
-  dn_lua.file_monitor = arr_push(&file_monitors);
+  dn_lua.file_monitor = dn_file_monitors_add();
   dn_lua.file_monitor->init(on_file_event, events, &dn_lua);
 
   // Basic Lua bootstrapping. Don't load any game scripts here. This is called before

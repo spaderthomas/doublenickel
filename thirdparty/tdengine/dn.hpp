@@ -91,6 +91,8 @@
 #include "source/utils/coordinate.hpp"
 #define DN_DYNAMIC_ARRAY_IMPLEMENTATION
 #include "source/utils/dynamic_array.hpp"
+#define DN_FILE_MONITOR_IMPLEMENTATION
+#include "source/utils/file_monitor.hpp"
 #define DN_FIXED_ARRAY_IMPLEMENTATION
 #include "source/utils/fixed_array.hpp"
 #define DN_LOG_IMPLEMENTATION
@@ -109,7 +111,6 @@
 #include "source/utils/string.hpp"
 
 
-#include "source/utils/file_monitor.cpp"
 #include "source/utils/array.cpp"
 #include "source/text.cpp"
 #include "source/draw.cpp"
@@ -130,7 +131,7 @@ int dn_main(dn_app_descriptor_t app) {
   dn_engine_init();
   dn_input_init();
   dn_time_metrics_init();
-  init_file_monitors();
+  dn_file_monitors_init();
   init_buffers();
   dn_lua_init();
   init_actions();
@@ -139,7 +140,7 @@ int dn_main(dn_app_descriptor_t app) {
   while(!dn_engine_should_exit()) {
     dn_engine_update();
     dn_allocators_update();
-    update_file_monitors();
+    dn_file_monitors_update();
     dn_assets_update();
     dn_imgui_update();
     dn_input_update();
