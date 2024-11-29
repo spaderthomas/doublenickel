@@ -128,7 +128,7 @@ void test_convert_point() {
 }
 
 void test_generational_arena() {
-	GenerationalArena<u32> arena;
+	dn_gen_arena_t<u32> arena;
 	arena.init(32);
 	auto rza = arena.insert(69);
 	auto gza = arena.insert(420);

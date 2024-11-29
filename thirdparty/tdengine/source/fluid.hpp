@@ -65,7 +65,7 @@ namespace LagrangianFluidSim {
 		ssbo system;
 	};
 
-	GenerationalArena<System> systems;
+	dn_gen_arena_t<System> systems;
 
 	void init();
 	void update();
@@ -143,7 +143,7 @@ namespace EulerianFluidSim {
 		ssbo system;
 	};
 	
-	GenerationalArena<System> systems;
+	dn_gen_arena_t<System> systems;
 
 	void init();
 	void update();

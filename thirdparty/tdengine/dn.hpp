@@ -53,10 +53,12 @@
 
 #define APP_IMPLEMENTATION
 #include "source/app.hpp"
-#define DN_AUDIO_IMPLEMENTATION
-#include "source/audio.hpp"
+#define DN_GEN_ARENA_IMPLEMENTATION
+#include "source/arena.hpp"
 #define DN_ASSET_IMPLEMENTATION
 #include "source/asset.hpp"
+#define DN_AUDIO_IMPLEMENTATION
+#include "source/audio.hpp"
 #define DN_ENGINE_IMPLEMENTATION
 #include "source/engine.hpp"
 #define DN_FONT_IMPLEMENTATION
