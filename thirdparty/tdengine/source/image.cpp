@@ -31,7 +31,7 @@ void TextureAtlas::init() {
 
 void TextureAtlas::set_name(const char* name) {
   strncpy(this->name, name, 64);
-  texture->hash = hash_label(name);
+  texture->hash = dn_hash_cstr_dumb(name);
 }
 
 RectPackId* TextureAtlas::find_pack_item(i32 id) {
@@ -81,15 +81,15 @@ void TextureAtlas::calc_hash_and_mod_time() {
     for (directory_iterator it(directory); it != directory_iterator(); it++) {
       if (it->is_directory()) {
         auto next = it->path().string();
-        normalize_path(next);
+        dn_path_normalize_std(next);
         check_directory(next.c_str());
       } else {
         auto file_name = it->path().filename().string();
         auto file_path = it->path().string();
-        normalize_path(file_path);
+        dn_path_normalize_std(file_path);
 
         // 1: We hash all the names of the files, so new files will trigger regardless of their modtime.
-        dn_hash_t file_name_hash = hash_label(file_name.c_str());
+        dn_hash_t file_name_hash = dn_hash_cstr_dumb(file_name.c_str());
         files_hash = files_hash ^ file_name_hash;
 
         // 2: We check modtime for files that exist
@@ -135,7 +135,7 @@ void TextureAtlas::build_from_config() {
 
     for (directory_iterator it(directory); it != directory_iterator(); ++it) {
       auto path = it->path().string();
-      normalize_path(path);
+      dn_path_normalize_std(path);
       
       if (it->is_directory()) {
         add_directory(path.c_str());
@@ -144,7 +144,7 @@ void TextureAtlas::build_from_config() {
 
         auto sprite = alloc_sprite();
         sprite->texture = this->texture->hash;
-        sprite->hash = hash_label(file_name.c_str());
+        sprite->hash = dn_hash_cstr_dumb(file_name.c_str());
         strncpy(sprite->file_path, file_name.c_str(), DN_MAX_PATH_LEN);
 
         lua_pushstring(l, file_name.c_str());
@@ -217,7 +217,7 @@ void TextureAtlas::build_from_source() {
 
     for (directory_iterator it(directory); it != directory_iterator(); ++it) {
       auto path = it->path().string();
-      normalize_path(path);
+      dn_path_normalize_std(path);
       
       if (it->is_directory()) {
         add_directory(path.c_str());
@@ -228,7 +228,7 @@ void TextureAtlas::build_from_source() {
         auto sprite = find_sprite_no_default(file_name.c_str());
         if (!sprite) sprite = alloc_sprite();
         sprite->texture = this->texture->hash;
-        sprite->hash = hash_label(file_name.c_str());
+        sprite->hash = dn_hash_cstr_dumb(file_name.c_str());
         strncpy(sprite->file_path, file_name.c_str(), DN_MAX_PATH_LEN);
 
         auto id = arr_push(&ids);
@@ -337,7 +337,7 @@ void TextureAtlas::write_to_config() {
     // Go through each sprite, register it in the asset table, and collect its rect data
     for (directory_iterator it(directory); it != directory_iterator(); ++it) {
       auto path = it->path().string();
-      normalize_path(path);
+      dn_path_normalize_std(path);
       
       if (it->is_directory()) {
         write_directory(path.c_str());
@@ -621,10 +621,10 @@ void create_sprite_ex(Sprite* sprite, const char* id, u8* data, i32 width, i32 h
   auto texture = alloc_texture();
   if (!texture) return;
   texture->init(width, height, channels);
-  texture->hash = hash_label(id);
+  texture->hash = dn_hash_cstr_dumb(id);
   texture->load_to_gpu((u32*)data);
   
-  sprite->hash = hash_label(id);
+  sprite->hash = dn_hash_cstr_dumb(id);
   sprite->texture = texture->hash;
   sprite->size = Vector2I(width, height);
   strncpy(sprite->file_path, id, DN_MAX_PATH_LEN);
@@ -642,7 +642,7 @@ void init_screenshots() {
   if (!std::filesystem::exists(screenshots)) return;
   for (directory_iterator it(screenshots); it != directory_iterator(); ++it) {
     auto path = it->path().string();
-    normalize_path(path);
+    dn_path_normalize_std(path);
     if (!is_png(path)) continue;
 
     // Load the data
@@ -664,12 +664,12 @@ void init_screenshots() {
 // BUFFERS //
 /////////////
 Texture* find_texture(const char* name) {
-  auto hash = hash_label(name);
+  auto hash = dn_hash_cstr_dumb(name);
   return find_texture(hash);
 }
 
 u32 find_texture_handle(const char* name) {
-  auto hash = hash_label(name);
+  auto hash = dn_hash_cstr_dumb(name);
   auto texture = find_texture(hash);
 
   if (!texture) return 0;
@@ -691,7 +691,7 @@ Sprite* find_sprite_no_default(const char* name) {
   
   if (!name) return nullptr;
 
-  auto hash = hash_label(name);
+  auto hash = dn_hash_cstr_dumb(name);
   arr_for(sprite_infos, sprite) {
     if (sprite->hash == hash) return sprite;
   }

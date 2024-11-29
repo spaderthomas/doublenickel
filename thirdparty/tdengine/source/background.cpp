@@ -312,7 +312,7 @@ void Background::load_tiles() {
 	// Make a completion queue that's the exact size we need. (If you had a vector, this would be a great time
 	// to use a vector that allocates from temporary storage)
 
-	loaded_tiles = dn::allocator::alloc_array<LoadedTile>(&dn_allocators.standard, tiles.size);
+	arr_init(&this->loaded_tiles, this->tiles.size, &dn_allocators.standard);
 
 	for (int tile_index = 0; tile_index < tiles.size; tile_index++) {
 		// Pull tile data
@@ -321,7 +321,7 @@ void Background::load_tiles() {
 
 		// Allocate any buffer resources
 		auto texture = alloc_texture();
-		texture->hash = hash_label(tile);
+		texture->hash = dn_hash_cstr_dumb(tile);
 		stbi_set_flip_vertically_on_load(false);
 		u32* data = (u32*)stbi_load(tile_full_path, &texture->width, &texture->height, &texture->channels, 0);
 			

@@ -274,7 +274,7 @@ void dn_lua_script_dir(const char* path) {
 
     auto dir_path = it->path().string();
     entry->path = dn_string_copy(dir_path, &dn_allocators.bump);
-    normalize_path(entry->path);
+    dn_path_normalize_cstr(entry->path);
 
     entry->is_regular_file = dn_os_is_regular_file(entry->path);
     entry->is_directory = dn_os_is_directory(entry->path);

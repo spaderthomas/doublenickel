@@ -81,7 +81,7 @@ dn_hash_t dn_combine_hashes(dn_hash_t a, dn_hash_t b) {
   return a ^ (b + 0x9e3779b9 + (a << 6) + (a >> 2));
 }
 
-dn_hash_t dn_hash_string_dumb(const char* str) {
+dn_hash_t dn_hash_cstr_dumb(const char* str) {
   constexpr size_t prime = 31;
   
   size_t result = 0;
@@ -91,5 +91,39 @@ dn_hash_t dn_hash_string_dumb(const char* str) {
     }
     return result;
 }
+
+void dn_hash_encode_hex(char* destination, const char* data, size_t len) {
+  static char const hex_chars[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+
+  for (int i = 0; i < len; i++) {
+    char const byte = data[i];
+
+    int base_index = i * 2;
+    destination[base_index] = hex_chars[(byte & 0xF0) >> 4];
+    destination[base_index + 1]     = hex_chars[(byte & 0x0F) >> 0];
+  }
+}
+
+void dn_hash_encode_base64(char* destination, const char* source, size_t len) {
+  static const char* base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+  uint32_t val = 0;
+  int valb = -6;
+
+  int i = 0;
+  for (i; i < len; ++i) {
+    val = (val << 8) + source[i];
+    valb += 8;
+    while (valb >= 0) {
+      destination[i] = base64_chars[(val >> valb) & 0x3F];
+      valb -= 6;
+    }
+  }
+  if (valb > -6) {
+    destination[i] = base64_chars[((val << 8) >> (valb + 8)) & 0x3F];
+  }
+
+  while (i % 4) destination[i++] = '=';
+}
+
 
 #define dn_hash_type(t) dn_hash_string_dumb((const char*)(#t))

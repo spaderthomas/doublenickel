@@ -4,14 +4,14 @@
 
 #include "source/utils/types.hpp"
 #include "source/utils/macros.hpp"
+#include "source/utils/memory.hpp"
+#include "source/utils/string.hpp"
 #include "source/utils/path.hpp"
 #include "source/utils/log.hpp"
 #include "source/utils/os.hpp"
 #include "source/utils/array.hpp"
 #include "source/utils/fixed_array.hpp"
-#include "source/utils/memory.hpp"
 #include "source/utils/ring_buffer.hpp"
-#include "source/utils/string.hpp"
 #include "source/utils/arena.hpp"
 #include "source/utils/colors.hpp"
 #include "source/utils/coordinate.hpp"
@@ -20,7 +20,6 @@
 #include "source/utils/filesystem.hpp"
 #include "source/utils/time_function.hpp"
 #include "source/utils/noise.hpp"
-#include "source/utils/dynamic_array.hpp"
 #include "source/utils/hash.hpp"
 #include "source/utils/preprocessor.hpp"
 #include "source/imgui/dn_imgui.hpp"
@@ -82,8 +81,6 @@
 #include "source/imgui/dn_imgui.hpp"
 #define COORDINATE_IMPLEMENTATION
 #include "source/utils/coordinate.hpp"
-#define DN_DYNAMIC_ARRAY_IMPLEMENTATION
-#include "source/utils/dynamic_array.hpp"
 #define DN_FILE_MONITOR_IMPLEMENTATION
 #include "source/utils/file_monitor.hpp"
 #define DN_FIXED_ARRAY_IMPLEMENTATION
@@ -117,7 +114,7 @@
 
 int dn_main(dn_app_descriptor_t app) {
   dn_allocators_init();
-  init_random();
+  dn_random_init();
   dn_app_init(app);
   init_paths();
   dn_log_init();

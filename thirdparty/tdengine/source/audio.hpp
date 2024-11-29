@@ -340,7 +340,7 @@ bool dn_audio_is_any_playing() {
 dn_audio_info_t* dn_audio_find_no_default(const char* name) {
   std::unique_lock lock(dn_audio_mutex);
 
-  auto hash = hash_label(name);
+  auto hash = dn_hash_cstr_dumb(name);
   arr_for(sound_infos, info) {
     if (info->hash == hash) return info;
   }
@@ -447,7 +447,7 @@ void dn_audio_load(const char* file_path, const char* file_name) {
 
   auto sound = alloc_sound(file_name);
   strncpy(sound->name, file_name, DN_ASSET_NAME_LEN);
-  sound->hash = hash_label(sound->name);
+  sound->hash = dn_hash_cstr_dumb(sound->name);
   
   sound->samples = drwav_open_file_and_read_pcm_frames_f32(file_path, &sound->num_channels, &sound->sample_rate, &sound->num_frames, NULL);
   if (!sound->samples) {

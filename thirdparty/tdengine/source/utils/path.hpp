@@ -4,8 +4,11 @@
 #define DN_MAX_PATH_LEN 256
 typedef char dn_path_t [DN_MAX_PATH_LEN];
 
-void normalize_path(char* str);
-void normalize_path(std::string& str);
+DN_API void dn_path_normalize_cstr(char* str);
+DN_IMP void dn_path_normalize_std(std::string& str);
+DN_API void dn_path_from_cstr(dn_path_t path, const char* a);
+DN_API void dn_path_join(dn_path_t path, const char* a, const char* b);
+DN_IMP bool dn_path_match_extension(std::string_view str, dn_string_t extension);
 bool is_png(std::string& asset_path);
 dn_tstring_t extract_file_name(const char* full_path);
 char* wide_to_utf8(uint16* path, uint32 length);
@@ -15,8 +18,6 @@ namespace path_util {
 }
 
 
-DN_API void dn_path_join(dn_path_t path, const char* a, const char* b);
-DN_API void dn_path_from_cstr(dn_path_t path, const char* a);
 #endif
 
 #ifdef DN_PATH_IMPLEMENTATION
@@ -28,6 +29,13 @@ void dn_path_join(dn_path_t path, const char* a, const char* b) {
 	snprintf(path, DN_MAX_PATH_LEN, "%s/%s", a, b);
 }
 
+bool dn_path_match_extension(std::string_view str, dn_string_t extension) {
+	if (str.size() < extension.len) return false;
+
+	std::string_view extension_view = str.substr(str.size() - extension.len, extension.len);
+	return !extension_view.compare(dn_string_to_cstr(extension, &dn_allocators.bump));
+}
+
 
 namespace path_util {
 	bool is_lua(std::string_view str) {
@@ -37,7 +45,7 @@ namespace path_util {
 	}
 }
 
-void normalize_path(char* str) {
+void dn_path_normalize_cstr(char* str) {
 	u32 i = 0;
 	while (true) {
 		if (str[i] == 0) break;
@@ -48,7 +56,7 @@ void normalize_path(char* str) {
 	}
 }
 
-void normalize_path(std::string& str) {
+void dn_path_normalize_std(std::string& str) {
 	size_t start_pos = 0;
 	while((start_pos = str.find("\\", start_pos)) != std::string::npos) {
 			str.replace(start_pos, 1, "/");

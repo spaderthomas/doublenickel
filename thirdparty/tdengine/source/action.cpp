@@ -9,8 +9,8 @@ void init_actions() {
 		return;
 	}
 
-	steam_input.actions = dn::allocator::alloc_array<Action>(&dn_allocators.standard, SteamInputManager::MAX_ACTIONS);
-	steam_input.action_sets = dn::allocator::alloc_array<ActionSet>(&dn_allocators.standard, SteamInputManager::MAX_ACTION_SETS);
+	arr_init(&steam_input.actions, SteamInputManager::MAX_ACTIONS, &dn_allocators.standard);
+	arr_init(&steam_input.action_sets, SteamInputManager::MAX_ACTION_SETS, &dn_allocators.standard);
 
 	steam_input.poll_for_inputs();
 	steam_input.poll_for_controllers();
@@ -98,7 +98,8 @@ void SteamInputManager::poll_for_inputs() {
 void SteamInputManager::poll_for_controllers() {
 	if (!dn_steam_initialized()) return;
 
-	auto controllers = dn::allocator::alloc_array<InputHandle_t>(&dn_allocators.bump, STEAM_INPUT_MAX_COUNT);
+	Array<InputHandle_t, STEAM_INPUT_MAX_COUNT> controllers;
+	arr_init(&controllers, &dn_allocators.bump);
 	controllers.size = SteamInput()->GetConnectedControllers(controllers.data);
 
 	auto last_controller = controller;
@@ -142,7 +143,8 @@ void SteamInputManager::poll_for_controllers() {
 }
 
 void SteamInputManager::load_controller_glyphs() {
-	auto origins = dn::allocator::alloc_array<EInputActionOrigin>(&dn_allocators.bump, STEAM_INPUT_MAX_COUNT);
+	Array<EInputActionOrigin, STEAM_INPUT_MAX_COUNT> origins;
+	arr_init(&origins, &dn_allocators.bump);
 		
 	arr_for(actions, action) {
 		arr_clear(&origins);

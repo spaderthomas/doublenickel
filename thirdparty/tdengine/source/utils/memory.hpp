@@ -58,9 +58,6 @@ namespace dn::allocator {
 
 	template<typename T>
 	void free(dn_allocator_t* allocator, T* buffer);
-
-	template<typename T>
-	Array<T> alloc_array(u32 size);
 }
 #endif
 
@@ -81,16 +78,6 @@ namespace dn::allocator {
 	template<typename T>
 	void free(dn_allocator_t* allocator, T* buffer) {
 		return dn_allocator_free(allocator, (void*)buffer);
-	}
-
-	template<typename T>
-	Array<T> alloc_array(dn_allocator_t* allocator, u32 size) {
-		Array<T> array;
-		array.data = alloc<T>(allocator, size);
-		array.size = 0;
-		array.capacity = size;
-
-		return array;
 	}
 }
 

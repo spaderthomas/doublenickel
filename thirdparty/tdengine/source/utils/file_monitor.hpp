@@ -198,7 +198,7 @@ void FileMonitor::process_changes() {
 			char* full_path = dn::allocator::alloc<char>(&dn_allocators.bump, DN_MAX_PATH_LEN);
 			char* partial_path = wide_to_utf8((uint16*)&notify->FileName[0], notify->FileNameLength / 2);
 			snprintf(full_path, DN_MAX_PATH_LEN, "%s/%s", info->path, partial_path);
-			normalize_path(full_path);
+			dn_path_normalize_cstr(full_path);
 			char* file_name = extract_file_name(full_path);
 
 			this->add_change(full_path, file_name, events);
@@ -258,7 +258,7 @@ void FileMonitor::emit_changes() {
 }
 
 FileMonitor::CacheEntry* FileMonitor::find_cache_entry(char* file_path) {
-	dn_hash_t file_hash = hash_label(file_path);
+	dn_hash_t file_hash = dn_hash_cstr_dumb(file_path);
 	
 	CacheEntry* found = nullptr;
 	arr_for(this->cache, entry) {
@@ -270,7 +270,7 @@ FileMonitor::CacheEntry* FileMonitor::find_cache_entry(char* file_path) {
 
 	if (!found) {
 		found = arr_push(&this->cache);
-		found->hash = hash_label(file_path);
+		found->hash = dn_hash_cstr_dumb(file_path);
 	}
 	
 	return found;
