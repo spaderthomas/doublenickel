@@ -201,7 +201,7 @@ void dn_font_bake(dn_font_descriptor_t desc) {
     
     i32 tex_height = font_height_px * glyphs_per_row;
     i32 tex_width = tex_height;
-    auto buffer = dn_allocators.bump.alloc<char>(tex_width * tex_height);
+    auto buffer = dn::allocator::alloc<char>(&dn_allocators.bump, tex_width * tex_height);
 
     // Read each character's bitmap into the image buffer
     Vector2 point = { 0 };
@@ -294,7 +294,7 @@ void dn_font_bake(dn_font_descriptor_t desc) {
     }
 
 
-    auto tmp = dn_allocators.bump.alloc<char>(tex_width);
+    auto tmp = dn::allocator::alloc<char>(&dn_allocators.bump, tex_width);
     for (i32 i = 0; i != tex_height / 2; i++) {
       char* top = buffer + (i * tex_width); // first element of top row
       char* btm = buffer + ((tex_height - i - 1) * tex_width); // first element of bottom row

@@ -92,7 +92,7 @@ void dn_steam_callbacks_t::on_dismiss_text_input(GamepadTextInputDismissed_t* ca
 
   dn_steam.text_input.state = DN_STEAM_INPUT_TEXT_UNREAD;
   dn_steam.text_input.contents.len = len;
-  dn_steam.text_input.contents.data = dn_allocators.standard.alloc<u8>(len);
+  dn_steam.text_input.contents.data = dn::allocator::alloc<u8>(&dn_allocators.standard, len);
 
   bool success = SteamUtils()->GetEnteredGamepadTextInput((char*)dn_steam.text_input.contents.data, len);
   if (!success) {

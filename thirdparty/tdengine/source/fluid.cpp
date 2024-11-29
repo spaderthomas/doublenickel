@@ -13,7 +13,7 @@ void sync_gpu_buffer(u32 handle, void* data, u32 size) {
 }
 
 void zero_gpu_buffer(u32 handle, u32 size) {
-	auto data = dn_allocators.bump.alloc<u8>(size);
+	auto data = dn::allocator::alloc<u8>(&dn_allocators.bump, size);
 	
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, handle);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, size, (void*)data, GL_STATIC_DRAW);

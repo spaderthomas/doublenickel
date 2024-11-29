@@ -63,9 +63,9 @@ struct GenerationalArena {
 		this->capacity = capacity;
 		free_list = 0;
 		
-		values = dn_allocators.standard.alloc<T>(capacity);
+		values = dn::allocator::alloc<T>(&dn_allocators.standard, capacity);
 		
-		entries = dn_allocators.standard.alloc<Entry>(capacity); 
+		entries = dn::allocator::alloc<Entry>(&dn_allocators.standard, capacity); 
 		for (int i = 0; i < capacity; i++) {
 			entries[i].next_free = i + 1;
 		}

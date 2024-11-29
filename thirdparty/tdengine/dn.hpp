@@ -95,6 +95,8 @@
 #include "source/utils/fixed_array.hpp"
 #define DN_LOG_IMPLEMENTATION
 #include "source/utils/log.hpp"
+#define DN_MEMORY_IMPLEMENTATION
+#include "source/utils/memory.hpp"
 #define DN_NOISE_IMPLEMENTATION
 #include "source/utils/noise.hpp"
 #define DN_OS_IMPLEMENTATION
@@ -107,7 +109,6 @@
 #include "source/utils/string.hpp"
 
 
-#include "source/utils/memory.cpp"
 #include "source/utils/file_monitor.cpp"
 #include "source/utils/array.cpp"
 #include "source/text.cpp"

@@ -882,7 +882,7 @@ void dn_gpu_buffer_sync_subdata(dn_gpu_buffer_t* buffer, void* data, u32 byte_si
 }
 
 void dn_gpu_buffer_zero(dn_gpu_buffer_t* buffer, u32 size) {
-  auto data = dn_allocators.bump.alloc<u8>(size);
+	auto data = dn::allocator::alloc<u8>(&dn_allocators.bump, size);
   dn_gpu_buffer_sync(buffer, data, size);
 }
 
@@ -939,7 +939,7 @@ dn_gpu_shader_t* dn_gpu_shader_find(const char* name) {
 ////////////////////
 dn_tstring_t build_shader_source(const char* file_path) {
   auto shader_file = dn_string_copy(file_path, &dn_allocators.bump);
-  auto error = dn_allocators.bump.alloc<char>(256);
+  auto error = dn::allocator::alloc<char>(&dn_allocators.bump, 256);
   
   dn_preprocessor_context_t context = {
     .file_path = file_path,
@@ -966,7 +966,7 @@ void check_shader_compilation(u32 shader, const char* file_path) {
   glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
   if (!success) {
     static constexpr u32 error_size = 512;
-    auto compilation_status = dn_allocators.bump.alloc<char>(error_size);
+    auto compilation_status = dn::allocator::alloc<char>(&dn_allocators.bump, error_size);
     
     glGetShaderInfoLog(shader, error_size, NULL, compilation_status);
 
@@ -980,7 +980,7 @@ void check_shader_linkage(u32 program, const char* file_path) {
   glGetProgramiv(program, GL_LINK_STATUS, &success);
   if (!success) {
     static constexpr u32 error_size = 512;
-    auto compilation_status = dn_allocators.bump.alloc<char>(error_size);
+    auto compilation_status = dn::allocator::alloc<char>(&dn_allocators.bump, error_size);
     
     glGetProgramInfoLog(program, error_size, NULL, compilation_status);
     dn_log("shader link error; shader = %s, err = %s", file_path, compilation_status);

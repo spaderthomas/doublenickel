@@ -75,7 +75,7 @@ dn_tstring_t extract_file_name(const char* full_path) {
 }
 
 dn_tstring_t wide_to_utf8(u16* string, u32 length) {
-	dn_tstring_t utf8 = dn_allocators.bump.alloc<char>(length + 1);
+	dn_tstring_t utf8 = dn::allocator::alloc<char>(&dn_allocators.bump, length + 1);
 	WideCharToMultiByte(CP_UTF8, 0, (LPCWCH)string, length, utf8, length, NULL, NULL);
 	return utf8;
 }

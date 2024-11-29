@@ -373,7 +373,9 @@ void Background::load_to_gpu() {
 // TILE PROCESSOR
 //
 void TileProcessor::init(u32* source_data) {
-	if (!tile_data) tile_data = dn_allocators.standard.alloc<u32>(Background::TILE_SIZE * Background::TILE_SIZE);
+	if (!tile_data) {
+		tile_data = dn::allocator::alloc<u32>(&dn_allocators.standard, Background::TILE_SIZE * Background::TILE_SIZE);
+	}
 	this->source_data = source_data;
 }
 

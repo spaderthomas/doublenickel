@@ -89,7 +89,7 @@ dn_prepared_text_t* dn_prepare_text_wrap(const char* text, float32 px, float32 p
 dn_prepared_text_t* dn_prepare_text_ex(const char* text, float32 px, float32 py, dn_baked_font_t* font, float32 wrap, Vector4 color, bool precise) {
 	if (!text) return nullptr;
 	
-	auto prepared_text = dn_allocators.bump.alloc<dn_prepared_text_t>();
+	auto prepared_text = dn::allocator::alloc<dn_prepared_text_t>(&dn_allocators.bump, 1);
 	prepared_text->init();
 	prepared_text->set_text(text);
 	prepared_text->set_position(px, py);
