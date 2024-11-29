@@ -43,8 +43,8 @@ struct AssetLoader {
   std::condition_variable condition;
   std::mutex mutex;
 
-  RingBuffer<AssetLoadRequest> load_requests;
-  RingBuffer<AssetLoadRequest> completion_queue;
+  dn_ring_buffer_t<AssetLoadRequest> load_requests;
+  dn_ring_buffer_t<AssetLoadRequest> completion_queue;
 
   void process_requests();
   void process_completion_queue();
@@ -106,8 +106,8 @@ typedef struct {
   std::unordered_map<std::string, dn_asset_t> assets;
   std::unordered_map<std::string, dn_asset_importer_t> importers;
 
-  RingBuffer<AssetLoadRequest> load_requests;
-  RingBuffer<AssetLoadRequest> completion_queue;
+  dn_ring_buffer_t<AssetLoadRequest> load_requests;
+  dn_ring_buffer_t<AssetLoadRequest> completion_queue;
 } dn_assets_t;
 dn_assets_t dn_assets;
 
@@ -199,8 +199,8 @@ void dn_assets_init(dn_asset_config_t user_config) {
   }
   
 
-  rb_init(&asset_loader.load_requests, 2048);
-  rb_init(&asset_loader.completion_queue, 2048);
+  dn_ring_buffer_init(&asset_loader.load_requests, 2048);
+  dn_ring_buffer_init(&asset_loader.completion_queue, 2048);
   
   // asset_loader.thread = std::thread(&AssetLoader::process_requests, &asset_loader);
   // asset_loader.thread.detach();
@@ -255,7 +255,7 @@ void AssetLoader::process_requests() {
       return load_requests.size > 0;
       });
 
-    auto request = rb_pop(&load_requests);
+    auto request = dn_ring_buffer_pop(&load_requests);
     lock.unlock();
 
     if (request.kind == AssetKind::TextureAtlas) {
@@ -268,7 +268,7 @@ void AssetLoader::process_requests() {
       }
 
       lock.lock();
-      rb_push(&completion_queue, request);
+      dn_ring_buffer_push(&completion_queue, request);
       lock.unlock();
 
     }
@@ -282,7 +282,7 @@ void AssetLoader::process_requests() {
       }
 
       lock.lock();
-      rb_push(&completion_queue, request);
+      dn_ring_buffer_push(&completion_queue, request);
       lock.unlock();
     }
   }
@@ -297,7 +297,7 @@ void AssetLoader::process_completion_queue() {
       break;
     }
 
-    auto completion = rb_pop(&completion_queue);
+    auto completion = dn_ring_buffer_pop(&completion_queue);
     lock.unlock();
 
     num_assets_loaded++;
@@ -347,7 +347,7 @@ void AssetLoader::submit(AssetLoadRequest request) {
   request.id = AssetLoadRequest::next_id++;
 
   mutex.lock();
-  rb_push(&load_requests, request);
+  dn_ring_buffer_push(&load_requests, request);
   mutex.unlock();
 
   condition.notify_all();

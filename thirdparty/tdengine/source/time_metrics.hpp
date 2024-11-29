@@ -1,7 +1,7 @@
 #ifndef DN_TIME_METRICS_H
 #define DN_TIME_METRICS_H
 struct dn_time_metric_t {
-	RingBuffer<double> queue;
+	dn_ring_buffer_t<double> queue;
 	double time_begin;
 
 	void init();
@@ -44,7 +44,7 @@ void dn_time_metrics_update() {
 }
 
 void dn_time_metric_t::init() {
-	rb_init(&this->queue, 64);
+	dn_ring_buffer_init(&this->queue, 64);
 }
 
 void dn_time_metric_t::begin() {
@@ -54,14 +54,14 @@ void dn_time_metric_t::begin() {
 void dn_time_metric_t::end() {
 	auto time_end = glfwGetTime();
 	auto delta = time_end - this->time_begin;
-	rb_push_overwrite(&this->queue, delta);
+	dn_ring_buffer_push_overwrite(&this->queue, delta);
 }
 
 float64 dn_time_metric_t::get_average() {
 	if (!queue.size) return 0;
 	
 	float64 total = 0;
-	rb_for(queue, entry) {
+	dn_ring_buffer_for(queue, entry) {
 		total += **entry;
 	}
 
@@ -69,13 +69,13 @@ float64 dn_time_metric_t::get_average() {
 }
 
 float64 dn_time_metric_t::get_last() {
-	if (queue.size) return *rb_back(&queue);
+	if (queue.size) return *dn_ring_buffer_back(&queue);
 	return 0;
 }
 
 double dn_time_metric_t::get_largest() {
 	double max_entry = 0;
-	rb_for(queue, entry) {
+	dn_ring_buffer_for(queue, entry) {
 		max_entry = std::max(max_entry, **entry);
 	}
 
@@ -84,7 +84,7 @@ double dn_time_metric_t::get_largest() {
 
 double dn_time_metric_t::get_smallest() {
 	double min_entry = std::numeric_limits<double>::max();
-	rb_for(queue, entry) {
+	dn_ring_buffer_for(queue, entry) {
 		min_entry = std::min(min_entry, **entry);
 	}
 
