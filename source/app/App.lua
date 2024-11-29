@@ -102,6 +102,9 @@ function App:on_init_game()
         }
       }
     }),
+    steam = SteamConfig:new({
+      app_id = 480
+    })
   })
 
   tdengine.ffi.dn_app_configure(dn_config)

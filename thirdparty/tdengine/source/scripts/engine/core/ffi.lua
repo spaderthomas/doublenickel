@@ -988,7 +988,11 @@ function GpuConfig:init(params)
   for i = 0, self.num_render_targets - 1 do
     self.render_targets[i] = GpuRenderTargetDescriptor:new(params.render_targets[i + 1])
   end
+end
 
+SteamConfig = tdengine.class.metatype('dn_steam_config_t')
+function SteamConfig:init(params)
+  self.app_id = params.app_id
 end
 
 AppConfig = tdengine.class.metatype('dn_app_config_t')
@@ -998,6 +1002,7 @@ function AppConfig:init(params)
   self.font = params.font or tdengine.ffi.dn_font_config_default()
   self.gpu = params.gpu or ffi.new('dn_gpu_config_t')
   self.asset = params.asset or ffi.new('dn_asset_config_t')
+  self.steam = params.steam or ffi.new('dn_steam_config_t')
   self.target_fps = params.target_fps or 60
 end
 

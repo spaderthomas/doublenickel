@@ -107,16 +107,18 @@
 #include "source/utils/string.hpp"
 
 
-#include "source/particle.cpp"
-#include "source/text.cpp"
 #include "source/utils/memory.cpp"
 #include "source/utils/file_monitor.cpp"
 #include "source/utils/array.cpp"
-#include "source/action.cpp" // HALF
-#include "source/background.cpp" // INVERT (I need something to load large images though, in general)
+#include "source/text.cpp"
 #include "source/draw.cpp"
+#include "source/background.cpp" // INVERT (I need something to load large images though, in general)
 #include "source/image.cpp" // HALF (Screenshots should be reworked, probably? I'm referencing a named path when I initialize)
 #include "source/fluid.cpp" // GAME
+#include "source/action.cpp" // HALF
+
+// I should probably nuke this, because the particle system should be a GPU implementation
+#include "source/particle.cpp"
 
 int dn_main(dn_app_descriptor_t app) {
   dn_allocators_init();
