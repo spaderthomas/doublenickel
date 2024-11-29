@@ -47,7 +47,7 @@ void dn_noise_init() {
 
 	auto rx = static_cast<u32>(window.native_resolution.x);
 	auto ry = static_cast<u32>(window.native_resolution.y);
-	auto data = bump_allocator.alloc<u32>(rx * ry);
+	auto data = dn_allocators.bump.alloc<u32>(rx * ry);
 
 	for (int x = 0; x < rx; x++) {
 		for (int y = 0; y < ry; y++) {

@@ -43,7 +43,7 @@ void dn_paths_add_subpath(const char* name, const char* parent_name, const char*
   if (!relative_path) return;
   
   auto parent_path = dn_paths_resolve(parent_name);
-  auto absolute_path = bump_allocator.alloc_path();
+  auto absolute_path = dn_allocators.bump.alloc_path();
   snprintf(absolute_path, DN_MAX_PATH_LEN, "%s/%s", parent_path, relative_path);
   
   dn_paths_add_ex(name, absolute_path);
@@ -62,11 +62,11 @@ void dn_paths_add_write_subpath(const char* name, const char* relative_path) {
 }
 
 dn_tstring_t dn_paths_strip(const char* name, const char* absolute_path) {
-  auto named_path = dn_paths_resolve_ex(name, &bump_allocator);
+  auto named_path = dn_paths_resolve_ex(name, &dn_allocators.bump);
   auto named_path_len = strlen(named_path);
   auto absolute_path_len = strlen(absolute_path);
   
-  auto stripped_path = dn_string_copy(absolute_path, absolute_path_len, &bump_allocator);
+  auto stripped_path = dn_string_copy(absolute_path, absolute_path_len, &dn_allocators.bump);
   
   u32 num_strip_chars = std::min(named_path_len, absolute_path_len);
   u32 num_stripped = 0;
@@ -79,7 +79,7 @@ dn_tstring_t dn_paths_strip(const char* name, const char* absolute_path) {
 }
 
 dn_tstring_t dn_paths_resolve(const char* name) {
-  return dn_paths_resolve_ex(name, &bump_allocator);
+  return dn_paths_resolve_ex(name, &dn_allocators.bump);
 }
 
 char* dn_paths_resolve_ex(const char* name, dn_allocator_t* allocator) {
@@ -95,7 +95,7 @@ char* dn_paths_resolve_ex(const char* name, dn_allocator_t* allocator) {
 }
 
 dn_tstring_t dn_paths_resolve_format(const char* name, const char* file_name) {
-  return dn_paths_resolve_format_ex(name, file_name, &bump_allocator);
+  return dn_paths_resolve_format_ex(name, file_name, &dn_allocators.bump);
 }
 
 char* dn_paths_resolve_format_ex(const char* name, const char* file_name, dn_allocator_t* allocator) {
@@ -116,12 +116,12 @@ char* dn_paths_resolve_format_ex(const char* name, const char* file_name, dn_all
 
 dn_named_path_result_t dn_paths_find_all() {
   Array<dn_named_path_t> collected_paths;
-  arr_init(&collected_paths, named_paths.size(), &bump_allocator);
+  arr_init(&collected_paths, named_paths.size(), &dn_allocators.bump);
 
   for (auto& [name, path] : named_paths) {
     auto collected_path = arr_push(&collected_paths);
-    collected_path->name = dn_string_copy(name, &bump_allocator);
-    collected_path->path = dn_string_copy(path, &bump_allocator);
+    collected_path->name = dn_string_copy(name, &dn_allocators.bump);
+    collected_path->path = dn_string_copy(path, &dn_allocators.bump);
   }
 
   return {
@@ -131,7 +131,7 @@ dn_named_path_result_t dn_paths_find_all() {
 }
 
 dn_tstring_t build_path(const char* relative_path) {
-  auto executable_file = bump_allocator.alloc_path();
+  auto executable_file = dn_allocators.bump.alloc_path();
   GetModuleFileNameA(NULL, executable_file, DN_MAX_PATH_LEN);
 
   std::error_code error;
@@ -140,7 +140,7 @@ dn_tstring_t build_path(const char* relative_path) {
   auto canonical_path = std::filesystem::canonical(executable_dir, error);
   auto canonical_dir = canonical_path.string();
 
-  auto normalized_dir = dn_string_copy(canonical_dir, &bump_allocator);
+  auto normalized_dir = dn_string_copy(canonical_dir, &dn_allocators.bump);
   for (u32 i = 0; i < canonical_dir.size(); i++) {
     if (normalized_dir[i] == '\\') {
       normalized_dir[i] = '/';
@@ -160,7 +160,7 @@ void set_write_path() {
 #if defined(FM_EDITOR)
   dn_paths_add_ex("write", build_path(dn_app.write_path));
 #else
-  auto appdata_dir = bump_allocator.alloc_path();
+  auto appdata_dir = dn_allocators.bump.alloc_path();
 
   // In release mode, we have to write to an OS-approved directory. 
   SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, appdata_dir);

@@ -8,7 +8,7 @@ float64 file_mod_time(const char* file_path) {
 }
 
 dn_tstring_t strip_extension(const char* file_name) {
-	auto stripped = dn_string_copy(file_name, &bump_allocator);
+	auto stripped = dn_string_copy(file_name, &dn_allocators.bump);
 	
 	auto length = strlen(stripped);
 	auto period = length;

@@ -38,7 +38,7 @@ DN_API char*       dn_string_to_cstr(dn_string_t str, dn_allocator_t* allocator)
 
 #ifdef DN_STRING_IMPLEMENTATION
 char* dn_string_copy(const char* str, u32 length, dn_allocator_t* allocator) {
-  if (!allocator) allocator = &standard_allocator;
+  if (!allocator) allocator = &dn_allocators.standard;
 
   auto buffer_length = length + 1;
   auto copy = allocator->alloc<char>(buffer_length);

@@ -42,13 +42,16 @@ struct dn_bump_allocator_t : dn_allocator_t {
 	void init(u32 size);
 	void clear();
 };
-dn_bump_allocator_t bump_allocator;
 
 struct dn_standard_allocator_t : dn_allocator_t {
 	void init();
 };
 
-dn_standard_allocator_t standard_allocator;
+typedef struct {
+	dn_standard_allocator_t standard;
+	dn_bump_allocator_t bump;
+} dn_allocators_t;
+dn_allocators_t dn_allocators;
 
 DN_API void             dn_allocator_add(const char* name, dn_allocator_t* allocator);
 DN_API dn_allocator_t*  dn_allocator_find(const char* name);

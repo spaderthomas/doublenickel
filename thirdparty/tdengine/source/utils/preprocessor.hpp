@@ -32,14 +32,14 @@ void dn_preprocess(dn_preprocessor_context_t* context) {
 
   fseek(context->file, 0, SEEK_END);
   context->file_data.len = ftell(context->file);
-  context->file_data.data = bump_allocator.alloc<u8>(context->file_data.len + 1);
+  context->file_data.data = dn_allocators.bump.alloc<u8>(context->file_data.len + 1);
   char* file_data = (char*)context->file_data.data;
 
   fseek(context->file, 0, SEEK_SET);
   fread(file_data, 1, context->file_data.len, context->file);
   fclose(context->file);
 
-  char* temp = bump_allocator.alloc<char>(4096);
+  char* temp = dn_allocators.bump.alloc<char>(4096);
 
 
   char* str = reinterpret_cast<char*>(context->file_data.data);
@@ -55,7 +55,7 @@ void dn_preprocess(dn_preprocessor_context_t* context) {
       for (u32 dir_index = 0; dir_index < context->include_dirs.count; dir_index++) {
         dn_string_builder_t builder = { 
             .buffer = {0}, 
-            .allocator = &bump_allocator 
+            .allocator = &dn_allocators.bump 
         };
 
         dn_string_builder_append_cstr(&builder, context->include_dirs.data[dir_index]);

@@ -49,7 +49,7 @@ char* dn_allocator_t::alloc_path() {
 // BUMP ALLOCATOR //
 ////////////////////
 void dn_bump_allocator_t::init(u32 capacity) {
-	this->buffer = standard_allocator.alloc<u8>(capacity);
+	this->buffer = dn_allocators.standard.alloc<u8>(capacity);
 	this->capacity = capacity;
 	
 	on_alloc = [this](dn_allocator_mode_t mode, u32 size, void* old_memory) -> void* {
@@ -159,13 +159,13 @@ void dn_allocator_free(dn_allocator_t* allocator, void* buffer) {
 
 // ENGINE
 void dn_allocators_init() {
-	standard_allocator.init();
-	bump_allocator.init(50 * 1024 * 1024);
+	dn_allocators.standard.init();
+	dn_allocators.bump.init(50 * 1024 * 1024);
 
-	dn_allocator_add("bump", &bump_allocator);
-	dn_allocator_add("standard", &standard_allocator);
+	dn_allocator_add("bump", &dn_allocators.bump);
+	dn_allocator_add("standard", &dn_allocators.standard);
 }
 
 void dn_allocators_update() {
-	bump_allocator.clear();
+	dn_allocators.bump.clear();
 }

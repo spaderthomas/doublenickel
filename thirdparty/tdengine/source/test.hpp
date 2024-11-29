@@ -157,18 +157,18 @@ void test_generational_arena() {
 	}
 }
 
-void test_bump_allocator() {
-	dn_allocator_t* allocator = &bump_allocator;
+void test_dn_allocators.bump() {
+	dn_allocator_t* allocator = &dn_allocators.bump;
 
 	auto memory_block = (u32*)dn_allocator_alloc(allocator, sizeof(u32) * 8);
 	memory_block[0] = 69;
 	memory_block[7] = 420;
-	assert(bump_allocator.allocations[0] == sizeof(u32) * 8);
+	assert(dn_allocators.bump.allocations[0] == sizeof(u32) * 8);
 
 	memory_block = (u32*)dn_allocator_realloc(allocator, memory_block, sizeof(u32) * 16);
 	assert(memory_block[0] == 69);
 	assert(memory_block[7] == 420);
-	assert(bump_allocator.allocations[sizeof(u32) * 8] == sizeof(u32) * 16);
+	assert(dn_allocators.bump.allocations[sizeof(u32) * 8] == sizeof(u32) * 16);
 }
 void test_dyn_array() {
 	auto array = dn_dynamic_array_create_t<u32>(dn_allocator_find("bump"));
@@ -191,7 +191,7 @@ void test_dyn_array() {
 }
 
 void run_tests() {
-	test_bump_allocator();
+	test_dn_allocators.bump();
 	test_dyn_array();
 	test_generational_arena();
 	test_convert_mag();

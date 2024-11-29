@@ -424,10 +424,10 @@ void TextureAtlas::write_to_config() {
 }
 
 void TextureAtlas::write_to_png() {
-  auto file_path = dn_paths_resolve_format_ex("dn_atlas", name, &standard_allocator);
+  auto file_path = dn_paths_resolve_format_ex("dn_atlas", name, &dn_allocators.standard);
   stbi_write_png(file_path, TEXTURE_ATLAS_SIZE, TEXTURE_ATLAS_SIZE, 4, buffer.data, 0);
   
-  standard_allocator.free(file_path);
+  dn_allocators.standard.free(file_path);
 }
 
 void TextureAtlas::load_to_gpu() {
@@ -537,7 +537,7 @@ void init_texture_atlas() {
       DEFER_POP(l);
 
       auto subdirectory = lua_tostring(l, -1);
-      auto directory = dn_paths_resolve_format_ex("dn_image", subdirectory, &standard_allocator);
+      auto directory = dn_paths_resolve_format_ex("dn_image", subdirectory, &dn_allocators.standard);
       arr_push(&atlas->directories, directory);
       atlas->file_monitor->add_directory(directory);
     }

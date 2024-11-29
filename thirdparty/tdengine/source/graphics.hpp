@@ -462,7 +462,7 @@ void dn_gpu_init(dn_gpu_config_t config) {
   arr_init(&dn_gpu.gpu_buffers);
   arr_init(&dn_gpu.targets);
   arr_init(&dn_gpu.shaders);
-  dn_fixed_array_init_t(&dn_gpu.search_paths, &standard_allocator);
+  dn_fixed_array_init_t(&dn_gpu.search_paths, &dn_allocators.standard);
 
   auto swapchain = arr_push(&dn_gpu.targets);
   swapchain->handle = 0;
@@ -882,14 +882,14 @@ void dn_gpu_buffer_sync_subdata(dn_gpu_buffer_t* buffer, void* data, u32 byte_si
 }
 
 void dn_gpu_buffer_zero(dn_gpu_buffer_t* buffer, u32 size) {
-  auto data = bump_allocator.alloc<u8>(size);
+  auto data = dn_allocators.bump.alloc<u8>(size);
   dn_gpu_buffer_sync(buffer, data, size);
 }
 
 dn_gpu_backed_buffer_t dn_gpu_backed_buffer_create(dn_gpu_buffer_descriptor_t descriptor) {
   dn_gpu_backed_buffer_t backed_buffer;
   backed_buffer.gpu_buffer = dn_gpu_buffer_create(descriptor);
-  dn_fixed_array_init(&backed_buffer.buffer, descriptor.capacity, descriptor.element_size, &standard_allocator);
+  dn_fixed_array_init(&backed_buffer.buffer, descriptor.capacity, descriptor.element_size, &dn_allocators.standard);
   return backed_buffer;
 }
 
@@ -938,8 +938,8 @@ dn_gpu_shader_t* dn_gpu_shader_find(const char* name) {
 // SHADER LOADING //
 ////////////////////
 dn_tstring_t build_shader_source(const char* file_path) {
-  auto shader_file = dn_string_copy(file_path, &bump_allocator);
-  auto error = bump_allocator.alloc<char>(256);
+  auto shader_file = dn_string_copy(file_path, &dn_allocators.bump);
+  auto error = dn_allocators.bump.alloc<char>(256);
   
   dn_preprocessor_context_t context = {
     .file_path = file_path,
@@ -952,10 +952,10 @@ dn_tstring_t build_shader_source(const char* file_path) {
 
   if (!context.result) {
     dn_log("shader preprocessor error; shader = %s, err = %s", shader_file, context.error);
-    return dn_string_copy("YOUR_SHADER_FAILED_TO_COMPILE", &bump_allocator);
+    return dn_string_copy("YOUR_SHADER_FAILED_TO_COMPILE", &dn_allocators.bump);
   }
   
-  auto source = dn_string_copy(context.result, &bump_allocator);
+  auto source = dn_string_copy(context.result, &dn_allocators.bump);
   
   return source;
 }
@@ -966,7 +966,7 @@ void check_shader_compilation(u32 shader, const char* file_path) {
   glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
   if (!success) {
     static constexpr u32 error_size = 512;
-    auto compilation_status = bump_allocator.alloc<char>(error_size);
+    auto compilation_status = dn_allocators.bump.alloc<char>(error_size);
     
     glGetShaderInfoLog(shader, error_size, NULL, compilation_status);
 
@@ -980,7 +980,7 @@ void check_shader_linkage(u32 program, const char* file_path) {
   glGetProgramiv(program, GL_LINK_STATUS, &success);
   if (!success) {
     static constexpr u32 error_size = 512;
-    auto compilation_status = bump_allocator.alloc<char>(error_size);
+    auto compilation_status = dn_allocators.bump.alloc<char>(error_size);
     
     glGetProgramInfoLog(program, error_size, NULL, compilation_status);
     dn_log("shader link error; shader = %s, err = %s", file_path, compilation_status);
@@ -1322,16 +1322,16 @@ void dn_gpu_error_clear() {
 dn_tstring_t dn_gpu_error_read() {
   auto error = glGetError();
   if (error == GL_INVALID_ENUM) {
-    return dn_string_copy("GL_INVALID_ENUM", &bump_allocator);
+    return dn_string_copy("GL_INVALID_ENUM", &dn_allocators.bump);
   }
   else if (error == GL_INVALID_OPERATION) {
-    return dn_string_copy("GL_INVALID_OPERATION", &bump_allocator);
+    return dn_string_copy("GL_INVALID_OPERATION", &dn_allocators.bump);
   }
   else if (error == GL_OUT_OF_MEMORY) {
-    return dn_string_copy("GL_OUT_OF_MEMORY", &bump_allocator);
+    return dn_string_copy("GL_OUT_OF_MEMORY", &dn_allocators.bump);
   }
   else if (error == GL_NO_ERROR) {
-    return dn_string_copy("GL_NO_ERROR", &bump_allocator);
+    return dn_string_copy("GL_NO_ERROR", &dn_allocators.bump);
   }
 
   return nullptr;

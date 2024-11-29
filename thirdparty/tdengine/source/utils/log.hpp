@@ -24,7 +24,7 @@ DN_IMP void dn_log_zero();
 #ifdef DN_LOG_IMPLEMENTATION
 void dn_log_init() {
 	dn_logger = dn_zero_initialize();
-	dn_logger.file_path = dn_paths_resolve_ex("log", &standard_allocator);
+	dn_logger.file_path = dn_paths_resolve_ex("log", &dn_allocators.standard);
 	
 	FILE* file = fopen(dn_logger.file_path, "w");
 	if (!file) {

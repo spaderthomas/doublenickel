@@ -80,7 +80,7 @@ void dn_imgui_update() {
   if (dn_imgui.layout_to_load) {
     ImGui::LoadIniSettingsFromDisk(dn_imgui.layout_to_load);
 
-    standard_allocator.free(dn_imgui.layout_to_load); 
+    dn_allocators.standard.free(dn_imgui.layout_to_load); 
     dn_imgui.layout_to_load = nullptr;
   }
   
@@ -136,7 +136,7 @@ void dn_imgui_load_colors(dn_imgui_colors_t colors) {
 
 void dn_imgui_load_layout(const char* file_name) {
   dn_log("%s: %s", __func__, file_name);
-  dn_imgui.layout_to_load = dn_paths_resolve_format_ex("layout", file_name, &standard_allocator);
+  dn_imgui.layout_to_load = dn_paths_resolve_format_ex("layout", file_name, &dn_allocators.standard);
 }
 
 void dn_imgui_save_layout(const char* file_name) {
@@ -186,6 +186,6 @@ dn_tstring_t dn_imgui_file_browser_get_selected_file() {
   std::string selected = dn_imgui_file_browser.GetSelected().string();
   dn_imgui_file_browser.ClearSelected();
 
-  return dn_string_copy(selected, &bump_allocator);
+  return dn_string_copy(selected, &dn_allocators.bump);
 }
 #endif

@@ -9,8 +9,8 @@ void init_actions() {
 		return;
 	}
 
-	steam_input.actions = standard_allocator.alloc_array<Action>(SteamInputManager::MAX_ACTIONS);
-	steam_input.action_sets = standard_allocator.alloc_array<ActionSet>(SteamInputManager::MAX_ACTION_SETS);
+	steam_input.actions = dn_allocators.standard.alloc_array<Action>(SteamInputManager::MAX_ACTIONS);
+	steam_input.action_sets = dn_allocators.standard.alloc_array<ActionSet>(SteamInputManager::MAX_ACTION_SETS);
 
 	steam_input.poll_for_inputs();
 	steam_input.poll_for_controllers();
@@ -98,7 +98,7 @@ void SteamInputManager::poll_for_inputs() {
 void SteamInputManager::poll_for_controllers() {
 	if (!dn_steam_initialized()) return;
 
-	auto controllers = bump_allocator.alloc_array<InputHandle_t>(STEAM_INPUT_MAX_COUNT);
+	auto controllers = dn_allocators.bump.alloc_array<InputHandle_t>(STEAM_INPUT_MAX_COUNT);
 	controllers.size = SteamInput()->GetConnectedControllers(controllers.data);
 
 	auto last_controller = controller;
@@ -142,7 +142,7 @@ void SteamInputManager::poll_for_controllers() {
 }
 
 void SteamInputManager::load_controller_glyphs() {
-	auto origins = bump_allocator.alloc_array<EInputActionOrigin>(STEAM_INPUT_MAX_COUNT);
+	auto origins = dn_allocators.bump.alloc_array<EInputActionOrigin>(STEAM_INPUT_MAX_COUNT);
 		
 	arr_for(actions, action) {
 		arr_clear(&origins);
@@ -244,7 +244,7 @@ dn_tstring_t SteamInputManager::get_controller_name(Steam::Controller controller
 		name = "A Seriously Unknown Controller";
 	}
 
-	return dn_string_copy(name, &bump_allocator);
+	return dn_string_copy(name, &dn_allocators.bump);
 }
 
 bool SteamInputManager::update_cooldown_hack() {

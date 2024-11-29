@@ -118,10 +118,10 @@ void dn_lua_init_game() {
   // Lua itself has been initialized, and we've loaded in other assets our scripts
   // may use (shaders, fonts, etc). The last step is to load the game scripts and
   // configure the game itself through Lua
-  arr_push(&dn_lua.script_dirs, dn_paths_resolve_ex("engine_components", &standard_allocator));
-  arr_push(&dn_lua.script_dirs, dn_paths_resolve_ex("engine_editor", &standard_allocator));
-  arr_push(&dn_lua.script_dirs, dn_paths_resolve_ex("engine_entities", &standard_allocator));
-  arr_push(&dn_lua.script_dirs, dn_paths_resolve_ex("app", &standard_allocator));
+  arr_push(&dn_lua.script_dirs, dn_paths_resolve_ex("engine_components", &dn_allocators.standard));
+  arr_push(&dn_lua.script_dirs, dn_paths_resolve_ex("engine_editor", &dn_allocators.standard));
+  arr_push(&dn_lua.script_dirs, dn_paths_resolve_ex("engine_entities", &dn_allocators.standard));
+  arr_push(&dn_lua.script_dirs, dn_paths_resolve_ex("app", &dn_allocators.standard));
 
   arr_for(dn_lua.script_dirs, directory) {
     dn_lua_script_dir(*directory);
@@ -273,7 +273,7 @@ void dn_lua_script_dir(const char* path) {
     entry->occupied = true;
 
     auto dir_path = it->path().string();
-    entry->path = dn_string_copy(dir_path, &bump_allocator);
+    entry->path = dn_string_copy(dir_path, &dn_allocators.bump);
     normalize_path(entry->path);
 
     entry->is_regular_file = dn_os_is_regular_file(entry->path);
@@ -353,7 +353,7 @@ void dn_lua_dump_stack () {
 }
 
 void dn_lua_add_dir(const char* directory) {
-  auto copy = dn_string_copy(directory, &standard_allocator);
+  auto copy = dn_string_copy(directory, &dn_allocators.standard);
   arr_push(&dn_lua.script_dirs, copy);
 }
 #endif

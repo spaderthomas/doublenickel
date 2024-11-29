@@ -22,12 +22,12 @@ fm_error arr_init(Array<T, N>* array, u64 capacity, dn_allocator_t* allocator) {
 
 template<typename T, u64 N>
 fm_error arr_init(Array<T, N>* array, u64 capacity) {
-	return arr_init(array, capacity, &standard_allocator);
+	return arr_init(array, capacity, &dn_allocators.standard);
 }
 
 template<typename T, u64 N>
 fm_error arr_init(Array<T, N>* array, u64 capacity, T fill) {
-	auto error = arr_init(array, capacity, &standard_allocator);
+	auto error = arr_init(array, capacity, &dn_allocators.standard);
 	if (error) return error;
 	
 	arr_fill(array, T());
@@ -36,7 +36,7 @@ fm_error arr_init(Array<T, N>* array, u64 capacity, T fill) {
 
 template<typename T, u64 N>
 fm_error arr_init(Array<T, N>* array) {
-	return arr_init(array, &standard_allocator);
+	return arr_init(array, &dn_allocators.standard);
 }
 
 template<typename T, u64 N>

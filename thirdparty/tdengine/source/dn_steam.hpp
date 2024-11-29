@@ -92,7 +92,7 @@ void dn_steam_callbacks_t::on_dismiss_text_input(GamepadTextInputDismissed_t* ca
 
   dn_steam.text_input.state = DN_STEAM_INPUT_TEXT_UNREAD;
   dn_steam.text_input.contents.len = len;
-  dn_steam.text_input.contents.data = standard_allocator.alloc<u8>(len);
+  dn_steam.text_input.contents.data = dn_allocators.standard.alloc<u8>(len);
 
   bool success = SteamUtils()->GetEnteredGamepadTextInput((char*)dn_steam.text_input.contents.data, len);
   if (!success) {
@@ -106,7 +106,7 @@ void dn_steam_callbacks_t::on_dismiss_text_input(GamepadTextInputDismissed_t* ca
 
    dn_string_builder_t builder = {
      .buffer = dn_zero_initialize(),
-     .allocator = &bump_allocator,
+     .allocator = &dn_allocators.bump,
    };
    dn_string_builder_append_cstr(&builder, "https://store.steampowered.com/app/");
    dn_string_builder_append_fmt(&builder, dn_string_literal("%d"), dn_steam.app_id);
@@ -117,7 +117,7 @@ void dn_steam_callbacks_t::on_dismiss_text_input(GamepadTextInputDismissed_t* ca
   
    dn_string_builder_t builder = {
      .buffer = dn_zero_initialize(),
-     .allocator = &bump_allocator
+     .allocator = &dn_allocators.bump
    };
    dn_string_builder_append_cstr(&builder, "https://store.steampowered.com/app/");
    dn_string_builder_append_fmt(&builder,dn_string_literal("%d"), dn_steam.app_id);
@@ -128,12 +128,12 @@ void dn_steam_callbacks_t::on_dismiss_text_input(GamepadTextInputDismissed_t* ca
   DN_UNTESTED();
 
   if (dn_steam_initialized()) {
-    SteamFriends()->ActivateGameOverlayToWebPage(dn_string_to_cstr(url, &bump_allocator));
+    SteamFriends()->ActivateGameOverlayToWebPage(dn_string_to_cstr(url, &dn_allocators.bump));
   }
   else {
     dn_string_builder_t builder = {
       .buffer = dn_zero_initialize(),
-      .allocator = &bump_allocator
+      .allocator = &dn_allocators.bump
     };
     dn_string_builder_append_cstr(&builder, "start ");
     dn_string_builder_append(&builder, url);
