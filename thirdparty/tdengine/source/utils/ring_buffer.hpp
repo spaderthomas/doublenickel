@@ -42,7 +42,7 @@ T* rb_at(RingBuffer<T>* buffer, int32 index) {
 
 template<typename T>
 T* rb_back(RingBuffer<T>* buffer) {
-	fm_assert(buffer->size);
+	DN_ASSERT(buffer->size);
 	return (*buffer)[buffer->size - 1];
 }
 
@@ -55,7 +55,7 @@ int32 rb_index_of(RingBuffer<T>* buffer, T* element) {
 
 template<typename T>
 T* rb_push(RingBuffer<T>* buffer, T data) {
-	fm_assert(buffer->size < buffer->capacity &&
+	DN_ASSERT(buffer->size < buffer->capacity &&
 			  "Insufficient space remaining!");
 	auto index = (buffer->head + buffer->size) % buffer->capacity;
 	buffer->data[index] = data;
@@ -65,7 +65,7 @@ T* rb_push(RingBuffer<T>* buffer, T data) {
 
 template<typename T>
 T* rb_push(RingBuffer<T>* buffer) {
-	fm_assert(buffer->size < buffer->capacity &&
+	DN_ASSERT(buffer->size < buffer->capacity &&
 			  "Insufficient space remaining!");
 	auto index = (buffer->head + buffer->size) % buffer->capacity;
 	buffer->data[index] = T();
@@ -87,7 +87,7 @@ T* rb_push_overwrite(RingBuffer<T>* buffer, T data) {
 
 template<typename T>
 T rb_pop(RingBuffer<T>* buffer) {
-	fm_assert(buffer->size);
+	DN_ASSERT(buffer->size);
 	auto element = buffer->data[buffer->head];
 	buffer->head = (buffer->head + 1) % buffer->capacity;
 	buffer->size--;
@@ -98,9 +98,9 @@ template<typename T>
 RingBuffer<T> rb_slice(RingBuffer<T>* buffer, int32 index, int32 size) {
 	// No need to make any bounds checks if it's an empty slice
 	if (size) {
-		fm_assert(size  <= buffer->size);
-		fm_assert(index <  buffer->size); 
-		fm_assert(index >= 0);
+		DN_ASSERT(size  <= buffer->size);
+		DN_ASSERT(index <  buffer->size); 
+		DN_ASSERT(index >= 0);
 	}
 	
 	RingBuffer<T> slice;
@@ -119,7 +119,7 @@ RingBuffer<T> rb_slice(RingBuffer<T>* buffer, int32 size) {
 
 template<typename T>
 RingBuffer<T> rb_rslice(RingBuffer<T>* buffer, int32 size) {
-	fm_assert(size  <= buffer->size);
+	DN_ASSERT(size  <= buffer->size);
 	
 	RingBuffer<T> slice;
 	slice.data = buffer->data;
@@ -169,12 +169,12 @@ struct RingBufferIterator {
 	}
 	
 	void operator++(int32) {
-		fm_assert(index < buffer->size);
+		DN_ASSERT(index < buffer->size);
 		index++;
 	}
 
 	void operator--(int32) {
-		fm_assert(index >= 0);
+		DN_ASSERT(index >= 0);
 		index--;
 	}
 

@@ -8,7 +8,7 @@ struct Array {
 	u64 capacity  = 0;
 	T* data         = nullptr;
 
-	T* operator[](u64 index) { fm_assert(index < size); return data + index; }
+	T* operator[](u64 index) { DN_ASSERT(index < size); return data + index; }
 	operator bool() { return data; }
 };
 
@@ -134,7 +134,7 @@ struct ArrayView {
 	T* data         = nullptr;
 
 	// @spader could make this const correct, whatever
-	T* operator[](u64 index) { fm_assert(index < size); return data + index; }
+	T* operator[](u64 index) { DN_ASSERT(index < size); return data + index; }
 };
 
 template<typename T>

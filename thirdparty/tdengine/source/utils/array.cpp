@@ -79,7 +79,7 @@ void arr_fill(Array<T, N>* array, u64 offset, u64 count, T element) {
 
 template<typename T, u64 N>
 Array<T, N> arr_stack(T* data, u64 capacity) {
-	fm_assert(data);
+	DN_ASSERT(data);
 
 	Array<T, N> array;
 	array.size = 0;
@@ -99,8 +99,8 @@ Array<T, N> arr_stack(T (&c_array)[N]) {
 
 template<typename T, u64 N>
 Array<T, N> arr_slice(Array<T, N>* array, u64 index, u64 size) {
-	fm_assert(index >= 0);
-	fm_assert(index + size <= array->capacity);
+	DN_ASSERT(index >= 0);
+	DN_ASSERT(index + size <= array->capacity);
 	
 	Array<T, N> view;
 	view.size = size;
@@ -132,8 +132,8 @@ Array<T, N> arr_slice(T (&data)[N]) {
 template<typename T, u64 N>
 u32 arr_indexof(Array<T, N>* array, T* element) {
 	u32 index = element - array->data;
-	fm_assert(index >= 0);
-	fm_assert(index < array->size);
+	DN_ASSERT(index >= 0);
+	DN_ASSERT(index < array->size);
 	return index;
 }
 
@@ -208,14 +208,14 @@ T* arr_push(Array<T, N>* array) {
 
 template<typename T, u64 N>
 void arr_pop(Array<T, N>* array) {
-	fm_assert(array->size && "cannot pop / what has not / been pushed");
+	DN_ASSERT(array->size && "cannot pop / what has not / been pushed");
 	array->size -= 1;
 	return;
 }
 
 template<typename T, u64 N>
 T* arr_reserve(Array<T, N>* array, u64 count) {
-	fm_assert(array->size <= array->capacity + count && "Insufficient space remaining!");
+	DN_ASSERT(array->size <= array->capacity + count && "Insufficient space remaining!");
 	T* out = array->data + array->size;
 	array->size += count;
 	return out;
@@ -224,7 +224,7 @@ T* arr_reserve(Array<T, N>* array, u64 count) {
 
 template<typename T, u64 N>
 T* arr_concat(Array<T, N>* dest, Array<T, N>* source) {
-	fm_assert(dest->size + source->size < dest->capacity);
+	DN_ASSERT(dest->size + source->size < dest->capacity);
 	memcpy(dest->data + dest->size, source->data, sizeof(T) * source->count);
 	T* out = dest->data + dest->size;
 	dest->size += source->size;
@@ -233,7 +233,7 @@ T* arr_concat(Array<T, N>* dest, Array<T, N>* source) {
 
 template<typename T, u64 N>
 T* arr_concat(Array<T, N>* dest, Array<T, N>* source, u64 count) {
-	fm_assert(dest->size + count < dest->capacity);
+	DN_ASSERT(dest->size + count < dest->capacity);
 	memcpy(dest->data + dest->size, source->data, sizeof(T) * count);
 	T* out = dest->data + dest->size;
 	dest->size += count;
@@ -249,7 +249,7 @@ T* arr_back(Array<T, N>* array) {
 
 template<typename T, u64 N>
 T* arr_next(Array<T, N>* array) {
-	fm_assert(array->size != array->capacity);
+	DN_ASSERT(array->size != array->capacity);
 	return array->data + (array->size);
 }
 
@@ -304,8 +304,8 @@ ArrayView<T> arr_view(Array<T>* array) {
 
 template<typename T>
 ArrayView<T> arr_view(Array<T>* array, u64 index, u64 count) {
-	fm_assert(index >= 0);
-	fm_assert(index + count <= array->capacity);
+	DN_ASSERT(index >= 0);
+	DN_ASSERT(index + count <= array->capacity);
 
 	ArrayView<T> view;
 	view.size = count;
@@ -329,8 +329,8 @@ ArrayView<T> arr_view(T (&array)[N]) {
 template<typename T>
 i32 arr_indexof(ArrayView<T>* array, T* element) {
 	i32 index = element - array->data;
-	fm_assert(index >= 0);
-	fm_assert(index < array->size);
+	DN_ASSERT(index >= 0);
+	DN_ASSERT(index < array->size);
 	return index;
 }
 

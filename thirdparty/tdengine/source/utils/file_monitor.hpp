@@ -145,7 +145,7 @@ bool FileMonitor::add_file(const char* file_path) {
 }
 
 void FileMonitor::issue_one_read(DirectoryInfo* info) {
-	fm_assert(info->handle != INVALID_HANDLE_VALUE);
+	DN_ASSERT(info->handle != INVALID_HANDLE_VALUE);
 
 	int32 notify_filter = 0;
 	if (this->events_to_watch & (DN_FILE_CHANGE_EVENT_ADDED | DN_FILE_CHANGE_EVENT_REMOVED)) {
@@ -163,7 +163,7 @@ void FileMonitor::issue_one_read(DirectoryInfo* info) {
 
 void FileMonitor::process_changes() {
 	arr_for(this->directory_infos, info) {
-		fm_assert(info->handle != INVALID_HANDLE_VALUE);
+		DN_ASSERT(info->handle != INVALID_HANDLE_VALUE);
 
 		if (!HasOverlappedIoCompleted(&info->overlapped)) continue;
 

@@ -17,8 +17,8 @@ bool fm_floateq(float a, float b) {
 }
 
 float32 fm_lerp(float32 a, float32 b, float32 t) {
-  fm_assert(t >= 0.f);
-  fm_assert(t <= 1.f);
+  DN_ASSERT(t >= 0.f);
+  DN_ASSERT(t <= 1.f);
 
   return (a * (1 - t)) + (b * t);
 }

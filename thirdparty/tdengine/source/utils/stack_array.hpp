@@ -10,9 +10,9 @@ struct StackArray {
 	
 	void push(T element) {
 		if (size >= N) {
-			fm_assert(!"Overrunning stack array");
+			DN_ASSERT(!"Overrunning stack array");
 		}
-		fm_assert(size < N);
+		DN_ASSERT(size < N);
 		data[size++] = element;
 	}
 

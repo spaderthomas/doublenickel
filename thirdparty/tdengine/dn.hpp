@@ -3,7 +3,6 @@
 #include "external/include/libs.hpp"
 
 #include "source/utils/types.hpp"
-#include "source/utils/assert.hpp"
 #include "source/utils/macros.hpp"
 #include "source/utils/path.hpp"
 #include "source/utils/log.hpp"
