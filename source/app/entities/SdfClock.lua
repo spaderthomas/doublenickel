@@ -67,6 +67,12 @@ function SdfClock:init_bubbles()
 end
 
 function SdfClock:draw()
+
+  self.colors = {
+    face = tdengine.colors.white,
+    border = tdengine.colors.white,
+  }
+
   self.accumulated = self.accumulated + tdengine.dt * self.speed
   while self.accumulated >= 1.0 do
     self.accumulated = self.accumulated - 1.0

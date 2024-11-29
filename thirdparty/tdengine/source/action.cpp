@@ -1,5 +1,5 @@
 void init_actions() {
-	if (!engine.steam) return;
+	if (!dn_steam_initialized()) return;
 	
 	steam_input.steam = SteamInput();
 	
@@ -96,7 +96,7 @@ void SteamInputManager::poll_for_inputs() {
 }
 
 void SteamInputManager::poll_for_controllers() {
-	if (!engine.steam) return;
+	if (!dn_steam_initialized()) return;
 
 	auto controllers = bump_allocator.alloc_array<InputHandle_t>(STEAM_INPUT_MAX_COUNT);
 	controllers.size = SteamInput()->GetConnectedControllers(controllers.data);
@@ -209,7 +209,7 @@ Action* SteamInputManager::find_action(const char* name) {
 	return nullptr;
 }
 
-tstring SteamInputManager::get_controller_name(Steam::Controller controller) {
+dn_tstring_t SteamInputManager::get_controller_name(Steam::Controller controller) {
 	auto controller_type = steam->GetInputTypeForHandle(controller);
 	const char* name = "";
 
@@ -244,7 +244,7 @@ tstring SteamInputManager::get_controller_name(Steam::Controller controller) {
 		name = "A Seriously Unknown Controller";
 	}
 
-	return copy_string(name, &bump_allocator);
+	return dn_string_copy(name, &bump_allocator);
 }
 
 bool SteamInputManager::update_cooldown_hack() {
@@ -256,7 +256,7 @@ bool SteamInputManager::update_cooldown_hack() {
 // EXPORT API
 //
 void activate_action_set(const char* name) {
-	if (!engine.steam) return;
+	if (!dn_steam_initialized()) return;
 	steam_input.queued_action_set = steam_input.find_action_set(name);
 	steam_input.action_set_cooldown = SteamInputManager::action_set_cooldown_max;
 }
@@ -266,7 +266,7 @@ int32 get_action_set_cooldown() {
 }
 
 void register_action_set(const char* name) {
-	if (!engine.steam) return;
+	if (!dn_steam_initialized()) return;
 
 	auto action_set = steam_input.find_action_set(name);
 	if (!action_set) action_set = arr_push(&steam_input.action_sets);
@@ -276,7 +276,7 @@ void register_action_set(const char* name) {
 }
 
 void register_action(const char* name, u32 key, u32 key_event, const char* action_set) {
-	if (!engine.steam) return;
+	if (!dn_steam_initialized()) return;
 
 	auto action = steam_input.find_action(name);
 	if (!action) action = arr_push(&steam_input.actions);
@@ -289,7 +289,7 @@ void register_action(const char* name, u32 key, u32 key_event, const char* actio
 }
 
 bool is_digital_active(const char* name) {
-	if (!engine.steam) return false;
+	if (!dn_steam_initialized()) return false;
 	
 	auto action = steam_input.find_action(name);
 	if (!action) return false;
@@ -298,7 +298,7 @@ bool is_digital_active(const char* name) {
 }
 
 bool was_digital_active(const char* name) {
-	if (!engine.steam) return false;
+	if (!dn_steam_initialized()) return false;
 
 	auto action = steam_input.find_action(name);
 	if (!action) return false;
@@ -307,7 +307,7 @@ bool was_digital_active(const char* name) {
 }
 
 bool was_digital_pressed(const char* name) {
-	if (!engine.steam) return false;
+	if (!dn_steam_initialized()) return false;
 
 	auto action = steam_input.find_action(name);
 	if (!action) return false;

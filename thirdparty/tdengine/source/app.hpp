@@ -32,6 +32,7 @@ typedef struct {
   dn_font_config_t font;
   dn_gpu_config_t gpu;
   dn_asset_config_t asset;
+  dn_steam_config_t steam;
   u32 target_fps;
 } dn_app_config_t;
 
@@ -71,6 +72,8 @@ void dn_app_configure(dn_app_config_t config) {
   init_screenshots(); // Use the asset loader
   init_particles();
   init_fluid();
+  dn_steam_init(config.steam);
+
 }
 
 #endif

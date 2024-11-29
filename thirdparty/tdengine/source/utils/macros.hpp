@@ -21,8 +21,9 @@
 
 #define DN_ALIGN(n) __declspec(align(n))
 #define DN_ASSERT(condition) assert(condition)
+#define DN_UNTESTED() DN_ASSERT(false)
 
-#define dn_zero_initialize() { 0 };
+#define dn_zero_initialize() { 0 }
 
 
 #define dn_type_name(t) (#t)

@@ -58,11 +58,11 @@ typedef struct {
 } Matrix4;
 
 // These are just in Lua, so I can add a metatype to returned strings for a nice interning API.
-// tstring is a temporary string; i.e., one allocated with temporary storage. There's nothing different
+// dn_tstring_t is a temporary string; i.e., one allocated with temporary storage. There's nothing different
 // about the underlying data, it's just a hint to the programmer to not hold onto this pointer.
 typedef struct {
   char* data;
-} tstring;
+} dn_tstring_t;
 
 typedef struct {
   char* data;
@@ -70,6 +70,7 @@ typedef struct {
 
 typedef char dn_asset_name_t [64]; // [DN_ASSET_NAME_LEN];
 typedef char dn_path_t [256]; // [DN_MAX_PATH_LEN];
+
 
 
 //////////////////////////////////////////////////////
@@ -123,8 +124,8 @@ void                   dn_paths_add_install_subpath(const char* name, const char
 void                   dn_paths_add_engine_subpath(const char* name, const char* relative_path);
 void                   dn_paths_add_write_subpath(const char* name, const char* relative_path);
 void                   dn_paths_add_subpath(const char* name, const char* parent_name, const char* relative_path);
-tstring                dn_paths_resolve(const char* name);
-tstring                dn_paths_resolve_format(const char* name, const char* file_name);
+dn_tstring_t                dn_paths_resolve(const char* name);
+dn_tstring_t                dn_paths_resolve_format(const char* name, const char* file_name);
 
 
 ///////////////////////
@@ -153,8 +154,8 @@ typedef struct dn_os_date_time_t {
 } dn_os_date_time_t;
 
 typedef struct {
-  tstring file_path;
-  tstring file_name;
+  dn_tstring_t file_path;
+  dn_tstring_t file_name;
   dn_os_file_attr_t attributes;
 } dn_os_directory_entry_t;
 
@@ -179,6 +180,21 @@ dn_allocator_t*  dn_allocator_find(const char* name);
 void*            dn_allocator_alloc(dn_allocator_t* allocator, u32 size);
 void*            dn_allocator_realloc(dn_allocator_t* allocator, void* memory, u32 size);
 void             dn_allocator_free(dn_allocator_t* allocator, void* buffer);
+
+typedef struct {
+  u8* data;
+  u32 len;
+} dn_string_t;
+
+typedef struct {
+  struct {
+    u8* data;
+    u32 count;
+    u32 capacity;
+  } buffer;
+
+  dn_allocator_t* allocator;
+} dn_string_builder_t;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -210,8 +226,8 @@ typedef struct {
   i32 generation;
 } dn_gen_arena_handle_t;
 
-void copy_string(const char* str, char* buffer, u32 buffer_length);
-void copy_string_n(const char* str, u32 length, char* buffer, u32 buffer_length);
+void dn_string_copy(const char* str, char* buffer, u32 buffer_length);
+void dn_string_copy_n(const char* str, u32 length, char* buffer, u32 buffer_length);
 
 
 ///////////////////////////////////////////
@@ -850,7 +866,7 @@ void                     dn_gpu_memory_barrier(dn_gpu_memory_barrier_t barrier);
 void                     dn_gpu_dispatch_compute(dn_gpu_buffer_t* buffer, u32 size);
 void                     dn_gpu_swap_buffers();
 void                     dn_gpu_error_clear();
-tstring                  dn_gpu_error_read();
+dn_tstring_t                  dn_gpu_error_read();
 void                     dn_gpu_error_log_one();
 void                     dn_gpu_error_log_all();
 void                     dn_gpu_set_resource_name(dn_gpu_resource_id_t id, u32 handle, u32 name_len, const char* name);
@@ -990,7 +1006,7 @@ void    dn_imgui_file_browser_open();
 void    dn_imgui_file_browser_close();
 void    dn_imgui_file_browser_set_work_dir(const char* directory);
 bool    dn_imgui_file_browser_is_file_selected();
-tstring dn_imgui_file_browser_get_selected_file();
+dn_tstring_t dn_imgui_file_browser_get_selected_file();
 void    dn_imgui_load_layout(const char* file_name);
 void    dn_imgui_save_layout(const char* file_name);
 void    dn_imgui_load_colors(dn_imgui_colors_t colors);
@@ -1085,6 +1101,38 @@ void dn_assets_add(const char* name, dn_asset_data_t data);
 void dn_asset_copy_name(const char* source, dn_asset_name_t dest);
 
 
+
+
+
+
+typedef enum {
+  DN_STEAM_INIT_NONE = 0,
+  DN_STEAM_INIT_FAILED = 1,
+  DN_STEAM_INIT_OK = 2,
+} dn_steam_init_state_t;
+
+typedef enum {
+  DN_STEAM_INPUT_TEXT_UNINITIALIZED = 0,
+  DN_STEAM_INPUT_TEXT_OPEN = 1,
+  DN_STEAM_INPUT_TEXT_UNREAD = 2,
+  DN_STEAM_INPUT_TEXT_CLOSED = 3,
+} dn_steam_text_input_state_t;
+
+typedef struct {
+  u32 app_id;
+} dn_steam_config_t;
+
+void                        dn_steam_init(dn_steam_config_t config);
+bool                        dn_steam_initialized();
+void                        dn_steam_open_store_page();
+void                        dn_steam_open_store_page_utm(dn_string_t utm);
+void                        dn_steam_open_store_page_ex(dn_string_t url);
+void                        dn_steam_open_text_input();
+dn_steam_text_input_state_t dn_steam_text_input_state();
+dn_string_t                 dn_string_read_text_input();
+bool                        dn_steam_is_deck();
+
+
 //////////////////////////////
 //  █████╗ ██████╗ ██████╗  //
 // ██╔══██╗██╔══██╗██╔══██╗ //
@@ -1107,6 +1155,7 @@ typedef struct {
   dn_font_config_t font;
   dn_gpu_config_t gpu;
   dn_asset_config_t asset;
+  dn_steam_config_t steam;
   u32 target_fps;
 } dn_app_config_t;
 
@@ -1177,12 +1226,6 @@ void ef_draw(dn_gen_arena_handle_t handle);
 void take_screenshot();
 void write_screenshot_to_png(const char* file_name);
 
-// STEAM
-void open_steam_page(const char* utm);
-bool is_steam_deck();
-void show_text_input(const char* description, const char* existing_text);
-bool is_text_input_dirty();
-const char* read_text_input();
 
 //
 // DRAW
@@ -1473,8 +1516,6 @@ function tdengine.init_phase_0()
   tdengine.gui.scroll = {}
   tdengine.gui.drag = {}
   tdengine.gui.menu = {}
-
-  tdengine.steam = {}
 
   tdengine.window = {}
 

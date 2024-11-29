@@ -369,7 +369,7 @@ function EngineStats:engine_viewer()
 
   if imgui.TreeNode('Utility') then
     if imgui.Button('Show Text Input') then
-      tdengine.steam.show_text_input('Title', 'Text')
+      tdengine.ffi.dn_steam_open_text_input()
     end
 
     if imgui.Button('Window') then

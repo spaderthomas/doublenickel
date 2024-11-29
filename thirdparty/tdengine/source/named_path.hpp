@@ -16,9 +16,9 @@ DN_API void dn_paths_add_install_subpath(const char* name, const char* relative_
 DN_API void dn_paths_add_write_subpath(const char* name, const char* relative_path);
 DN_API void dn_paths_add_engine_subpath(const char* name, const char* relative_path);
 DN_API void dn_paths_add_subpath(const char* name, const char* parent_name, const char* relative_path);
-DN_API tstring dn_paths_resolve(const char* name);
-DN_API tstring dn_paths_resolve_format(const char* name, const char* file_name);
-DN_API tstring dn_paths_strip(const char* name, const char* absolute_path);
+DN_API dn_tstring_t dn_paths_resolve(const char* name);
+DN_API dn_tstring_t dn_paths_resolve_format(const char* name, const char* file_name);
+DN_API dn_tstring_t dn_paths_strip(const char* name, const char* absolute_path);
 
 void dn_paths_add_ex(const char* name, const char* absolute_path);
 char* dn_paths_resolve_ex(const char* name, dn_allocator_t* allocator);
@@ -61,12 +61,12 @@ void dn_paths_add_write_subpath(const char* name, const char* relative_path) {
   dn_paths_add_subpath(name, "write", relative_path);
 }
 
-tstring dn_paths_strip(const char* name, const char* absolute_path) {
+dn_tstring_t dn_paths_strip(const char* name, const char* absolute_path) {
   auto named_path = dn_paths_resolve_ex(name, &bump_allocator);
   auto named_path_len = strlen(named_path);
   auto absolute_path_len = strlen(absolute_path);
   
-  auto stripped_path = copy_string(absolute_path, absolute_path_len, &bump_allocator);
+  auto stripped_path = dn_string_copy(absolute_path, absolute_path_len, &bump_allocator);
   
   u32 num_strip_chars = std::min(named_path_len, absolute_path_len);
   u32 num_stripped = 0;
@@ -78,7 +78,7 @@ tstring dn_paths_strip(const char* name, const char* absolute_path) {
   return stripped_path + num_stripped;
 }
 
-tstring dn_paths_resolve(const char* name) {
+dn_tstring_t dn_paths_resolve(const char* name) {
   return dn_paths_resolve_ex(name, &bump_allocator);
 }
 
@@ -91,10 +91,10 @@ char* dn_paths_resolve_ex(const char* name, dn_allocator_t* allocator) {
   }
 
   auto& path = named_paths[name];
-  return copy_string(path.c_str(), path.length(), allocator);   
+  return dn_string_copy(path.c_str(), path.length(), allocator);   
 }
 
-tstring dn_paths_resolve_format(const char* name, const char* file_name) {
+dn_tstring_t dn_paths_resolve_format(const char* name, const char* file_name) {
   return dn_paths_resolve_format_ex(name, file_name, &bump_allocator);
 }
 
@@ -120,8 +120,8 @@ dn_named_path_result_t dn_paths_find_all() {
 
   for (auto& [name, path] : named_paths) {
     auto collected_path = arr_push(&collected_paths);
-    collected_path->name = copy_string(name, &bump_allocator);
-    collected_path->path = copy_string(path, &bump_allocator);
+    collected_path->name = dn_string_copy(name, &bump_allocator);
+    collected_path->path = dn_string_copy(path, &bump_allocator);
   }
 
   return {
@@ -130,7 +130,7 @@ dn_named_path_result_t dn_paths_find_all() {
   };
 }
 
-tstring build_path(const char* relative_path) {
+dn_tstring_t build_path(const char* relative_path) {
   auto executable_file = bump_allocator.alloc_path();
   GetModuleFileNameA(NULL, executable_file, DN_MAX_PATH_LEN);
 
@@ -140,7 +140,7 @@ tstring build_path(const char* relative_path) {
   auto canonical_path = std::filesystem::canonical(executable_dir, error);
   auto canonical_dir = canonical_path.string();
 
-  auto normalized_dir = copy_string(canonical_dir, &bump_allocator);
+  auto normalized_dir = dn_string_copy(canonical_dir, &bump_allocator);
   for (u32 i = 0; i < canonical_dir.size(); i++) {
     if (normalized_dir[i] == '\\') {
       normalized_dir[i] = '/';

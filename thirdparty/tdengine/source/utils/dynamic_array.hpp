@@ -137,7 +137,7 @@ void* dn_dynamic_array_reserve(dn_dyn_array_t* array, u32 num_elements) {
 
 void* dn_dynamic_array_push_n(dn_dyn_array_t* array, dn_dyn_array_element_t* data, u32 num_elements) {
     void* memory = dn_dynamic_array_reserve(array, num_elements);
-    copy_memory(data, memory, dn_dynamic_array_element_size(array) * num_elements);
+    dn_os_memory_copy(data, memory, dn_dynamic_array_element_size(array) * num_elements);
     return memory;
 }
 #endif

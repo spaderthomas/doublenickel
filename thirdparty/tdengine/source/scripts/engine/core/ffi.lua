@@ -39,7 +39,7 @@ function tdengine.ffi.init()
       end,
     }
   }
-  ffi.metatype('tstring', string_metatable)
+  ffi.metatype('dn_tstring_t', string_metatable)
   ffi.metatype('string', string_metatable)
 
   Sdf = tdengine.enum.define(

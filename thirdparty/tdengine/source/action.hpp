@@ -66,7 +66,7 @@ struct SteamInputManager {
 	bool got_controller_input;
 	dn_input_device_t last_input_device;
 	
-	tstring get_controller_name(Steam::Controller controller);
+	dn_tstring_t get_controller_name(Steam::Controller controller);
 	ActionSet* find_action_set(const char* name);
 	ActionSet* find_action_set(Steam::ActionSet handle);
 	ActionSet* find_current_action_set();

@@ -36,7 +36,7 @@ end
 function tdengine.window.animate_display_mode(display_mode)
   local was_full_screen = self.display_mode == tdengine.enums.DisplayMode.Fullscreen
   local is_full_screen = display_mode == tdengine.enums.DisplayMode.Fullscreen
-  if was_full_screen or is_full_screen or tdengine.ffi.is_steam_deck() then
+  if was_full_screen or is_full_screen or tdengine.ffi.dn_steam_is_deck() then
     tdengine.ffi.dn_window_set_display_mode(display_mode)
     self.display_mode = display_mode
     self.state = self.states.Idle

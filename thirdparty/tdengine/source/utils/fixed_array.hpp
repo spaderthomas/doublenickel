@@ -65,7 +65,7 @@ u8* dn_fixed_array_push(dn_fixed_array_t* buffer, void* data, u32 count) {
   DN_ASSERT(buffer->size < buffer->capacity);
 
   auto vertices = dn_fixed_array_reserve(buffer, count);
-  if (data) copy_memory(data, vertices, buffer->element_size * count);
+  if (data) dn_os_memory_copy(data, vertices, buffer->element_size * count);
   return vertices;
 }
 

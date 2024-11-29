@@ -112,6 +112,18 @@ void init_random() {
 }
 
 
+void hex_encode(char* destination, const char* data, size_t len) {
+  char const hex_chars[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+
+  for (int i = 0; i < len; i++) {
+    char const byte = data[i];
+
+    int base_index = i * 2;
+    destination[base_index] = hex_chars[(byte & 0xF0) >> 4];
+    destination[base_index + 1]     = hex_chars[(byte & 0x0F) >> 0];
+  }
+}
+
 void base64_encode(char* destination, const char* source, size_t len) {
   const char* base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
   uint32_t val = 0;

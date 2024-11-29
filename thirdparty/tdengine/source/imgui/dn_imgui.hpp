@@ -28,7 +28,7 @@ DN_API void    dn_imgui_file_browser_open();
 DN_API void    dn_imgui_file_browser_close();
 DN_API void    dn_imgui_file_browser_set_work_dir(const char* directory);
 DN_API bool    dn_imgui_file_browser_is_file_selected();
-DN_API tstring dn_imgui_file_browser_get_selected_file();
+DN_API dn_tstring_t dn_imgui_file_browser_get_selected_file();
 DN_API void    dn_imgui_load_layout(const char* file_name);
 DN_API void    dn_imgui_save_layout(const char* file_name);
 DN_API void    dn_imgui_load_colors(dn_imgui_colors_t colors);
@@ -182,10 +182,10 @@ bool dn_imgui_file_browser_is_file_selected() {
   return dn_imgui_file_browser.HasSelected();
 }
 
-tstring dn_imgui_file_browser_get_selected_file() {
+dn_tstring_t dn_imgui_file_browser_get_selected_file() {
   std::string selected = dn_imgui_file_browser.GetSelected().string();
   dn_imgui_file_browser.ClearSelected();
 
-  return copy_string(selected, &bump_allocator);
+  return dn_string_copy(selected, &bump_allocator);
 }
 #endif

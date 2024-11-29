@@ -418,7 +418,7 @@ DN_API void                      dn_gpu_memory_barrier(dn_gpu_memory_barrier_t b
 DN_API void                      dn_gpu_dispatch_compute(dn_gpu_buffer_t* buffer, u32 size);
 DN_API void                      dn_gpu_swap_buffers();
 DN_API void                      dn_gpu_error_clear();
-DN_API tstring                   dn_gpu_error_read();
+DN_API dn_tstring_t                   dn_gpu_error_read();
 DN_API void                      dn_gpu_error_log_one();
 DN_API void                      dn_gpu_error_log_all();
 DN_API void                      dn_gpu_set_resource_name(dn_gpu_resource_id_t id, u32 handle, u32 name_len, const char* name);
@@ -554,10 +554,10 @@ dn_gpu_command_buffer_t* dn_gpu_command_buffer_create(dn_gpu_command_buffer_desc
 
 void dn_gpu_command_buffer_clear_cached_state(dn_gpu_command_buffer_t* command_buffer) {
   command_buffer->pipeline = nullptr;
-  zero_memory(&command_buffer->bindings, sizeof(dn_gpu_buffer_binding_t));
-  zero_memory(&command_buffer->render_pass, sizeof(dn_gpu_render_pass_t));
-  zero_memory(&command_buffer->render, sizeof(dn_gpu_renderer_state_t));
-  zero_memory(&command_buffer->scissor, sizeof(dn_gpu_scissor_state_t));
+  dn_os_zero_memory(&command_buffer->bindings, sizeof(dn_gpu_buffer_binding_t));
+  dn_os_zero_memory(&command_buffer->render_pass, sizeof(dn_gpu_render_pass_t));
+  dn_os_zero_memory(&command_buffer->render, sizeof(dn_gpu_renderer_state_t));
+  dn_os_zero_memory(&command_buffer->scissor, sizeof(dn_gpu_scissor_state_t));
 }
 
 void dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
@@ -746,7 +746,7 @@ dn_gpu_pipeline_t* dn_gpu_pipeline_create(dn_gpu_pipeline_descriptor_t descripto
   dn_gpu_pipeline_t* pipeline = arr_push(&dn_gpu.pipelines);
   pipeline->raster = descriptor.raster;
   pipeline->blend = descriptor.blend;
-  copy_memory(descriptor.buffer_layouts, pipeline->buffer_layouts, descriptor.num_buffer_layouts * sizeof(dn_gpu_buffer_layout_t));
+  dn_os_memory_copy(descriptor.buffer_layouts, pipeline->buffer_layouts, descriptor.num_buffer_layouts * sizeof(dn_gpu_buffer_layout_t));
   pipeline->num_buffer_layouts = descriptor.num_buffer_layouts;
 
   return pipeline;
@@ -777,7 +777,7 @@ void dn_gpu_end_render_pass(dn_gpu_command_buffer_t* command_buffer) {
 }
 
 void dn_gpu_apply_bindings(dn_gpu_command_buffer_t* command_buffer, dn_gpu_buffer_binding_t bindings) {
-  if (is_memory_equal(&command_buffer->bindings, &bindings, sizeof(dn_gpu_buffer_binding_t))) return;
+  if (dn_os_is_memory_equal(&command_buffer->bindings, &bindings, sizeof(dn_gpu_buffer_binding_t))) return;
 
   arr_push(&command_buffer->commands, {
     .op = GPU_COMMAND_OP_BIND_BUFFERS,
@@ -812,7 +812,7 @@ void dn_gpu_set_world_space(dn_gpu_command_buffer_t* command_buffer, bool world_
 }
 
 void dn_gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, Vector2 camera) {
-  if (is_memory_equal(&command_buffer->render.camera,  &camera, sizeof(Vector2))) return;
+  if (dn_os_is_memory_equal(&command_buffer->render.camera,  &camera, sizeof(Vector2))) return;
 
   arr_push(&command_buffer->commands, {
     .op = GPU_COMMAND_OP_SET_CAMERA,
@@ -937,8 +937,8 @@ dn_gpu_shader_t* dn_gpu_shader_find(const char* name) {
 ////////////////////
 // SHADER LOADING //
 ////////////////////
-tstring build_shader_source(const char* file_path) {
-  auto shader_file = copy_string(file_path, &bump_allocator);
+dn_tstring_t build_shader_source(const char* file_path) {
+  auto shader_file = dn_string_copy(file_path, &bump_allocator);
   auto error = bump_allocator.alloc<char>(256);
   
   dn_preprocessor_context_t context = {
@@ -952,10 +952,10 @@ tstring build_shader_source(const char* file_path) {
 
   if (!context.result) {
     dn_log("shader preprocessor error; shader = %s, err = %s", shader_file, context.error);
-    return copy_string("YOUR_SHADER_FAILED_TO_COMPILE", &bump_allocator);
+    return dn_string_copy("YOUR_SHADER_FAILED_TO_COMPILE", &bump_allocator);
   }
   
-  auto source = copy_string(context.result, &bump_allocator);
+  auto source = dn_string_copy(context.result, &bump_allocator);
   
   return source;
 }
@@ -995,8 +995,8 @@ void dn_gpu_shader_init(dn_gpu_shader_t* shader, dn_gpu_shader_descriptor_t desc
   switch (descriptor.kind) {
     case GPU_SHADER_COMPUTE: {
       shader->kind = GPU_SHADER_COMPUTE;
-      copy_string(descriptor.name, shader->name, DN_ASSET_NAME_LEN);
-      shader->compute.path = copy_string(descriptor.compute_shader);
+      dn_string_copy(descriptor.name, shader->name, DN_ASSET_NAME_LEN);
+      shader->compute.path = dn_string_copy(descriptor.compute_shader);
       auto source = build_shader_source(shader->compute.path);
 
       u32 num_shaders = 1;
@@ -1013,9 +1013,9 @@ void dn_gpu_shader_init(dn_gpu_shader_t* shader, dn_gpu_shader_descriptor_t desc
     } break;
     case GPU_SHADER_GRAPHICS: {
       shader->kind = GPU_SHADER_GRAPHICS;
-      copy_string(descriptor.name, shader->name, DN_ASSET_NAME_LEN);
-      shader->graphics.vertex_path = copy_string(descriptor.vertex_shader);
-      shader->graphics.fragment_path = copy_string(descriptor.fragment_shader);
+      dn_string_copy(descriptor.name, shader->name, DN_ASSET_NAME_LEN);
+      shader->graphics.vertex_path = dn_string_copy(descriptor.vertex_shader);
+      shader->graphics.fragment_path = dn_string_copy(descriptor.fragment_shader);
       
 
       const char* paths[] = {
@@ -1319,19 +1319,19 @@ void dn_gpu_error_clear() {
   while (glGetError() != GL_NO_ERROR) {}
 }
 
-tstring dn_gpu_error_read() {
+dn_tstring_t dn_gpu_error_read() {
   auto error = glGetError();
   if (error == GL_INVALID_ENUM) {
-    return copy_string("GL_INVALID_ENUM", &bump_allocator);
+    return dn_string_copy("GL_INVALID_ENUM", &bump_allocator);
   }
   else if (error == GL_INVALID_OPERATION) {
-    return copy_string("GL_INVALID_OPERATION", &bump_allocator);
+    return dn_string_copy("GL_INVALID_OPERATION", &bump_allocator);
   }
   else if (error == GL_OUT_OF_MEMORY) {
-    return copy_string("GL_OUT_OF_MEMORY", &bump_allocator);
+    return dn_string_copy("GL_OUT_OF_MEMORY", &bump_allocator);
   }
   else if (error == GL_NO_ERROR) {
-    return copy_string("GL_NO_ERROR", &bump_allocator);
+    return dn_string_copy("GL_NO_ERROR", &bump_allocator);
   }
 
   return nullptr;

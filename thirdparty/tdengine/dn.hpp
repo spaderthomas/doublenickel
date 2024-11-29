@@ -47,7 +47,7 @@
 #include "source/action.hpp"
 #include "source/particle.hpp"
 #include "source/buffers.hpp"
-#include "source/steam.hpp"
+#include "source/dn_steam.hpp"
 #include "source/asset.hpp"
 #include "source/named_path.hpp"
 #include "source/graphics.hpp"
@@ -79,6 +79,8 @@
 #include "source/named_path.hpp"
 #define DN_SDF_IMPLEMENTATION
 #include "source/sdf.hpp"
+#define DN_STEAM_IMPLEMENTATION
+#include "source/dn_steam.hpp"
 #define DN_TIME_METRICS_IMPLEMENTATION
 #include "source/time_metrics.hpp"
 #define DN_WINDOW_IMPLEMENTATION
@@ -106,7 +108,6 @@
 
 
 #include "source/particle.cpp"
-#include "source/steam.cpp"
 #include "source/text.cpp"
 #include "source/utils/memory.cpp"
 #include "source/utils/file_monitor.cpp"
@@ -126,7 +127,6 @@ int dn_main(dn_app_descriptor_t app) {
   dn_engine_init();
   dn_input_init();
   dn_time_metrics_init();
-  init_steam();
   init_file_monitors();
   init_buffers();
   dn_lua_init();
@@ -135,7 +135,6 @@ int dn_main(dn_app_descriptor_t app) {
 
   while(!dn_engine_should_exit()) {
     dn_engine_update();
-    update_steam();
     dn_allocators_update();
     update_file_monitors();
     dn_assets_update();
@@ -147,7 +146,7 @@ int dn_main(dn_app_descriptor_t app) {
   }
 
   dn_audio_shutdown();
-  shutdown_steam();
+  dn_steam_shutdown();
   dn_imgui_shutdown();
   dn_window_shutdown();
 

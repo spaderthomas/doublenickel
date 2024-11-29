@@ -176,7 +176,7 @@ function imgui.internal.init_lua_api_overwrites()
 		local allocator = tdengine.ffi.dn_allocator_find('bump')
 		local buffer_len = len + max_chars_per_frame
 		local buffer = allocator:alloc(buffer_len)
-		tdengine.ffi.copy_string_n(value, len, buffer, buffer_len)
+		tdengine.ffi.dn_string_copy_n(value, len, buffer, buffer_len)
 	
 		flags = flags or 0
 		flags = bitwise(tdengine.op_or, flags, ffi.C.ImGuiInputTextFlags_CallbackResize)

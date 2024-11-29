@@ -259,7 +259,7 @@ void dn_lua_script_dir(const char* path) {
   dn_lua.file_monitor->add_directory(path);
 
   struct DirectoryEntry {
-    tstring path;
+    dn_tstring_t path;
     bool is_directory;
     bool is_regular_file;
     bool occupied = false;
@@ -273,7 +273,7 @@ void dn_lua_script_dir(const char* path) {
     entry->occupied = true;
 
     auto dir_path = it->path().string();
-    entry->path = copy_string(dir_path, &bump_allocator);
+    entry->path = dn_string_copy(dir_path, &bump_allocator);
     normalize_path(entry->path);
 
     entry->is_regular_file = dn_os_is_regular_file(entry->path);
@@ -353,7 +353,7 @@ void dn_lua_dump_stack () {
 }
 
 void dn_lua_add_dir(const char* directory) {
-  auto copy = copy_string(directory, &standard_allocator);
+  auto copy = dn_string_copy(directory, &standard_allocator);
   arr_push(&dn_lua.script_dirs, copy);
 }
 #endif

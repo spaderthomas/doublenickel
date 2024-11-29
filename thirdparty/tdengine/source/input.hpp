@@ -49,7 +49,7 @@ DN_IMP void              dn_input_callback_window_size(GLFWwindow* window, int w
 #ifdef DN_INPUT_IMPLEMENTATION
 
 void dn_input_init() {
-	zero_memory(dn_input.shift_map, sizeof(dn_input.shift_map));
+	dn_os_zero_memory(dn_input.shift_map, sizeof(dn_input.shift_map));
 		
 	dn_input.shift_map[' ']  =  ' ';
 	dn_input.shift_map['\''] =  '"';

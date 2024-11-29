@@ -148,8 +148,8 @@ void dn_font_bake(dn_font_descriptor_t desc) {
 
     dn_baked_font_t* font = dn_fixed_array_reserve_t(&dn_fonts.baked_fonts, 1);
     font->hash = dn_font_hash(desc.id, size);
-    copy_string(desc.id, font->name, DN_ASSET_NAME_LEN);
-    copy_string(desc.file_path, font->path, DN_MAX_PATH_LEN);
+    dn_string_copy(desc.id, font->name, DN_ASSET_NAME_LEN);
+    dn_string_copy(desc.file_path, font->path, DN_MAX_PATH_LEN);
     font->size = size;
     font->flags = desc.flags;
     

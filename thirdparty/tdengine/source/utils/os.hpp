@@ -17,8 +17,8 @@ typedef struct {
 } dn_os_date_time_t;
 
 typedef struct {
-  tstring file_path;
-  tstring file_name;
+  dn_tstring_t file_path;
+  dn_tstring_t file_name;
   dn_os_file_attr_t attributes;
 } dn_os_directory_entry_t;
 
@@ -35,6 +35,12 @@ DN_API void                         dn_os_create_directory(const char* path);
 DN_API dn_os_directory_entry_list_t dn_os_scan_directory(const char* path);
 DN_API dn_os_date_time_t            dn_os_get_date_time();
 DN_IMP dn_os_file_attr_t            dn_os_winapi_attr_to_dn_attr(u32 attr);
+void                                dn_os_memory_copy(const void* source, void* dest, u32 num_bytes);
+bool                                dn_os_is_memory_equal(void* a, void* b, size_t len);
+void                                dn_os_fill_memory(void* buffer, u32 buffer_size, void* fill, u32 fill_size);
+void                                dn_os_fill_memory_u8(void* buffer, u32 buffer_size, u8 fill);
+void                                dn_os_zero_memory(void* buffer, u32 buffer_size);
+
 #endif
 
 #ifdef DN_OS_IMPLEMENTATION
@@ -91,8 +97,8 @@ dn_os_directory_entry_list_t dn_os_scan_directory(const char* path) {
     dn_path_t file_path;
     dn_path_join(file_path, path, find_data.cFileName);
     dn_os_directory_entry_t entry = {
-      .file_path = copy_string(file_path, &bump_allocator),
-      .file_name = copy_string(find_data.cFileName, &bump_allocator),
+      .file_path = dn_string_copy(file_path, &bump_allocator),
+      .file_name = dn_string_copy(find_data.cFileName, &bump_allocator),
       .attributes = dn_os_winapi_attr_to_dn_attr(GetFileAttributesA(file_path)),
     };
     dn_fixed_array_push_t(&entries, &entry, 1);
@@ -141,4 +147,30 @@ dn_os_file_attr_t dn_os_winapi_attr_to_dn_attr(u32 attr) {
   return (dn_os_file_attr_t)result;
 }
 
+bool dn_os_is_memory_equal(void* a, void* b, size_t len) {
+    return 0 == memcmp(a, b, len);
+}
+
+void dn_os_memory_copy(const void* source, void* dest, u32 num_bytes) {
+    std::memcpy(dest, source, num_bytes);
+}
+
+void dn_os_fill_memory(void* buffer, u32 buffer_size, void* fill, u32 fill_size) {
+  u8* current_byte = (u8*)buffer;
+
+  int i = 0;
+  while (true) {
+    if (i + fill_size > buffer_size) return;
+    memcpy(current_byte + i, (u8*)fill, fill_size);
+    i += fill_size;
+  }
+}
+
+void dn_os_fill_memory_u8(void* buffer, u32 buffer_size, u8 fill) {
+  dn_os_fill_memory(buffer, buffer_size, &fill, sizeof(u8));
+}
+
+void dn_os_zero_memory(void* buffer, u32 buffer_size) {
+  dn_os_fill_memory_u8(buffer, buffer_size, 0);
+}
 #endif

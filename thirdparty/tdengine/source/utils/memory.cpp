@@ -79,7 +79,7 @@ void dn_bump_allocator_t::init(u32 capacity) {
 			} 
 
 			auto memory_block = on_alloc(DN_ALLOCATOR_MODE_ALLOC, size, nullptr);
-			copy_memory(old_memory, memory_block, size);
+			dn_os_memory_copy(old_memory, memory_block, size);
 			return memory_block;
 		}
 

@@ -7,7 +7,7 @@ typedef char dn_path_t [DN_MAX_PATH_LEN];
 void normalize_path(char* str);
 void normalize_path(std::string& str);
 bool is_png(std::string& asset_path);
-tstring extract_file_name(const char* full_path);
+dn_tstring_t extract_file_name(const char* full_path);
 char* wide_to_utf8(uint16* path, uint32 length);
 
 namespace path_util {
@@ -62,7 +62,7 @@ bool is_png(std::string& asset_path) {
 	return true;
 }
 
-tstring extract_file_name(const char* full_path) {
+dn_tstring_t extract_file_name(const char* full_path) {
 	auto size = strlen(full_path);
 	auto index = size - 1;
 	while (true) {
@@ -71,11 +71,11 @@ tstring extract_file_name(const char* full_path) {
 		index -= 1;
 	}
 	
-	return copy_string(full_path + index, &bump_allocator);
+	return dn_string_copy(full_path + index, &bump_allocator);
 }
 
-tstring wide_to_utf8(u16* string, u32 length) {
-	tstring utf8 = bump_allocator.alloc<char>(length + 1);
+dn_tstring_t wide_to_utf8(u16* string, u32 length) {
+	dn_tstring_t utf8 = bump_allocator.alloc<char>(length + 1);
 	WideCharToMultiByte(CP_UTF8, 0, (LPCWCH)string, length, utf8, length, NULL, NULL);
 	return utf8;
 }
