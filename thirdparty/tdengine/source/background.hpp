@@ -14,9 +14,9 @@ struct Background {
 	char* tile_output_full_path;
 	char* source_image;
 	char* source_image_full_path;
-	Array<char*, 64> tiles;
-	Array<char*, 64> tile_full_paths;
-	Array<Vector2I, 64> tile_positions;
+	dn_array_t<char*, 64> tiles;
+	dn_array_t<char*, 64> tile_full_paths;
+	dn_array_t<Vector2I, 64> tile_positions;
 	i32 width;
 	i32 height;
 	i32 channels;
@@ -34,7 +34,7 @@ struct Background {
 		Texture* texture;
 		u32* data;
 	};
-	Array<LoadedTile> loaded_tiles;
+	dn_array_t<LoadedTile> loaded_tiles;
 	bool gpu_ready = false;
 	bool gpu_done = false;
 	int gpu_load_index = 0;
@@ -82,4 +82,4 @@ std::mutex TileProcessor::mutex = std::mutex();
 
 
 void init_backgrounds();
-Array<Background> backgrounds;
+dn_array_t<Background> backgrounds;

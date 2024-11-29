@@ -55,7 +55,7 @@ struct ParticleSystem {
 	int32 generation;
 
 	static constexpr int max_particles = 4096;
-	Array<Particle> particles;
+	dn_array_t<Particle> particles;
 	Particle* free_list;
 
 	// RUNTIME

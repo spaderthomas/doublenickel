@@ -40,7 +40,7 @@ struct SteamInputManager {
 
 	Steam::Controller controller;
 	
-	Array<ActionSet> action_sets;
+	dn_array_t<ActionSet> action_sets;
 	ActionSet* current_action_set;
 	ActionSet* queued_action_set;
 
@@ -60,7 +60,7 @@ struct SteamInputManager {
 	static constexpr int32 action_set_cooldown_max = 5;
 	int32 action_set_cooldown = 0;
 
-	Array<Action> actions;
+	dn_array_t<Action> actions;
 
 	ISteamInput* steam;
 	bool got_controller_input;

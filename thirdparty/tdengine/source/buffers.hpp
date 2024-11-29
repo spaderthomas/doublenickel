@@ -1,26 +1,26 @@
 // Infos: chunks of contiguous memory that are initialized and then static
 #define FONT_INFO_SIZE 64
-Array<dn_baked_font_t> font_infos;
+dn_array_t<dn_baked_font_t> font_infos;
 #define GLYPH_INFO_SIZE FONT_INFO_SIZE * 128
-Array<dn_baked_glyph_t> glyph_infos;
+dn_array_t<dn_baked_glyph_t> glyph_infos;
 #define VX_INFO_SIZE GLYPH_INFO_SIZE * 6
-Array<Vector2>   text_vx_data;
+dn_array_t<Vector2>   text_vx_data;
 #define TEXT_UV_DATA_SIZE GLYPH_INFO_SIZE * 6
-Array<Vector2>   text_uv_data;
+dn_array_t<Vector2>   text_uv_data;
 #define TC_INFO_SIZE VX_INFO_SIZE
-Array<Vector2>   tc_data;
+dn_array_t<Vector2>   tc_data;
 #define IMAGE_INFO_SIZE 256
-Array<Texture> image_infos;
+dn_array_t<Texture> image_infos;
 #define SPRITE_INFO_SIZE 1024
-Array<Sprite> sprite_infos;
+dn_array_t<Sprite> sprite_infos;
 #define ATLAS_INFO_SIZE 64
-Array<TextureAtlas> atlas_infos;
+dn_array_t<TextureAtlas> atlas_infos;
 #define SOUND_INFO_SIZE 1024
-Array<dn_audio_info_t> sound_infos;
+dn_array_t<dn_audio_info_t> sound_infos;
 #define ACTIVE_SOUND_SIZE 64
-Array<dn_audio_instance_t> active_sounds;
+dn_array_t<dn_audio_instance_t> active_sounds;
 #define PARTICLE_SYSTEMS_SIZE 64
-Array<ParticleSystem> particle_systems;
+dn_array_t<ParticleSystem> particle_systems;
 
 
 void init_buffers() { 

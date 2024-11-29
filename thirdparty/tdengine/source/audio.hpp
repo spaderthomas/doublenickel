@@ -70,7 +70,7 @@ typedef struct {
   float master_volume;
   float master_volume_mod;
   FileMonitor* file_monitor;
-  Array<float> sample_buffer;
+  dn_array_t<float> sample_buffer;
 } dn_audio_t;
 dn_audio_t dn_audio;
 std::recursive_mutex dn_audio_mutex;

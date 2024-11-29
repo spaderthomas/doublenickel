@@ -67,7 +67,7 @@ void dn_prepared_text_t::add_break(int32 index) {
 	breaks[i] = index;
 }
 
-ArrayView<char> dn_prepared_text_t::get_line(int32 index) {
+dn_array_view_t<char> dn_prepared_text_t::get_line(int32 index) {
 	auto begin = get_break(index);
 	auto end   = get_break(index + 1);
 	auto count = end - begin;

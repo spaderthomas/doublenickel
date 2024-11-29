@@ -51,15 +51,15 @@ struct TextureAtlas {
   dn_hash_t cfg_files_hash;
   dn_hash_t files_hash;
   bool high_priority;
-  Array<char*> directories;
+  dn_array_t<char*> directories;
   Texture* texture = nullptr;
 
   // Data used for generation. These are initialized to temporary storage, so
   // don't expect them to be valid in other cases.
-  Array<RectPackId> ids;
-  Array<stbrp_rect> rects;
-  Array<stbrp_node> nodes;
-  Array<u32> buffer;
+  dn_array_t<RectPackId> ids;
+  dn_array_t<stbrp_rect> rects;
+  dn_array_t<stbrp_node> nodes;
+  dn_array_t<u32> buffer;
 
   bool need_async_build;
   bool need_async_load;

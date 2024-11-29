@@ -348,7 +348,7 @@ typedef struct {
   dn_gpu_renderer_state_t render;
   dn_gpu_scissor_state_t scissor;
 
-  Array<dn_gpu_command_t> commands;
+  dn_array_t<dn_gpu_command_t> commands;
   u32 vao;
 } dn_gpu_command_buffer_t;
 
@@ -366,12 +366,12 @@ typedef struct {
 } dn_gpu_config_t;
 
 typedef struct {
-  Array<dn_gpu_command_buffer_t, 32> command_buffers;
-  Array<dn_gpu_uniform_t, 1024> uniforms;
-  Array<dn_gpu_pipeline_t, 64> pipelines;
-  Array<dn_gpu_buffer_t, 128>  gpu_buffers;
-  Array<dn_gpu_render_target_t, 32>  targets;
-  Array<dn_gpu_shader_t, 128> shaders;
+  dn_array_t<dn_gpu_command_buffer_t, 32> command_buffers;
+  dn_array_t<dn_gpu_uniform_t, 1024> uniforms;
+  dn_array_t<dn_gpu_pipeline_t, 64> pipelines;
+  dn_array_t<dn_gpu_buffer_t, 128>  gpu_buffers;
+  dn_array_t<dn_gpu_render_target_t, 32>  targets;
+  dn_array_t<dn_gpu_shader_t, 128> shaders;
 
   FileMonitor* shader_monitor;
   dn_fixed_array<dn_path_t, 16> search_paths;

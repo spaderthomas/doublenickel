@@ -1,9 +1,8 @@
-struct dn_allocator_t;
 
 void memfill(void* dst, i32 size, void* pattern, i32 pattern_size);
 
 template<typename T, u64 N = 0>
-struct Array {
+struct dn_array_t {
 	u64 size      = 0;
 	u64 capacity  = 0;
 	T* data         = nullptr;
@@ -13,113 +12,113 @@ struct Array {
 };
 
 template<typename T, u64 N>
-void dn_array_init(Array<T, N>* array, u64 capacity, dn_allocator_t* allocator);
+void dn_array_init(dn_array_t<T, N>* array, u64 capacity, dn_allocator_t* allocator);
 
 template<typename T, u64 N>
-void dn_array_init(Array<T, N>* array, u64 capacity);
+void dn_array_init(dn_array_t<T, N>* array, u64 capacity);
 
 template<typename T, u64 N>
-void dn_array_init(Array<T, N>* array, u64 capacity, T fill);
+void dn_array_init(dn_array_t<T, N>* array, u64 capacity, T fill);
 
 template<typename T, u64 N>
-void dn_array_init(Array<T, N>* array);
+void dn_array_init(dn_array_t<T, N>* array);
 
 template<typename T, u64 N>
-void dn_array_init(Array<T, N>* array, dn_allocator_t* allocator);
+void dn_array_init(dn_array_t<T, N>* array, dn_allocator_t* allocator);
 
 template<typename T, u64 N>
-void dn_array_clear(Array<T, N>* array);
+void dn_array_clear(dn_array_t<T, N>* array);
 
 template<typename T, u64 N>
-void dn_array_fastclear(Array<T, N>* array);
+void dn_array_fastclear(dn_array_t<T, N>* array);
 
 template<typename T, u64 N>
-void dn_array_clear_n(Array<T, N>* array, i32 n);
+void dn_array_clear_n(dn_array_t<T, N>* array, i32 n);
 
 template<typename T, u64 N>
-void dn_array_fill(Array<T, N>* array, T element);
+void dn_array_fill(dn_array_t<T, N>* array, T element);
 
 template<typename T, u64 N>
-void dn_array_fill(Array<T, N>* array, T element, u64 count);
+void dn_array_fill(dn_array_t<T, N>* array, T element, u64 count);
 
 template<typename T, u64 N>
-void dn_array_fill(Array<T, N>* array, u64 offset, u64 count, T element);
+void dn_array_fill(dn_array_t<T, N>* array, u64 offset, u64 count, T element);
 
 // Use case: You declare some array on the stack. It's empty, and you only want to modify its elements
-// using an Array. Call this to wrap it in an empty Array of the correct capacity.
+// using an dn_array_t. Call this to wrap it in an empty dn_array_t of the correct capacity.
 template<typename T, u64 N>
-Array<T, N> dn_array_stack(T* data, u64 capacity);
+dn_array_t<T, N> dn_array_stack(T* data, u64 capacity);
 
 template<typename T, u64 N>
-Array<T, N> dn_array_stack(T (&c_array)[N]);
+dn_array_t<T, N> dn_array_stack(T (&c_array)[N]);
 
-// Use case: You have some contiguous data filled out somewhere (maybe in another Array, maybe in a C
-// array). You want to RW a subarray using Array functions. Call this to wrap the subarray. 
+// Use case: You have some contiguous data filled out somewhere (maybe in another dn_array_t, maybe in a C
+// array). You want to RW a subarray using dn_array_t functions. Call this to wrap the subarray. 
 template<typename T, u64 N>
-Array<T, N> dn_array_slice(Array<T, N>* array, u64 index, u64 size);
-
-template<typename T, u64 N>
-Array<T, N> dn_array_slice(T* data, u64 size);
+dn_array_t<T, N> dn_array_slice(dn_array_t<T, N>* array, u64 index, u64 size);
 
 template<typename T, u64 N>
-Array<T, N> dn_array_slice(T (&data)[N]);
+dn_array_t<T, N> dn_array_slice(T* data, u64 size);
 
 template<typename T, u64 N>
-u32 dn_array_indexof(Array<T, N>* array, T* element);
+dn_array_t<T, N> dn_array_slice(T (&data)[N]);
 
 template<typename T, u64 N>
-T* dn_array_at(Array<T, N>* array, u64 index);
+u32 dn_array_indexof(dn_array_t<T, N>* array, T* element);
 
 template<typename T, u64 N>
-bool dn_array_full(Array<T, N>* array);
+T* dn_array_at(dn_array_t<T, N>* array, u64 index);
 
 template<typename T, u64 N>
-T* dn_array_push(Array<T, N>* array, const T* data, u64 count);
+bool dn_array_full(dn_array_t<T, N>* array);
 
 template<typename T, u64 N>
-T* dn_array_push(Array<T, N>* array, T* data, u64 count);
+T* dn_array_push(dn_array_t<T, N>* array, const T* data, u64 count);
 
 template<typename T, u64 N>
-T* dn_array_push(Array<T, N>* array, T element, u64 count);
+T* dn_array_push(dn_array_t<T, N>* array, T* data, u64 count);
 
 template<typename T, u64 N>
-T* dn_array_push(Array<T, N>* array, T* data);
+T* dn_array_push(dn_array_t<T, N>* array, T element, u64 count);
 
 template<typename T, u64 N>
-T* dn_array_push(Array<T, N>* array, T data);
+T* dn_array_push(dn_array_t<T, N>* array, T* data);
 
 template<typename T, u64 N>
-T* dn_array_push(Array<T, N>* array);
+T* dn_array_push(dn_array_t<T, N>* array, T data);
 
 template<typename T, u64 N>
-void dn_array_pop(Array<T, N>* array);
+T* dn_array_push(dn_array_t<T, N>* array);
+
+template<typename T, u64 N>
+void dn_array_pop(dn_array_t<T, N>* array);
 
 // "Preallocate" space in the array without the cost of zeroing memory or default constructing
 // entities. For example, if you want to push 16 elements to an array and modify the elements
 // in-place -- reserve the space with this function, then just use the memory blocks.
 template<typename T, u64 N>
-T* dn_array_reserve(Array<T, N>* array, u64 count);
+T* dn_array_reserve(dn_array_t<T, N>* array, u64 count);
 
 template<typename T, u64 N>
-T* dn_array_concat(Array<T, N>* dest, Array<T, N>* source);
+T* dn_array_concat(dn_array_t<T, N>* dest, dn_array_t<T, N>* source);
 
 template<typename T, u64 N>
-T* dn_array_concat(Array<T, N>* dest, Array<T, N>* source, u64 count);
+T* dn_array_concat(dn_array_t<T, N>* dest, dn_array_t<T, N>* source, u64 count);
 
 template<typename T, u64 N>
-T* dn_array_back(Array<T, N>* array);
+T* dn_array_back(dn_array_t<T, N>* array);
 
 template<typename T, u64 N>
-T* dn_array_next(Array<T, N>* array);
+T* dn_array_next(dn_array_t<T, N>* array);
 
 template<typename T, u64 N>
-void dn_array_free(Array<T, N>* array);
+void dn_array_free(dn_array_t<T, N>* array);
 
 template<typename T, u64 N>
-i32 dn_array_bytes(Array<T, N>* array);
+i32 dn_array_bytes(dn_array_t<T, N>* array);
 
 template<typename T, u64 N>
-i32 dn_array_bytes_used(Array<T, N>* array);
+i32 dn_array_bytes_used(dn_array_t<T, N>* array);
 
 #define dn_array_for(array, it) for (auto (it) = (array).data; (it) != ((array).data + (array).size); (it)++)
 #define dn_array_for_ref(array, it, ref) for (auto (it) = (array).data; (it) != ((array).data + (array).size); (it)++)
@@ -128,46 +127,27 @@ i32 dn_array_bytes_used(Array<T, N>* array);
 
 
 template<typename T> 
-struct ArrayView {
+struct dn_array_view_t {
 	u64 size      = 0;
 	u64 capacity  = 0;
 	T* data         = nullptr;
 
-	// @spader could make this const correct, whatever
 	T* operator[](u64 index) { DN_ASSERT(index < size); return data + index; }
 };
 
 template<typename T>
-ArrayView<T> dn_array_view(T* data, u64 size);
+dn_array_view_t<T> dn_array_view(T* data, u64 size);
 
 template<typename T>
-ArrayView<T> dn_array_view(Array<T>* array);
+dn_array_view_t<T> dn_array_view(dn_array_t<T>* array);
 
 template<typename T>
-ArrayView<T> dn_array_view(Array<T>* array, u64 index, u64 count);
+dn_array_view_t<T> dn_array_view(dn_array_t<T>* array, u64 index, u64 count);
 
 template<typename T, u64 N>
-ArrayView<T> dn_array_view(T (&array)[N]);
+dn_array_view_t<T> dn_array_view(T (&array)[N]);
 
 template<typename T>
-i32 dn_array_indexof(ArrayView<T>* array, T* element);
+i32 dn_array_indexof(dn_array_view_t<T>* array, T* element);
 
 
-template<typename T>
-struct ArrayMarker {
-	u64 begin = 0;
-	u64 frozen_size = -1;
-	Array<T>* array  = nullptr;
-};
-
-template<typename T>
-ArrayMarker<T> dn_array_marker_make(Array<T>* array);
-
-template<typename T>
-void dn_array_marker_init(ArrayMarker<T>* marker, Array<T>* array);
-
-template<typename T>
-void dn_array_marker_freeze(ArrayMarker<T>* marker);
-
-template<typename T>
-i32 dn_array_marker_count(ArrayMarker<T>* marker);

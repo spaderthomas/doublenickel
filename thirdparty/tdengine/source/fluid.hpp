@@ -136,7 +136,7 @@ namespace EulerianFluidSim {
 		u32 num_sim_cells;
 		u32 gauss_seidel_iterations;
 
-		Array<Source> sources;
+		dn_array_t<Source> sources;
 		
 		ssbo fluid;
 		ssbo source;

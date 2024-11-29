@@ -209,7 +209,7 @@ void Background::build_from_source() {
 
 	constexpr u32 nthreads = 16;
 	TileProcessor::current_tile = 0;
-	Array<TileProcessor> tile_processors;
+	dn_array_t<TileProcessor> tile_processors;
 	dn_array_init(&tile_processors, nthreads, TileProcessor());
 
 	// Use a thread per-tile, up to the maximum number of threads in the pool.

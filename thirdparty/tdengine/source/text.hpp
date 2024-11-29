@@ -43,7 +43,7 @@ struct dn_prepared_text_t {
 	i32 count_lines();
 	i32 get_break(i32 index);
 	void add_break(i32 index);
-	ArrayView<char> get_line(i32 index);
+	dn_array_view_t<char> get_line(i32 index);
 };
 
 DN_API dn_prepared_text_t* dn_prepare_text(const char* text, float px, float py, dn_baked_font_t* font);

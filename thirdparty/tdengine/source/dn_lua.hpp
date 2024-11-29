@@ -8,7 +8,7 @@ typedef lua_State* dn_lua_interpreter_t;
 typedef struct {
   dn_lua_interpreter_t state;
   FileMonitor* file_monitor;
-  Array<char*, 32> script_dirs;
+  dn_array_t<char*, 32> script_dirs;
 } dn_lua_t;
 dn_lua_t dn_lua;
 
@@ -265,7 +265,7 @@ void dn_lua_script_dir(const char* path) {
     bool occupied = false;
   };
   
-  Array<DirectoryEntry, 256> directory_entries;
+  dn_array_t<DirectoryEntry, 256> directory_entries;
   dn_array_init(&directory_entries);
   
   for (auto it = directory_iterator(path); it != directory_iterator(); it++) {

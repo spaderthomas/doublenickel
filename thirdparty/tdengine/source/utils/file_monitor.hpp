@@ -39,9 +39,9 @@ struct FileMonitor {
 	dn_file_change_event_t events_to_watch;
 	void* userdata;
 	float64 debounce_time = .1;
-	Array<DirectoryInfo, 128> directory_infos;
-	Array<FileChange, 16> changes;
-	Array<CacheEntry, 512> cache;
+	dn_array_t<DirectoryInfo, 128> directory_infos;
+	dn_array_t<FileChange, 16> changes;
+	dn_array_t<CacheEntry, 512> cache;
 
 	void init(FileChangeCallback callback, dn_file_change_event_t events, void* userdata);
 	bool add_directory(const char* path);
@@ -55,7 +55,7 @@ struct FileMonitor {
 };
 
 typedef struct {
-	Array<FileMonitor, 64> monitors;
+	dn_array_t<FileMonitor, 64> monitors;
 } dn_file_monitors_t;
 dn_file_monitors_t dn_file_monitors;
 

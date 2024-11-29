@@ -110,7 +110,7 @@ void TextureAtlas::calc_hash_and_mod_time() {
 }
 
 void TextureAtlas::build_from_config() {
-  this->buffer = Array<u32>();
+  this->buffer = dn_array_t<u32>();
   dn_array_init(&this->buffer, TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE);
 
   lua_State* l = dn_lua.state;
@@ -197,13 +197,13 @@ void TextureAtlas::build_from_config() {
 void TextureAtlas::build_from_source() {
   dn_log("%s: rebuilding %s", __func__, this->name);
 
-  this->rects = Array<stbrp_rect>();
+  this->rects = dn_array_t<stbrp_rect>();
   dn_array_init(&this->rects, MAX_IMAGES_PER_ATLAS);
-  this->ids = Array<RectPackId>();
+  this->ids = dn_array_t<RectPackId>();
   dn_array_init(&this->ids, MAX_IMAGES_PER_ATLAS);
-  this->nodes = Array<stbrp_node>();
+  this->nodes = dn_array_t<stbrp_node>();
   dn_array_init(&this->nodes, TEXTURE_ATLAS_SIZE);
-  this->buffer = Array<u32>();
+  this->buffer = dn_array_t<u32>();
   dn_array_init(&this->buffer, TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE);
 
   constexpr int fudge_px = 5;

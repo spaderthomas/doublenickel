@@ -98,7 +98,7 @@ void SteamInputManager::poll_for_inputs() {
 void SteamInputManager::poll_for_controllers() {
 	if (!dn_steam_initialized()) return;
 
-	Array<InputHandle_t, STEAM_INPUT_MAX_COUNT> controllers;
+	dn_array_t<InputHandle_t, STEAM_INPUT_MAX_COUNT> controllers;
 	dn_array_init(&controllers, &dn_allocators.bump);
 	controllers.size = SteamInput()->GetConnectedControllers(controllers.data);
 
@@ -143,7 +143,7 @@ void SteamInputManager::poll_for_controllers() {
 }
 
 void SteamInputManager::load_controller_glyphs() {
-	Array<EInputActionOrigin, STEAM_INPUT_MAX_COUNT> origins;
+	dn_array_t<EInputActionOrigin, STEAM_INPUT_MAX_COUNT> origins;
 	dn_array_init(&origins, &dn_allocators.bump);
 		
 	dn_array_for(actions, action) {
