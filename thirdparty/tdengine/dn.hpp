@@ -17,7 +17,6 @@
 #include "source/utils/vector.hpp"
 #include "source/utils/quad.hpp"
 #include "source/utils/colors.hpp"
-#include "source/utils/defer.hpp"
 #include "source/utils/coordinate.hpp"
 #include "source/utils/utils.hpp"
 #include "source/utils/file_monitor.hpp"

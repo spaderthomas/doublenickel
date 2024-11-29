@@ -269,7 +269,7 @@ void TextureAtlas::build_from_source() {
     float32 left   = rect->x            / (float32)TEXTURE_ATLAS_SIZE;
     float32 right  = (rect->x + size.x) / (float32)TEXTURE_ATLAS_SIZE;
       
-    Vector2 uv [6] = TD_MAKE_QUAD(top, bottom, left, right);
+    Vector2 uv [6] = dn_quad_literal(top, bottom, left, right);
     memcpy(item->sprite->uv, uv, sizeof(Vector2) * 6);
 
     // Copy the sprite into the image buffer
@@ -605,7 +605,7 @@ void init_texture_atlas() {
 void create_sprite(const char* id, const char* file_path) {
   i32 width, height, channels;
   u8* data = (u8*)stbi_load(file_path, &width, &height, &channels, 0);
-  defer{ free(data); };
+  dn_defer{ free(data); };
   
   return create_sprite(id, data, width, height, channels);
 }
@@ -629,7 +629,7 @@ void create_sprite_ex(Sprite* sprite, const char* id, u8* data, i32 width, i32 h
   sprite->size = Vector2I(width, height);
   strncpy(sprite->file_path, id, DN_MAX_PATH_LEN);
 
-  Vector2 uv [6] = TD_MAKE_QUAD(0, 1, 0, 1);
+  Vector2 uv [6] = dn_quad_literal(0, 1, 0, 1);
   memcpy(sprite->uv, uv, sizeof(Vector2) * 6);
 }
 
@@ -651,7 +651,7 @@ void init_screenshots() {
     i32 channels;
     stbi_set_flip_vertically_on_load(false);
     unsigned char* data = (unsigned char*)stbi_load(path.c_str(), &width, &height, &channels, 0);
-    defer { free(data); };
+    dn_defer { free(data); };
 
     // Create a Sprite using the file name as the ID
     auto file_name = it->path().filename().string();

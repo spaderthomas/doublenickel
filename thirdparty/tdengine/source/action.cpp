@@ -154,7 +154,7 @@ void SteamInputManager::load_controller_glyphs() {
 
 			int height, width, channels;
 			unsigned char* glyph_data = (unsigned char*)stbi_load(glyph_path, &height, &width, &channels, 0);
-			defer { stbi_image_free(glyph_data); };
+			dn_defer { stbi_image_free(glyph_data); };
 			if (channels != 4) {
 				dn_log("could not load glyph %s for action %s; num_channels = %d", glyph_path, action->name, channels);
 				continue;

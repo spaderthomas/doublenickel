@@ -1,7 +1,7 @@
 #ifndef DN_LUA_H
 #define DN_LUA_H
 
-#define DEFER_POP(l) defer { lua_pop(l, 1); };
+#define DEFER_POP(l) dn_defer { lua_pop(l, 1); };
 
 typedef lua_State* dn_lua_interpreter_t;
 

@@ -167,7 +167,7 @@ void LineBreakContext::calculate() {
 	// By definition, we always have a line break at index 0, and at the length of the string
 	this->info->add_break(0);
 	
-	defer {
+	dn_defer {
 		auto len = strlen(this->info->text);
 		this->info->add_break(len);
 	};

@@ -183,7 +183,7 @@ dn_sdf_renderer_t dn_sdf_renderer_create(u32 buffer_size) {
     })
   };
 
-  Vector2 vertices [6] = TD_MAKE_QUAD(0.5, -0.5, -0.5, 0.5);
+  Vector2 vertices [6] = dn_quad_literal(0.5, -0.5, -0.5, 0.5);
   for (u32 i = 0; i < 6; i++) {
     dn_sdf_vertex_t vertex = {
       .position = vertices[i],

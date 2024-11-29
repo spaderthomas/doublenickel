@@ -25,7 +25,44 @@
 
 #define dn_zero_initialize() { 0 }
 
-
 #define dn_type_name(t) (#t)
 
 #define dn_enum_flags(t) DEFINE_ENUM_FLAG_OPERATORS(t)
+
+// Defer works by using (abusing...?) RAII; define a struct which holds a function and calls
+// that function in its destructor. Then, use __LINE__ to make an instance of that struct with
+// a unique name and use operator overloading with a lambda to get nice syntax.
+template <typename F>
+struct Defer {
+    Defer( F f ) : f( f ) {}
+    ~Defer( ) { f( ); }
+    F f;
+};
+
+template <typename F>
+Defer<F> makeDefer( F f ) {
+    return Defer<F>( f );
+};
+
+#define _dn_defer( line ) dn_macro_cat(dn_defer_, line)
+
+struct dn_defer_dummy { };
+template<typename F>
+Defer<F> operator+( dn_defer_dummy, F&& f )
+{
+    return makeDefer<F>( std::forward<F>( f ) );
+}
+
+#define dn_defer auto _dn_defer( __LINE__ ) = dn_defer_dummy( ) + [ & ]( )
+
+
+#define dn_quad_literal(top, bottom, left, right) \
+    {                                     \
+        { left, top },                    \
+        { left, bottom },                 \
+        { right, bottom },                \
+                                          \
+        { left, top },                    \
+        { right, bottom },                \
+        { right, top }                    \
+    }                                     

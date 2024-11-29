@@ -200,7 +200,7 @@ void Background::build_from_source() {
 	// Load the source image
 	stbi_set_flip_vertically_on_load(false);
 	u32* source_data = (u32*)stbi_load(source_image_full_path, &width, &height, &channels, 0);
-	defer { free(source_data); };
+	dn_defer { free(source_data); };
 
 	assert(channels == 4);
 
@@ -333,7 +333,7 @@ void Background::load_tiles() {
 		sprite->size = { texture->width, texture->height };
 
 		// Each tile spans the entire image, so use trivial UVs
-		Vector2 uv [6] = TD_MAKE_QUAD(0, 1, 0, 1);
+		Vector2 uv [6] = dn_quad_literal(0, 1, 0, 1);
 		for (u32 i = 0; i < 6; i++) sprite->uv[i] = uv[i];
 
 		// Mark the data to be loaded to the GPU
