@@ -1,18 +1,18 @@
 #ifndef DN_FILE_MONITOR_H
 #define DN_FILE_MONITOR_H
 
-enum class FileChangeEvent {
-	None              = 0,
-	Added             = 1 << 0,
-	Modified          = 1 << 1,
-	Removed           = 1 << 2,
-};
-DEFINE_ENUM_FLAG_OPERATORS(FileChangeEvent)
+typedef enum {
+	DN_FILE_CHANGE_EVENT_NONE = 0,
+	DN_FILE_CHANGE_EVENT_ADDED = 1 << 0,
+	DN_FILE_CHANGE_EVENT_MODIFIED = 1 << 1,
+	DN_FILE_CHANGE_EVENT_REMOVED = 1 << 2,
+} dn_file_change_event_t;
+DEFINE_ENUM_FLAG_OPERATORS(dn_file_change_event_t);
 
 struct FileChange {
 	char* file_path;
 	char* file_name;
-	FileChangeEvent events;
+	dn_file_change_event_t events;
 	float32 time;
 };
 
@@ -36,20 +36,20 @@ struct FileMonitor {
 	static constexpr int32 BUFFER_SIZE = 4092;
 	
 	FileChangeCallback callback;
-	FileChangeEvent events_to_watch;
+	dn_file_change_event_t events_to_watch;
 	void* userdata;
 	float64 debounce_time = .1;
 	Array<DirectoryInfo, 128> directory_infos;
 	Array<FileChange, 16> changes;
 	Array<CacheEntry, 512> cache;
 
-	void init(FileChangeCallback callback, FileChangeEvent events, void* userdata);
+	void init(FileChangeCallback callback, dn_file_change_event_t events, void* userdata);
 	bool add_directory(const char* path);
 	bool add_file(const char* file_path);
 	void process_changes();
 	void issue_one_read(DirectoryInfo* info);
 	void emit_changes();
-	void add_change(char* file_path, char* file_name, FileChangeEvent events);
+	void add_change(char* file_path, char* file_name, dn_file_change_event_t events);
 	bool check_cache(char* file_path, float64 time);
 	CacheEntry* find_cache_entry(char* file_path);
 };
@@ -67,7 +67,7 @@ DN_API FileMonitor* dn_file_monitors_add();
 #endif
 
 #ifdef DN_FILE_MONITOR_IMPLEMENTATION
-void FileMonitor::init(FileChangeCallback callback, FileChangeEvent events, void* userdata) {
+void FileMonitor::init(FileChangeCallback callback, dn_file_change_event_t events, void* userdata) {
 	this->callback = callback;
 	this->events_to_watch = events;
 	this->userdata = userdata;
@@ -148,10 +148,10 @@ void FileMonitor::issue_one_read(DirectoryInfo* info) {
 	fm_assert(info->handle != INVALID_HANDLE_VALUE);
 
 	int32 notify_filter = 0;
-	if (enum_any(this->events_to_watch & (FileChangeEvent::Added | FileChangeEvent::Removed))) {
+	if (this->events_to_watch & (DN_FILE_CHANGE_EVENT_ADDED | DN_FILE_CHANGE_EVENT_REMOVED)) {
 		notify_filter |= FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_CREATION;
 	}
-	if (enum_any(this->events_to_watch & FileChangeEvent::Modified)) {
+	if (this->events_to_watch & DN_FILE_CHANGE_EVENT_MODIFIED) {
 		notify_filter |= FILE_NOTIFY_CHANGE_SIZE | FILE_NOTIFY_CHANGE_LAST_WRITE;
 	}
 
@@ -174,15 +174,15 @@ void FileMonitor::process_changes() {
 		auto notify = (FILE_NOTIFY_INFORMATION*)info->notify_information;
 		while (true) {
 			// Parse this notification
-			FileChangeEvent events = FileChangeEvent::None;
+			dn_file_change_event_t events = DN_FILE_CHANGE_EVENT_NONE;
 			if (notify->Action == FILE_ACTION_MODIFIED) {
-				events = FileChangeEvent::Modified;
+				events = DN_FILE_CHANGE_EVENT_MODIFIED;
 			}
 			else if (notify->Action == FILE_ACTION_ADDED) {
-				events = FileChangeEvent::Added;
+				events = DN_FILE_CHANGE_EVENT_ADDED;
 			}
 			else if (notify->Action == FILE_ACTION_REMOVED) {
-				events = FileChangeEvent::Removed;
+				events = DN_FILE_CHANGE_EVENT_REMOVED;
 			}
 			else if (notify->Action == FILE_ACTION_RENAMED_OLD_NAME) {
 				
@@ -214,7 +214,7 @@ void FileMonitor::process_changes() {
 	emit_changes();
 }
 
-void FileMonitor::add_change(char* file_path, char* file_name, FileChangeEvent events) {
+void FileMonitor::add_change(char* file_path, char* file_name, dn_file_change_event_t events) {
 	auto time = glfwGetTime();
 
 	// We don't care about directory updates. They're annoying and hard to understand

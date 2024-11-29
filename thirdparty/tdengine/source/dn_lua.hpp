@@ -38,11 +38,11 @@ void dn_lua_init() {
 
   arr_init(&dn_lua.script_dirs);
   
-  auto events = FileChangeEvent::Added | FileChangeEvent::Modified | FileChangeEvent::Removed;
+  auto events = DN_FILE_CHANGE_EVENT_ADDED | DN_FILE_CHANGE_EVENT_MODIFIED | DN_FILE_CHANGE_EVENT_REMOVED;
   auto on_file_event = [](FileMonitor* monitor, FileChange* event, void* userdata) {
     // We only watch directories, so there's no need to remove a file from the watch
     // list when it's removed
-    if (enum_any(event->events & FileChangeEvent::Removed)) return;
+    if (event->events & DN_FILE_CHANGE_EVENT_REMOVED) return;
 
     // Any other files we happen to create should be skipped
     if (!path_util::is_lua(event->file_path)) return;

@@ -169,7 +169,7 @@ void dn_audio_init(dn_audio_config_t config) {
     dn_audio_load(event->file_path, event->file_name);
   };
 
-  auto events = FileChangeEvent::Added | FileChangeEvent::Modified;
+  auto events = DN_FILE_CHANGE_EVENT_ADDED | DN_FILE_CHANGE_EVENT_MODIFIED;
   dn_audio.file_monitor->init(on_file_event, events, nullptr);
   
   dn_log("%s: Loading default audio directory; directory = %s", __func__, dn_paths_resolve("dn_audio"));

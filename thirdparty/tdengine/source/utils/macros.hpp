@@ -27,3 +27,5 @@
 
 
 #define dn_type_name(t) (#t)
+
+#define dn_enum_flags(t) DEFINE_ENUM_FLAG_OPERATORS(t)

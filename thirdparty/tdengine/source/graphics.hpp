@@ -477,7 +477,7 @@ void dn_gpu_init(dn_gpu_config_t config) {
     }
   };
   dn_gpu.shader_monitor = dn_file_monitors_add();
-  dn_gpu.shader_monitor->init(reload_all_shaders, FileChangeEvent::Modified, nullptr);
+  dn_gpu.shader_monitor->init(reload_all_shaders, DN_FILE_CHANGE_EVENT_MODIFIED, nullptr);
   dn_gpu.shader_monitor->add_directory(config.shader_path);
 
   // Add default search paths and shaders

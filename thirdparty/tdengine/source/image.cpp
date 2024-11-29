@@ -7,12 +7,12 @@ void TextureAtlas::init() {
   texture = alloc_texture();
   texture->init(TEXTURE_ATLAS_SIZE, TEXTURE_ATLAS_SIZE, 4);
   
-  auto events = FileChangeEvent::Added | FileChangeEvent::Modified;
+  auto events = DN_FILE_CHANGE_EVENT_ADDED | DN_FILE_CHANGE_EVENT_MODIFIED;
   auto on_file_event = [](FileMonitor* monitor, FileChange* event, void* userdata) {
     auto atlas = (TextureAtlas*)userdata;
 
     // If an image is removed, all of the still-existing images are still in the atlas
-    if (enum_any(event->events & FileChangeEvent::Removed)) {
+    if (event->events & DN_FILE_CHANGE_EVENT_REMOVED) {
       return;
     }
 
