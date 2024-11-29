@@ -13,19 +13,19 @@ struct Array {
 };
 
 template<typename T, u64 N>
-fm_error arr_init(Array<T, N>* array, u64 capacity, dn_allocator_t* allocator);
+void arr_init(Array<T, N>* array, u64 capacity, dn_allocator_t* allocator);
 
 template<typename T, u64 N>
-fm_error arr_init(Array<T, N>* array, u64 capacity);
+void arr_init(Array<T, N>* array, u64 capacity);
 
 template<typename T, u64 N>
-fm_error arr_init(Array<T, N>* array, u64 capacity, T fill);
+void arr_init(Array<T, N>* array, u64 capacity, T fill);
 
 template<typename T, u64 N>
-fm_error arr_init(Array<T, N>* array);
+void arr_init(Array<T, N>* array);
 
 template<typename T, u64 N>
-fm_error arr_init(Array<T, N>* array, dn_allocator_t* allocator);
+void arr_init(Array<T, N>* array, dn_allocator_t* allocator);
 
 template<typename T, u64 N>
 void arr_clear(Array<T, N>* array);

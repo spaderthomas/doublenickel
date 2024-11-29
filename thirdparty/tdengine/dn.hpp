@@ -4,11 +4,9 @@
 
 #include "source/utils/types.hpp"
 #include "source/utils/assert.hpp"
-#include "source/utils/error.hpp"
 #include "source/utils/macros.hpp"
 #include "source/utils/path.hpp"
 #include "source/utils/log.hpp"
-#include "source/utils/enum.hpp"
 #include "source/utils/os.hpp"
 #include "source/utils/array.hpp"
 #include "source/utils/fixed_array.hpp"

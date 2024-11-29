@@ -11,43 +11,34 @@ void memfill(void* dst, i32 size, void* pattern, i32 pattern_size) {
 }
 
 template<typename T, u64 N>
-fm_error arr_init(Array<T, N>* array, u64 capacity, dn_allocator_t* allocator) {
+void arr_init(Array<T, N>* array, u64 capacity, dn_allocator_t* allocator) {
 	array->size = 0;
 	array->capacity = capacity;
 	array->data = dn::allocator::alloc<T>(allocator, capacity);
-	
-	if (array->data) return FM_ERR_SUCCESS;
-	return FM_ERR_FAILED_ALLOC;
 }
 
 template<typename T, u64 N>
-fm_error arr_init(Array<T, N>* array, u64 capacity) {
-	return arr_init(array, capacity, &dn_allocators.standard);
+void arr_init(Array<T, N>* array, u64 capacity) {
+	arr_init(array, capacity, &dn_allocators.standard);
 }
 
 template<typename T, u64 N>
-fm_error arr_init(Array<T, N>* array, u64 capacity, T fill) {
-	auto error = arr_init(array, capacity, &dn_allocators.standard);
-	if (error) return error;
-	
+void arr_init(Array<T, N>* array, u64 capacity, T fill) {
+	arr_init(array, capacity, &dn_allocators.standard);
 	arr_fill(array, T());
-	return FM_ERR_SUCCESS;
 }
 
 template<typename T, u64 N>
-fm_error arr_init(Array<T, N>* array) {
-	return arr_init(array, &dn_allocators.standard);
+void arr_init(Array<T, N>* array) {
+	arr_init(array, &dn_allocators.standard);
 }
 
 template<typename T, u64 N>
-fm_error arr_init(Array<T, N>* array, dn_allocator_t* allocator) {
+void arr_init(Array<T, N>* array, dn_allocator_t* allocator) {
 	static_assert(N > 0, "If you want to bake a fixed capacity into an Array, you need to put it as the second template parameter. Otherwise, specify the capacity when initializing.");
 	array->size = 0;
 	array->capacity = N;
 	array->data = dn::allocator::alloc<T>(allocator, N);
-	
-	if (array->data) return FM_ERR_SUCCESS;
-	return FM_ERR_FAILED_ALLOC;
 }
 
 template<typename T, u64 N>

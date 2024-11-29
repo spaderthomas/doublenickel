@@ -2,7 +2,7 @@
 // dn_prepared_text_t //
 ///////////////////
 void dn_prepared_text_t::init() {
-	this->color = colors::white;
+	this->color = { 1.f };
 	this->font = dn_font_default();
 	this->wrap = 0;
 }
@@ -79,11 +79,11 @@ ArrayView<char> dn_prepared_text_t::get_line(int32 index) {
 }
 
 dn_prepared_text_t* dn_prepare_text(const char* text, float32 px, float32 py, dn_baked_font_t* font) {
-	return dn_prepare_text_ex(text, px, py, font, 0, colors::white, true);
+	return dn_prepare_text_ex(text, px, py, font, 0, dn_colors::white, true);
 }
 
 dn_prepared_text_t* dn_prepare_text_wrap(const char* text, float32 px, float32 py, dn_baked_font_t* font, float32 wrap) {
-	return dn_prepare_text_ex(text, px, py, font, wrap, colors::white, true);
+	return dn_prepare_text_ex(text, px, py, font, wrap, dn_colors::white, true);
 }
 
 dn_prepared_text_t* dn_prepare_text_ex(const char* text, float32 px, float32 py, dn_baked_font_t* font, float32 wrap, Vector4 color, bool precise) {
