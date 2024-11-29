@@ -43,7 +43,7 @@ void dn_paths_add_subpath(const char* name, const char* parent_name, const char*
   if (!relative_path) return;
   
   auto parent_path = dn_paths_resolve(parent_name);
-  auto absolute_path = dn_allocators.bump.alloc_path();
+  auto absolute_path = dn::allocator::alloc<char>(&dn_allocators.bump, DN_MAX_PATH_LEN);
   snprintf(absolute_path, DN_MAX_PATH_LEN, "%s/%s", parent_path, relative_path);
   
   dn_paths_add_ex(name, absolute_path);
@@ -109,7 +109,7 @@ char* dn_paths_resolve_format_ex(const char* name, const char* file_name, dn_all
 
   auto& path = named_paths[name];
   
-  auto resolved_path = allocator->alloc_path();
+  auto resolved_path = dn::allocator::alloc<char>(allocator, DN_MAX_PATH_LEN);
   snprintf(resolved_path, DN_MAX_PATH_LEN, path.c_str(), file_name);
   return resolved_path;
 }
@@ -131,7 +131,7 @@ dn_named_path_result_t dn_paths_find_all() {
 }
 
 dn_tstring_t build_path(const char* relative_path) {
-  auto executable_file = dn_allocators.bump.alloc_path();
+  auto executable_file = dn::allocator::alloc<char>(&dn_allocators.bump, DN_MAX_PATH_LEN);
   GetModuleFileNameA(NULL, executable_file, DN_MAX_PATH_LEN);
 
   std::error_code error;
@@ -160,7 +160,7 @@ void set_write_path() {
 #if defined(FM_EDITOR)
   dn_paths_add_ex("write", build_path(dn_app.write_path));
 #else
-  auto appdata_dir = dn_allocators.bump.alloc_path();
+  auto appdata_dir = dn::allocator::alloc<char>(&dn_allocators.bump, DN_MAX_PATH_LEN);
 
   // In release mode, we have to write to an OS-approved directory. 
   SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, appdata_dir);

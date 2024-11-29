@@ -14,7 +14,7 @@ template<typename T, u64 N>
 fm_error arr_init(Array<T, N>* array, u64 capacity, dn_allocator_t* allocator) {
 	array->size = 0;
 	array->capacity = capacity;
-	array->data = allocator->alloc<T>(capacity);
+	array->data = dn::allocator::alloc<T>(allocator, capacity);
 	
 	if (array->data) return FM_ERR_SUCCESS;
 	return FM_ERR_FAILED_ALLOC;
@@ -44,7 +44,7 @@ fm_error arr_init(Array<T, N>* array, dn_allocator_t* allocator) {
 	static_assert(N > 0, "If you want to bake a fixed capacity into an Array, you need to put it as the second template parameter. Otherwise, specify the capacity when initializing.");
 	array->size = 0;
 	array->capacity = N;
-	array->data = allocator->alloc<T>(N);
+	array->data = dn::allocator::alloc<T>(allocator, N);
 	
 	if (array->data) return FM_ERR_SUCCESS;
 	return FM_ERR_FAILED_ALLOC;

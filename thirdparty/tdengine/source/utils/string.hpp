@@ -41,7 +41,7 @@ char* dn_string_copy(const char* str, u32 length, dn_allocator_t* allocator) {
   if (!allocator) allocator = &dn_allocators.standard;
 
   auto buffer_length = length + 1;
-  auto copy = allocator->alloc<char>(buffer_length);
+  auto copy = dn::allocator::alloc<char>(allocator, buffer_length);
   dn_string_copy_n(str, length, copy, buffer_length);
   return copy;
 }
@@ -83,7 +83,7 @@ void dn_string_copy_n(const char* str, u32 length, char* buffer, u32 buffer_leng
 void dn_string_builder_grow(dn_string_builder_t* builder, u32 requested_capacity) {
   if (builder->buffer.capacity > requested_capacity) return;
 
-  builder->buffer.data = builder->allocator->realloc<u8>(builder->buffer.data, requested_capacity);
+  builder->buffer.data = dn::allocator::realloc<u8>(builder->allocator, builder->buffer.data, requested_capacity);
   builder->buffer.capacity = requested_capacity;
 }
 
@@ -106,7 +106,7 @@ void dn_string_builder_append_fmt(dn_string_builder_t* builder, dn_string_t fmt,
 
 dn_string_t dn_string_builder_write(dn_string_builder_t* builder) {
   dn_string_t string = {
-    .data = builder->allocator->alloc<u8>(builder->buffer.count),
+    .data = dn::allocator::alloc<u8>(builder->allocator, builder->buffer.count),
     .len = builder->buffer.count
   };
 

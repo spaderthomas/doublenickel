@@ -96,32 +96,32 @@ void init_backgrounds() {
 
 
 void Background::init() {
-	this->tiles = dn_allocators.standard.alloc_array<char*>(64);
-	this->tile_full_paths = dn_allocators.standard.alloc_array<char*>(64);
-	this->tile_positions = dn_allocators.standard.alloc_array<Vector2I>(64);
-	this->source_image = dn_allocators.standard.alloc_path();
-	this->tile_output_folder = dn_allocators.standard.alloc_path();
+	arr_init(&this->tiles, &dn_allocators.standard);
+	arr_init(&this->tile_full_paths, &dn_allocators.standard);
+	arr_init(&this->tile_positions, &dn_allocators.standard);
+	this->source_image = dn::allocator::alloc<char>(&dn_allocators.standard, DN_MAX_PATH_LEN);
+	this->tile_output_folder = dn::allocator::alloc<char>(&dn_allocators.standard, DN_MAX_PATH_LEN);
 }
 
 void Background::deinit() {
 	arr_for(tiles, tile_ptr) {
 		char* tile = *tile_ptr;
-		dn_allocators.standard.free(tile);
+		dn::allocator::free(&dn_allocators.standard,tile);
 	}
 
 	arr_for(tile_full_paths, tile_ptr) {
 		char* tile = *tile_ptr;
-		dn_allocators.standard.free(tile);
+		dn::allocator::free(&dn_allocators.standard,tile);
 	}
 
-	dn_allocators.standard.free_array(&this->tiles);
-	dn_allocators.standard.free_array(&this->tile_full_paths);
-	dn_allocators.standard.free_array(&this->tile_positions);
-	dn_allocators.standard.free_array(&this->loaded_tiles);
-	dn_allocators.standard.free(this->source_image);
-	dn_allocators.standard.free(this->source_image_full_path);
-	dn_allocators.standard.free(this->tile_output_folder);
-	dn_allocators.standard.free(this->tile_output_full_path);
+	dn::allocator::free(&dn_allocators.standard, this->tiles.data);
+	dn::allocator::free(&dn_allocators.standard, this->tile_full_paths.data);
+	dn::allocator::free(&dn_allocators.standard, this->tile_positions.data);
+	dn::allocator::free(&dn_allocators.standard, this->loaded_tiles.data);
+	dn::allocator::free(&dn_allocators.standard, this->source_image);
+	dn::allocator::free(&dn_allocators.standard, this->source_image_full_path);
+	dn::allocator::free(&dn_allocators.standard, this->tile_output_folder);
+	dn::allocator::free(&dn_allocators.standard, this->tile_output_full_path);
 }
 
 void Background::load_paths() {
@@ -178,11 +178,11 @@ bool Background::add_tile() {
 		
 		
 	char** tile = arr_push(&tiles);
-	*tile = dn_allocators.standard.alloc_path();
+	*tile = dn::allocator::alloc<char>(&dn_allocators.standard, DN_MAX_PATH_LEN);
 	snprintf(*tile, 256, "%s_%03lld.png", name, tiles.size);
 		
 	char** tile_full_path = arr_push(&tile_full_paths);
-	*tile_full_path = dn_allocators.standard.alloc_path();
+	*tile_full_path = dn::allocator::alloc<char>(&dn_allocators.standard, DN_MAX_PATH_LEN);
 	snprintf(*tile_full_path, DN_MAX_PATH_LEN, "%s/%s", tile_output_full_path, *tile);
 
 	return true;
@@ -312,7 +312,7 @@ void Background::load_tiles() {
 	// Make a completion queue that's the exact size we need. (If you had a vector, this would be a great time
 	// to use a vector that allocates from temporary storage)
 
-	loaded_tiles = dn_allocators.standard.alloc_array<LoadedTile>(tiles.size);
+	loaded_tiles = dn::allocator::alloc_array<LoadedTile>(&dn_allocators.standard, tiles.size);
 
 	for (int tile_index = 0; tile_index < tiles.size; tile_index++) {
 		// Pull tile data
@@ -380,7 +380,7 @@ void TileProcessor::init(u32* source_data) {
 }
 
 void TileProcessor::deinit() {
-	dn_allocators.standard.free(tile_data);
+	dn::allocator::free(&dn_allocators.standard, tile_data);
 	tile_data = nullptr;
 	source_data = nullptr;
 }

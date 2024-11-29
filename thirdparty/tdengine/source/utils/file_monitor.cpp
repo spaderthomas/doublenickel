@@ -126,7 +126,7 @@ void FileMonitor::process_changes() {
 			}
 
 			// Construct the full path
-			char* full_path = dn_allocators.bump.alloc_path();
+			char* full_path = dn::allocator::alloc<char>(&dn_allocators.bump, DN_MAX_PATH_LEN);
 			char* partial_path = wide_to_utf8((uint16*)&notify->FileName[0], notify->FileNameLength / 2);
 			snprintf(full_path, DN_MAX_PATH_LEN, "%s/%s", info->path, partial_path);
 			normalize_path(full_path);

@@ -424,10 +424,8 @@ void TextureAtlas::write_to_config() {
 }
 
 void TextureAtlas::write_to_png() {
-  auto file_path = dn_paths_resolve_format_ex("dn_atlas", name, &dn_allocators.standard);
+  auto file_path = dn_paths_resolve_format_ex("dn_atlas", name, &dn_allocators.bump);
   stbi_write_png(file_path, TEXTURE_ATLAS_SIZE, TEXTURE_ATLAS_SIZE, 4, buffer.data, 0);
-  
-  dn_allocators.standard.free(file_path);
 }
 
 void TextureAtlas::load_to_gpu() {

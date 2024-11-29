@@ -80,7 +80,7 @@ void dn_imgui_update() {
   if (dn_imgui.layout_to_load) {
     ImGui::LoadIniSettingsFromDisk(dn_imgui.layout_to_load);
 
-    dn_allocators.standard.free(dn_imgui.layout_to_load); 
+    dn::allocator::free(&dn_allocators.standard, dn_imgui.layout_to_load); 
     dn_imgui.layout_to_load = nullptr;
   }
   
