@@ -2,7 +2,7 @@
 // TEXTURE ATLAS //
 ///////////////////
 void TextureAtlas::init() {
-  arr_init(&directories, MAX_DIRECTORIES_PER_ATLAS);
+  dn_array_init(&directories, MAX_DIRECTORIES_PER_ATLAS);
 
   texture = alloc_texture();
   texture->init(TEXTURE_ATLAS_SIZE, TEXTURE_ATLAS_SIZE, 4);
@@ -35,7 +35,7 @@ void TextureAtlas::set_name(const char* name) {
 }
 
 RectPackId* TextureAtlas::find_pack_item(i32 id) {
-  arr_for(ids, item) {
+  dn_array_for(ids, item) {
     if (item->id == id) return item;
   }
   return nullptr;
@@ -101,7 +101,7 @@ void TextureAtlas::calc_hash_and_mod_time() {
     }
   };
 
-  arr_for(directories, directory) {
+  dn_array_for(directories, directory) {
     check_directory(*directory);
   }
 
@@ -111,7 +111,7 @@ void TextureAtlas::calc_hash_and_mod_time() {
 
 void TextureAtlas::build_from_config() {
   this->buffer = Array<u32>();
-  arr_init(&this->buffer, TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE);
+  dn_array_init(&this->buffer, TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE);
 
   lua_State* l = dn_lua.state;
   // Push global texture data onto the stack
@@ -189,7 +189,7 @@ void TextureAtlas::build_from_config() {
     }
   };
       
-  arr_for(directories, directory) {
+  dn_array_for(directories, directory) {
     add_directory(*directory);
   }
 }
@@ -198,13 +198,13 @@ void TextureAtlas::build_from_source() {
   dn_log("%s: rebuilding %s", __func__, this->name);
 
   this->rects = Array<stbrp_rect>();
-  arr_init(&this->rects, MAX_IMAGES_PER_ATLAS);
+  dn_array_init(&this->rects, MAX_IMAGES_PER_ATLAS);
   this->ids = Array<RectPackId>();
-  arr_init(&this->ids, MAX_IMAGES_PER_ATLAS);
+  dn_array_init(&this->ids, MAX_IMAGES_PER_ATLAS);
   this->nodes = Array<stbrp_node>();
-  arr_init(&this->nodes, TEXTURE_ATLAS_SIZE);
+  dn_array_init(&this->nodes, TEXTURE_ATLAS_SIZE);
   this->buffer = Array<u32>();
-  arr_init(&this->buffer, TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE);
+  dn_array_init(&this->buffer, TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE);
 
   constexpr int fudge_px = 5;
   constexpr float fudge_uv = fudge_px / (float)TEXTURE_ATLAS_SIZE; 
@@ -231,7 +231,7 @@ void TextureAtlas::build_from_source() {
         sprite->hash = dn_hash_cstr_dumb(file_name.c_str());
         strncpy(sprite->file_path, file_name.c_str(), DN_MAX_PATH_LEN);
 
-        auto id = arr_push(&ids);
+        auto id = dn_array_push(&ids);
         id->sprite = sprite;
 
         // @hack: Sometimes on hotload the file is open when this is hit, it fails to open the file, bad things happen.
@@ -241,7 +241,7 @@ void TextureAtlas::build_from_source() {
           id->data = (u32*)stbi_load(path.c_str(), &sprite->size.x, &sprite->size.y, &id->channels, 0);
         }
 
-        auto rect = arr_push(&rects);
+        auto rect = dn_array_push(&rects);
         rect->id = id->id;
         rect->w = sprite->size.x + fudge_px;
         rect->h = sprite->size.y + fudge_px;
@@ -249,7 +249,7 @@ void TextureAtlas::build_from_source() {
     }
   };
   
-  arr_for(directories, directory) {
+  dn_array_for(directories, directory) {
     add_directory(*directory);
   }
 
@@ -259,7 +259,7 @@ void TextureAtlas::build_from_source() {
   stbrp_pack_rects(&stbrp, rects.data, rects.size);
 
   // Copy the sprites into the texture atlas
-  arr_for(rects, rect) {
+  dn_array_for(rects, rect) {
     auto item = find_pack_item(rect->id);
     auto size = item->sprite->size;
 
@@ -394,7 +394,7 @@ void TextureAtlas::write_to_config() {
     }
   };
       
-  arr_for(directories, directory) {
+  dn_array_for(directories, directory) {
     write_directory(*directory);
   }
 
@@ -430,10 +430,10 @@ void TextureAtlas::write_to_png() {
 
 void TextureAtlas::load_to_gpu() {
   texture->load_to_gpu(buffer.data);
-  arr_free(&ids);
-  arr_free(&rects);
-  arr_free(&nodes);
-  arr_free(&buffer);
+  dn_array_free(&ids);
+  dn_array_free(&rects);
+  dn_array_free(&nodes);
+  dn_array_free(&buffer);
 }
 
 
@@ -497,7 +497,7 @@ void init_texture_atlas() {
   
   lua_pushnil(l);
   while (lua_next(l, -2)) {
-    auto atlas = arr_push(&atlas_infos);
+    auto atlas = dn_array_push(&atlas_infos);
     atlas->init();
 
     // Mod time
@@ -536,7 +536,7 @@ void init_texture_atlas() {
 
       auto subdirectory = lua_tostring(l, -1);
       auto directory = dn_paths_resolve_format_ex("dn_image", subdirectory, &dn_allocators.standard);
-      arr_push(&atlas->directories, directory);
+      dn_array_push(&atlas->directories, directory);
       atlas->file_monitor->add_directory(directory);
     }
     lua_pop(l, 1);
@@ -549,7 +549,7 @@ void init_texture_atlas() {
   lua_pop(l, 1); // pop data.atlases
   return;
   // Load texture atlases; most are loaded async, except for a few important early ones
-  arr_for(atlas_infos, atlas) {
+  dn_array_for(atlas_infos, atlas) {
     // Step 1: Ensure that the atlas is up-to-date with its source images and load it into memory
     if (atlas->is_dirty()) {
       // Dirty atlases need to be rebuilt from source (i.e. load every constituent PNG, pack them into an atlas,
@@ -679,7 +679,7 @@ u32 find_texture_handle(const char* name) {
 Texture* find_texture(dn_hash_t hash) {
   std::lock_guard lock(image_mutex);
   
-  arr_for(image_infos, image) {
+  dn_array_for(image_infos, image) {
     if (image->hash == hash) return image;
   }
 
@@ -692,7 +692,7 @@ Sprite* find_sprite_no_default(const char* name) {
   if (!name) return nullptr;
 
   auto hash = dn_hash_cstr_dumb(name);
-  arr_for(sprite_infos, sprite) {
+  dn_array_for(sprite_infos, sprite) {
     if (sprite->hash == hash) return sprite;
   }
   
@@ -707,7 +707,7 @@ Sprite* find_sprite(const char* name) {
 }
 
 Vector2* alloc_uvs_no_lock() {
-  return arr_push(&tc_data, Vector2(), 6);
+  return dn_array_push(&tc_data, Vector2(), 6);
 }
 
 Vector2* alloc_uvs() {
@@ -717,7 +717,7 @@ Vector2* alloc_uvs() {
 
 Texture* alloc_texture() {
   std::lock_guard lock(image_mutex);
-  return arr_push(&image_infos);
+  return dn_array_push(&image_infos);
 }
 
 Sprite* alloc_sprite() {
@@ -735,7 +735,7 @@ Sprite* alloc_sprite() {
   // your lifetimes get all tangled up and you have no way to reason about when a thing is valid or not. But it's not
   // worth rewriting a bunch of code just for this simple case; just a note for the future. 
   std::lock_guard lock(image_mutex);
-  auto sprite = arr_push(&sprite_infos);
+  auto sprite = dn_array_push(&sprite_infos);
   sprite->uv = alloc_uvs_no_lock();
   return sprite;
 }

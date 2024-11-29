@@ -72,7 +72,7 @@ ArrayView<char> dn_prepared_text_t::get_line(int32 index) {
 	auto end   = get_break(index + 1);
 	auto count = end - begin;
 	
-	return arr_view(
+	return dn_array_view(
 		text + begin,
 		count
 	);
@@ -107,7 +107,7 @@ dn_prepared_text_t* dn_prepare_text_ex(const char* text, float32 px, float32 py,
 	float32 this_line_width = 0;
 	for (int i = 0; i < prepared_text->count_breaks(); i++) {
 		auto line = prepared_text->get_line(i);
-		arr_for(line, c) {
+		dn_array_for(line, c) {
 			if (*c == 0) break;
 			dn_baked_glyph_t& glyph = prepared_text->font->glyphs[*c];
 			this_line_width += glyph.advance.x;
@@ -121,7 +121,7 @@ dn_prepared_text_t* dn_prepare_text_ex(const char* text, float32 px, float32 py,
 	auto first_line = prepared_text->get_line(0);
 	float32 first_line_height = 0;
 	float32 first_line_descender = 0;
-	arr_for(first_line, c) {
+	dn_array_for(first_line, c) {
 		if (*c == 0) break;
 		dn_baked_glyph_t& glyph = prepared_text->font->glyphs[*c];
 		first_line_height = std::max(first_line_height, glyph.size.y - glyph.descender);
@@ -178,7 +178,7 @@ void LineBreakContext::calculate() {
 	float32 word_size = 0;
 	int32 word_begin  = 0;
 	dn_baked_glyph_t* glyph  = nullptr;
-	auto text = arr_view(info->text, MAX_TEXT_LEN);
+	auto text = dn_array_view(info->text, MAX_TEXT_LEN);
 
 	auto break_on_previous_word = [&]() {
 		// word_begin points, inclusively, to the first character of the next word.
@@ -188,12 +188,12 @@ void LineBreakContext::calculate() {
 	};
 
 	auto begin_new_word = [&](char* c) {
-		word_begin = arr_indexof(&text, c) + 1;
+		word_begin = dn_array_indexof(&text, c) + 1;
 		word_size = 0;
 	};
 
 
-	arr_for(text, c) {
+	dn_array_for(text, c) {
 		if (*c == 0) break;
 		glyph = &this->info->font->glyphs[*c];
 
@@ -205,7 +205,7 @@ void LineBreakContext::calculate() {
 
 			// Add a line break at the index of the newline, begin a new word at the next character,
 			// and reset the point (since we're starting at the very beginning of the next line)
-			this->info->add_break(arr_indexof(&text, c));
+			this->info->add_break(dn_array_indexof(&text, c));
 			
 			this->point = 0;
 			begin_new_word(c);

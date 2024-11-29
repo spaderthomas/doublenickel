@@ -234,7 +234,7 @@ void dn_asset_copy_name(const char* source, dn_asset_name_t dest) {
 void dn_assets_update() {
   asset_loader.process_completion_queue();
 
-  arr_for(backgrounds, background) {
+  dn_array_for(backgrounds, background) {
     if (background->gpu_ready && !background->gpu_done) {
       background->load_one_to_gpu();
 

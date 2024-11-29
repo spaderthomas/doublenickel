@@ -11,30 +11,30 @@ void memfill(void* dst, i32 size, void* pattern, i32 pattern_size) {
 }
 
 template<typename T, u64 N>
-void arr_init(Array<T, N>* array, u64 capacity, dn_allocator_t* allocator) {
+void dn_array_init(Array<T, N>* array, u64 capacity, dn_allocator_t* allocator) {
 	array->size = 0;
 	array->capacity = capacity;
 	array->data = dn::allocator::alloc<T>(allocator, capacity);
 }
 
 template<typename T, u64 N>
-void arr_init(Array<T, N>* array, u64 capacity) {
-	arr_init(array, capacity, &dn_allocators.standard);
+void dn_array_init(Array<T, N>* array, u64 capacity) {
+	dn_array_init(array, capacity, &dn_allocators.standard);
 }
 
 template<typename T, u64 N>
-void arr_init(Array<T, N>* array, u64 capacity, T fill) {
-	arr_init(array, capacity, &dn_allocators.standard);
-	arr_fill(array, T());
+void dn_array_init(Array<T, N>* array, u64 capacity, T fill) {
+	dn_array_init(array, capacity, &dn_allocators.standard);
+	dn_array_fill(array, T());
 }
 
 template<typename T, u64 N>
-void arr_init(Array<T, N>* array) {
-	arr_init(array, &dn_allocators.standard);
+void dn_array_init(Array<T, N>* array) {
+	dn_array_init(array, &dn_allocators.standard);
 }
 
 template<typename T, u64 N>
-void arr_init(Array<T, N>* array, dn_allocator_t* allocator) {
+void dn_array_init(Array<T, N>* array, dn_allocator_t* allocator) {
 	static_assert(N > 0, "If you want to bake a fixed capacity into an Array, you need to put it as the second template parameter. Otherwise, specify the capacity when initializing.");
 	array->size = 0;
 	array->capacity = N;
@@ -42,43 +42,43 @@ void arr_init(Array<T, N>* array, dn_allocator_t* allocator) {
 }
 
 template<typename T, u64 N>
-void arr_clear(Array<T, N>* array) {
+void dn_array_clear(Array<T, N>* array) {
 	memset(array->data, 0, array->size * sizeof(T));
 	array->size = 0;
 }
 
 template<typename T, u64 N>
-void arr_fastclear(Array<T, N>* array) {
+void dn_array_fastclear(Array<T, N>* array) {
 	array->size = 0;
 }
 
 template<typename T, u64 N>
-void arr_clear_n(Array<T, N>* array, i32 n) {
+void dn_array_clear_n(Array<T, N>* array, i32 n) {
 	memset(array->data, 0, n * sizeof(T));
 	array->size = 0;
 }
 
 template<typename T, u64 N>
-void arr_fill(Array<T, N>* array, T element) {
-	memfill(array->data, arr_bytes(array), &element, sizeof(T));
+void dn_array_fill(Array<T, N>* array, T element) {
+	memfill(array->data, dn_array_bytes(array), &element, sizeof(T));
 	array->size = array->capacity; 
 }
 
 template<typename T, u64 N>
-void arr_fill(Array<T, N>* array, T element, u64 count) {
+void dn_array_fill(Array<T, N>* array, T element, u64 count) {
 	memfill(array->data, count * sizeof(T), &element, sizeof(T));
 	array->size = count;
 }
 
 template<typename T, u64 N>
-void arr_fill(Array<T, N>* array, u64 offset, u64 count, T element) {
+void dn_array_fill(Array<T, N>* array, u64 offset, u64 count, T element) {
 	memfill(array->data + offset, count * sizeof(T), &element, sizeof(T));
 	array->size = count;
 	// You're on your own as far as the size here
 }
 
 template<typename T, u64 N>
-Array<T, N> arr_stack(T* data, u64 capacity) {
+Array<T, N> dn_array_stack(T* data, u64 capacity) {
 	DN_ASSERT(data);
 
 	Array<T, N> array;
@@ -89,7 +89,7 @@ Array<T, N> arr_stack(T* data, u64 capacity) {
 }
 
 template<typename T, u64 N>
-Array<T, N> arr_stack(T (&c_array)[N]) {
+Array<T, N> dn_array_stack(T (&c_array)[N]) {
 	Array<T, N> array;
 	array.size = 0;
 	array.capacity = N;
@@ -98,7 +98,7 @@ Array<T, N> arr_stack(T (&c_array)[N]) {
 }
 
 template<typename T, u64 N>
-Array<T, N> arr_slice(Array<T, N>* array, u64 index, u64 size) {
+Array<T, N> dn_array_slice(Array<T, N>* array, u64 index, u64 size) {
 	DN_ASSERT(index >= 0);
 	DN_ASSERT(index + size <= array->capacity);
 	
@@ -111,7 +111,7 @@ Array<T, N> arr_slice(Array<T, N>* array, u64 index, u64 size) {
 }
 
 template<typename T, u64 N>
-Array<T, N> arr_slice(T* data, u64 size) {
+Array<T, N> dn_array_slice(T* data, u64 size) {
 	Array<T, N> arr;
 	arr.size = size;
 	arr.capacity = size;
@@ -121,7 +121,7 @@ Array<T, N> arr_slice(T* data, u64 size) {
 }
 
 template<typename T, u64 N>
-Array<T, N> arr_slice(T (&data)[N]) {
+Array<T, N> dn_array_slice(T (&data)[N]) {
 	Array<T, N> array;
 	array.size = N;
 	array.capacity = N;
@@ -130,7 +130,7 @@ Array<T, N> arr_slice(T (&data)[N]) {
 }
 
 template<typename T, u64 N>
-u32 arr_indexof(Array<T, N>* array, T* element) {
+u32 dn_array_indexof(Array<T, N>* array, T* element) {
 	u32 index = element - array->data;
 	DN_ASSERT(index >= 0);
 	DN_ASSERT(index < array->size);
@@ -138,17 +138,17 @@ u32 arr_indexof(Array<T, N>* array, T* element) {
 }
 
 template<typename T, u64 N>
-T* arr_at(Array<T, N>* array, u64 index) {
+T* dn_array_at(Array<T, N>* array, u64 index) {
 	return (*array)[index];
 }
 
 template<typename T, u64 N>
-bool arr_full(Array<T, N>* array) {
+bool dn_array_full(Array<T, N>* array) {
 	return array->size ==  array->capacity;
 }
 
 template<typename T, u64 N>
-T* arr_push(Array<T, N>* array, const T* data, u64 count) {
+T* dn_array_push(Array<T, N>* array, const T* data, u64 count) {
 	i32 remaining = array->capacity - array->size;
 	assert(remaining >= count && "Insufficient space remaining!");
 
@@ -161,7 +161,7 @@ T* arr_push(Array<T, N>* array, const T* data, u64 count) {
 }
 
 template<typename T, u64 N>
-T* arr_push(Array<T, N>* array, T* data, u64 count) {
+T* dn_array_push(Array<T, N>* array, T* data, u64 count) {
 	i32 remaining = array->capacity - array->size;
 	assert(remaining >= count && "Insufficient space remaining!");
 	
@@ -172,7 +172,7 @@ T* arr_push(Array<T, N>* array, T* data, u64 count) {
 }
 
 template<typename T, u64 N>
-T* arr_push(Array<T, N>* array, T element, u64 count) {
+T* dn_array_push(Array<T, N>* array, T element, u64 count) {
 	auto back = array->data + array->size;
 	memfill(back, count * sizeof(T), &element, sizeof(T));
 	array->size += count;
@@ -180,7 +180,7 @@ T* arr_push(Array<T, N>* array, T element, u64 count) {
 }
 
 template<typename T, u64 N>
-T* arr_push(Array<T, N>* array, T* data) {
+T* dn_array_push(Array<T, N>* array, T* data) {
 	assert(array->size < array->capacity && "Insufficient space remaining!");
 	array->data[array->size] = *data;
 	T* out = array->data + array->size;
@@ -189,7 +189,7 @@ T* arr_push(Array<T, N>* array, T* data) {
 }
 
 template<typename T, u64 N>
-T* arr_push(Array<T, N>* array, T data) {
+T* dn_array_push(Array<T, N>* array, T data) {
 	assert(array->size < array->capacity && "Insufficient space remaining!");
 	array->data[array->size] = data;
 	T* out = array->data + array->size;
@@ -198,7 +198,7 @@ T* arr_push(Array<T, N>* array, T data) {
 }
 
 template<typename T, u64 N>
-T* arr_push(Array<T, N>* array) {
+T* dn_array_push(Array<T, N>* array) {
 	assert(array->size < array->capacity && "Insufficient space remaining!");
 	array->data[array->size] = T();
 	T* out = array->data + array->size;
@@ -207,14 +207,14 @@ T* arr_push(Array<T, N>* array) {
 }
 
 template<typename T, u64 N>
-void arr_pop(Array<T, N>* array) {
+void dn_array_pop(Array<T, N>* array) {
 	DN_ASSERT(array->size && "cannot pop / what has not / been pushed");
 	array->size -= 1;
 	return;
 }
 
 template<typename T, u64 N>
-T* arr_reserve(Array<T, N>* array, u64 count) {
+T* dn_array_reserve(Array<T, N>* array, u64 count) {
 	DN_ASSERT(array->size <= array->capacity + count && "Insufficient space remaining!");
 	T* out = array->data + array->size;
 	array->size += count;
@@ -223,7 +223,7 @@ T* arr_reserve(Array<T, N>* array, u64 count) {
 
 
 template<typename T, u64 N>
-T* arr_concat(Array<T, N>* dest, Array<T, N>* source) {
+T* dn_array_concat(Array<T, N>* dest, Array<T, N>* source) {
 	DN_ASSERT(dest->size + source->size < dest->capacity);
 	memcpy(dest->data + dest->size, source->data, sizeof(T) * source->count);
 	T* out = dest->data + dest->size;
@@ -232,7 +232,7 @@ T* arr_concat(Array<T, N>* dest, Array<T, N>* source) {
 }
 
 template<typename T, u64 N>
-T* arr_concat(Array<T, N>* dest, Array<T, N>* source, u64 count) {
+T* dn_array_concat(Array<T, N>* dest, Array<T, N>* source, u64 count) {
 	DN_ASSERT(dest->size + count < dest->capacity);
 	memcpy(dest->data + dest->size, source->data, sizeof(T) * count);
 	T* out = dest->data + dest->size;
@@ -242,19 +242,19 @@ T* arr_concat(Array<T, N>* dest, Array<T, N>* source, u64 count) {
 
 
 template<typename T, u64 N>
-T* arr_back(Array<T, N>* array) {
+T* dn_array_back(Array<T, N>* array) {
 	if (!array->size) return array->data;
 	return array->data + (array->size - 1);
 }
 
 template<typename T, u64 N>
-T* arr_next(Array<T, N>* array) {
+T* dn_array_next(Array<T, N>* array) {
 	DN_ASSERT(array->size != array->capacity);
 	return array->data + (array->size);
 }
 
 template<typename T, u64 N>
-void arr_free(Array<T, N>* array) {
+void dn_array_free(Array<T, N>* array) {
 	if (!array->data) return;
 	
 	free(array->data);
@@ -266,24 +266,24 @@ void arr_free(Array<T, N>* array) {
 }
 
 template<typename T, u64 N>
-i32 arr_bytes(Array<T, N>* array) {
+i32 dn_array_bytes(Array<T, N>* array) {
 	return array->capacity * sizeof(T);
 }
 
 template<typename T, u64 N>
-i32 arr_bytes_used(Array<T, N>* array) {
+i32 dn_array_bytes_used(Array<T, N>* array) {
 	return array->size * sizeof(T);
 }
 
-#define arr_for(array, it) for (auto (it) = (array).data; (it) != ((array).data + (array).size); (it)++)
-#define arr_rfor(array, it) for (auto (it) = (array).data + array.size - 1; (it) >= ((array).data); (it)--)
+#define dn_array_for(array, it) for (auto (it) = (array).data; (it) != ((array).data + (array).size); (it)++)
+#define dn_array_rfor(array, it) for (auto (it) = (array).data + array.size - 1; (it) >= ((array).data); (it)--)
 
 
 ////////////////
 // ARRAY VIEW //
 ////////////////
 template<typename T>
-ArrayView<T> arr_view(T* data, u64 size) {
+ArrayView<T> dn_array_view(T* data, u64 size) {
 	ArrayView<T> view;
 	view.size = size;
 	view.capacity = size;
@@ -293,7 +293,7 @@ ArrayView<T> arr_view(T* data, u64 size) {
 }
 
 template<typename T>
-ArrayView<T> arr_view(Array<T>* array) {
+ArrayView<T> dn_array_view(Array<T>* array) {
 	ArrayView<T> view;
 	view.size = array->size;
 	view.capacity = array->size;
@@ -303,7 +303,7 @@ ArrayView<T> arr_view(Array<T>* array) {
 }
 
 template<typename T>
-ArrayView<T> arr_view(Array<T>* array, u64 index, u64 count) {
+ArrayView<T> dn_array_view(Array<T>* array, u64 index, u64 count) {
 	DN_ASSERT(index >= 0);
 	DN_ASSERT(index + count <= array->capacity);
 
@@ -316,7 +316,7 @@ ArrayView<T> arr_view(Array<T>* array, u64 index, u64 count) {
 }
 
 template<typename T, u64 N>
-ArrayView<T> arr_view(T (&array)[N]) {
+ArrayView<T> dn_array_view(T (&array)[N]) {
 	ArrayView<T> view;
 	view.size = N;
 	view.capacity = N;
@@ -327,7 +327,7 @@ ArrayView<T> arr_view(T (&array)[N]) {
 
 
 template<typename T>
-i32 arr_indexof(ArrayView<T>* array, T* element) {
+i32 dn_array_indexof(ArrayView<T>* array, T* element) {
 	i32 index = element - array->data;
 	DN_ASSERT(index >= 0);
 	DN_ASSERT(index < array->size);
@@ -339,26 +339,26 @@ i32 arr_indexof(ArrayView<T>* array, T* element) {
 // ARRAY MARKER //
 //////////////////
 template<typename T>
-ArrayMarker<T> arr_marker_make(Array<T>* array) {
+ArrayMarker<T> dn_array_marker_make(Array<T>* array) {
 	ArrayMarker<T> marker;
-	arr_marker_init(&marker, array);
+	dn_array_marker_init(&marker, array);
 	return marker;
 }
 
 template<typename T>
-void arr_marker_init(ArrayMarker<T>* marker, Array<T>* array) {
+void dn_array_marker_init(ArrayMarker<T>* marker, Array<T>* array) {
 	marker->begin = array->size;
 	marker->array = array;
 }
 
 template<typename T>
-void arr_marker_freeze(ArrayMarker<T>* marker) {
+void dn_array_marker_freeze(ArrayMarker<T>* marker) {
 	assert(marker->array);
 	marker->frozen_size = marker->array->size;
 }
 
 template<typename T>
-i32 arr_marker_count(ArrayMarker<T>* marker) {
+i32 dn_array_marker_count(ArrayMarker<T>* marker) {
 	if (marker->frozen_size >= 0) return marker->frozen_size - marker->begin;
 	return marker->array->size - marker->begin;
 }

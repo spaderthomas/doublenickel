@@ -116,10 +116,10 @@ char* dn_paths_resolve_format_ex(const char* name, const char* file_name, dn_all
 
 dn_named_path_result_t dn_paths_find_all() {
   Array<dn_named_path_t> collected_paths;
-  arr_init(&collected_paths, named_paths.size(), &dn_allocators.bump);
+  dn_array_init(&collected_paths, named_paths.size(), &dn_allocators.bump);
 
   for (auto& [name, path] : named_paths) {
-    auto collected_path = arr_push(&collected_paths);
+    auto collected_path = dn_array_push(&collected_paths);
     collected_path->name = dn_string_copy(name, &dn_allocators.bump);
     collected_path->path = dn_string_copy(path, &dn_allocators.bump);
   }

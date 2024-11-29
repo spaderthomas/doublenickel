@@ -3,7 +3,7 @@ void init_backgrounds() {
 	auto& lua = dn_lua;
 	lua_State* l = dn_lua.state;
 
-	arr_init(&backgrounds, 64);
+	dn_array_init(&backgrounds, 64);
 			
 	lua_getglobal(l, "tdengine");
 	DEFER_POP(l);
@@ -18,7 +18,7 @@ void init_backgrounds() {
 	while (lua_next(l, -2)) {
 		DEFER_POP(l);
 
-		auto background = arr_push(&backgrounds);
+		auto background = dn_array_push(&backgrounds);
 		background->init();
 		background->load_paths();
 		
@@ -96,20 +96,20 @@ void init_backgrounds() {
 
 
 void Background::init() {
-	arr_init(&this->tiles, &dn_allocators.standard);
-	arr_init(&this->tile_full_paths, &dn_allocators.standard);
-	arr_init(&this->tile_positions, &dn_allocators.standard);
+	dn_array_init(&this->tiles, &dn_allocators.standard);
+	dn_array_init(&this->tile_full_paths, &dn_allocators.standard);
+	dn_array_init(&this->tile_positions, &dn_allocators.standard);
 	this->source_image = dn::allocator::alloc<char>(&dn_allocators.standard, DN_MAX_PATH_LEN);
 	this->tile_output_folder = dn::allocator::alloc<char>(&dn_allocators.standard, DN_MAX_PATH_LEN);
 }
 
 void Background::deinit() {
-	arr_for(tiles, tile_ptr) {
+	dn_array_for(tiles, tile_ptr) {
 		char* tile = *tile_ptr;
 		dn::allocator::free(&dn_allocators.standard,tile);
 	}
 
-	arr_for(tile_full_paths, tile_ptr) {
+	dn_array_for(tile_full_paths, tile_ptr) {
 		char* tile = *tile_ptr;
 		dn::allocator::free(&dn_allocators.standard,tile);
 	}
@@ -156,10 +156,10 @@ bool Background::add_tile() {
 	// Calculate where the next tile will be
 	if (!tile_positions.size) {
 		// If we just started, it's just (0, 0)
-		arr_push(&tile_positions);
+		dn_array_push(&tile_positions);
 	} else {
 		// Otherwise, advance the previous tile one column, and move to the next row if needed.
-		Vector2I last_tile_position = *arr_back(&tile_positions);
+		Vector2I last_tile_position = *dn_array_back(&tile_positions);
 		Vector2I tile_position = { 0, 0 };
 		tile_position.x = last_tile_position.x + Background::TILE_SIZE;
 		tile_position.y = last_tile_position.y;
@@ -172,16 +172,16 @@ bool Background::add_tile() {
 		if (tile_position.y >= height) {
 			return false;
 		} else {
-			arr_push(&tile_positions, tile_position);
+			dn_array_push(&tile_positions, tile_position);
 		}
 	}
 		
 		
-	char** tile = arr_push(&tiles);
+	char** tile = dn_array_push(&tiles);
 	*tile = dn::allocator::alloc<char>(&dn_allocators.standard, DN_MAX_PATH_LEN);
 	snprintf(*tile, 256, "%s_%03lld.png", name, tiles.size);
 		
-	char** tile_full_path = arr_push(&tile_full_paths);
+	char** tile_full_path = dn_array_push(&tile_full_paths);
 	*tile_full_path = dn::allocator::alloc<char>(&dn_allocators.standard, DN_MAX_PATH_LEN);
 	snprintf(*tile_full_path, DN_MAX_PATH_LEN, "%s/%s", tile_output_full_path, *tile);
 
@@ -210,7 +210,7 @@ void Background::build_from_source() {
 	constexpr u32 nthreads = 16;
 	TileProcessor::current_tile = 0;
 	Array<TileProcessor> tile_processors;
-	arr_init(&tile_processors, nthreads, TileProcessor());
+	dn_array_init(&tile_processors, nthreads, TileProcessor());
 
 	// Use a thread per-tile, up to the maximum number of threads in the pool.
 	auto use_threads = DN_MIN(tiles.size, nthreads);
@@ -312,7 +312,7 @@ void Background::load_tiles() {
 	// Make a completion queue that's the exact size we need. (If you had a vector, this would be a great time
 	// to use a vector that allocates from temporary storage)
 
-	arr_init(&this->loaded_tiles, this->tiles.size, &dn_allocators.standard);
+	dn_array_init(&this->loaded_tiles, this->tiles.size, &dn_allocators.standard);
 
 	for (int tile_index = 0; tile_index < tiles.size; tile_index++) {
 		// Pull tile data
@@ -337,7 +337,7 @@ void Background::load_tiles() {
 		for (u32 i = 0; i < 6; i++) sprite->uv[i] = uv[i];
 
 		// Mark the data to be loaded to the GPU
-		auto item = arr_push(&loaded_tiles);
+		auto item = dn_array_push(&loaded_tiles);
 		item->texture = texture;
 		item->data = data;
 	}

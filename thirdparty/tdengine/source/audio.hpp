@@ -188,14 +188,14 @@ void dn_audio_init(dn_audio_config_t config) {
   saudio_setup(&descriptor);
 
   auto max_samples_requested = saudio_expect() * saudio_channels() * 2;
-  arr_init(&dn_audio.sample_buffer, max_samples_requested);
+  dn_array_init(&dn_audio.sample_buffer, max_samples_requested);
   dn_audio.sample_buffer.size = dn_audio.sample_buffer.capacity;
 
 
   // We use this array like a free list, so it is always full and we determine which elements are current
   // based on a flag in the element itself.
   active_sounds.size = active_sounds.capacity;
-  arr_for(active_sounds, active_sound) {
+  dn_array_for(active_sounds, active_sound) {
     active_sound->occupied = false;
   }
 
@@ -252,7 +252,7 @@ void dn_audio_update(float* buffer, int frames_requested, int num_channels) {
 
   std::unique_lock lock(dn_audio_mutex);
 
-  arr_for(active_sounds, active_sound) {
+  dn_array_for(active_sounds, active_sound) {
     if (!active_sound->occupied) continue;
     if (active_sound->paused) continue;
     if (!dn_gen_arena_handle_valid(active_sound->info)) continue;
@@ -271,7 +271,7 @@ void dn_audio_update(float* buffer, int frames_requested, int num_channels) {
   while (chaining_sounds) {
     chaining_sounds = false;
     
-    arr_for(active_sounds, active_sound) {
+    dn_array_for(active_sounds, active_sound) {
       if (!active_sound->occupied) continue;
       if (active_sound->paused) continue;
 
@@ -320,7 +320,7 @@ void dn_audio_update(float* buffer, int frames_requested, int num_channels) {
   }
 
   memcpy(buffer, dn_audio.sample_buffer.data, samples_requested * sizeof(float));
-  arr_fill(&dn_audio.sample_buffer, 0.f);
+  dn_array_fill(&dn_audio.sample_buffer, 0.f);
 }
 
 void dn_audio_shutdown() {
@@ -330,7 +330,7 @@ void dn_audio_shutdown() {
 bool dn_audio_is_any_playing() {
   std::unique_lock lock(dn_audio_mutex);
   
-  arr_for(active_sounds, active_sound) {
+  dn_array_for(active_sounds, active_sound) {
     if (active_sound->occupied) return true;
   }
 
@@ -341,7 +341,7 @@ dn_audio_info_t* dn_audio_find_no_default(const char* name) {
   std::unique_lock lock(dn_audio_mutex);
 
   auto hash = dn_hash_cstr_dumb(name);
-  arr_for(sound_infos, info) {
+  dn_array_for(sound_infos, info) {
     if (info->hash == hash) return info;
   }
 
@@ -389,7 +389,7 @@ dn_audio_instance_handle_t dn_audio_play_sound_ex(dn_audio_info_t* sound, bool l
   if (!dn_gen_arena_handle_valid(handle)) return handle;
 
   auto active_sound = dn_audio_resolve(handle);
-  active_sound->info = { arr_indexof(&sound_infos, sound), sound->generation };
+  active_sound->info = { dn_array_indexof(&sound_infos, sound), sound->generation };
   active_sound->volume = 1.f;
   active_sound->next_sample = 0;
   active_sound->loop = loop;
@@ -422,7 +422,7 @@ void dn_audio_stop_ex(dn_audio_instance_t* active_sound) {
 
 dn_audio_info_t* alloc_sound(const char* file_name) {
   auto sound = dn_audio_find_no_default(file_name);
-  if (!sound) sound = arr_push(&sound_infos);
+  if (!sound) sound = dn_array_push(&sound_infos);
   sound->generation++;
 
   return sound;
@@ -550,7 +550,7 @@ void dn_audio_stop(dn_audio_instance_handle_t handle) {
 }
 
 void dn_audio_stop_all() {
-  arr_for(active_sounds, active_sound) {
+  dn_array_for(active_sounds, active_sound) {
     dn_audio_stop_ex(active_sound);
   }
 }

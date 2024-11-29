@@ -278,7 +278,7 @@ dn_gen_arena_handle_t ef_create(u32 grid_size) {
 	system->num_boundary_workgroups = dn_math_ceil_divide(system->gpu.grid_size, EulerianFluidSim::threads_per_workgroup);
 	system->gauss_seidel_iterations = 20;
 	
-	arr_init(&system->sources, system->num_cells);
+	dn_array_init(&system->sources, system->num_cells);
 	system->sources.size = system->sources.capacity;
 
 	glGenBuffers(1, &system->system);
@@ -302,7 +302,7 @@ void ef_destroy(dn_gen_arena_handle_t handle) {
 	glDeleteBuffers(1, &system->fluid);
 	glDeleteBuffers(1, &system->source);
 
-	arr_free(&system->sources);
+	dn_array_free(&system->sources);
 
 	EulerianFluidSim::systems.remove(handle);
 }
@@ -352,7 +352,7 @@ void ef_clear_density_source(dn_gen_arena_handle_t handle) {
 	auto system = EulerianFluidSim::systems[handle];
 	if (!system) return;
 
-	arr_clear(&system->sources);
+	dn_array_clear(&system->sources);
 	system->sources.size = system->sources.capacity;
 }
 

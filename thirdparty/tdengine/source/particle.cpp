@@ -61,7 +61,7 @@ void clear_particles(ParticleSystemHandle handle) {
 	auto particle_system = find_particle_system(handle);
 	if (!particle_system) return;
 
-	arr_for(particle_system->particles, particle) {
+	dn_array_for(particle_system->particles, particle) {
 		if (!particle->occupied) continue;
 		particle_system->despawn_particle(particle);
 	}
@@ -78,7 +78,7 @@ void draw_particles(ParticleSystemHandle handle) {
 	auto particle_system = find_particle_system(handle);
 	if (!particle_system) return;
 
-	arr_for(particle_system->particles, particle) {
+	dn_array_for(particle_system->particles, particle) {
 		if (!particle->occupied) continue;
 
 		// DRAW ONE PARTICLE
@@ -100,7 +100,7 @@ void draw_particles(ParticleSystemHandle handle) {
 }
 
 void stop_all_particles() {
-	arr_for(particle_systems, particle_system) {
+	dn_array_for(particle_systems, particle_system) {
 		if (particle_system->occupied) {
 			particle_system->emit = false;
 		}
@@ -334,7 +334,7 @@ void set_particle_gravity_enabled(ParticleSystemHandle handle, bool enabled) {
 /////////////////////
 void ParticleSystem::init() {
 	// INTERNAL DATA STRUCTURES
-	arr_init(&particles, ParticleSystem::max_particles);
+	dn_array_init(&particles, ParticleSystem::max_particles);
 	particles.size = ParticleSystem::max_particles;
 	
 	for (int index = 0; index < particles.size - 1; index++) {
@@ -374,7 +374,7 @@ void ParticleSystem::init() {
 }
 
 void ParticleSystem::deinit() {
-	arr_free(&particles);
+	dn_array_free(&particles);
 }
 
 void ParticleSystem::update() {
@@ -394,7 +394,7 @@ void ParticleSystem::update() {
 		float alignment_threshold = 0.95f;
 		float deceleration = .99f;
 		
-		arr_for(particles, particle) {
+		dn_array_for(particles, particle) {
 			if (!particle->occupied) continue;
 
 			frame_stats.alive++;

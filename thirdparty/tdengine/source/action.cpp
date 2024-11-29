@@ -9,8 +9,8 @@ void init_actions() {
 		return;
 	}
 
-	arr_init(&steam_input.actions, SteamInputManager::MAX_ACTIONS, &dn_allocators.standard);
-	arr_init(&steam_input.action_sets, SteamInputManager::MAX_ACTION_SETS, &dn_allocators.standard);
+	dn_array_init(&steam_input.actions, SteamInputManager::MAX_ACTIONS, &dn_allocators.standard);
+	dn_array_init(&steam_input.action_sets, SteamInputManager::MAX_ACTION_SETS, &dn_allocators.standard);
 
 	steam_input.poll_for_inputs();
 	steam_input.poll_for_controllers();
@@ -22,7 +22,7 @@ void update_actions() {
 	steam_input.poll_for_inputs();
 	
 	// Reset all actions for this frame
-	arr_for(steam_input.actions, action) {
+	dn_array_for(steam_input.actions, action) {
 		action->old_state = action->state;
 		action->state = false;
 	}
@@ -41,7 +41,7 @@ void update_actions() {
 
 	// Poll for action inputs
 	auto& input = dn_input;
-	arr_for(steam_input.actions, action) {
+	dn_array_for(steam_input.actions, action) {
 		if (!steam_input.is_action_active(action)) continue;
 
 		// If Steam is loaded and there is a controller, query SteamInput
@@ -99,7 +99,7 @@ void SteamInputManager::poll_for_controllers() {
 	if (!dn_steam_initialized()) return;
 
 	Array<InputHandle_t, STEAM_INPUT_MAX_COUNT> controllers;
-	arr_init(&controllers, &dn_allocators.bump);
+	dn_array_init(&controllers, &dn_allocators.bump);
 	controllers.size = SteamInput()->GetConnectedControllers(controllers.data);
 
 	auto last_controller = controller;
@@ -144,10 +144,10 @@ void SteamInputManager::poll_for_controllers() {
 
 void SteamInputManager::load_controller_glyphs() {
 	Array<EInputActionOrigin, STEAM_INPUT_MAX_COUNT> origins;
-	arr_init(&origins, &dn_allocators.bump);
+	dn_array_init(&origins, &dn_allocators.bump);
 		
-	arr_for(actions, action) {
-		arr_clear(&origins);
+	dn_array_for(actions, action) {
+		dn_array_clear(&origins);
 		origins.size = steam->GetDigitalActionOrigins(controller, action->set->handle, action->handle, origins.data);
 		
 		if (origins.size) {
@@ -178,7 +178,7 @@ bool SteamInputManager::is_action_active(Action* action) {
 
 
 ActionSet* SteamInputManager::find_action_set(const char* name) {
-	arr_for(action_sets, action_set) {
+	dn_array_for(action_sets, action_set) {
 		if (!strncmp(name, action_set->name, ActionSet::NAME_MAX)) {
 			return action_set;
 		}
@@ -188,7 +188,7 @@ ActionSet* SteamInputManager::find_action_set(const char* name) {
 }
 
 ActionSet* SteamInputManager::find_action_set(Steam::ActionSet handle) {
-	arr_for(action_sets, action_set) {
+	dn_array_for(action_sets, action_set) {
 		if (action_set->handle == handle) {
 			return action_set;
 		}
@@ -202,7 +202,7 @@ ActionSet* SteamInputManager::find_current_action_set() {
 }
 
 Action* SteamInputManager::find_action(const char* name) {
-	arr_for(actions, action) {
+	dn_array_for(actions, action) {
 		if (!strncmp(name, action->name, Action::NAME_MAX)) {
 			return action;
 		}
@@ -271,7 +271,7 @@ void register_action_set(const char* name) {
 	if (!dn_steam_initialized()) return;
 
 	auto action_set = steam_input.find_action_set(name);
-	if (!action_set) action_set = arr_push(&steam_input.action_sets);
+	if (!action_set) action_set = dn_array_push(&steam_input.action_sets);
 
 	std::strncpy(action_set->name, name, ActionSet::NAME_MAX);
 	action_set->handle = steam_input.steam->GetActionSetHandle(name);
@@ -281,7 +281,7 @@ void register_action(const char* name, u32 key, u32 key_event, const char* actio
 	if (!dn_steam_initialized()) return;
 
 	auto action = steam_input.find_action(name);
-	if (!action) action = arr_push(&steam_input.actions);
+	if (!action) action = dn_array_push(&steam_input.actions);
 
 	action->key = key;
 	action->key_event = static_cast<KeyEvent>(key_event);

@@ -71,9 +71,9 @@ void FileMonitor::init(FileChangeCallback callback, dn_file_change_event_t event
 	this->callback = callback;
 	this->events_to_watch = events;
 	this->userdata = userdata;
-	arr_init(&this->directory_infos);
-	arr_init(&this->changes);
-	arr_init(&this->cache);
+	dn_array_init(&this->directory_infos);
+	dn_array_init(&this->changes);
+	dn_array_init(&this->cache);
 }
 
 bool FileMonitor::add_directory(const char* directory_path) {
@@ -95,7 +95,7 @@ bool FileMonitor::add_directory(const char* directory_path) {
 		return false;
 	}
 
-	auto info = arr_push(&directory_infos);
+	auto info = dn_array_push(&directory_infos);
 	info->overlapped.hEvent = event;
 	info->overlapped.Offset = 0;
 	info->handle = handle;
@@ -130,7 +130,7 @@ bool FileMonitor::add_file(const char* file_path) {
     }
 
     // Push the file info into the monitoring list
-    auto info = arr_push(&directory_infos);
+    auto info = dn_array_push(&directory_infos);
     info->overlapped.hEvent = event;
     info->overlapped.Offset = 0;
     info->handle = handle;
@@ -162,7 +162,7 @@ void FileMonitor::issue_one_read(DirectoryInfo* info) {
 }
 
 void FileMonitor::process_changes() {
-	arr_for(this->directory_infos, info) {
+	dn_array_for(this->directory_infos, info) {
 		DN_ASSERT(info->handle != INVALID_HANDLE_VALUE);
 
 		if (!HasOverlappedIoCompleted(&info->overlapped)) continue;
@@ -232,7 +232,7 @@ void FileMonitor::add_change(char* file_path, char* file_name, dn_file_change_ev
 	// https://stackoverflow.com/a/14040978/6847023
 	if (!check_cache(file_path, time)) return;
 
-	arr_for(this->changes, change) {
+	dn_array_for(this->changes, change) {
 		if (!strcmp(change->file_path, file_path)) {
 			// De-duplicate this change
 			change->events |= events;
@@ -241,7 +241,7 @@ void FileMonitor::add_change(char* file_path, char* file_name, dn_file_change_ev
 		}
 	}
 
-	auto change = arr_push(&this->changes);
+	auto change = dn_array_push(&this->changes);
 	change->file_path = file_path;
 	change->file_name = file_name;
 	change->events = events;
@@ -250,18 +250,18 @@ void FileMonitor::add_change(char* file_path, char* file_name, dn_file_change_ev
 
 
 void FileMonitor::emit_changes() {
-	arr_for(this->changes, change) {
+	dn_array_for(this->changes, change) {
 		this->callback(this, change, this->userdata);
 		}
 
-	arr_clear(&this->changes);
+	dn_array_clear(&this->changes);
 }
 
 FileMonitor::CacheEntry* FileMonitor::find_cache_entry(char* file_path) {
 	dn_hash_t file_hash = dn_hash_cstr_dumb(file_path);
 	
 	CacheEntry* found = nullptr;
-	arr_for(this->cache, entry) {
+	dn_array_for(this->cache, entry) {
 		if (entry->hash == file_hash) {
 			found = entry;
 			break;
@@ -269,7 +269,7 @@ FileMonitor::CacheEntry* FileMonitor::find_cache_entry(char* file_path) {
 	}
 
 	if (!found) {
-		found = arr_push(&this->cache);
+		found = dn_array_push(&this->cache);
 		found->hash = dn_hash_cstr_dumb(file_path);
 	}
 	
@@ -288,16 +288,16 @@ bool FileMonitor::check_cache(char* file_path, float64 time) {
 
 void dn_file_monitors_init() {
 	dn_log("%s", __func__);
-	arr_init(&dn_file_monitors.monitors);
+	dn_array_init(&dn_file_monitors.monitors);
 }
 
 void dn_file_monitors_update() {
-	arr_for(dn_file_monitors.monitors, monitor) {
+	dn_array_for(dn_file_monitors.monitors, monitor) {
 		monitor->process_changes();
 	}
 }
 
 FileMonitor* dn_file_monitors_add() {
-	return arr_push(&dn_file_monitors.monitors);
+	return dn_array_push(&dn_file_monitors.monitors);
 }
 #endif

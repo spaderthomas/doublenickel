@@ -270,7 +270,7 @@ void dn_font_bake(dn_font_descriptor_t desc) {
           { right, bottom },
           { right, top },
       };
-      glyph.verts = arr_push(&text_vx_data, vertices, 6);
+      glyph.verts = dn_array_push(&text_vx_data, vertices, 6);
 
       float uv_left = point.x / tex_width;
       float uv_right = (point.x + face->glyph->bitmap.width) / tex_width;
@@ -285,7 +285,7 @@ void dn_font_bake(dn_font_descriptor_t desc) {
           { uv_right, uv_bottom },
           { uv_right, uv_top },
       };
-      glyph.uv = arr_push(&text_uv_data, uv, 6);
+      glyph.uv = dn_array_push(&text_uv_data, uv, 6);
 
       font->glyphs[c] = glyph;
       

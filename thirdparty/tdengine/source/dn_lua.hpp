@@ -36,7 +36,7 @@ void dn_lua_init() {
   
   dn_lua.state = luaL_newstate();
 
-  arr_init(&dn_lua.script_dirs);
+  dn_array_init(&dn_lua.script_dirs);
   
   auto events = DN_FILE_CHANGE_EVENT_ADDED | DN_FILE_CHANGE_EVENT_MODIFIED | DN_FILE_CHANGE_EVENT_REMOVED;
   auto on_file_event = [](FileMonitor* monitor, FileChange* event, void* userdata) {
@@ -118,12 +118,12 @@ void dn_lua_init_game() {
   // Lua itself has been initialized, and we've loaded in other assets our scripts
   // may use (shaders, fonts, etc). The last step is to load the game scripts and
   // configure the game itself through Lua
-  arr_push(&dn_lua.script_dirs, dn_paths_resolve_ex("engine_components", &dn_allocators.standard));
-  arr_push(&dn_lua.script_dirs, dn_paths_resolve_ex("engine_editor", &dn_allocators.standard));
-  arr_push(&dn_lua.script_dirs, dn_paths_resolve_ex("engine_entities", &dn_allocators.standard));
-  arr_push(&dn_lua.script_dirs, dn_paths_resolve_ex("app", &dn_allocators.standard));
+  dn_array_push(&dn_lua.script_dirs, dn_paths_resolve_ex("engine_components", &dn_allocators.standard));
+  dn_array_push(&dn_lua.script_dirs, dn_paths_resolve_ex("engine_editor", &dn_allocators.standard));
+  dn_array_push(&dn_lua.script_dirs, dn_paths_resolve_ex("engine_entities", &dn_allocators.standard));
+  dn_array_push(&dn_lua.script_dirs, dn_paths_resolve_ex("app", &dn_allocators.standard));
 
-  arr_for(dn_lua.script_dirs, directory) {
+  dn_array_for(dn_lua.script_dirs, directory) {
     dn_lua_script_dir(*directory);
   }
   
@@ -266,10 +266,10 @@ void dn_lua_script_dir(const char* path) {
   };
   
   Array<DirectoryEntry, 256> directory_entries;
-  arr_init(&directory_entries);
+  dn_array_init(&directory_entries);
   
   for (auto it = directory_iterator(path); it != directory_iterator(); it++) {
-    auto entry = arr_push(&directory_entries);
+    auto entry = dn_array_push(&directory_entries);
     entry->occupied = true;
 
     auto dir_path = it->path().string();
@@ -314,7 +314,7 @@ void dn_lua_script_dir(const char* path) {
   };
   qsort(directory_entries.data, directory_entries.size, sizeof(DirectoryEntry), compare_subpaths);
 
-  arr_for(directory_entries, entry) {
+  dn_array_for(directory_entries, entry) {
     // Make sure the new file is a Lua script
     if (entry->is_regular_file) {
       dn_lua_script_file(entry->path);
@@ -354,6 +354,6 @@ void dn_lua_dump_stack () {
 
 void dn_lua_add_dir(const char* directory) {
   auto copy = dn_string_copy(directory, &dn_allocators.standard);
-  arr_push(&dn_lua.script_dirs, copy);
+  dn_array_push(&dn_lua.script_dirs, copy);
 }
 #endif

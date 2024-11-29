@@ -456,15 +456,15 @@ DN_IMP u32                       dn_gpu_memory_barrier_to_gl_barrier(dn_gpu_memo
 #ifdef GRAPHICS_IMPLEMENTATION
 void dn_gpu_init(dn_gpu_config_t config) {
   dn_log("%s", __func__);
-  arr_init(&dn_gpu.command_buffers);
-  arr_init(&dn_gpu.uniforms);
-  arr_init(&dn_gpu.pipelines);
-  arr_init(&dn_gpu.gpu_buffers);
-  arr_init(&dn_gpu.targets);
-  arr_init(&dn_gpu.shaders);
+  dn_array_init(&dn_gpu.command_buffers);
+  dn_array_init(&dn_gpu.uniforms);
+  dn_array_init(&dn_gpu.pipelines);
+  dn_array_init(&dn_gpu.gpu_buffers);
+  dn_array_init(&dn_gpu.targets);
+  dn_array_init(&dn_gpu.shaders);
   dn::fixed_array::init(&dn_gpu.search_paths, &dn_allocators.standard);
 
-  auto swapchain = arr_push(&dn_gpu.targets);
+  auto swapchain = dn_array_push(&dn_gpu.targets);
   swapchain->handle = 0;
   swapchain->color_buffer = 0;
   swapchain->size = window.content_area;
@@ -472,7 +472,7 @@ void dn_gpu_init(dn_gpu_config_t config) {
   dn_log("%s: Initializing shader file monitor", __func__);
   auto reload_all_shaders = [](FileMonitor* file_monitor, FileChange* event, void* userdata) {
     dn_log("SHADER_RELOAD");
-    arr_for(dn_gpu.shaders, shader) {
+    dn_array_for(dn_gpu.shaders, shader) {
       dn_gpu_shader_reload(shader);
     }
   };
@@ -544,8 +544,8 @@ void dn_gpu_init(dn_gpu_config_t config) {
 // COMMAND BUFFER //
 ////////////////////
 dn_gpu_command_buffer_t* dn_gpu_command_buffer_create(dn_gpu_command_buffer_descriptor_t descriptor) {
-  auto command_buffer = arr_push(&dn_gpu.command_buffers);
-  arr_init(&command_buffer->commands, descriptor.max_commands);
+  auto command_buffer = dn_array_push(&dn_gpu.command_buffers);
+  dn_array_init(&command_buffer->commands, descriptor.max_commands);
   glGenVertexArrays(1, &command_buffer->vao);
   glBindVertexArray(command_buffer->vao);
 
@@ -564,7 +564,7 @@ void dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
   dn_gpu_command_buffer_clear_cached_state(command_buffer);
   glBindVertexArray(command_buffer->vao);
 
-  arr_for(command_buffer->commands, it) {
+  dn_array_for(command_buffer->commands, it) {
     auto& command = *it;
     auto& pipeline = *command_buffer->pipeline;
 
@@ -727,12 +727,12 @@ void dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
 
   glBindVertexArray(0);
   dn_gpu_command_buffer_clear_cached_state(command_buffer);
-  arr_clear(&command_buffer->commands);
+  dn_array_clear(&command_buffer->commands);
 }
 
 
 void dn_gpu_command_buffer_draw(dn_gpu_command_buffer_t* command_buffer, dn_gpu_draw_call_t draw_call) {
-  arr_push(&command_buffer->commands, {
+  dn_array_push(&command_buffer->commands, {
     .op = GPU_COMMAND_OP_DRAW,
     .draw = draw_call
   });
@@ -743,7 +743,7 @@ void dn_gpu_command_buffer_draw(dn_gpu_command_buffer_t* command_buffer, dn_gpu_
 // PIPELINE //
 //////////////
 dn_gpu_pipeline_t* dn_gpu_pipeline_create(dn_gpu_pipeline_descriptor_t descriptor) {
-  dn_gpu_pipeline_t* pipeline = arr_push(&dn_gpu.pipelines);
+  dn_gpu_pipeline_t* pipeline = dn_array_push(&dn_gpu.pipelines);
   pipeline->raster = descriptor.raster;
   pipeline->blend = descriptor.blend;
   dn_os_memory_copy(descriptor.buffer_layouts, pipeline->buffer_layouts, descriptor.num_buffer_layouts * sizeof(dn_gpu_buffer_layout_t));
@@ -753,7 +753,7 @@ dn_gpu_pipeline_t* dn_gpu_pipeline_create(dn_gpu_pipeline_descriptor_t descripto
 }
 
 void dn_gpu_bind_pipeline(dn_gpu_command_buffer_t* command_buffer, dn_gpu_pipeline_t* pipeline) {
-  arr_push(&command_buffer->commands, {
+  dn_array_push(&command_buffer->commands, {
     .op = GPU_COMMAND_OP_BIND_PIPELINE,
     .pipeline = pipeline
   });
@@ -764,14 +764,14 @@ void dn_gpu_bind_pipeline(dn_gpu_command_buffer_t* command_buffer, dn_gpu_pipeli
 // BINDING //
 /////////////
 void dn_gpu_begin_render_pass(dn_gpu_command_buffer_t* command_buffer, dn_gpu_render_pass_t render_pass) {
-  arr_push(&command_buffer->commands, {
+  dn_array_push(&command_buffer->commands, {
     .op = GPU_COMMAND_OP_BEGIN_RENDER_PASS,
     .render_pass = render_pass
   });
 }
 
 void dn_gpu_end_render_pass(dn_gpu_command_buffer_t* command_buffer) {
-  arr_push(&command_buffer->commands, {
+  dn_array_push(&command_buffer->commands, {
     .op = GPU_COMMAND_OP_END_RENDER_PASS,
   });
 }
@@ -779,7 +779,7 @@ void dn_gpu_end_render_pass(dn_gpu_command_buffer_t* command_buffer) {
 void dn_gpu_apply_bindings(dn_gpu_command_buffer_t* command_buffer, dn_gpu_buffer_binding_t bindings) {
   if (dn_os_is_memory_equal(&command_buffer->bindings, &bindings, sizeof(dn_gpu_buffer_binding_t))) return;
 
-  arr_push(&command_buffer->commands, {
+  dn_array_push(&command_buffer->commands, {
     .op = GPU_COMMAND_OP_BIND_BUFFERS,
     .bindings = bindings
   });
@@ -792,7 +792,7 @@ void dn_gpu_apply_bindings(dn_gpu_command_buffer_t* command_buffer, dn_gpu_buffe
 void dn_gpu_set_layer(dn_gpu_command_buffer_t* command_buffer, u32 layer) {
   if (command_buffer->render.layer == layer) return;
 
-  arr_push(&command_buffer->commands, {
+  dn_array_push(&command_buffer->commands, {
     .op = GPU_COMMAND_OP_SET_LAYER,
     .render = {
       .layer = layer
@@ -803,7 +803,7 @@ void dn_gpu_set_layer(dn_gpu_command_buffer_t* command_buffer, u32 layer) {
 void dn_gpu_set_world_space(dn_gpu_command_buffer_t* command_buffer, bool world_space) {
   if (command_buffer->render.world_space == world_space) return;
 
-  arr_push(&command_buffer->commands, {
+  dn_array_push(&command_buffer->commands, {
     .op = GPU_COMMAND_OP_SET_WORLD_SPACE,
     .render = {
       .world_space = world_space
@@ -814,7 +814,7 @@ void dn_gpu_set_world_space(dn_gpu_command_buffer_t* command_buffer, bool world_
 void dn_gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, Vector2 camera) {
   if (dn_os_is_memory_equal(&command_buffer->render.camera,  &camera, sizeof(Vector2))) return;
 
-  arr_push(&command_buffer->commands, {
+  dn_array_push(&command_buffer->commands, {
     .op = GPU_COMMAND_OP_SET_CAMERA,
     .render = {
       .camera = camera
@@ -833,7 +833,7 @@ void dn_gpu_bind_render_state(dn_gpu_command_buffer_t* command_buffer, dn_gpu_re
 // UNIFORMS //
 //////////////
 dn_gpu_uniform_t* dn_gpu_uniform_create(dn_gpu_uniform_descriptor_t descriptor) {
-  auto uniform = arr_push(&dn_gpu.uniforms);
+  auto uniform = dn_array_push(&dn_gpu.uniforms);
   dn_asset_copy_name(descriptor.name, uniform->name);
   uniform->kind = descriptor.kind;
   
@@ -845,7 +845,7 @@ dn_gpu_uniform_t* dn_gpu_uniform_create(dn_gpu_uniform_descriptor_t descriptor) 
 // GPU BUFFERS //
 /////////////////
 dn_gpu_buffer_t* dn_gpu_buffer_create(dn_gpu_buffer_descriptor_t descriptor) {
-  auto buffer = arr_push(&dn_gpu.gpu_buffers);
+  auto buffer = dn_array_push(&dn_gpu.gpu_buffers);
   dn_asset_copy_name(descriptor.name, buffer->name);
   buffer->kind = descriptor.kind;
   buffer->usage = descriptor.usage;
@@ -919,7 +919,7 @@ dn_gpu_shader_t* dn_gpu_shader_create(dn_gpu_shader_descriptor_t descriptor) {
     case GPU_SHADER_COMPUTE: dn_log("%s: GPU_SHADER_COMPUTE (%s)", __func__, descriptor.compute_shader); break;
   }
   
-  auto shader = arr_push(&dn_gpu.shaders);
+  auto shader = dn_array_push(&dn_gpu.shaders);
   dn_gpu_shader_init(shader, descriptor);
   dn_assets_add(shader->name, shader);
   
@@ -927,7 +927,7 @@ dn_gpu_shader_t* dn_gpu_shader_create(dn_gpu_shader_descriptor_t descriptor) {
 }
 
 dn_gpu_shader_t* dn_gpu_shader_find(const char* name) {
-  arr_for(dn_gpu.shaders, shader) {
+  dn_array_for(dn_gpu.shaders, shader) {
     if (!strncmp(shader->name, name, DN_MAX_PATH_LEN)) return shader;
   }
 
@@ -1092,7 +1092,7 @@ void dn_gpu_shader_reload(dn_gpu_shader_t* shader) {
 // RENDER TARGET //
 ///////////////////
 dn_gpu_render_target_t* dn_gpu_render_target_create(dn_gpu_render_target_descriptor_t descriptor) {
-  auto target = arr_push(&dn_gpu.targets);
+  auto target = dn_array_push(&dn_gpu.targets);
   dn_asset_copy_name(descriptor.name, target->name);
   target->size = descriptor.size;
   
