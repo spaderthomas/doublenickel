@@ -19,32 +19,47 @@ DN_API void dn_fixed_array_clear(dn_fixed_array_t* vertex_buffer);
 DN_API u32  dn_fixed_array_byte_size(dn_fixed_array_t* vertex_buffer);
 DN_API u8*  dn_fixed_array_at(dn_fixed_array_t* vertex_buffer, u32 index);
 
-template<typename T, u32 N>
-void dn_fixed_array_init_t(dn_fixed_array<T, N>* vertex_buffer, dn_allocator_t* allocator);
+namespace dn::fixed_array {
+  template<typename T, u32 N>
+  void init(dn_fixed_array<T, N>* fixed_array, dn_allocator_t* allocator);
 
-template<typename T, u32 N>
-T* dn_fixed_array_push_t(dn_fixed_array<T, N>* vertex_buffer, T* data, u32 count) {
-  return (T*)dn_fixed_array_push(vertex_buffer, data, count);
+  template<typename T, u32 N>
+  T* push(dn_fixed_array<T, N>* vertex_buffer, T* data, u32 count);
+
+  template<typename T, u32 N>
+  T* reserve(dn_fixed_array<T, N>* vertex_buffer, u32 count);
+
+  template<typename T, u32 N>
+  T* at(dn_fixed_array<T, N>* fixed_array, u32 index);
 }
 
-template<typename T, u32 N>
-T* dn_fixed_array_reserve_t(dn_fixed_array<T, N>* vertex_buffer, u32 count) {
-  return (T*)dn_fixed_array_reserve(vertex_buffer, count);
-}
 
-template<typename T, u32 N>
-T* dn_fixed_array_at_t(dn_fixed_array<T, N>* fixed_array, u32 index) {
-  return (T*)dn_fixed_array_at((dn_fixed_array_t*)fixed_array, index);
-}
+
 #endif
 
 
 #ifdef DN_FIXED_ARRAY_IMPLEMENTATION
-template<typename T, u32 N>
-void dn_fixed_array_init_t(dn_fixed_array<T, N>* vertex_buffer, dn_allocator_t* allocator) {
-  return dn_fixed_array_init(vertex_buffer, N, sizeof(T), allocator);
-}
+namespace dn::fixed_array {
+  template<typename T, u32 N>
+  void init(dn_fixed_array<T, N>* fixed_array, dn_allocator_t* allocator) {
+    return dn_fixed_array_init(fixed_array, N, sizeof(T), allocator);
+  }
 
+  template<typename T, u32 N>
+  T* push(dn_fixed_array<T, N>* vertex_buffer, T* data, u32 count) {
+    return (T*)dn_fixed_array_push(vertex_buffer, data, count);
+  }
+
+  template<typename T, u32 N>
+  T* reserve(dn_fixed_array<T, N>* vertex_buffer, u32 count) {
+    return (T*)dn_fixed_array_reserve(vertex_buffer, count);
+  }
+
+  template<typename T, u32 N>
+  T* at(dn_fixed_array<T, N>* fixed_array, u32 index) {
+    return (T*)dn_fixed_array_at((dn_fixed_array_t*)fixed_array, index);
+  }
+}
 void dn_fixed_array_init(dn_fixed_array_t* buffer, u32 max_vertices, u32 element_size, dn_allocator_t* allocator) {
   DN_ASSERT(buffer);
 

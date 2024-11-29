@@ -85,10 +85,10 @@ void dn_font_init(dn_font_config_t config) {
   
   dn_fonts = {0};
 
-  dn_fixed_array_init_t(&dn_fonts.baked_fonts, &dn_allocators.standard);
-  dn_fixed_array_init_t(&dn_fonts.baked_glyphs, &dn_allocators.standard);
-  dn_fixed_array_init_t(&dn_fonts.vertex_data, &dn_allocators.standard);
-  dn_fixed_array_init_t(&dn_fonts.uv_data, &dn_allocators.standard);
+  dn::fixed_array::init(&dn_fonts.baked_fonts, &dn_allocators.standard);
+  dn::fixed_array::init(&dn_fonts.baked_glyphs, &dn_allocators.standard);
+  dn::fixed_array::init(&dn_fonts.vertex_data, &dn_allocators.standard);
+  dn::fixed_array::init(&dn_fonts.uv_data, &dn_allocators.standard);
 
   dn_font_descriptor_t engine_fonts [] = {
     {
@@ -146,7 +146,7 @@ void dn_font_bake(dn_font_descriptor_t desc) {
       return;
     }
 
-    dn_baked_font_t* font = dn_fixed_array_reserve_t(&dn_fonts.baked_fonts, 1);
+    dn_baked_font_t* font = dn::fixed_array::reserve(&dn_fonts.baked_fonts, 1);
     font->hash = dn_font_hash(desc.id, size);
     dn_string_copy(desc.id, font->name, DN_ASSET_NAME_LEN);
     dn_string_copy(desc.file_path, font->path, DN_MAX_PATH_LEN);
@@ -154,7 +154,7 @@ void dn_font_bake(dn_font_descriptor_t desc) {
     font->flags = desc.flags;
     
     static const i32 num_glyphs = 128;
-    font->glyphs = dn_fixed_array_reserve_t(&dn_fonts.baked_glyphs, num_glyphs);
+    font->glyphs = dn::fixed_array::reserve(&dn_fonts.baked_glyphs, num_glyphs);
 
     /* 
       Jesus Christ, fonts are really hard. FreeType generally returns all of its metrics in "font units". 
@@ -343,7 +343,7 @@ dn_baked_font_t* dn_font_find(const char* id, u32 size) {
 
   auto hash = dn_font_hash(id, size);
   for (u32 i = 0; i < dn_fonts.baked_fonts.size; i++) {
-    auto font = dn_fixed_array_at_t(&dn_fonts.baked_fonts, i);
+    auto font = dn::fixed_array::at(&dn_fonts.baked_fonts, i);
     if (font->hash == hash) return font;
   }
 

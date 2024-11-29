@@ -79,7 +79,7 @@ dn_os_directory_entry_list_t dn_os_scan_directory(const char* path) {
   }
 
   dn_fixed_array<dn_os_directory_entry_t, 256> entries;
-  dn_fixed_array_init_t(&entries, &dn_allocators.bump);
+  dn::fixed_array::init(&entries, &dn_allocators.bump);
 
   dn_path_t glob = dn_zero_initialize();
   snprintf(glob, DN_MAX_PATH_LEN, "%s/*", path);
@@ -101,7 +101,7 @@ dn_os_directory_entry_list_t dn_os_scan_directory(const char* path) {
       .file_name = dn_string_copy(find_data.cFileName, &dn_allocators.bump),
       .attributes = dn_os_winapi_attr_to_dn_attr(GetFileAttributesA(file_path)),
     };
-    dn_fixed_array_push_t(&entries, &entry, 1);
+    dn::fixed_array::push(&entries, &entry, 1);
   } while (FindNextFile(handle, &find_data));
 
   FindClose(handle);

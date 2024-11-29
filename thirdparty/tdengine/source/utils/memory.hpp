@@ -6,7 +6,11 @@ typedef enum {
 	DN_ALLOCATOR_MODE_RESIZE,
 } dn_allocator_mode_t;
 
-dn_typedef_fn(void*, dn_alloc_fn_t, dn_allocator_mode_t mode, u32 size, void* previous_allocation, void* userdata);
+dn_typedef_fn(
+	void*, 
+	dn_alloc_fn_t, 
+	dn_allocator_mode_t mode, u32 size, void* previous_allocation, void* userdata
+);
 
 struct dn_allocator_t {
 	dn_alloc_fn_t on_alloc;
@@ -58,7 +62,6 @@ namespace dn::allocator {
 	template<typename T>
 	Array<T> alloc_array(u32 size);
 }
-
 #endif
 
 

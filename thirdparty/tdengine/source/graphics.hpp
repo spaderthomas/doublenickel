@@ -462,7 +462,7 @@ void dn_gpu_init(dn_gpu_config_t config) {
   arr_init(&dn_gpu.gpu_buffers);
   arr_init(&dn_gpu.targets);
   arr_init(&dn_gpu.shaders);
-  dn_fixed_array_init_t(&dn_gpu.search_paths, &dn_allocators.standard);
+  dn::fixed_array::init(&dn_gpu.search_paths, &dn_allocators.standard);
 
   auto swapchain = arr_push(&dn_gpu.targets);
   swapchain->handle = 0;
@@ -487,7 +487,7 @@ void dn_gpu_init(dn_gpu_config_t config) {
     dn_paths_resolve("dn_shader_includes"),
   };
   for (u32 i = 0; i < DN_ARR_LEN(default_include_paths); i++) {
-    dn_path_t* path = dn_fixed_array_reserve_t(&dn_gpu.search_paths, 1);
+    dn_path_t* path = dn::fixed_array::reserve(&dn_gpu.search_paths, 1);
     dn_path_from_cstr(*path, default_include_paths[i]);
   }
 
@@ -524,7 +524,7 @@ void dn_gpu_init(dn_gpu_config_t config) {
 
   // Add user search paths and shaders
   for (u32 i = 0; i < config.num_search_paths; i++) {
-    auto path = dn_fixed_array_reserve_t(&dn_gpu.search_paths, 1);
+    auto path = dn::fixed_array::reserve(&dn_gpu.search_paths, 1);
     dn_path_from_cstr(*path, config.search_paths[i]);
   }
 
@@ -944,7 +944,7 @@ dn_tstring_t build_shader_source(const char* file_path) {
   dn_preprocessor_context_t context = {
     .file_path = file_path,
     .include_dirs = {
-      .data = dn_fixed_array_at_t(&dn_gpu.search_paths, 0),
+      .data = dn::fixed_array::at(&dn_gpu.search_paths, 0),
       .count = dn_gpu.search_paths.size
     }
   };
