@@ -11,40 +11,27 @@ typedef GLFW_KEY_TYPE key_t;
 #define ASCII_QMARK      63
 #define ASCII_UNDERSCORE 95
 
-#define FM_FLOATEQ_EPSILON .00005
-bool fm_floateq(float a, float b) {
-  return abs(a - b) < FM_FLOATEQ_EPSILON;
-}
-
-float32 fm_lerp(float32 a, float32 b, float32 t) {
+float32 dn_math_lerp(float32 a, float32 b, float32 t) {
   DN_ASSERT(t >= 0.f);
   DN_ASSERT(t <= 1.f);
 
   return (a * (1 - t)) + (b * t);
 }
 
-float32 clamp(float32 value, float32 lower, float32 upper) {
+float32 dn_math_clamp(float32 value, float32 lower, float32 upper) {
   return std::min(std::max(value, lower), upper);
 }
 
-int32 fm_floor(float32 f) {
-  return static_cast<int32>(floor(f));
-}
-
-int32 fm_ceil(float32 f) {
-  return static_cast<int32>(ceil(f));
-}
-
-constexpr u32 ceiling(float f) {
+constexpr u32 dn_math_ceilf(float f) {
     const u32 i = static_cast<u32>(f);
     return f > i ? i + 1 : i;
 }
 
-constexpr u32 ceiling_divide(u32 a, u32 b) {
-  return ceiling(static_cast<float>(a) / static_cast<float>(b));
+constexpr u32 dn_math_ceil_divide(u32 a, u32 b) {
+  return dn_math_ceilf(static_cast<float>(a) / static_cast<float>(b));
 }
 
-float random_float(float min, float max) {
+float dn_math_random_float_slow(float min, float max) {
   std::random_device rd;
   std::mt19937 generator(rd());
   std::uniform_real_distribution<float> distribution(min, max);
@@ -59,40 +46,6 @@ int dn_math_random_int(int min, int max) {
   return distribution(generator);
 }
 
-
-
-void* ogl_offset_to_ptr(int32 offset) {
-  return (char*)nullptr + offset;
-}
-
-template<typename T, uint32 N>
-T* arr_to_ptr(T (&array)[N]) {
-  return &array[0];
-}
-
-
-// STL extensions 
-std::vector<std::string> split(const std::string &str, char delim) {
-  std::stringstream stream(str);
-  std::string item;
-  std::vector<std::string> tokens;
-  while (getline(stream, item, delim)) {
-    tokens.push_back(item);
-  }
-  return tokens;
-}
-
-void string_replace(std::string& str, std::string from, std::string to) {
-    size_t start_pos = 0;
-    while((start_pos = str.find(from, start_pos)) != std::string::npos) {
-        str.replace(start_pos, from.length(), to);
-        start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
-    }
-}
-
-GLFWwindow* g_window;
-
-/* Some utilities for dealing with files, directories, and paths */
 
 double pi = 3.14159;
 

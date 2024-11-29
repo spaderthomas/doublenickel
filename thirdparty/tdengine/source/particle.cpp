@@ -470,11 +470,11 @@ bool ParticleSystem::spawn_particle() {
 
 	// PARTICLE DATA
 	static constexpr float lifetime_jitter = .05f;
-	particle->lifetime = lifetime + random_float(-1 * lifetime_jitter * lifetime, lifetime_jitter * lifetime);
+	particle->lifetime = lifetime + dn_math_random_float_slow(-1 * lifetime_jitter * lifetime, lifetime_jitter * lifetime);
 	particle->accumulated = 0;
 	
 	if (position_mode == ParticlePositionMode::Bottom) {
-		particle->position.x = random_float(position.x, position.x + area.x);
+		particle->position.x = dn_math_random_float_slow(position.x, position.x + area.x);
 		particle->position.y = position.y;
 	}
 	else {
@@ -484,12 +484,12 @@ bool ParticleSystem::spawn_particle() {
 	particle->velocity = velocity;
 	
 	if (jitter_base_velocity) {
-		particle->velocity.start.x += random_float(-1 * velocity_jitter.x, velocity_jitter.x);
-		particle->velocity.start.y += random_float(-1 * velocity_jitter.y, velocity_jitter.y);
+		particle->velocity.start.x += dn_math_random_float_slow(-1 * velocity_jitter.x, velocity_jitter.x);
+		particle->velocity.start.y += dn_math_random_float_slow(-1 * velocity_jitter.y, velocity_jitter.y);
 	}
 	if (jitter_max_velocity) {
-		particle->velocity.target.x += random_float(-1 * velocity_jitter.x, velocity_jitter.x);
-		particle->velocity.target.y += random_float(-1 * velocity_jitter.y, velocity_jitter.y);
+		particle->velocity.target.x += dn_math_random_float_slow(-1 * velocity_jitter.x, velocity_jitter.x);
+		particle->velocity.target.y += dn_math_random_float_slow(-1 * velocity_jitter.y, velocity_jitter.y);
 	}
 
 	particle->kind = particle_kind;
@@ -504,7 +504,7 @@ bool ParticleSystem::spawn_particle() {
 	}
 
 	if (jitter_size) {
-		auto jitter = random_float(-1 * size_jitter, size_jitter);
+		auto jitter = dn_math_random_float_slow(-1 * size_jitter, size_jitter);
 		if (particle_kind == ParticleKind::Quad) {
 			auto& size = particle->data.quad.size;
 			size.x += jitter;
@@ -523,7 +523,7 @@ bool ParticleSystem::spawn_particle() {
 
 	particle->base_color = color;
 	if (jitter_opacity) {
-		auto jitter = random_float(-1 * opacity_jitter, opacity_jitter);
+		auto jitter = dn_math_random_float_slow(-1 * opacity_jitter, opacity_jitter);
 		particle->base_color.a = std::min(particle->base_color.a + jitter, 1.f);
 	}
 	particle->color = particle->base_color;

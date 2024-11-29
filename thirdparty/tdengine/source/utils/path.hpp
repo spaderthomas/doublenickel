@@ -49,7 +49,11 @@ void normalize_path(char* str) {
 }
 
 void normalize_path(std::string& str) {
-	string_replace(str, "\\", "/");
+	size_t start_pos = 0;
+	while((start_pos = str.find("\\", start_pos)) != std::string::npos) {
+			str.replace(start_pos, 1, "/");
+			start_pos++;
+	}
 }
 
 

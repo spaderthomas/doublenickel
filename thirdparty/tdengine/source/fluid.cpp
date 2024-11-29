@@ -73,7 +73,7 @@ dn_gen_arena_handle_t lf_create(u32 num_particles) {
 	auto system = LagrangianFluidSim::systems[handle];
 	
 	system->gpu.num_particles = num_particles;
-	system->num_workgroups = ceiling_divide(system->gpu.num_particles, LagrangianFluidSim::threads_per_workgroup);
+	system->num_workgroups = dn_math_ceil_divide(system->gpu.num_particles, LagrangianFluidSim::threads_per_workgroup);
 	
 	// SSBO 1: Particle data. We don't zero the memory because this could be a huge block.
 	glGenBuffers(1, &system->particles);
@@ -274,8 +274,8 @@ dn_gen_arena_handle_t ef_create(u32 grid_size) {
 	system->gpu.grid_size = grid_size;
 	system->num_sim_cells = grid_size * grid_size;
 	system->num_cells = (grid_size + 2) * (grid_size + 2);
-	system->num_workgroups = ceiling_divide(system->num_sim_cells, EulerianFluidSim::threads_per_workgroup);
-	system->num_boundary_workgroups = ceiling_divide(system->gpu.grid_size, EulerianFluidSim::threads_per_workgroup);
+	system->num_workgroups = dn_math_ceil_divide(system->num_sim_cells, EulerianFluidSim::threads_per_workgroup);
+	system->num_boundary_workgroups = dn_math_ceil_divide(system->gpu.grid_size, EulerianFluidSim::threads_per_workgroup);
 	system->gauss_seidel_iterations = 20;
 	
 	arr_init(&system->sources, system->num_cells);

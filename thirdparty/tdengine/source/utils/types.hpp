@@ -35,3 +35,22 @@ typedef size_t dn_hash_t;
 typedef char dn_asset_name_t [DN_ASSET_NAME_LEN];
 
 typedef char* dn_tstring_t;
+
+typedef HMM_Vec2 Vector2;
+typedef HMM_Vec3 Vector3;
+typedef HMM_Vec4 Vector4;
+struct Vector2I {
+	int32 x = 0;
+	int32 y = 0;
+};
+
+#define dn_quad_literal(top, bottom, left, right) \
+    {                                     \
+        { left, top },                    \
+        { left, bottom },                 \
+        { right, bottom },                \
+                                          \
+        { left, top },                    \
+        { right, bottom },                \
+        { right, top }                    \
+    }                                     

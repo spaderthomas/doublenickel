@@ -73,7 +73,7 @@ ArrayView<char> dn_prepared_text_t::get_line(int32 index) {
 	auto count = end - begin;
 	
 	return arr_view(
-		arr_to_ptr(text) + begin,
+		text + begin,
 		count
 	);
 }

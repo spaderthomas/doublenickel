@@ -298,7 +298,7 @@ void dn_audio_update(float* buffer, int frames_requested, int num_channels) {
 
     auto abs_sample = std::abs(sample);
     if (dn_audio.compressor.enabled) {
-      envelope = fm_lerp(envelope, abs_sample, dn_audio.compressor.attack_time);
+      envelope = dn_math_lerp(envelope, abs_sample, dn_audio.compressor.attack_time);
 
       if (envelope > dn_audio.compressor.threshold) {
         auto decibel = 10 * std::log10(envelope / dn_audio.compressor.threshold);
@@ -308,13 +308,13 @@ void dn_audio_update(float* buffer, int frames_requested, int num_channels) {
         gain = target_envelope / envelope;
       }
       else {
-        gain = fm_lerp(gain, 1.0f, dn_audio.compressor.release_time);
+        gain = dn_math_lerp(gain, 1.0f, dn_audio.compressor.release_time);
       }
     }
 
     sample *= gain;
     sample = dn_low_pass_filter_apply(&dn_audio.filter, sample);
-    sample = clamp(sample, -1.f, 1.f);
+    sample = dn_math_clamp(sample, -1.f, 1.f);
     
     *dn_audio.sample_buffer[i] = sample;
   }
@@ -561,7 +561,7 @@ void dn_audio_set_volume(dn_audio_instance_handle_t handle, float volume) {
 
   std::unique_lock lock(dn_audio_mutex);
 
-  active_sound->volume = clamp(volume, 0.f, 1.f);
+  active_sound->volume = dn_math_clamp(volume, 0.f, 1.f);
 }
 
 void dn_audio_set_filter_mode(dn_audio_instance_handle_t handle, dn_audio_filter_mode_t mode) {
