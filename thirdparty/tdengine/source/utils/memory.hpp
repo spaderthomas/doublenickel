@@ -6,7 +6,7 @@ typedef enum {
 	DN_ALLOCATOR_MODE_RESIZE,
 } dn_allocator_mode_t;
 
-typedef std::function<void*(dn_allocator_mode_t, u32, void*)> dn_alloc_fn_t;
+dn_typedef_fn(void*, dn_alloc_fn_t, dn_allocator_mode_t mode, u32 size, void* previous_allocation, void* userdata);
 
 struct dn_allocator_t {
 	dn_alloc_fn_t on_alloc;
@@ -39,7 +39,9 @@ DN_API void*            dn_allocator_realloc(dn_allocator_t* allocator, void* me
 DN_API void             dn_allocator_free(dn_allocator_t* allocator, void* buffer);
 DN_IMP void             dn_bump_allocator_init(dn_bump_allocator_t* allocator, u32 capacity);
 DN_IMP void             dn_bump_allocator_clear(dn_bump_allocator_t* allocator);
+DN_IMP void*            dn_bump_allocator_on_alloc(dn_allocator_mode_t mode, u32 size, void* buffer, void* userdata);
 DN_IMP void             dn_standard_allocator_init(dn_standard_allocator_t* allocator);
+DN_IMP void*            dn_standard_allocator_on_alloc(dn_allocator_mode_t mode, u32 size, void* buffer, void* userdata);
 DN_IMP void             dn_allocators_init();
 DN_IMP void             dn_allocators_update();
 
@@ -95,41 +97,7 @@ namespace dn::allocator {
 void dn_bump_allocator_init(dn_bump_allocator_t* allocator, u32 capacity) {
 	allocator->buffer = dn::allocator::alloc<u8>(&dn_allocators.standard, capacity);
 	allocator->capacity = capacity;
-	
-	allocator->on_alloc = [allocator](dn_allocator_mode_t mode, u32 size, void* old_memory) -> void* {
-		if (mode == DN_ALLOCATOR_MODE_ALLOC) {
-			if (allocator->bytes_used + size > allocator->capacity) {
-				assert(false);
-			}
-
-			auto memory_block = allocator->buffer + allocator->bytes_used;
-			allocator->allocations[allocator->bytes_used] = size;
-			allocator->bytes_used += size;
-		
-			return memory_block;
-		}
-		else if (mode == DN_ALLOCATOR_MODE_FREE) {
-			return nullptr;
-		}
-		else if (mode == DN_ALLOCATOR_MODE_RESIZE) {
-			if (!old_memory) {
-				return allocator->on_alloc(DN_ALLOCATOR_MODE_ALLOC, size, nullptr);
-			}
-	
-			auto offset = (u32)((u8*)old_memory - (u8*)allocator->buffer);
-			auto old_size = allocator->allocations[offset];
-			if (old_size >= size) {
-				return old_memory;
-			} 
-
-			auto memory_block = allocator->on_alloc(DN_ALLOCATOR_MODE_ALLOC, size, nullptr);
-			dn_os_memory_copy(old_memory, memory_block, size);
-			return memory_block;
-		}
-
-		assert(false);
-		return nullptr;
-	};
+	allocator->on_alloc = &dn_bump_allocator_on_alloc;
 }
 
 void dn_bump_allocator_clear(dn_bump_allocator_t* allocator) {
@@ -138,22 +106,59 @@ void dn_bump_allocator_clear(dn_bump_allocator_t* allocator) {
 	allocator->allocations.clear();
 }
 
-void dn_standard_allocator_init(dn_standard_allocator_t* allocator) {
-	allocator->on_alloc = [&](dn_allocator_mode_t mode, u32 size, void* old_memory) -> void* {
-		if (mode == DN_ALLOCATOR_MODE_ALLOC) {
-			return calloc(size, 1);
-		}
-		else if (mode == DN_ALLOCATOR_MODE_FREE) {
-			::free(old_memory);
-			return nullptr;
-		}
-		else if (mode == DN_ALLOCATOR_MODE_RESIZE) {
-			return ::realloc(old_memory, size);
-		}
+void* dn_bump_allocator_on_alloc(dn_allocator_mode_t mode, u32 size, void* old_memory, void* userdata) {
+	dn_bump_allocator_t* allocator = (dn_bump_allocator_t*)userdata;
+	if (mode == DN_ALLOCATOR_MODE_ALLOC) {
+		DN_ASSERT(allocator->bytes_used + size <= allocator->capacity);
+
+		auto memory_block = allocator->buffer + allocator->bytes_used;
+		allocator->allocations[allocator->bytes_used] = size;
+		allocator->bytes_used += size;
 	
-		assert(false);
+		return memory_block;
+	}
+	else if (mode == DN_ALLOCATOR_MODE_FREE) {
 		return nullptr;
-	};
+	}
+	else if (mode == DN_ALLOCATOR_MODE_RESIZE) {
+		if (!old_memory) {
+			return allocator->on_alloc(DN_ALLOCATOR_MODE_ALLOC, size, nullptr, allocator);
+		}
+
+		auto offset = (u32)((u8*)old_memory - (u8*)allocator->buffer);
+		auto old_size = allocator->allocations[offset];
+		if (old_size >= size) {
+			return old_memory;
+		} 
+
+		auto memory_block = allocator->on_alloc(DN_ALLOCATOR_MODE_ALLOC, size, nullptr, allocator);
+		dn_os_memory_copy(old_memory, memory_block, size);
+		return memory_block;
+	}
+
+	assert(false);
+	return nullptr;
+}
+
+void dn_standard_allocator_init(dn_standard_allocator_t* allocator) {
+	allocator->on_alloc = &dn_standard_allocator_on_alloc;
+}
+
+void* dn_standard_allocator_on_alloc(dn_allocator_mode_t mode, u32 size, void* old_memory, void* userdata) {
+	auto allocator = (dn_standard_allocator_t*)userdata;
+	if (mode == DN_ALLOCATOR_MODE_ALLOC) {
+		return calloc(size, 1);
+	}
+	else if (mode == DN_ALLOCATOR_MODE_FREE) {
+		::free(old_memory);
+		return nullptr;
+	}
+	else if (mode == DN_ALLOCATOR_MODE_RESIZE) {
+		return ::realloc(old_memory, size);
+	}
+
+	DN_ASSERT(false);
+	return nullptr;
 }
 
 void dn_allocator_add(const char* name, dn_allocator_t* allocator) {
@@ -175,18 +180,18 @@ dn_allocator_t* dn_allocator_find(const char* name) {
 
 void* dn_allocator_alloc(dn_allocator_t* allocator, u32 size) {
 	DN_ASSERT(allocator);
-	return allocator->on_alloc(DN_ALLOCATOR_MODE_ALLOC, size, NULL);
+	return allocator->on_alloc(DN_ALLOCATOR_MODE_ALLOC, size, NULL, allocator);
 }
 
 void* dn_allocator_realloc(dn_allocator_t* allocator, void* memory, u32 size) {
 	DN_ASSERT(allocator);
-	return allocator->on_alloc(DN_ALLOCATOR_MODE_RESIZE, size, memory);
+	return allocator->on_alloc(DN_ALLOCATOR_MODE_RESIZE, size, memory, allocator);
 }
 
 void dn_allocator_free(dn_allocator_t* allocator, void* buffer) {
 	DN_ASSERT(allocator);
 	DN_ASSERT(buffer);
-	allocator->on_alloc(DN_ALLOCATOR_MODE_FREE, 0, buffer);
+	allocator->on_alloc(DN_ALLOCATOR_MODE_FREE, 0, buffer, allocator);
 }
 
 void dn_allocators_init() {
