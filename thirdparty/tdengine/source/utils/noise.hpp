@@ -51,9 +51,9 @@ void dn_noise_init() {
 
 	for (int x = 0; x < rx; x++) {
 		for (int y = 0; y < ry; y++) {
-            u32 r = dn_math_random_int(0, 255);
-            u32 g = dn_math_random_int(0, 255) << 8;
-            u32 b = dn_math_random_int(0, 255) << 16;
+            u32 r = dn_math_random_i32(0, 255);
+            u32 g = dn_math_random_i32(0, 255) << 8;
+            u32 b = dn_math_random_i32(0, 255) << 16;
             u32 a = 255 << 24;
             data[y * rx + x] = r + g + b + a;
         }

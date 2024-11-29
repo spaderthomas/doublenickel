@@ -1,5 +1,5 @@
-#ifndef GRAPHICS_H
-#define GRAPHICS_H
+#ifndef DN_GRAPHICS_H
+#define DN_GRAPHICS_H
 
 #define GPU_NEAR_PLANE -100.0
 #define GPU_FAR_PLANE 100.0
@@ -441,19 +441,11 @@ DN_IMP u32                       dn_gpu_blend_func_to_gl_blend_func(dn_gpu_blend
 DN_IMP u32                       dn_gpu_blend_mode_to_gl_blend_mode(dn_gpu_blend_mode_t mode);
 DN_IMP u32                       dn_gpu_resource_id_to_gl_id(dn_gpu_resource_id_t id);
 DN_IMP u32                       dn_gpu_memory_barrier_to_gl_barrier(dn_gpu_memory_barrier_t barrier);
-
-//////////////
-// INTERNAL //
-//////////////
-
 #endif // GRAPHICS_H
 
 
 
-////////////////////
-// IMPLEMENTATION //
-////////////////////
-#ifdef GRAPHICS_IMPLEMENTATION
+#ifdef DN_GRAPHICS_IMPLEMENTATION
 void dn_gpu_init(dn_gpu_config_t config) {
   dn_log("%s", __func__);
   dn_array_init(&dn_gpu.command_buffers);

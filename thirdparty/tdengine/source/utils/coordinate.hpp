@@ -1,5 +1,5 @@
-#ifndef COORDINATE_H
-#define COORDINATE_H
+#ifndef DN_COORDINATE_H
+#define DN_COORDINATE_H
 
 typedef enum {
 	// Exactly where you are on the monitor. In other words, a fraction of the output resolution
@@ -59,7 +59,7 @@ DN_API Vector2         dn_coord_world_to_game_mag(float x, float y);
                
 #endif
 
-#ifdef COORDINATE_IMPLEMENTATION
+#ifdef DN_COORDINATE_IMPLEMENTATION
 dn_coord_data_t dn_coord_get() {
 	return dn_coord_data;
 }

@@ -15,7 +15,7 @@
 #include "source/utils/arena.hpp"
 #include "source/utils/colors.hpp"
 #include "source/utils/coordinate.hpp"
-#include "source/utils/utils.hpp"
+#include "source/utils/math.hpp"
 #include "source/utils/file_monitor.hpp"
 #include "source/utils/filesystem.hpp"
 #include "source/utils/time_function.hpp"
@@ -63,7 +63,7 @@
 #include "source/font.hpp"
 #define DN_INPUT_IMPLEMENTATION
 #include "source/input.hpp"
-#define GRAPHICS_IMPLEMENTATION
+#define DN_GRAPHICS_IMPLEMENTATION
 #include "source/graphics.hpp"
 #define DN_LUA_IMPLEMENTATION
 #include "source/dn_lua.hpp"
@@ -79,7 +79,9 @@
 #include "source/window.hpp"
 #define DN_IMGUI_IMPLEMENTATION
 #include "source/imgui/dn_imgui.hpp"
-#define COORDINATE_IMPLEMENTATION
+#define DN_ARRAY_IMPLEMENTATION
+#include "source/utils/array.hpp"
+#define DN_COORDINATE_IMPLEMENTATION
 #include "source/utils/coordinate.hpp"
 #define DN_FILE_MONITOR_IMPLEMENTATION
 #include "source/utils/file_monitor.hpp"
@@ -87,6 +89,8 @@
 #include "source/utils/fixed_array.hpp"
 #define DN_LOG_IMPLEMENTATION
 #include "source/utils/log.hpp"
+#define DN_MATH_IMPLEMENTATION
+#include "source/utils/math.hpp"
 #define DN_MEMORY_IMPLEMENTATION
 #include "source/utils/memory.hpp"
 #define DN_NOISE_IMPLEMENTATION
@@ -101,7 +105,6 @@
 #include "source/utils/string.hpp"
 
 
-#include "source/utils/array.cpp"
 #include "source/text.cpp"
 #include "source/draw.cpp"
 #include "source/background.cpp" // INVERT (I need something to load large images though, in general)
