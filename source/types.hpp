@@ -1,3 +1,4 @@
+#ifndef DN_NO_HIJACK_NUMERIC_TYPES
 typedef int8_t   i8;
 typedef int16_t  i16;
 typedef int32_t  i32;
@@ -10,6 +11,7 @@ typedef uint64_t u64;
 
 typedef float f32;
 typedef double f64;
+#endif
 
 typedef size_t dn_hash_t;
 
