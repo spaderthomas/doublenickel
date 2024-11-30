@@ -38,6 +38,7 @@ DN_API void    dn_imgui_load_colors(dn_imgui_colors_t colors);
 
 
 #ifdef DN_IMGUI_IMPLEMENTATION
+
 void dn_imgui_init() {
   dn_log("%s", __func__);
   dn_imgui = dn_zero_initialize();

@@ -1,6 +1,6 @@
 #ifndef DN_HPP
 #define DN_HPP
-#include "external/include/libs.hpp"
+#include "external/include/dn_external.hpp"
 
 #include "source/types.hpp"
 #include "source/macros.hpp"
@@ -22,7 +22,7 @@
 #include "source/noise.hpp"
 #include "source/hash.hpp"
 #include "source/preprocessor.hpp"
-#include "source/imgui/dn_imgui.hpp"
+#include "source/dn_imgui.hpp"
 #include "source/dn_lua.hpp"
 #include "source/engine.hpp"
 #include "source/time_metrics.hpp"
@@ -37,7 +37,6 @@
 #include "source/audio.hpp"
 #include "source/action.hpp"
 #include "source/particle.hpp"
-#include "source/buffers.hpp"
 #include "source/dn_steam.hpp"
 #include "source/asset.hpp"
 #include "source/named_path.hpp"
@@ -48,8 +47,7 @@
 #endif
 
 #ifdef DN_IMPLEMENTATION
-#include "source/glad.c"
-#include "source/imgui/imgui_compilation_unit.cpp"
+#include "external/source/dn_external.cpp"
 
 #define DN_APP_IMPLEMENTATION
 #include "source/app.hpp"
@@ -76,7 +74,7 @@
 #define DN_GRAPHICS_IMPLEMENTATION
 #include "source/graphics.hpp"
 #define DN_IMGUI_IMPLEMENTATION
-#include "source/imgui/dn_imgui.hpp"
+#include "source/dn_imgui.hpp"
 #define DN_LOG_IMPLEMENTATION
 #include "source/log.hpp"
 #define DN_LUA_IMPLEMENTATION
