@@ -1,6 +1,6 @@
-<div style="text-align: center;">
+<p align="center">
     <img src="doc/boonbane.png" alt="doublenickel" width="400">
-</div>
+</p>
 `doublenickel` is a header only framework for building games and tech demos on Windows, written in a minimal C-style C++ and scripted with LuaJIT.
 
 ## overview
