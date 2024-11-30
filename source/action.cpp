@@ -263,7 +263,7 @@ void activate_action_set(const char* name) {
 	steam_input.action_set_cooldown = SteamInputManager::action_set_cooldown_max;
 }
 
-int32 get_action_set_cooldown() {
+i32 get_action_set_cooldown() {
 	return steam_input.action_set_cooldown;
 }
 

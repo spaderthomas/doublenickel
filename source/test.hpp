@@ -71,7 +71,7 @@ void dn_test_init();
 // 	dn_vector2_t point;
 // 	dn_vector2_t result;
 
-// 	static constexpr int32 NATIVE = 1000;
+// 	static constexpr i32 NATIVE = 1000;
 	
 // 	window.native_resolution.x = 1000;
 // 	window.native_resolution.y = 1000;

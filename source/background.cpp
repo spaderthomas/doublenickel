@@ -26,7 +26,7 @@ void init_backgrounds() {
 		//lua.parse_bool("high_priority", &background->high_priority);
 
 		// Figure out whether the source has been modified since we tiled it
-		//lua.parse_float64("mod_time", &background->mod_time);
+		//lua.parse_f64("mod_time", &background->mod_time);
 		background->filesystem_mod_time = dn_os_file_mod_time(background->source_image_full_path);
 
 		if (background->is_dirty()) {
@@ -159,8 +159,8 @@ bool Background::add_tile() {
 		dn_array_push(&tile_positions);
 	} else {
 		// Otherwise, advance the previous tile one column, and move to the next row if needed.
-		dn_vector2_tI last_tile_position = *dn_array_back(&tile_positions);
-		dn_vector2_tI tile_position = { 0, 0 };
+		dn_vector2i_t last_tile_position = *dn_array_back(&tile_positions);
+		dn_vector2i_t tile_position = { 0, 0 };
 		tile_position.x = last_tile_position.x + Background::TILE_SIZE;
 		tile_position.y = last_tile_position.y;
 		if (tile_position.x >= width) {
@@ -393,7 +393,7 @@ void TileProcessor::process(Background* background) {
 		u32 tile = current_tile++;
 		mutex.unlock();
 
-		dn_vector2_tI source_position = *background->tile_positions[tile];
+		dn_vector2i_t source_position = *background->tile_positions[tile];
 		char*    tile_path       = *background->tile_full_paths[tile];
 		memset(tile_data, 0, Background::TILE_SIZE * Background::TILE_SIZE * sizeof(u32));
 			

@@ -172,7 +172,7 @@ void _dn_paths_set_write_path() {
   SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, appdata_dir);
   
   // Normalize
-  for (int32 i = 0; i < DN_MAX_PATH_LEN; i++) {
+  for (i32 i = 0; i < DN_MAX_PATH_LEN; i++) {
     if (appdata_dir[i] == 0) break;
     if (appdata_dir[i] == '\\') appdata_dir[i] = '/';
   }

@@ -18,7 +18,7 @@ struct Sprite {
   dn_hash_t hash;
   dn_hash_t texture;
   dn_vector2_t* uv;
-  dn_vector2_tI size;
+  dn_vector2i_t size;
 };
 Sprite* find_sprite(const char* name);
 Sprite* find_sprite_no_default(const char* name);

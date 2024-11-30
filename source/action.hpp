@@ -35,8 +35,8 @@ struct Action {
 
 
 struct SteamInputManager {
-	static constexpr int32 MAX_ACTION_SETS = 8;
-	static constexpr int32 MAX_ACTIONS = 128;
+	static constexpr i32 MAX_ACTION_SETS = 8;
+	static constexpr i32 MAX_ACTIONS = 128;
 
 	Steam::Controller controller;
 	
@@ -57,8 +57,8 @@ struct SteamInputManager {
 	//
 	// 5 is picked more or less arbitrarily. I see the input happening the frame after I switch action sets, so theoretically
 	// 2 or 3 should be enough.
-	static constexpr int32 action_set_cooldown_max = 5;
-	int32 action_set_cooldown = 0;
+	static constexpr i32 action_set_cooldown_max = 5;
+	i32 action_set_cooldown = 0;
 
 	dn_array_t<Action> actions;
 
@@ -89,5 +89,5 @@ DN_API void activate_action_set(const char* name);
 DN_API bool is_digital_active(const char* name);
 DN_API bool was_digital_active(const char* name);
 DN_API bool was_digital_pressed(const char* name);
-DN_API int32 get_action_set_cooldown();
+DN_API i32 get_action_set_cooldown();
 DN_API const char* get_active_action_set(); 

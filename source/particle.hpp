@@ -52,7 +52,7 @@ struct ParticleSystemFrame {
 
 struct ParticleSystem {
 	bool occupied;
-	int32 generation;
+	i32 generation;
 
 	static constexpr int max_particles = 4096;
 	dn_array_t<Particle> particles;
@@ -78,7 +78,7 @@ struct ParticleSystem {
 	dn_vector2_t velocity_jitter;
 	bool jitter_base_velocity;
 	bool jitter_max_velocity;
-	int32 layer;
+	i32 layer;
 	int max_spawn;
 	float spawn_rate;
 	float lifetime;
@@ -103,8 +103,8 @@ struct ParticleSystem {
 };
 
 struct ParticleSystemHandle {
-	int32 index = -1;
-	int32 generation = -1;
+	i32 index = -1;
+	i32 generation = -1;
 
 	operator bool();
 };
@@ -135,7 +135,7 @@ DN_API void set_particle_position(ParticleSystemHandle handle, float x, float y)
 DN_API void set_particle_area(ParticleSystemHandle handle, float x, float y);
 DN_API void set_particle_kind(ParticleSystemHandle handle, ParticleKind kind);
 DN_API void set_particle_color(ParticleSystemHandle handle, float r, float g, float b, float a);
-DN_API void set_particle_layer(ParticleSystemHandle handle, int32 layer);
+DN_API void set_particle_layer(ParticleSystemHandle handle, i32 layer);
 DN_API void set_particle_velocity_fn(ParticleSystemHandle handle, InterpolationFn function);
 DN_API void set_particle_velocity_base(ParticleSystemHandle handle, float x, float y);
 DN_API void set_particle_velocity_max(ParticleSystemHandle handle, float x, float y);
@@ -149,7 +149,7 @@ DN_API void set_particle_opacity_jitter(ParticleSystemHandle handle, float jitte
 DN_API void set_particle_jitter_opacity(ParticleSystemHandle handle, bool jitter);
 DN_API void set_particle_opacity_interpolation(ParticleSystemHandle handle, bool active, float start_time, float interpolate_to);
 DN_API void set_particle_warm(ParticleSystemHandle handle, bool warm);
-DN_API void set_particle_warmup(ParticleSystemHandle handle, int32 iter);
+DN_API void set_particle_warmup(ParticleSystemHandle handle, i32 iter);
 DN_API void set_particle_gravity_source(ParticleSystemHandle handle, float x, float y);
 DN_API void set_particle_gravity_intensity(ParticleSystemHandle handle, float intensity);
 DN_API void set_particle_gravity_enabled(ParticleSystemHandle handle, bool enabled);

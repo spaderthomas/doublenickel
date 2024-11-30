@@ -37,7 +37,7 @@ typedef struct {
   GLFWwindow* handle;
   dn_window_flags_t flags;
   dn_display_mode_t display_mode;
-  dn_vector2_tI windowed_position;
+  dn_vector2i_t windowed_position;
   dn_vector2_t native_resolution;
   dn_vector2_t requested_area;
   dn_vector2_t content_area;

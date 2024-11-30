@@ -179,7 +179,7 @@ void set_particle_kind(ParticleSystemHandle handle, ParticleKind particle_kind) 
 	if (!particle_system) return;
 
 	// These are coming in from Lua, where you can type anything into the editor.
-	if (static_cast<int32>(particle_kind) >= static_cast<int32>(ParticleKind::Invalid)) {
+	if (static_cast<i32>(particle_kind) >= static_cast<i32>(ParticleKind::Invalid)) {
 		particle_kind = ParticleKind::Invalid;
 	}
 	particle_system->particle_kind = particle_kind;
@@ -192,7 +192,7 @@ void set_particle_color(ParticleSystemHandle handle, float r, float g, float b, 
 	particle_system->color = dn_vector4_t{r, g, b, a};
 }
 
-void set_particle_layer(ParticleSystemHandle handle, int32 layer) {
+void set_particle_layer(ParticleSystemHandle handle, i32 layer) {
 	auto particle_system = find_particle_system(handle);
 	if (!particle_system) return;
 	
@@ -300,7 +300,7 @@ void set_particle_warm(ParticleSystemHandle handle, bool warm) {
 }
 
 
-void set_particle_warmup(ParticleSystemHandle handle, int32 iter) {
+void set_particle_warmup(ParticleSystemHandle handle, i32 iter) {
 	auto particle_system = find_particle_system(handle);
 	if (!particle_system) return;
 

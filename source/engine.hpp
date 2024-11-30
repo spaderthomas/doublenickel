@@ -1,10 +1,10 @@
 #ifndef DN_ENGINE_H
 #define DN_ENGINE_H
 struct Engine {
-  float32 target_fps;
-  float32 dt;
-  float32 elapsed_time;
-  int32 frame = 0;
+  f32 target_fps;
+  f32 dt;
+  f32 elapsed_time;
+  i32 frame = 0;
   bool exit_game = false;
   bool steam = false;
 };
@@ -118,7 +118,7 @@ dn_type_info_list_t dn_engine_query_types() {
     .count = DN_ARR_LEN(types)
   };
 }
-void dn_engine_set_target_fps(float64 fps) {
+void dn_engine_set_target_fps(f64 fps) {
   engine.target_fps = fps;
   engine.dt = 1.f / fps;
 }

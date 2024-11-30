@@ -1,17 +1,17 @@
 template<typename T>
 struct dn_ring_buffer_t {
-	int32 head      = 0;
-	int32 size      = 0;
-	int32 capacity  = 0;
+	i32 head      = 0;
+	i32 size      = 0;
+	i32 capacity  = 0;
 	T* data         = nullptr;
 
-	T* operator[](uint32 index) {
+	T* operator[](u32 index) {
 		return data + ((head + index) % capacity);
 	}
 };
 
 template<typename T>
-void dn_ring_buffer_init(dn_ring_buffer_t<T>* buffer, int32 capacity) {
+void dn_ring_buffer_init(dn_ring_buffer_t<T>* buffer, i32 capacity) {
 	buffer->size = 0;
 	buffer->head = 0;
 	buffer->capacity = capacity;
@@ -19,7 +19,7 @@ void dn_ring_buffer_init(dn_ring_buffer_t<T>* buffer, int32 capacity) {
 }
 
 template<typename T>
-void dn_ring_buffer_init(dn_ring_buffer_t<T>* buffer, int32 capacity, T fill) {
+void dn_ring_buffer_init(dn_ring_buffer_t<T>* buffer, i32 capacity, T fill) {
 	dn_ring_buffer_init(buffer, capacity);
 	dn_ring_buffer_fill(buffer, T());
 }
@@ -36,7 +36,7 @@ void dn_ring_buffer_free(dn_ring_buffer_t<T>* buffer) {
 
 
 template<typename T>
-T* dn_ring_buffer_at(dn_ring_buffer_t<T>* buffer, int32 index) {
+T* dn_ring_buffer_at(dn_ring_buffer_t<T>* buffer, i32 index) {
 	return (*buffer)[index];
 }
 
@@ -47,8 +47,8 @@ T* dn_ring_buffer_back(dn_ring_buffer_t<T>* buffer) {
 }
 
 template<typename T>
-int32 dn_ring_buffer_index_of(dn_ring_buffer_t<T>* buffer, T* element) {
-	int32 index = element - (buffer->data + buffer->head);
+i32 dn_ring_buffer_index_of(dn_ring_buffer_t<T>* buffer, T* element) {
+	i32 index = element - (buffer->data + buffer->head);
 	if (index < 0) return (buffer->size - buffer->head) - index;
 	return index;
 }
@@ -95,7 +95,7 @@ T dn_ring_buffer_pop(dn_ring_buffer_t<T>* buffer) {
 }
 
 template<typename T>
-dn_ring_buffer_t<T> dn_ring_buffer_slice(dn_ring_buffer_t<T>* buffer, int32 index, int32 size) {
+dn_ring_buffer_t<T> dn_ring_buffer_slice(dn_ring_buffer_t<T>* buffer, i32 index, i32 size) {
 	// No need to make any bounds checks if it's an empty slice
 	if (size) {
 		DN_ASSERT(size  <= buffer->size);
@@ -113,12 +113,12 @@ dn_ring_buffer_t<T> dn_ring_buffer_slice(dn_ring_buffer_t<T>* buffer, int32 inde
 }
 
 template<typename T>
-dn_ring_buffer_t<T> dn_ring_buffer_slice(dn_ring_buffer_t<T>* buffer, int32 size) {
+dn_ring_buffer_t<T> dn_ring_buffer_slice(dn_ring_buffer_t<T>* buffer, i32 size) {
 	return dn_ring_buffer_slice(buffer, 0, size);
 }
 
 template<typename T>
-dn_ring_buffer_t<T> dn_ring_buffer_rslice(dn_ring_buffer_t<T>* buffer, int32 size) {
+dn_ring_buffer_t<T> dn_ring_buffer_rslice(dn_ring_buffer_t<T>* buffer, i32 size) {
 	DN_ASSERT(size  <= buffer->size);
 	
 	dn_ring_buffer_t<T> slice;
@@ -132,7 +132,7 @@ dn_ring_buffer_t<T> dn_ring_buffer_rslice(dn_ring_buffer_t<T>* buffer, int32 siz
 }
 
 template<typename T>
-int32 dn_ring_buffer_bytes(dn_ring_buffer_t<T>* buffer) {
+i32 dn_ring_buffer_bytes(dn_ring_buffer_t<T>* buffer) {
 	return buffer->capacity * sizeof(T);
 }
 
@@ -156,7 +156,7 @@ bool dn_ring_buffer_empty(dn_ring_buffer_t<T>* buffer) {
 // Iterator
 template<typename T>
 struct dn_ring_buffer_tIterator {
-	uint32 index;
+	u32 index;
 	bool reverse;
 	dn_ring_buffer_t<T>* buffer;
 
@@ -168,12 +168,12 @@ struct dn_ring_buffer_tIterator {
 		return buffer;
 	}
 	
-	void operator++(int32) {
+	void operator++(i32) {
 		DN_ASSERT(index < buffer->size);
 		index++;
 	}
 
-	void operator--(int32) {
+	void operator--(i32) {
 		DN_ASSERT(index >= 0);
 		index--;
 	}

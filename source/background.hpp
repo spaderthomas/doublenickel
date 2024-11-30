@@ -16,15 +16,15 @@ struct Background {
 	char* source_image_full_path;
 	dn_array_t<char*, 64> tiles;
 	dn_array_t<char*, 64> tile_full_paths;
-	dn_array_t<dn_vector2_tI, 64> tile_positions;
+	dn_array_t<dn_vector2i_t, 64> tile_positions;
 	i32 width;
 	i32 height;
 	i32 channels;
 	u32* data;
 	bool high_priority = false;
 
-	float64 mod_time;
-	float64 filesystem_mod_time;
+	f64 mod_time;
+	f64 filesystem_mod_time;
 
 	bool need_async_build;
 	bool need_async_load;

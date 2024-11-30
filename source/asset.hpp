@@ -6,8 +6,8 @@ enum class AssetKind {
 };
 
 struct AssetLoadRequest {
-  int32 id;
-  static int32 next_id;
+  i32 id;
+  static i32 next_id;
 
   AssetKind kind;
   union {
@@ -15,7 +15,7 @@ struct AssetLoadRequest {
     TextureAtlas* atlas;
   };
 };
-int32 AssetLoadRequest::next_id = 0;
+i32 AssetLoadRequest::next_id = 0;
 
 /*
 I used to load all assets for the game synchronously, at startup. This was OK for a while, but eventually the game 

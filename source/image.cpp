@@ -264,10 +264,10 @@ void TextureAtlas::build_from_source() {
     auto size = item->sprite->size;
 
     // Generate UV coordinates
-    float32 top    = rect->y            / (float32)TEXTURE_ATLAS_SIZE;
-    float32 bottom = (rect->y + size.y) / (float32)TEXTURE_ATLAS_SIZE;
-    float32 left   = rect->x            / (float32)TEXTURE_ATLAS_SIZE;
-    float32 right  = (rect->x + size.x) / (float32)TEXTURE_ATLAS_SIZE;
+    f32 top    = rect->y            / (f32)TEXTURE_ATLAS_SIZE;
+    f32 bottom = (rect->y + size.y) / (f32)TEXTURE_ATLAS_SIZE;
+    f32 left   = rect->x            / (f32)TEXTURE_ATLAS_SIZE;
+    f32 right  = (rect->x + size.x) / (f32)TEXTURE_ATLAS_SIZE;
       
     dn_vector2_t uv [6] = dn_quad_literal(top, bottom, left, right);
     memcpy(item->sprite->uv, uv, sizeof(dn_vector2_t) * 6);
@@ -626,7 +626,7 @@ void create_sprite_ex(Sprite* sprite, const char* id, u8* data, i32 width, i32 h
   
   sprite->hash = dn_hash_cstr_dumb(id);
   sprite->texture = texture->hash;
-  sprite->size = dn_vector2_tI(width, height);
+  sprite->size = dn_vector2i_t(width, height);
   strncpy(sprite->file_path, id, DN_MAX_PATH_LEN);
 
   dn_vector2_t uv [6] = dn_quad_literal(0, 1, 0, 1);
