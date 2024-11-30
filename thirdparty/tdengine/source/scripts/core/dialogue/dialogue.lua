@@ -9,7 +9,13 @@ function tdengine.dialogue.init()
   end
   tdengine.callback.register('debug', on_unknown_callback)
 
-  tdengine.dialogue.characters = tdengine.module.read_from_named_path('character_info')
+  local info = tdengine.ffi.dn_paths_resolve('character_info'):to_interned()
+  if tdengine.ffi.dn_os_does_path_exist(info) then
+    tdengine.dialogue.characters = tdengine.module.read_from_named_path('character_info')
+  else
+    tdengine.dialogue.characters = {}
+  end
+
 
   self.controller = DialogueController:new()
   self.history = History:new()

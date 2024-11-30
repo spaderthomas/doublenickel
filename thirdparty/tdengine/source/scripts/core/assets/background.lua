@@ -1,5 +1,10 @@
 function tdengine.background.load()
-	tdengine.background.data = tdengine.module.read_from_named_path('background_info')
+	local info = tdengine.ffi.dn_paths_resolve('background_info'):to_interned()
+  if tdengine.ffi.dn_os_does_path_exist(info) then
+		tdengine.background.data = tdengine.module.read_from_named_path('background_info')
+	else
+		tdengine.background.data = {}
+  end
 end
 
 function tdengine.background.save()

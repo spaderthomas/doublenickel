@@ -245,9 +245,6 @@ function tdengine.ffi.init()
   imgui.internal.init_c_api()
   imgui.internal.init_lua_api()
   imgui.internal.init_lua_api_overwrites()
-
-  local header = tdengine.module.read_from_named_path('ffi_info')
-  ffi.cdef(header)
 end
 
 

@@ -172,6 +172,12 @@ void                         dn_os_remove_directory(const char* path);
 void                         dn_os_create_directory(const char* path);
 dn_os_directory_entry_list_t dn_os_scan_directory(const char* path);
 dn_os_date_time_t            dn_os_get_date_time();
+f64                          dn_os_file_mod_time(const char* path);
+void                         dn_os_memory_copy(const void* source, void* dest, u32 num_bytes);
+bool                         dn_os_is_memory_equal(void* a, void* b, size_t len);
+void                         dn_os_fill_memory(void* buffer, u32 buffer_size, void* fill, u32 fill_size);
+void                         dn_os_fill_memory_u8(void* buffer, u32 buffer_size, u8 fill);
+void                         dn_os_zero_memory(void* buffer, u32 buffer_size);
 
 typedef struct dn_allocator_t dn_allocator_t;
 

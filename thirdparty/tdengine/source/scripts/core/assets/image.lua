@@ -15,7 +15,13 @@ tdengine.layers = {
 }
 
 function tdengine.animation.load()
-  tdengine.animation.data = tdengine.module.read_from_named_path('animation_info')
+  local info = tdengine.ffi.dn_paths_resolve('animation_info'):to_interned()
+  if tdengine.ffi.dn_os_does_path_exist(info) then
+    tdengine.animation.data = tdengine.module.read_from_named_path('animation_info')
+  else
+    tdengine.animation.data = {}
+  end
+
 end
 
 function tdengine.animation.save()

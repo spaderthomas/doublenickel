@@ -81,7 +81,6 @@ return {
 				font_info = 'fonts.lua',
 				ffi_info = 'ffi.lua',
 				texture_info = 'textures.lua',
-				gpu_info = 'gpu.lua',
 			}
 		},
 		dialogue = 'dialogue',
