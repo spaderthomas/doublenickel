@@ -1,10 +1,10 @@
-tdengine.array = {}
+doublenickel.array = {}
 
-function tdengine.array.add(array, item)
+function doublenickel.array.add(array, item)
   array[#array + 1] = item
 end
 
-function tdengine.array.remove(array, index)
+function doublenickel.array.remove(array, index)
   for i = index, #array, 1 do
     array[i] = array[i + 1]
   end
@@ -32,9 +32,9 @@ function delete(array, value)
   end
 end
 
-Array = tdengine.class.define('Array')
-tdengine.data_types.array = Array
-tdengine.data_types.Array = Array
+Array = doublenickel.class.define('Array')
+doublenickel.data_types.array = Array
+doublenickel.data_types.Array = Array
 
 function Array:init()
   self.data = {}
@@ -152,7 +152,7 @@ function Array:__tostring()
 end
 
 local function test_array()
-  local a = tdengine.data_types.array:new()
+  local a = doublenickel.data_types.array:new()
   a:add(69)
   a:add(420)
   a:add(9001)

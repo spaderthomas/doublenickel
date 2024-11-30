@@ -1,4 +1,4 @@
-tdengine.layers = {
+doublenickel.layers = {
   editor = 5,
   background = 5,
   foreground = 25,
@@ -14,22 +14,22 @@ tdengine.layers = {
   ui = 100,
 }
 
-function tdengine.animation.load()
-  local info = tdengine.ffi.dn_paths_resolve('animation_info'):to_interned()
-  if tdengine.ffi.dn_os_does_path_exist(info) then
-    tdengine.animation.data = tdengine.module.read_from_named_path('animation_info')
+function doublenickel.animation.load()
+  local info = doublenickel.ffi.dn_paths_resolve('animation_info'):to_interned()
+  if doublenickel.ffi.dn_os_does_path_exist(info) then
+    doublenickel.animation.data = doublenickel.module.read_from_named_path('animation_info')
   else
-    tdengine.animation.data = {}
+    doublenickel.animation.data = {}
   end
 
 end
 
-function tdengine.animation.save()
-  tdengine.module.write_to_named_path('animation_info', tdengine.animation.data, tdengine.module.WriteOptions.Pretty)
+function doublenickel.animation.save()
+  doublenickel.module.write_to_named_path('animation_info', doublenickel.animation.data, doublenickel.module.WriteOptions.Pretty)
 end
 
-function tdengine.animation.find(animation)
-  for name, data in tdengine.animation.iterate() do
+function doublenickel.animation.find(animation)
+  for name, data in doublenickel.animation.iterate() do
     if name == animation then return data end
   end
 
@@ -42,14 +42,14 @@ function tdengine.animation.find(animation)
   }
 end
 
-function tdengine.animation.add(name, data)
-  tdengine.animation.data[name] = table.deep_copy(data)
+function doublenickel.animation.add(name, data)
+  doublenickel.animation.data[name] = table.deep_copy(data)
 end
 
-function tdengine.animation.remove(name)
-  tdengine.animation.data[name] = nil
+function doublenickel.animation.remove(name)
+  doublenickel.animation.data[name] = nil
 end
 
-function tdengine.animation.iterate()
-  return pairs(tdengine.animation.data)
+function doublenickel.animation.iterate()
+  return pairs(doublenickel.animation.data)
 end

@@ -5,7 +5,7 @@ void init_backgrounds() {
 
 	dn_array_init(&backgrounds, 64);
 			
-	lua_getglobal(l, "tdengine");
+	lua_getglobal(l, "doublenickel");
 	DEFER_POP(l);
 	lua_pushstring(l, "background");
 	lua_gettable(l, -2);
@@ -230,7 +230,7 @@ void Background::build_from_source() {
 void Background::update_config() {
 	lua_State* l = dn_lua.state;
 
-	lua_getglobal(l, "tdengine");
+	lua_getglobal(l, "doublenickel");
 	DEFER_POP(l);
 	lua_pushstring(l, "background");
 	lua_gettable(l, -2);
@@ -278,14 +278,14 @@ void Background::update_config() {
 	lua_settable(l, -3);
 	
 	// Write the file to disk
-	lua_getglobal(l, "tdengine");
+	lua_getglobal(l, "doublenickel");
 	lua_pushstring(l, "write_file_to_return_table");
 	lua_gettable(l, -2);
 
 	auto background_info = dn_paths_resolve("background_info");
 	lua_pushstring(l, background_info);
 
-	lua_getglobal(l, "tdengine");
+	lua_getglobal(l, "doublenickel");
 	DEFER_POP(l);
 	lua_pushstring(l, "background");
 	lua_gettable(l, -2);

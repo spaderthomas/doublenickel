@@ -1,4 +1,4 @@
-function tdengine.platform()
+function doublenickel.platform()
   local separator = package.config:sub(1, 1)
   if separator == '\\' then
     return 'Windows'
@@ -31,7 +31,7 @@ function string.split_ex(str, separator)
   return split_ex(str, separator)
 end
 
-KeyRepeat = tdengine.class.define('KeyRepeat')
+KeyRepeat = doublenickel.class.define('KeyRepeat')
 function KeyRepeat:init(params)
   self.repeat_time = {}
   self.repeat_delay = params.repeat_delay
@@ -39,16 +39,16 @@ end
 
 function KeyRepeat:check(key)
   -- Always do it on the first press
-  if tdengine.input.pressed(key) then
+  if doublenickel.input.pressed(key) then
     self.repeat_time[key] = self.repeat_delay
     return true
   end
 
   -- Otherwise, check if we've hit the repeat threshold
-  if tdengine.input.down(key) then
+  if doublenickel.input.down(key) then
     -- @hack: self.repeat_time[key] is nil occasionally when pressing a chord
     if not self.repeat_time[key] then self.repeat_time[key] = self.repeat_delay end
-    self.repeat_time[key] = self.repeat_time[key] - tdengine.dt
+    self.repeat_time[key] = self.repeat_time[key] - doublenickel.dt
     if self.repeat_time[key] <= 0 then
       return true
     end

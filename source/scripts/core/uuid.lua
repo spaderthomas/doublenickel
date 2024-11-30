@@ -1,4 +1,4 @@
-function tdengine.uuid()
+function doublenickel.uuid()
   local random = math.random
   local template = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
   local sub = function(c)
@@ -8,7 +8,7 @@ function tdengine.uuid()
   return string.gsub(template, '[xy]', sub)
 end
 
-function tdengine.uuid_imgui()
+function doublenickel.uuid_imgui()
   local random = math.random
   local template = '##xxxxxxxx-xxxx-4xxx-yxxx'
   local sub = function(c)

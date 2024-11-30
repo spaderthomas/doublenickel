@@ -1,4 +1,4 @@
-Marker = tdengine.entity.define('Marker')
+Marker = doublenickel.entity.define('Marker')
 
 Marker.components = {
   'Collider'
@@ -6,8 +6,8 @@ Marker.components = {
 
 function Marker:init()
   self.collider = self:find_component('Collider')
-  self.collider:set_shape(tdengine.enums.ColliderShape.Circle, { radius = 12 })
-  self.collider.kind = tdengine.enums.ColliderKind.Bypass
+  self.collider:set_shape(doublenickel.enums.ColliderShape.Circle, { radius = 12 })
+  self.collider.kind = doublenickel.enums.ColliderKind.Bypass
 end
 
 function Marker:update()

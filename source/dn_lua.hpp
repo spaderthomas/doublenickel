@@ -65,10 +65,10 @@ void dn_lua_init() {
   // PHASE BOOTSTRAP:
   // Define the main table where all game data and functions go
   lua_newtable(l);
-  lua_setglobal(l, "tdengine");
+  lua_setglobal(l, "doublenickel");
 
   // Define a variable so we can ~ifdef in Lua
-  lua_getglobal(l, "tdengine");
+  lua_getglobal(l, "doublenickel");
   DEFER_POP(l);
   lua_pushstring(l, "is_packaged_build");
 #if defined(DN_EDITOR)
@@ -128,7 +128,7 @@ void dn_lua_init_game() {
   }
   
   // All scripts are loaded. We can start the game.
-  lua_getglobal(l, "tdengine");
+  lua_getglobal(l, "doublenickel");
   DEFER_POP(l);
   lua_pushstring(l, "init_phase_2");
   lua_gettable(l, -2);
@@ -146,7 +146,7 @@ void dn_lua_update() {
   lua_pushcfunction(l, &dn_lua_handle_error);
   DEFER_POP(l);
   
-  lua_getglobal(l, "tdengine");
+  lua_getglobal(l, "doublenickel");
   DEFER_POP(l);
   lua_pushstring(l, "update_game");
   lua_gettable(l, -2);
@@ -171,7 +171,7 @@ i32 dn_lua_handle_error(dn_lua_interpreter_t l) {
   const char* error = lua_tostring(l, -1);
   lua_pop(l, 1);
   
-  lua_getfield(l, LUA_GLOBALSINDEX, "tdengine");
+  lua_getfield(l, LUA_GLOBALSINDEX, "doublenickel");
   lua_getfield(l, -1, "handle_error");
 
   lua_pushstring(l, error);

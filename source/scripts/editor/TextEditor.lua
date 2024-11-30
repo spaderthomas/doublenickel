@@ -5,7 +5,7 @@ local editor_state = {
 }
 
 
-local TextEditor = tdengine.editor.define('TextEditor')
+local TextEditor = doublenickel.editor.define('TextEditor')
 TextEditor.editor_actions = {
   insert = 'insert',
   delete = 'delete'
@@ -17,7 +17,7 @@ TextEditor.editor_fields = {
 
 function TextEditor:init(params)
   params = params or {}
-  self.size = params.size or tdengine.vec2(0, 0)
+  self.size = params.size or doublenickel.vec2(0, 0)
   self.text = params.text or nil
   self.point = 0
   self.line_breaks = {}
@@ -40,7 +40,7 @@ function TextEditor:init(params)
   self.selection_delay = 8 / 60
   self.selection_begin = 0
   self.selection_end = 0
-  self.selection_color = tdengine.colors.spring_green:to_u32()
+  self.selection_color = doublenickel.colors.spring_green:to_u32()
 
   self.max_chars_per_line = nil
 
@@ -57,9 +57,9 @@ function TextEditor:init(params)
   --
   -- So I just hardcoded 7.63 as I remember seeing this value before & it makes the cursor right :^). Ditto for
   -- 20, except here I actually used to call GetTextLineHeightWithSpacing(), except that returned 4.
-  self.character_size = tdengine.vec2(7.63, 20)
+  self.character_size = doublenickel.vec2(7.63, 20)
 
-	self.input = ContextualInput:new(tdengine.enums.InputContext.Editor, tdengine.enums.CoordinateSystem.Game)
+	self.input = ContextualInput:new(doublenickel.enums.InputContext.Editor, doublenickel.enums.CoordinateSystem.Game)
 
   self.imgui_ignore = {
     last_action = true
@@ -70,16 +70,16 @@ end
 -- UPDATE --
 ------------
 function TextEditor:update()
-  if tdengine.editor.find('DialogueEditor').hidden then return end
+  if doublenickel.editor.find('DialogueEditor').hidden then return end
 
-  tdengine.editor.begin_window('Dialogue Node Text')
+  doublenickel.editor.begin_window('Dialogue Node Text')
 
   self.frame = self.frame + 1
-  self.time_since_click = self.time_since_click + tdengine.dt
+  self.time_since_click = self.time_since_click + doublenickel.dt
   self.last_action = nil
 
   if not self.text then
-    tdengine.editor.end_window()
+    doublenickel.editor.end_window()
     return
   end
 
@@ -94,20 +94,20 @@ function TextEditor:update()
     self.is_input_dirty = false
   end
 
-  local focus = tdengine.editor.is_window_focused()
-  local hover = tdengine.editor.is_window_hovered()
+  local focus = doublenickel.editor.is_window_focused()
+  local hover = doublenickel.editor.is_window_hovered()
 
   if self.state == editor_state.idle then
     for code = glfw.keys.SPACE, glfw.keys.GRAVE_ACCENT, 1 do
-      self:handle_check_repeat(tdengine.dt, code, self.handle_alpha, self, string.char(code))
+      self:handle_check_repeat(doublenickel.dt, code, self.handle_alpha, self, string.char(code))
       if code == glfw.keys.GRAVE_ACCENT then break end
     end
 
-    self:handle_check_repeat(tdengine.dt, glfw.keys.BACKSPACE, self.handle_backspace, self)
-    self:handle_check_repeat(tdengine.dt, glfw.keys.LEFT, self.handle_left_arrow, self)
-    self:handle_check_repeat(tdengine.dt, glfw.keys.RIGHT, self.handle_right_arrow, self)
-    self:handle_check_repeat(tdengine.dt, glfw.keys.DOWN, self.handle_down_arrow, self)
-    self:handle_check_repeat(tdengine.dt, glfw.keys.UP, self.handle_up_arrow, self)
+    self:handle_check_repeat(doublenickel.dt, glfw.keys.BACKSPACE, self.handle_backspace, self)
+    self:handle_check_repeat(doublenickel.dt, glfw.keys.LEFT, self.handle_left_arrow, self)
+    self:handle_check_repeat(doublenickel.dt, glfw.keys.RIGHT, self.handle_right_arrow, self)
+    self:handle_check_repeat(doublenickel.dt, glfw.keys.DOWN, self.handle_down_arrow, self)
+    self:handle_check_repeat(doublenickel.dt, glfw.keys.UP, self.handle_up_arrow, self)
 
     if hover then handle_click(self) end
 
@@ -120,7 +120,7 @@ function TextEditor:update()
     update_blink(self)
   elseif self.state == editor_state.dragging then
     if focus or hover then
-      self.selection_end = screen_to_point(self, tdengine.vec2(imgui.GetMousePos()))
+      self.selection_end = screen_to_point(self, doublenickel.vec2(imgui.GetMousePos()))
     end
 
     if self.selection_begin == self.selection_end then
@@ -162,7 +162,7 @@ function TextEditor:update()
     imgui.Text(self.text:sub(low, high))
   end
 
-  tdengine.editor.end_window()
+  doublenickel.editor.end_window()
 end
 
 ---------------
@@ -286,7 +286,7 @@ function TextEditor:handle_alpha(c)
 
   self.is_input_dirty = true
   local unshifted_byte = string.byte(c);
-  local shifted_byte = tdengine.ffi.dn_input_shift_key(unshifted_byte)
+  local shifted_byte = doublenickel.ffi.dn_input_shift_key(unshifted_byte)
   local c = string.char(shifted_byte)
   -- The point defines where the next character will go. For example, if the point is at 1, then
   -- the next character inserted will be at index 1.
@@ -296,7 +296,7 @@ end
 
 function handle_click(editor)
   if imgui.IsMouseClicked(0) then
-    editor.point = screen_to_point(editor, tdengine.vec2(imgui.GetMousePos()))
+    editor.point = screen_to_point(editor, doublenickel.vec2(imgui.GetMousePos()))
     editor.selection_begin = editor.point
     editor.selection_end = editor.point
     editor.time_since_click = 0
@@ -332,7 +332,7 @@ function screen_to_line(editor, screen)
 end
 
 function point_to_screen(editor, point)
-  local screen = tdengine.vec2(imgui.GetCursorScreenPos())
+  local screen = doublenickel.vec2(imgui.GetCursorScreenPos())
 
   local max_length, max_height = imgui.GetContentRegionAvail()
 
@@ -371,7 +371,7 @@ function screen_to_point(editor, screen)
   if #editor.text == 1 then return 1 end
 
   -- Find the coordinates relative to the beginning of the text editor window
-  local screen_begin = tdengine.vec2(imgui.GetCursorScreenPos())
+  local screen_begin = doublenickel.vec2(imgui.GetCursorScreenPos())
   local window_coordinates = screen:subtract(screen_begin)
   window_coordinates = window_coordinates:clampl(0)
 
@@ -424,17 +424,17 @@ function update_line_breaks(editor)
 end
 
 function show_grid(editor)
-  local line_color = tdengine.color32(255, 40, 200, 100)
-  local canvas = tdengine.vec2(imgui.GetCursorScreenPos())
-  local window = tdengine.vec2(imgui.GetWindowSize())
+  local line_color = doublenickel.color32(255, 40, 200, 100)
+  local canvas = doublenickel.vec2(imgui.GetCursorScreenPos())
+  local window = doublenickel.vec2(imgui.GetWindowSize())
   for x = 0, window.x, editor.character_size.x do
-    local top = tdengine.vec2(x, 0):add(canvas)
-    local bottom = tdengine.vec2(x, window.y):add(canvas)
+    local top = doublenickel.vec2(x, 0):add(canvas)
+    local bottom = doublenickel.vec2(x, window.y):add(canvas)
     imgui.GetWindowDrawList():AddLine(top.x, top.y, bottom.x, bottom.y, line_color)
   end
   for y = 0, window.y, editor.character_size.y do
-    local top = tdengine.vec2(0, y):add(canvas)
-    local bottom = tdengine.vec2(window.x, y):add(canvas)
+    local top = doublenickel.vec2(0, y):add(canvas)
+    local bottom = doublenickel.vec2(window.x, y):add(canvas)
     imgui.GetWindowDrawList():AddLine(top.x, top.y, bottom.x, bottom.y, line_color)
   end
 end
@@ -458,7 +458,7 @@ end
 
 function draw_blink(editor, point)
   local tl = point_to_screen(editor, editor.point)
-  local dim = tdengine.vec2(8, 20)
+  local dim = doublenickel.vec2(8, 20)
   adjust_cursor_height(tl, dim)
   imgui.GetWindowDrawList():AddRectFilled(imgui.ImVec2(tl.x, tl.y), imgui.ImVec2(tl.x + dim.x, tl.y + dim.y), editor.selection_color)
 end
@@ -484,7 +484,7 @@ function draw_selection(editor, selection_begin, selection_end, color)
 
     local hl_area = {
       top_left = point_to_screen(editor, line_begin),
-      dim = tdengine.vec2(count * chx, chy)
+      dim = doublenickel.vec2(count * chx, chy)
     }
     table.insert(hl_areas, hl_area)
 

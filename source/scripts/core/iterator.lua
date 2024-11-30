@@ -1,4 +1,4 @@
-function tdengine.iterator.values(t, filter)
+function doublenickel.iterator.values(t, filter)
   local function iterator()
     if not t then coroutine.yield(nil) end
 
@@ -14,7 +14,7 @@ function tdengine.iterator.values(t, filter)
   return coroutine.wrap(iterator)
 end
 
-function tdengine.iterator.keys(t, filter)
+function doublenickel.iterator.keys(t, filter)
   local function iterator()
     if not t then coroutine.yield(nil) end
     
@@ -30,7 +30,7 @@ function tdengine.iterator.keys(t, filter)
   return coroutine.wrap(iterator)
 end
 
-function tdengine.iterator.carray(array, length)
+function doublenickel.iterator.carray(array, length)
   local function iterator()
     for i = 0, length - 1 do
       coroutine.yield(array[i])

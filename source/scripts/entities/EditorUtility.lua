@@ -1,4 +1,4 @@
-EditorUtility = tdengine.editor.define('EditorUtility')
+EditorUtility = doublenickel.editor.define('EditorUtility')
 
 function EditorUtility:init()
   self.enabled = {
@@ -21,12 +21,12 @@ function EditorUtility:init()
   }
 
   self.colors = {
-    grid = tdengine.colors.grid_bg:copy(),
+    grid = doublenickel.colors.grid_bg:copy(),
     axis = {
-      x = tdengine.colors.indian_red:copy(),
-      y = tdengine.colors.spring_green:copy(),
+      x = doublenickel.colors.indian_red:copy(),
+      y = doublenickel.colors.spring_green:copy(),
     },
-    plot = tdengine.colors.white:alpha(.25),
+    plot = doublenickel.colors.white:alpha(.25),
   }
 
   self.layers = {
@@ -34,7 +34,7 @@ function EditorUtility:init()
     plot = 120
   }
 
-  self.input = ContextualInput:new(tdengine.enums.InputContext.Game, tdengine.enums.CoordinateSystem.World)
+  self.input = ContextualInput:new(doublenickel.enums.InputContext.Game, doublenickel.enums.CoordinateSystem.World)
 end
 
 
@@ -50,27 +50,27 @@ end
 function EditorUtility:draw_pallette()
   if not self.enabled.pallette then return end
 
-  local grid_cell = tdengine.vec2(0, 1)
+  local grid_cell = doublenickel.vec2(0, 1)
 
-  tdengine.ffi.set_world_space(true)
-  tdengine.ffi.set_layer(self.layers.pallette)
+  doublenickel.ffi.set_world_space(true)
+  doublenickel.ffi.set_layer(self.layers.pallette)
 
-  for category, color_names in pairs(tdengine.colors.pallette) do
+  for category, color_names in pairs(doublenickel.colors.pallette) do
     for _, color_name in pairs(color_names) do
-      local color = tdengine.colors[color_name]
+      local color = doublenickel.colors[color_name]
       local position = self:grid_to_world2(grid_cell)
 
       grid_cell.y = grid_cell.y + 1
 
-      local text_color = tdengine.colors.white
+      local text_color = doublenickel.colors.white
       local readable = color:readable_color()
-      if readable == tdengine.enums.ReadableTextColor.Light then
-        text_color = tdengine.colors.white
+      if readable == doublenickel.enums.ReadableTextColor.Light then
+        text_color = doublenickel.colors.white
       else
-        text_color = tdengine.colors.black
+        text_color = doublenickel.colors.black
       end
 
-      local label = tdengine.ffi.dn_prepare_text_ex(color_name,
+      local label = doublenickel.ffi.dn_prepare_text_ex(color_name,
         0, 0,
         'merriweather-bold-32',
         0,
@@ -80,8 +80,8 @@ function EditorUtility:draw_pallette()
       label.position.x = position.x + (self.style.grid.size / 2)
       label.position.y = position.y - (self.style.grid.size - label.height) / 2
 
-      tdengine.ffi.draw_quad(position.x, position.y, self.style.grid.size * 8, self.style.grid.size, color:to_vec4())
-      tdengine.ffi.draw_prepared_text(label)
+      doublenickel.ffi.draw_quad(position.x, position.y, self.style.grid.size * 8, self.style.grid.size, color:to_vec4())
+      doublenickel.ffi.draw_prepared_text(label)
     end
     grid_cell.y = grid_cell.y + 1
   end
@@ -90,30 +90,30 @@ end
 function EditorUtility:draw_grid()
   if not self.enabled.grid then return end
 
-  tdengine.ffi.set_world_space(true)
-  tdengine.ffi.set_layer(tdengine.editor.layers.grid)
+  doublenickel.ffi.set_world_space(true)
+  doublenickel.ffi.set_layer(doublenickel.editor.layers.grid)
 
   local grid_size = self.style.grid.size
   local line_thickness = 1
 
-  local size = tdengine.gpu.find(RenderTarget.Editor).size
-  local camera = tdengine.editor.find('EditorCamera')
-  if tdengine.tick then
-    local game_camera = tdengine.entity.find('Camera')
+  local size = doublenickel.gpu.find(RenderTarget.Editor).size
+  local camera = doublenickel.editor.find('EditorCamera')
+  if doublenickel.tick then
+    local game_camera = doublenickel.entity.find('Camera')
     camera = game_camera or camera
   end
   local slop = 300
 
-  local min = tdengine.vec2(
+  local min = doublenickel.vec2(
     camera.offset.x - slop,
     camera.offset.y - slop
   )
-  min.x = min.x - tdengine.math.fmod(min.x, grid_size)
-  min.y = min.y - tdengine.math.fmod(min.y, grid_size)
+  min.x = min.x - doublenickel.math.fmod(min.x, grid_size)
+  min.y = min.y - doublenickel.math.fmod(min.y, grid_size)
 
-  local max = tdengine.vec2(
-    camera.offset.x + size.x + tdengine.math.fmod(size.x, grid_size) + slop,
-    camera.offset.y + size.y + tdengine.math.fmod(size.y, grid_size) + slop
+  local max = doublenickel.vec2(
+    camera.offset.x + size.x + doublenickel.math.fmod(size.x, grid_size) + slop,
+    camera.offset.y + size.y + doublenickel.math.fmod(size.y, grid_size) + slop
   )
 
   if self.style.grid.draw_body then
@@ -121,13 +121,13 @@ function EditorUtility:draw_grid()
     -- Draw vertical lines
     for x = min.x, max.x, grid_size do  
       i = i + 1
-      tdengine.ffi.draw_line(x, min.y, x, max.y, line_thickness, self.colors.grid:to_vec4())
+      doublenickel.ffi.draw_line(x, min.y, x, max.y, line_thickness, self.colors.grid:to_vec4())
     end
 
     -- Draw horizontal lines
     for y = min.y, max.y, grid_size do
       i = i + 1
-      tdengine.ffi.draw_line(min.x, y, max.x, y, line_thickness, self.colors.grid:to_vec4())
+      doublenickel.ffi.draw_line(min.x, y, max.x, y, line_thickness, self.colors.grid:to_vec4())
     end
 
 
@@ -135,9 +135,9 @@ function EditorUtility:draw_grid()
 
 
   if self.style.grid.draw_axes then
-    tdengine.ffi.draw_line(1, min.y, 1, max.y, line_thickness,
+    doublenickel.ffi.draw_line(1, min.y, 1, max.y, line_thickness,
       self.colors.axis.x:to_vec4())
-    tdengine.ffi.draw_line(min.x, 0, max.x, 0, line_thickness,
+    doublenickel.ffi.draw_line(min.x, 0, max.x, 0, line_thickness,
       self.colors.axis.y:to_vec4())
   end
 end
@@ -148,7 +148,7 @@ function EditorUtility:mouse_to_grid()
 end
 
 function EditorUtility:grid_to_world(x, y)
-  return tdengine.vec2(x, y):scale(self.style.grid.size)
+  return doublenickel.vec2(x, y):scale(self.style.grid.size)
 end
 
 function EditorUtility:grid_to_world2(grid_cell)
@@ -160,69 +160,69 @@ function EditorUtility:draw_plot()
 
   local radius = 1
 
-  local lague_spiky_volume = tdengine.math.pi * math.pow(radius, 4.0) / 6.0;
+  local lague_spiky_volume = doublenickel.math.pi * math.pow(radius, 4.0) / 6.0;
   local lague_spiky = function(x)
     return math.pow(radius - math.abs(x), 2.0) / lague_spiky_volume
   end
 
-  local lague_smooth_volume = tdengine.math.pi * math.pow(radius, 8.0) / 4.0
+  local lague_smooth_volume = doublenickel.math.pi * math.pow(radius, 8.0) / 4.0
   local lague_smooth = function(x)
     return math.pow(radius * radius - x * x, 3) / lague_smooth_volume
   end
 
   local lague_smooth_derivative = function(x)
     local f = radius * radius - x * x
-    local scale = -24 / (tdengine.math.pi * math.pow(radius, 8))
+    local scale = -24 / (doublenickel.math.pi * math.pow(radius, 8))
     return scale * x * f * f
   end
 
-  local muller_spiky_volume = 15.0 / (tdengine.math.pi * math.pow(radius, 6));
+  local muller_spiky_volume = 15.0 / (doublenickel.math.pi * math.pow(radius, 6));
   local muller_spiky = function(x)
     return math.pow(radius - math.abs(x), 3) / muller_spiky_volume
   end
 
-  local muller_smooth_volume = 315 / (64 * tdengine.math.pi * math.pow(radius, 9))
+  local muller_smooth_volume = 315 / (64 * doublenickel.math.pi * math.pow(radius, 9))
   local muller_smooth = function(x)
     return math.pow(math.pow(radius, 2) - math.pow(math.abs(x), 2), 3) / muller_smooth_volume
   end
 
   local muller_viscosity = function(x)
-    local scale = 45.0 / (tdengine.math.pi * math.pow(radius, 6))
+    local scale = 45.0 / (doublenickel.math.pi * math.pow(radius, 6))
     return scale * (radius - math.abs(x))
   end
 
   local step = .025
-  self:plot_function(lague_spiky, -1, 1, step, 500, tdengine.colors.mindaro)
-  self:plot_function(lague_smooth, -1, 1, step, 500, tdengine.colors.cadet_gray)
-  self:plot_function(muller_spiky, -1, 1, step, 500, tdengine.colors.indian_red)
-  self:plot_function(muller_smooth, -1, 1, step, 500, tdengine.colors.spring_green)
-  self:plot_function(muller_viscosity, -1, 1, step, 50, tdengine.colors.spring_green)
+  self:plot_function(lague_spiky, -1, 1, step, 500, doublenickel.colors.mindaro)
+  self:plot_function(lague_smooth, -1, 1, step, 500, doublenickel.colors.cadet_gray)
+  self:plot_function(muller_spiky, -1, 1, step, 500, doublenickel.colors.indian_red)
+  self:plot_function(muller_smooth, -1, 1, step, 500, doublenickel.colors.spring_green)
+  self:plot_function(muller_viscosity, -1, 1, step, 50, doublenickel.colors.spring_green)
 
-  self:plot_derivative(lague_smooth, lague_smooth_derivative, -1, 1, 500, tdengine.colors.indian_red:copy())
+  self:plot_derivative(lague_smooth, lague_smooth_derivative, -1, 1, 500, doublenickel.colors.indian_red:copy())
 end
 
 function EditorUtility:plot_function(f, xmin, xmax, step, scale, color)
   scale = scale or 1
   color = color or self.colors.plot
 
-  tdengine.ffi.set_world_space(true)
-  tdengine.ffi.set_layer(self.layers.plot)
+  doublenickel.ffi.set_world_space(true)
+  doublenickel.ffi.set_layer(self.layers.plot)
 
   for x = xmin, xmax, step do
-    -- tdengine.ffi.draw_circle(x * scale, f(x) * scale, self.style.plot.point_size, color:to_vec4())
-    tdengine.ffi.draw_circle_sdf(x * scale, f(x) * scale, self.style.plot.point_size, color:to_vec4(), 2)
+    -- doublenickel.ffi.draw_circle(x * scale, f(x) * scale, self.style.plot.point_size, color:to_vec4())
+    doublenickel.ffi.draw_circle_sdf(x * scale, f(x) * scale, self.style.plot.point_size, color:to_vec4(), 2)
   end
 
-  tdengine.ffi.set_layer(self.layers.plot + 1)
+  doublenickel.ffi.set_layer(self.layers.plot + 1)
 
-  local x = tdengine.math.clamp(self.input:mouse().x / scale, xmin, xmax)
-  tdengine.ffi.draw_text_ex(
+  local x = doublenickel.math.clamp(self.input:mouse().x / scale, xmin, xmax)
+  doublenickel.ffi.draw_text_ex(
     string.format('%.3f -> %.3f', x, f(x)), 
     x * scale, f(x) * scale, 
-    tdengine.colors.white:to_vec4(), 
+    doublenickel.colors.white:to_vec4(), 
     'editor-16', 
     0)
-  tdengine.ffi.draw_circle_sdf(x * scale, f(x) * scale, self.style.plot.point_size * 1.5, tdengine.colors.cardinal:to_vec4(), 2)
+  doublenickel.ffi.draw_circle_sdf(x * scale, f(x) * scale, self.style.plot.point_size * 1.5, doublenickel.colors.cardinal:to_vec4(), 2)
 
 end
 
@@ -233,33 +233,33 @@ function EditorUtility:plot_derivative(f, df, xmin, xmax, scale, color)
   -- Calculate f(x) and df(x), using the mouse as the input point
   local mouse = self.input:mouse()
 
-  local point = tdengine.vec2()
-  point.x = tdengine.math.clamp(mouse.x / scale, xmin, xmax)
+  local point = doublenickel.vec2()
+  point.x = doublenickel.math.clamp(mouse.x / scale, xmin, xmax)
   point.y = f(point.x)
   
-  local delta = tdengine.vec2(1, df(point.x))
+  local delta = doublenickel.vec2(1, df(point.x))
 
   -- Scale everything to screen coordinates
   local scaled_point = point:scale(scale)
   local scaled_delta = delta:scale(scale):normalize():scale(self.style.plot.derivative_length)
   
   -- Draw it
-  tdengine.ffi.set_world_space(true)
-  tdengine.ffi.set_layer(self.layers.plot + 1)
+  doublenickel.ffi.set_world_space(true)
+  doublenickel.ffi.set_layer(self.layers.plot + 1)
 
-  tdengine.ffi.draw_circle(scaled_point.x, scaled_point.y, self.style.plot.point_size * 4, color:to_vec4())
-  tdengine.ffi.draw_line(
+  doublenickel.ffi.draw_circle(scaled_point.x, scaled_point.y, self.style.plot.point_size * 4, color:to_vec4())
+  doublenickel.ffi.draw_line(
     scaled_point.x - scaled_delta.x, scaled_point.y - scaled_delta.y,
     scaled_point.x + scaled_delta.x, scaled_point.y + scaled_delta.y,
     self.style.plot.derivative_width, 
     color:to_vec4())
 
-  local label = tdengine.ffi.dn_prepare_text_ex(
+  local label = doublenickel.ffi.dn_prepare_text_ex(
     string.format('%.3f', delta.y / delta.x),
     scaled_point.x, scaled_point.y,
     'merriweather-bold-48',
     0,
-    tdengine.colors.white:to_vec4(), 
+    doublenickel.colors.white:to_vec4(), 
     true)
-  tdengine.ffi.draw_prepared_text(label)
+  doublenickel.ffi.draw_prepared_text(label)
 end

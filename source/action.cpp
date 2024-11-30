@@ -82,7 +82,7 @@ void SteamInputManager::register_actions() {
 	steam->RunFrame();
 
 	auto l = dn_lua.state;
-	lua_getglobal(l, "tdengine");
+	lua_getglobal(l, "doublenickel");
 	lua_pushstring(l, "action");
 	lua_gettable(l, -2);
 	lua_pushstring(l, "init");

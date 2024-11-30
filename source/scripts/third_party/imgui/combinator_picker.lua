@@ -5,14 +5,14 @@ imgui.extensions.BranchCombinator = function(current_op)
   local change = false
   local next_op = current_op
   local combo_label = '##branch_combinator'
-  local op_display_name = tdengine.branch_combinator_names[current_op]
+  local op_display_name = doublenickel.branch_combinator_names[current_op]
 
   imgui.PushItemWidth(200)
   if imgui.BeginCombo(combo_label, op_display_name) then
     -- Iterate through all the ops that are in the engine
-    for op_name, op_id in pairs(tdengine.branch_combinators) do
+    for op_name, op_id in pairs(doublenickel.branch_combinators) do
       -- Translate them to a human readable name
-      local op_display_name = tdengine.branch_combinator_names[op_id]
+      local op_display_name = doublenickel.branch_combinator_names[op_id]
       local op_selected = op_id == current_op
 
       -- Update the branch with the op's integer identifier if chosen

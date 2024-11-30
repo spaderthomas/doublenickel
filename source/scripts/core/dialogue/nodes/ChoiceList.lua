@@ -1,4 +1,4 @@
-local ChoiceList = tdengine.node('ChoiceList')
+local ChoiceList = doublenickel.node('ChoiceList')
 
 ChoiceList.editor_fields = {
   'label',
@@ -9,14 +9,14 @@ ChoiceList.imgui_ignore = {
 }
 
 ChoiceList.colors = {
-  unselected = tdengine.color(1.00, 0.00, 0.00, 1.00),
-  selected = tdengine.color(1.00, 0.10, 0.00, 0.50),
-  hovered = tdengine.color(1.00, 1.00, 1.00, 1.00),
+  unselected = doublenickel.color(1.00, 0.00, 0.00, 1.00),
+  selected = doublenickel.color(1.00, 0.10, 0.00, 0.50),
+  hovered = doublenickel.color(1.00, 1.00, 1.00, 1.00),
 }
 
 function ChoiceList:init()
   self.label = ''
-  self.history = tdengine.dialogue.history
+  self.history = doublenickel.dialogue.history
   self.indices = {}
 end
 
@@ -43,7 +43,7 @@ function ChoiceList:process()
     self.history:add_node(node)
 
     if not node.mute then
-      tdengine.audio.play('ui_humver-003.wav')
+      doublenickel.audio.play('ui_humver-003.wav')
     end
 
     return dialogue_state.advancing

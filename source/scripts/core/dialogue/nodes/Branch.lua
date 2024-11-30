@@ -1,4 +1,4 @@
-local Branch = tdengine.node('Branch')
+local Branch = doublenickel.node('Branch')
 
 Branch.editor_fields = {
   'branches',
@@ -8,7 +8,7 @@ Branch.editor_fields = {
 
 function Branch:init()
   self.branches = {}
-  self.combinator = tdengine.branch_combinators.op_and
+  self.combinator = doublenickel.branch_combinators.op_and
   self.description = ''
 end
 

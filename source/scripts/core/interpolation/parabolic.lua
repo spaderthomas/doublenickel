@@ -1,5 +1,5 @@
-local Parabolic = tdengine.class.define('Parabolic')
-tdengine.interpolation.Parabolic = Parabolic
+local Parabolic = doublenickel.class.define('Parabolic')
+doublenickel.interpolation.Parabolic = Parabolic
 
 local function parabolic(t, exp)
   return 1 - math.pow(math.abs(2 * t - 1), exp)
@@ -18,7 +18,7 @@ function Parabolic:init(params)
 end
 
 function Parabolic:update(dt)
-  dt = dt or tdengine.dt
+  dt = dt or doublenickel.dt
   dt = dt / self.speed
   self.accumulated = math.min(self.accumulated + dt, self.time)
   return self:is_done()
@@ -53,13 +53,13 @@ function Parabolic:set_target(target)
   self.target = target
 end
 
-local Parabolic2 = tdengine.class.define('Parabolic2')
-tdengine.interpolation.Parabolic2 = Parabolic2
+local Parabolic2 = doublenickel.class.define('Parabolic2')
+doublenickel.interpolation.Parabolic2 = Parabolic2
 
 function Parabolic2:init(params)
   params = params or {}
-  self.start = tdengine.vec2(params.start)
-  self.target = tdengine.vec2(params.target)
+  self.start = doublenickel.vec2(params.start)
+  self.target = doublenickel.vec2(params.target)
   self.time = params.time or 1
   self.speed = params.speed or 1
   self.exponent = params.exponent or 2
@@ -69,7 +69,7 @@ function Parabolic2:init(params)
 end
 
 function Parabolic2:update(dt)
-  dt = dt or tdengine.dt
+  dt = dt or doublenickel.dt
   dt = dt / self.speed
   self.accumulated = math.min(self.accumulated + dt, self.time)
   return self:is_done()

@@ -1,12 +1,12 @@
-ColliderBox = tdengine.component.define('ColliderBox')
+ColliderBox = doublenickel.component.define('ColliderBox')
 
 function ColliderBox:init(params)
   params = params or {}
-  local position = params.position or tdengine.vec2(0, 0)
-  self.position = tdengine.vec2(position)
+  local position = params.position or doublenickel.vec2(0, 0)
+  self.position = doublenickel.vec2(position)
 
   local dimension = params.dimension or { x = 100, y = 100 }
-  self.dimension = tdengine.vec2(dimension)
+  self.dimension = doublenickel.vec2(dimension)
 end
 
 function ColliderBox:serialize()
@@ -28,13 +28,13 @@ function ColliderBox:get_width()
 end
 
 function ColliderBox:get_center()
-  return tdengine.vec2(
+  return doublenickel.vec2(
     self.position.x + (self.dimension.x / 2),
     self.position.y - (self.dimension.y / 2))
 end
 
 function ColliderBox:get_position()
-  return tdengine.vec2(self.position)
+  return doublenickel.vec2(self.position)
 end
 
 function ColliderBox:get_xmin()
@@ -64,13 +64,13 @@ function ColliderBox:set_position(position)
 end
 
 function ColliderBox:show(color)
-  color = color or tdengine.colors.idk
+  color = color or doublenickel.colors.idk
   if self.dbg_color then color = self.dbg_color end
 
 
-  if self.base.world_space then tdengine.ffi.set_world_space(true)() end
-  if not self.base.world_space then tdengine.ffi.end_world_space(true)() end
-  tdengine.ffi.draw_quad_l(self.position, self.dimension, color)
+  if self.base.world_space then doublenickel.ffi.set_world_space(true)() end
+  if not self.base.world_space then doublenickel.ffi.end_world_space(true)() end
+  doublenickel.ffi.draw_quad_l(self.position, self.dimension, color)
 end
 
 function ColliderBox:is_point_inside(point)
@@ -86,17 +86,17 @@ function ColliderBox:get_points()
   local xmin, xmax = self:get_xmin(), self:get_xmax()
   local ymin, ymax = self:get_ymin(), self:get_ymax()
   return {
-    tdengine.vec2(xmin, ymin),
-    tdengine.vec2(xmin, ymax),
-    tdengine.vec2(xmax, ymax),
-    tdengine.vec2(xmax, ymin),
+    doublenickel.vec2(xmin, ymin),
+    doublenickel.vec2(xmin, ymax),
+    doublenickel.vec2(xmax, ymax),
+    doublenickel.vec2(xmax, ymin),
   }
 end
 
 function ColliderBox:get_normals()
   return {
-    tdengine.vec2(1, 0),
-    tdengine.vec2(0, 1),
+    doublenickel.vec2(1, 0),
+    doublenickel.vec2(0, 1),
   }
 end
 
@@ -105,8 +105,8 @@ function ColliderBox:find_sat_axes(other)
 end
 
 function ColliderBox:project(axis)
-  local min = tdengine.really_large_number
-  local max = tdengine.really_small_number
+  local min = doublenickel.really_large_number
+  local max = doublenickel.really_small_number
 
   local points = self:get_points()
   for i, point in pairs(points) do
@@ -119,8 +119,8 @@ function ColliderBox:project(axis)
 end
 
 function ColliderBox:center_image(image)
-  local sx, sy = tdengine.sprite_size(image)
-  local position = tdengine.vec2()
+  local sx, sy = doublenickel.sprite_size(image)
+  local position = doublenickel.vec2()
   position.x = self.position.x + (self.dimension.x / 2 - sx / 2)
   position.y = self.position.y - (self.dimension.y / 2 - sy / 2)
 
@@ -149,7 +149,7 @@ function ColliderBox:get_corners()
 
   for _, x in pairs(xs) do
     for _, y in pairs(ys) do
-      table.insert(corners, tdengine.vec2(x, y))
+      table.insert(corners, doublenickel.vec2(x, y))
     end
   end
 

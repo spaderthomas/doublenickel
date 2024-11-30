@@ -1,66 +1,66 @@
-function tdengine.save.init()
-  tdengine.dn_log('tdengine.save.init')
-  local directory = tdengine.ffi.dn_paths_resolve('saves'):to_interned()
+function doublenickel.save.init()
+  doublenickel.dn_log('doublenickel.save.init')
+  local directory = doublenickel.ffi.dn_paths_resolve('saves'):to_interned()
   -- log.info('Initializing save directory; directory = %s', directory)
-  tdengine.dn_log('Initializing save directory; directory = %s', directory)
+  doublenickel.dn_log('Initializing save directory; directory = %s', directory)
 
-  tdengine.ffi.dn_os_create_directory(tdengine.ffi.dn_paths_resolve('saves'):to_interned())
-  tdengine.ffi.dn_os_create_directory(tdengine.ffi.dn_paths_resolve('screenshots'):to_interned())
+  doublenickel.ffi.dn_os_create_directory(doublenickel.ffi.dn_paths_resolve('saves'):to_interned())
+  doublenickel.ffi.dn_os_create_directory(doublenickel.ffi.dn_paths_resolve('screenshots'):to_interned())
 end
 
-function tdengine.save.create()
+function doublenickel.save.create()
   save_name = os.date('%Y-%m-%d-%H-%M-%S', os.time())
 
   local save = {
     date = os.date('*t'),
-    state = tdengine.state.data,
-    scene = tdengine.current_scene,
+    state = doublenickel.state.data,
+    scene = doublenickel.current_scene,
   }
 
-  local file_path = tdengine.ffi.dn_paths_resolve_format('save', save_name):to_interned()
-  tdengine.module.write(file_path, save, tdengine.module.WriteOptions.Pretty)
+  local file_path = doublenickel.ffi.dn_paths_resolve_format('save', save_name):to_interned()
+  doublenickel.module.write(file_path, save, doublenickel.module.WriteOptions.Pretty)
 
-  tdengine.dn_log(string.format('Created save file; file_path = %s', file_path))
+  doublenickel.dn_log(string.format('Created save file; file_path = %s', file_path))
 end
 
-function tdengine.save.read(file_name)
-  file_name = tdengine.strip_extension(file_name)
-  local file_path = tdengine.ffi.dn_paths_resolve_format('save', file_name):to_interned()
-  return tdengine.module.read(file_path)
+function doublenickel.save.read(file_name)
+  file_name = doublenickel.strip_extension(file_name)
+  local file_path = doublenickel.ffi.dn_paths_resolve_format('save', file_name):to_interned()
+  return doublenickel.module.read(file_path)
 end
 
-function tdengine.save.list()
-  local saves = tdengine.filesystem.collect_named_directory('saves')
-  for index in tdengine.iterator.keys(saves) do
-    saves[index] = tdengine.save.read(saves[index])
+function doublenickel.save.list()
+  local saves = doublenickel.filesystem.collect_named_directory('saves')
+  for index in doublenickel.iterator.keys(saves) do
+    saves[index] = doublenickel.save.read(saves[index])
   end
 
   return saves
 end
 
-function tdengine.save.count()
-  local save_dir = tdengine.ffi.dn_paths_resolve('saves'):to_interned()
-  local entries = tdengine.ffi.dn_os_scan_directory(save_dir)
+function doublenickel.save.count()
+  local save_dir = doublenickel.ffi.dn_paths_resolve('saves'):to_interned()
+  local entries = doublenickel.ffi.dn_os_scan_directory(save_dir)
   return entries.count
 end
 
-function tdengine.save.get_save_name(data)
+function doublenickel.save.get_save_name(data)
   return os.date('%Y-%m-%d-%H-%M-%S', os.time(data.date))
 end
 
-function tdengine.save.get_display_name(data)
+function doublenickel.save.get_display_name(data)
   return os.date('%B %d, %Y at %H:%M:%S', os.time(data.date))
 end
 
-function tdengine.save.get_screenshot_file(data)
-  return string.format('%s.png', tdengine.save.get_save_name(data))
+function doublenickel.save.get_screenshot_file(data)
+  return string.format('%s.png', doublenickel.save.get_save_name(data))
 end
 
 
 
-local self = tdengine.scene
+local self = doublenickel.scene
 
-function tdengine.scene.init()
+function doublenickel.scene.init()
   self.snapshots = {}
   self.internal = {}
 end
@@ -68,75 +68,75 @@ end
 
 
 
-function tdengine.scene.update()
+function doublenickel.scene.update()
   if self.internal.queued_scene then
     self.internal.current_scene = self.internal.queued_scene
     self.internal.queued_scene = nil
 
-    for entity in tdengine.entity.iterate() do
-      tdengine.entity.run_update_callback(entity, tdengine.lifecycle.update_callbacks.stop)
+    for entity in doublenickel.entity.iterate() do
+      doublenickel.entity.run_update_callback(entity, doublenickel.lifecycle.update_callbacks.stop)
     end
 
-    for entity in tdengine.entity.iterate() do
-      tdengine.entity.destroy(entity.id)
+    for entity in doublenickel.entity.iterate() do
+      doublenickel.entity.destroy(entity.id)
     end
 
-    for entity in tdengine.entity.iterate_staged() do
-      tdengine.entity.run_update_callback(entity, tdengine.lifecycle.update_callbacks.play)
+    for entity in doublenickel.entity.iterate_staged() do
+      doublenickel.entity.run_update_callback(entity, doublenickel.lifecycle.update_callbacks.play)
     end
   end
 
-  if self.internal.next_tick ~= tdengine.tick then
-    tdengine.tick = self.internal.next_tick
+  if self.internal.next_tick ~= doublenickel.tick then
+    doublenickel.tick = self.internal.next_tick
 
-    local callback = tdengine.tick and tdengine.lifecycle.callbacks.on_editor_play or tdengine.lifecycle.callbacks.on_editor_stop
-    tdengine.lifecycle.run_callback(callback)
+    local callback = doublenickel.tick and doublenickel.lifecycle.callbacks.on_editor_play or doublenickel.lifecycle.callbacks.on_editor_stop
+    doublenickel.lifecycle.run_callback(callback)
   end
 end
 
-function tdengine.scene.read(file_name)
-  local file_path = tdengine.ffi.dn_paths_resolve_format('scene', file_name):to_interned()
-  return tdengine.module.read(file_path)
+function doublenickel.scene.read(file_name)
+  local file_path = doublenickel.ffi.dn_paths_resolve_format('scene', file_name):to_interned()
+  return doublenickel.module.read(file_path)
 end
 
-function tdengine.scene.write(scene, file_name)
+function doublenickel.scene.write(scene, file_name)
   local serialized_entities = {}
   for _, entity in pairs(scene) do
-    local serialized_entity = tdengine.serialize_entity(entity)
+    local serialized_entity = doublenickel.serialize_entity(entity)
     serialized_entities[entity.uuid] = serialized_entity
   end
 
-  local file_path = tdengine.ffi.dn_paths_resolve_format('scene', file_name):to_interned()
-  tdengine.module.write(file_path, serialized_entities, tdengine.module.WriteOptions.Pretty)
+  local file_path = doublenickel.ffi.dn_paths_resolve_format('scene', file_name):to_interned()
+  doublenickel.module.write(file_path, serialized_entities, doublenickel.module.WriteOptions.Pretty)
 end
 
 
 
-function tdengine.scene.load(scene_name)
+function doublenickel.scene.load(scene_name)
   self.internal.queued_scene = scene_name
 
-  tdengine.entity.clear_add_queue()
+  doublenickel.entity.clear_add_queue()
 
-  local scene = tdengine.scene.read(scene_name)
+  local scene = doublenickel.scene.read(scene_name)
   for _, entity_data in pairs(scene) do
-    tdengine.entity.create(entity_data.name, entity_data)
+    doublenickel.entity.create(entity_data.name, entity_data)
   end
 end
 
 
-function tdengine.scene.set_tick(next_tick)
+function doublenickel.scene.set_tick(next_tick)
   self.internal.next_tick = next_tick
 end
 
 
 
-function tdengine.scene.populate_snapshots(save)
+function doublenickel.scene.populate_snapshots(save)
 end
 
-function tdengine.scene.apply_snapshot()
+function doublenickel.scene.apply_snapshot()
 end
 
-function tdengine.scene.find_snapshot(scene)
+function doublenickel.scene.find_snapshot(scene)
   if not self.snapshots[scene] then
     self.snapshots[scene] = {}
   end

@@ -1,4 +1,4 @@
-Popups = tdengine.class.define('Popups')
+Popups = doublenickel.class.define('Popups')
 
 function Popups:init(popups)
   self.popups = popups

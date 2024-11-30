@@ -184,7 +184,7 @@ void dn_paths_init() {
   _dn_paths_set_install_roots();
   _dn_paths_set_write_path();
 
-  dn_paths_add_install_subpath("dn_log", "tdengine.log");
+  dn_paths_add_install_subpath("dn_log", "doublenickel.log");
   dn_paths_add_engine_subpath("dn_bootstrap", "source/scripts/core/bootstrap.lua");
   dn_paths_add_engine_subpath("dn_install", "source/scripts/data/paths.lua");
 }

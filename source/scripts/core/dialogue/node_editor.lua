@@ -19,20 +19,20 @@ local sep_kind = {
 	box = 'box'
 }
 
-NodeEditor = tdengine.class.define('NodeEditor')
+NodeEditor = doublenickel.class.define('NodeEditor')
 
 function NodeEditor:init(params)
 	self.name = params.name or 'Node Editor'
 	self.node_kinds = params.node_kinds or {}
 	self.nodes = {}
 	self.gnodes = {}
-	self.camera = tdengine.vec2(0, 0)
+	self.camera = doublenickel.vec2(0, 0)
 	self.scroll_per_second = params.scroll_per_second or 3000
-	self.window_position = tdengine.vec2(0, 0)
-	self.window_size = tdengine.vec2(0, 0)
-	self.node_padding = tdengine.vec2(8, 8)
+	self.window_position = doublenickel.vec2(0, 0)
+	self.window_size = doublenickel.vec2(0, 0)
+	self.node_padding = doublenickel.vec2(8, 8)
 	self.inter_node_padding = 25 -- If we automatically add a node, how far is it from the previous?
-	self.canvas_rclick_pos = tdengine.vec2(0, 0)
+	self.canvas_rclick_pos = doublenickel.vec2(0, 0)
 	self.hovered = nil
 	self.state = editor_state.idle
 	self.separators = {}
@@ -45,8 +45,8 @@ function NodeEditor:init(params)
 	self.node_queue = Queue:new(5)
 	self.link_style = {
 		thickness = 3,
-		color = tdengine.color32(200, 200, 200, 255),
-		disconnect_color = tdengine.color32(255, 0, 0, 255),
+		color = doublenickel.color32(200, 200, 200, 255),
+		disconnect_color = doublenickel.color32(255, 0, 0, 255),
 	}
 	self.zoom = 1
 	self.speed = {
@@ -55,10 +55,10 @@ function NodeEditor:init(params)
 	}
 
 	self.colors = {
-		background = tdengine.colors.rich_black:copy(),
-		grid_line = tdengine.colors.white:alpha(.25),
-		disconnect = tdengine.colors.cardinal:copy(),
-		link = tdengine.colors.white:copy(),
+		background = doublenickel.colors.rich_black:copy(),
+		grid_line = doublenickel.colors.white:alpha(.25),
+		disconnect = doublenickel.colors.cardinal:copy(),
+		link = doublenickel.colors.white:copy(),
 	}
 
 	self.style = {
@@ -66,7 +66,7 @@ function NodeEditor:init(params)
 	}
 
 
-	self.input = ContextualInput:new(tdengine.enums.InputContext.Editor, tdengine.enums.CoordinateSystem.Game)
+	self.input = ContextualInput:new(doublenickel.enums.InputContext.Editor, doublenickel.enums.CoordinateSystem.Game)
 	self.input_cache        = {}
 
 	self.on_node_lclick     = params.on_node_lclick or function() end
@@ -89,7 +89,7 @@ end
 -- UPDATE --
 ------------
 function NodeEditor:update(dt)
-	local remove = tdengine.data_types.array:new()
+	local remove = doublenickel.data_types.array:new()
 	for id, node in pairs(self.nodes) do
 		if self.gnodes[id] == nil then
 			remove:add(id)
@@ -112,7 +112,7 @@ function NodeEditor:update(dt)
 	-- @hack: This is the most expensive part of the editor, and when zoomed out definitely makes the FPS drop
 	-- below acceptable. Instead of fixing that, I just skip all the expensive stuff when the game tab is
 	-- open
-	if not tdengine.editor.is_window_focused('Game') then
+	if not doublenickel.editor.is_window_focused('Game') then
 		self:calculate_visible_nodes()
 		self:draw_canvas()
 
@@ -131,13 +131,13 @@ function NodeEditor:update(dt)
 end
 
 function NodeEditor:update_input()
-	self.window_size = tdengine.vec2(imgui.GetWindowSize()) 
+	self.window_size = doublenickel.vec2(imgui.GetWindowSize()) 
 
 	self.input_cache.focused = imgui.IsWindowFocused()
 	self.input_cache.hovered = imgui.IsWindowHovered()
 	self.input_cache.left_drag = imgui.IsMouseDragging(0, 0)
 	self.input_cache.middle_drag = imgui.IsMouseDragging(2, 0)
-	self.input_cache.mouse = tdengine.vec2(imgui.GetMousePos())
+	self.input_cache.mouse = doublenickel.vec2(imgui.GetMousePos())
 	self.input_cache.mouse_delta = self.input:mouse_delta()
 	self.input_cache.mouse_delta.y = -self.input_cache.mouse_delta.y
 	self.input_cache.mouse_drag = imgui.IsMouseDragging(0)
@@ -334,10 +334,10 @@ function NodeEditor:update_state()
 		end
 
 		local separator = self.separators[#self.separators]
-		separator.br = tdengine.vec2(imgui.GetMousePos())
+		separator.br = doublenickel.vec2(imgui.GetMousePos())
 		self:do_multiselect()
 
-		local color = tdengine.color32(200, 255, 200, 30)
+		local color = doublenickel.color32(200, 255, 200, 30)
 		local ds = self.camera:subtract(separator.scroll)
 		local min = separator.tl:add(ds)
 		imgui.GetWindowDrawList():AddRectFilled(imgui.ImVec2(min.x, min.y), imgui.ImVec2(separator.br.x, separator.br.y), color, 0)
@@ -374,24 +374,24 @@ function NodeEditor:draw_grid()
 		grid.size = 256
 	end
 
-	grid.min = tdengine.vec2(
+	grid.min = doublenickel.vec2(
 		self.camera.x % grid.size - self.camera.x - grid.size, -- Start at the closest place on the grid behind the camera
 		self.camera.y % grid.size - self.camera.y - grid.size
 	)
-	grid.max = tdengine.vec2(
+	grid.max = doublenickel.vec2(
 		grid.min.x + self.window_size.x / self.zoom + grid.size,
 		grid.min.y + self.window_size.y / self.zoom + grid.size
 	)
 
 	for x = grid.min.x, grid.max.x, grid.size do
-		local top = self:world_to_zoom(tdengine.vec2(x, grid.min.y))
-		local bottom = self:world_to_zoom(tdengine.vec2(x, grid.max.y))
+		local top = self:world_to_zoom(doublenickel.vec2(x, grid.min.y))
+		local bottom = self:world_to_zoom(doublenickel.vec2(x, grid.max.y))
 		imgui.GetWindowDrawList():AddLine(imgui.ImVec2(top.x, top.y), imgui.ImVec2(bottom.x, bottom.y), self.colors.grid_line:to_u32(), self.style.grid_thickness)
 	end
 
 	for y = grid.min.y, grid.max.y, grid.size do
-		local left = self:world_to_zoom(tdengine.vec2(grid.min.x, y))
-		local right = self:world_to_zoom(tdengine.vec2(grid.max.x, y))
+		local left = self:world_to_zoom(doublenickel.vec2(grid.min.x, y))
+		local right = self:world_to_zoom(doublenickel.vec2(grid.max.x, y))
 		imgui.GetWindowDrawList():AddLine(imgui.ImVec2(left.x, left.y), imgui.ImVec2(right.x, right.y), self.colors.grid_line:to_u32(), self.style.grid_thickness)
 	end
 end
@@ -430,7 +430,7 @@ function NodeEditor:draw_nodes()
 		self.on_node_draw(id)
 		imgui.EndGroup()
 
-		local contents_size = tdengine.vec2(imgui.GetItemRectSize())
+		local contents_size = doublenickel.vec2(imgui.GetItemRectSize())
 		local padding_size = self.node_padding:scale(2):scale(self.zoom)
 		local pixel_size = contents_size:add(padding_size)
 		local node_unit_size = pixel_size:scale(1 / self.zoom)
@@ -461,7 +461,7 @@ function NodeEditor:draw_nodes()
 		local segments = 5 * math.sqrt(radius)
 		local ay = average(node_rect_max.y, node_rect_min.y)
 
-		local slot_color = self.on_node_color(id) or tdengine.colors.red:copy()
+		local slot_color = self.on_node_color(id) or doublenickel.colors.red:copy()
 		slot_color = slot_color:alpha(.75)
 
 		local in_slot = self:input_slot(id)
@@ -475,7 +475,7 @@ function NodeEditor:draw_nodes()
 
 		-- Try to draw fewer polygons at small zoom (i.e. far away), like a bootleg LOD.
 		local rounding = 4 * self.zoom
-		local color = self.on_node_color(id) or tdengine.colors.red:copy()
+		local color = self.on_node_color(id) or doublenickel.colors.red:copy()
 		imgui.GetWindowDrawList():AddRectFilled(imgui.ImVec2(node_rect_min.x, node_rect_min.y), imgui.ImVec2(node_rect_max.x, node_rect_max.y), color:to_u32(),
 			rounding)
 		imgui.PopID() -- Unique node ID
@@ -499,7 +499,7 @@ function NodeEditor:draw_nodes()
 			local bezier_min_distance = 50
 			local color = ternary(disconnect, self.colors.disconnect, self.colors.link)
 			if slot_distance > bezier_min_distance then
-				local cp = tdengine.vec2(50 * self.zoom, 0)
+				local cp = doublenickel.vec2(50 * self.zoom, 0)
 				imgui.GetWindowDrawList():AddBezierCubic(
 					imgui.ImVec2(output_slot.x, output_slot.y),
 					imgui.ImVec2(output_slot.x + cp.x, output_slot.y),
@@ -528,7 +528,7 @@ function NodeEditor:draw_nodes()
 	-- If you're connecting a node to something, follow the mouse with a bezier curve
 	if self.connecting then
 		local p0 = self:output_slot(self.connecting)
-		local cursor = tdengine.vec2(imgui.GetMousePos())
+		local cursor = doublenickel.vec2(imgui.GetMousePos())
 
 		imgui.GetWindowDrawList():AddBezierCubic(
 			imgui.ImVec2(p0.x, p0.y),
@@ -545,8 +545,8 @@ function NodeEditor:push_scaled_font()
 
 	local base_font_size = 16
 	local scaled_font_size = base_font_size * self.zoom
-	local clamped_font_size = tdengine.math.snap_to_range(base_font_size * self.zoom, range)
-	imgui.PushFont(tdengine.editor.config.fonts.regular, clamped_font_size)
+	local clamped_font_size = doublenickel.math.snap_to_range(base_font_size * self.zoom, range)
+	imgui.PushFont(doublenickel.editor.config.fonts.regular, clamped_font_size)
 
 	-- @hack: The problem here is that instead of making nodes the same size (which would be smart), I calculate
 	-- their size based on their contents. Because you don't have to calculate node sizes when zoomed (it just fits
@@ -651,9 +651,9 @@ end
 ------------
 function NodeEditor:begin_canvas()
 	local flags = 0
-	flags = bitwise(tdengine.op_or, flags, ffi.C.ImGuiWindowFlags_NoScrollWithMouse)
-	flags = bitwise(tdengine.op_or, flags, ffi.C.ImGuiWindowFlags_NoScrollbar)
-	tdengine.editor.begin_window(self.name, flags)
+	flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiWindowFlags_NoScrollWithMouse)
+	flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiWindowFlags_NoScrollbar)
+	doublenickel.editor.begin_window(self.name, flags)
 
 	-- Set up the canvas
 	imgui.PushStyleVar_2(ffi.C.ImGuiStyleVar_FramePadding, 1, 1)
@@ -662,21 +662,21 @@ function NodeEditor:begin_canvas()
 	imgui.PushStyleColor(ffi.C.ImGuiCol_ChildBg, self.colors.background:to_u32())
 
 
-	local flags = bitwise(tdengine.op_or, flags, ffi.C.ImGuiWindowFlags_NoMove)
+	local flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiWindowFlags_NoMove)
 
-	tdengine.editor.begin_child('camera_region', 0, 0, flags)
+	doublenickel.editor.begin_child('camera_region', 0, 0, flags)
 
 	-- Reset per-frame fields
 	self.window_position.x, self.window_position.y = imgui.GetCursorScreenPos()
 end
 
 function NodeEditor:end_canvas()
-	tdengine.editor.end_child()
+	doublenickel.editor.end_child()
 
 	imgui.PopStyleVar()  -- FramePadding
 	imgui.PopStyleVar()  -- WindowPadding
 	imgui.PopStyleColor() -- ChildBg
-	tdengine.editor.end_window()
+	doublenickel.editor.end_window()
 end
 
 function NodeEditor:update_translation()
@@ -686,27 +686,27 @@ function NodeEditor:update_translation()
 	if self.input:down(glfw.keys.LEFT_ALT) then return end
 	if self.input:down(glfw.keys.RIGHT_ALT) then return end
 
-	local delta = tdengine.vec2()
+	local delta = doublenickel.vec2()
 	if self.input_cache.middle_drag then
 		delta = self.input_cache.mouse_delta
 		goto apply_delta
 	end
 
 	-- @hack
-	if tdengine.editor.is_window_focused('Text Editor') then return end
-	if not tdengine.editor.is_window_hovered(self.name) then return end
+	if doublenickel.editor.is_window_focused('Text Editor') then return end
+	if not doublenickel.editor.is_window_hovered(self.name) then return end
 
 	if self.input:down(glfw.keys.W) then
-		delta.y = delta.y + (self.scroll_per_second * tdengine.dt)
+		delta.y = delta.y + (self.scroll_per_second * doublenickel.dt)
 	end
 	if self.input:down(glfw.keys.S) then
-		delta.y = delta.y - (self.scroll_per_second * tdengine.dt)
+		delta.y = delta.y - (self.scroll_per_second * doublenickel.dt)
 	end
 	if self.input:down(glfw.keys.A) then
-		delta.x = delta.x + (self.scroll_per_second * tdengine.dt)
+		delta.x = delta.x + (self.scroll_per_second * doublenickel.dt)
 	end
 	if self.input:down(glfw.keys.D) then
-		delta.x = delta.x - (self.scroll_per_second * tdengine.dt)
+		delta.x = delta.x - (self.scroll_per_second * doublenickel.dt)
 	end
 	if self.input:down(glfw.keys.LEFT_SHIFT) or self.input:down(glfw.keys.RIGHT_SHIFT) then
 		delta = delta:scale(.2)
@@ -722,7 +722,7 @@ function NodeEditor:update_zoom()
 	if self.input_cache.hovered and math.abs(self.input_cache.scroll.y) > 0 then
 		local zoom_min, zoom_max = .05, 3
 		local zoom_delta = self.input_cache.scroll.y * self.speed.zoom
-		local zoom_new = tdengine.math.clamp(
+		local zoom_new = doublenickel.math.clamp(
 			self.zoom * (1 + zoom_delta),
 			zoom_min, zoom_max)
 		zoom_delta = zoom_new - self.zoom
@@ -735,7 +735,7 @@ function NodeEditor:update_zoom()
 		-- Yeah, I just can't get the camera to stop drifting when zooming out and then back in. This
 		-- doesn't totally stop it but it *does* do enough to make it a lot less noticeable.
 		if math.abs(zoom_delta) > 0 then
-			local hack = tdengine.vec2(18, 18):scale(1 / self.zoom)
+			local hack = doublenickel.vec2(18, 18):scale(1 / self.zoom)
 			correction = correction:add(hack)
 		end
 
@@ -753,9 +753,9 @@ function NodeEditor:create_node(kind, position)
 
 	-- Use the UUID to keep track of the node's metadata
 	self.gnodes[uuid] = {
-		position = tdengine.vec2(position), -- Specified in world space
-		size = tdengine.vec2(),
-		pixel_size = tdengine.vec2()
+		position = doublenickel.vec2(position), -- Specified in world space
+		size = doublenickel.vec2(),
+		pixel_size = doublenickel.vec2()
 	}
 
 	self:select_single_node(uuid)
@@ -768,7 +768,7 @@ function NodeEditor:set_nodes(nodes, gnodes)
 
 	self:clear_selection()
 	self.state = editor_state.idle
-	self.camera = tdengine.vec2(0, 0)
+	self.camera = doublenickel.vec2(0, 0)
 	self.zoom = 1
 end
 
@@ -916,7 +916,7 @@ function NodeEditor:enter_multiselect_line_mode(sep_kind)
 	self.sep_kind = sep_kind
 
 	local separator = {
-		begin = tdengine.vec2(imgui.GetMousePos()),
+		begin = doublenickel.vec2(imgui.GetMousePos()),
 		direction = sep_direction.greater,
 		kind = self.sep_kind
 	}
@@ -1093,20 +1093,20 @@ The world space of the world in which all of the nodes live. Practically, canvas
 --]]
 
 function NodeEditor:window_to_canvas(window)
-	window = tdengine.vec2(window)
+	window = doublenickel.vec2(window)
 	local world = window:subtract(self.window_position)
 	return world
 end
 
 function NodeEditor:world_to_window(world)
-	world = tdengine.vec2(world)
+	world = doublenickel.vec2(world)
 	local canvas = world:add(self.camera)
 	local window = canvas:add(self.window_position)
 	return window
 end
 
 function NodeEditor:world_to_zoom(world)
-	local world = tdengine.vec2(world)
+	local world = doublenickel.vec2(world)
 	local canvas = world:add(self.camera)
 	local zoom = canvas:scale(self.zoom)
 	local window = zoom:add(self.window_position)
@@ -1114,7 +1114,7 @@ function NodeEditor:world_to_zoom(world)
 end
 
 function NodeEditor:zoom_to_world(zoom)
-	local zoom = tdengine.vec2(zoom)
+	local zoom = doublenickel.vec2(zoom)
 	local window = zoom:subtract(self.window_position)
 	local canvas = window:scale(1 / self.zoom)
 	local world = canvas:subtract(self.camera)
@@ -1122,13 +1122,13 @@ function NodeEditor:zoom_to_world(zoom)
 end
 
 function NodeEditor:world_to_canvas(world)
-	local world = tdengine.vec2(world)
+	local world = doublenickel.vec2(world)
 	local canvas = world:add(self.camera)
 	return canvas
 end
 
 function NodeEditor:canvas_to_window(canvas)
-	canvas = tdengine.vec2(canvas)
+	canvas = doublenickel.vec2(canvas)
 	return canvas:add(self.window_position)
 end
 
@@ -1206,6 +1206,6 @@ end
 
 function NodeEditor:snap_to_node(id)
 	local gnode = self.gnodes[id]
-	local offset = tdengine.vec2(700, 400)
-	self.camera = tdengine.vec2(gnode.position):scale(-1):add(offset)
+	local offset = doublenickel.vec2(700, 400)
+	self.camera = doublenickel.vec2(gnode.position):scale(-1):add(offset)
 end

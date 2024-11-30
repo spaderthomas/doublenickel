@@ -1,4 +1,4 @@
-local Continue = tdengine.node('Continue')
+local Continue = doublenickel.node('Continue')
 
 Continue.editor_fields = {
   'mute'
@@ -14,7 +14,7 @@ function Continue:short_text()
 end
 
 function Continue:enter(graph)
-  tdengine.dialogue.history:add_button()
+  doublenickel.dialogue.history:add_button()
 
   return dialogue_state.processing
 end

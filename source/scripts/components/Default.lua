@@ -1,4 +1,4 @@
-local Default = tdengine.component.define('Default')
+local Default = doublenickel.component.define('Default')
 
 Default.editor_fields = {}
 

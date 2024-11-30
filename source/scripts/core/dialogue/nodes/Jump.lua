@@ -1,4 +1,4 @@
-local Jump = tdengine.node('Jump')
+local Jump = doublenickel.node('Jump')
 
 Jump.editor_fields = {
   'target',
@@ -21,7 +21,7 @@ function Jump:has_target_dialogue()
 end
 
 function Jump:advance(graph)
-  local controller = tdengine.dialogue.controller
+  local controller = doublenickel.dialogue.controller
 
   local need_dialogue_change = false
   need_dialogue_change = need_dialogue_change or self:has_target_dialogue()
@@ -30,11 +30,11 @@ function Jump:advance(graph)
     -- Ask the controller to load the target dialogue, then return the
     -- target node within as the current node
     controller:change_dialogue(self.target_dialogue)
-    local node = tdengine.dialogue.find_node(controller.data, self.target)
+    local node = doublenickel.dialogue.find_node(controller.data, self.target)
     return node
   else
     -- We've already got the graph, so find the node in it
-    local node = tdengine.dialogue.find_node(graph, self.target)
+    local node = doublenickel.dialogue.find_node(graph, self.target)
     return node
   end
 end

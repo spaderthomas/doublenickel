@@ -1,4 +1,4 @@
-AnimationEditor = tdengine.editor.define('AnimationEditor')
+AnimationEditor = doublenickel.editor.define('AnimationEditor')
 
 AnimationEditor.popup_kind = {
 	edit = 'edit##animation_editor'
@@ -20,12 +20,12 @@ function AnimationEditor:init()
 	self.popups = Popups:new(popups)
 
 	self.colors = {
-		delete = tdengine.color32(150, 0, 25, 255),
-		disabled = tdengine.color32(100, 100, 100, 255),
+		delete = doublenickel.color32(150, 0, 25, 255),
+		disabled = doublenickel.color32(100, 100, 100, 255),
 	}
 
 	self.sizes = {
-		preview = tdengine.vec2(100, 200)
+		preview = doublenickel.vec2(100, 200)
 	}
 
 	self.old_name = ''
@@ -54,14 +54,14 @@ function AnimationEditor:reinit_animation_component()
 end
 
 function AnimationEditor:create(name)
-	local data = tdengine.animation.find('default')
+	local data = doublenickel.animation.find('default')
 	data = table.deep_copy(data)
-	tdengine.animation.add(name, data)
+	doublenickel.animation.add(name, data)
 end
 
 function AnimationEditor:edit(name)
 	-- Fetch the animation from our current canonical animation data
-	local animation = tdengine.animation.find(name)
+	local animation = doublenickel.animation.find(name)
 
 	-- Update our names to match
 	self.original_name = name
@@ -86,7 +86,7 @@ function AnimationEditor:draw_delete_frame_button(index)
 
 	if imgui.Button('Delete') then
 		if not disabled then
-			tdengine.array.remove(self.data.frames, index)
+			doublenickel.array.remove(self.data.frames, index)
 			self.animation:restart()
 		end
 	end
@@ -97,15 +97,15 @@ end
 function AnimationEditor:popup()
 	local done = false
 
-	local window = tdengine.vec2(450, 600)
-	local wx = tdengine.ffi.dn_window_get_content_area().x
+	local window = doublenickel.vec2(450, 600)
+	local wx = doublenickel.ffi.dn_window_get_content_area().x
 	imgui.SetCursorPosX((wx / 2) - (window.x / 2))
 	imgui.SetNextWindowSize(window:unpack())
 
 	local flags = 0
-	flags = bitwise(tdengine.op_or, flags, ffi.C.ImGuiWindowFlags_NoMove)
-	flags = bitwise(tdengine.op_or, flags, ffi.C.ImGuiWindowFlags_NoResize)
-	flags = bitwise(tdengine.op_or, flags, ffi.C.ImGuiWindowFlags_NoCollapse)
+	flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiWindowFlags_NoMove)
+	flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiWindowFlags_NoResize)
+	flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiWindowFlags_NoCollapse)
 
 	if imgui.BeginPopupModal(self.popup_kind.edit, nil, flags) then
 		local sprite = self:calc_preview_size()
@@ -151,13 +151,13 @@ function AnimationEditor:popup()
 		end
 
 		imgui.InputText(self.ids.import, self, 'import_dir')
-		local import_path = tdengine.ffi.dn_paths_resolve_format('dn_image', self.import_dir):to_interned()
-		local import_valid = tdengine.ffi.dn_os_does_path_exist(import_path) and #self.import_dir > 0
+		local import_path = doublenickel.ffi.dn_paths_resolve_format('dn_image', self.import_dir):to_interned()
+		local import_valid = doublenickel.ffi.dn_os_does_path_exist(import_path) and #self.import_dir > 0
 		imgui.SameLine()
 
 		if imgui.Button('Import') then
 			-- It's a directory, not a filename, but this function still just grabs the part after the final path separator.
-			local name = tdengine.extract_filename(import_path)
+			local name = doublenickel.extract_filename(import_path)
 			self.current_name = name
 
 			self.data.speed = .25
@@ -165,12 +165,12 @@ function AnimationEditor:popup()
 			table.clear(self.data.frames)
 			
 			local files = {}
-			for entry in tdengine.filesystem.iterate_directory(import_path) do
+			for entry in doublenickel.filesystem.iterate_directory(import_path) do
 				table.insert(files, entry.file_path:to_interned())
 			end
 			table.sort(files)
 
-			for file in tdengine.iterator.values(files) do
+			for file in doublenickel.iterator.values(files) do
 				local frame = {
 					image = file,
 					time = 0
@@ -196,8 +196,8 @@ Import a folder as one animation. The folder is a relative path from the /assets
 
 		-- Save
 		if imgui.Button('Save', imgui.ImVec2(100, 25)) then
-			tdengine.animation.add(self.current_name, self.data)
-			tdengine.animation.save()
+			doublenickel.animation.add(self.current_name, self.data)
+			doublenickel.animation.save()
 		end
 
 		imgui.SameLine()
@@ -217,10 +217,10 @@ end
 
 function AnimationEditor:calc_preview_size()
 	local image = self.animation:get_image()
-	local size = tdengine.vec2(tdengine.sprite_size(image))
+	local size = doublenickel.vec2(doublenickel.sprite_size(image))
 
 	if size.y == 0 then
-		return tdengine.vec2(tdengine.sprite_size('debug.png'))
+		return doublenickel.vec2(doublenickel.sprite_size('debug.png'))
 	end
 
 	-- @hack: Now that I have larger assets, they don't fit in the window. This flat doesn't work

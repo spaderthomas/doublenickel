@@ -115,7 +115,7 @@ void TextureAtlas::build_from_config() {
 
   lua_State* l = dn_lua.state;
   // Push global texture data onto the stack
-  lua_getglobal(l, "tdengine");
+  lua_getglobal(l, "doublenickel");
   DEFER_POP(l);
   lua_pushstring(l, "texture");
   lua_gettable(l, -2);
@@ -299,7 +299,7 @@ void TextureAtlas::write_to_config() {
   lua_State* l = dn_lua.state;
 
   // Push global texture data onto the stack
-  lua_getglobal(l, "tdengine");
+  lua_getglobal(l, "doublenickel");
   DEFER_POP(l);
   lua_pushstring(l, "texture");
   lua_gettable(l, -2);
@@ -399,7 +399,7 @@ void TextureAtlas::write_to_config() {
   }
 
   // Write the newly-updated config to disk
-  lua_getglobal(l, "tdengine");
+  lua_getglobal(l, "doublenickel");
   lua_pushstring(l, "write_file_to_return_table");
   lua_gettable(l, -2);
 
@@ -408,7 +408,7 @@ void TextureAtlas::write_to_config() {
   lua_pushstring(l, file_path);
 
   // Second argument: config data
-  lua_getglobal(l, "tdengine");
+  lua_getglobal(l, "doublenickel");
   DEFER_POP(l);
   lua_pushstring(l, "texture");
   lua_gettable(l, -2);
@@ -482,7 +482,7 @@ void init_texture_atlas() {
   lua_State* l = dn_lua.state;
 
   // Push global texture data onto the stack
-  lua_getglobal(l, "tdengine");
+  lua_getglobal(l, "doublenickel");
   DEFER_POP(l);
   lua_pushstring(l, "texture");
   lua_gettable(l, -2);

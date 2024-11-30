@@ -16,8 +16,8 @@ local function find_sorted_keys(t)
 		local va = t[ka]
 		local vb = t[kb]
 
-		local ma = tdengine.editor.get_field_metadata(tdengine.class.get(t), ka)
-		local mb = tdengine.editor.get_field_metadata(tdengine.class.get(t), kb)
+		local ma = doublenickel.editor.get_field_metadata(doublenickel.class.get(t), ka)
+		local mb = doublenickel.editor.get_field_metadata(doublenickel.class.get(t), kb)
 
 		local A_FIRST = true
 		local B_FIRST = false
@@ -31,8 +31,8 @@ local function find_sorted_keys(t)
 		end
 
 		-- 1. Tables always come before non-tables
-		local is_va_table = type(va) == 'table' and not tdengine.enum.is_enum(va)
-		local is_vb_table = type(vb) == 'table' and not tdengine.enum.is_enum(vb)
+		local is_va_table = type(va) == 'table' and not doublenickel.enum.is_enum(va)
+		local is_vb_table = type(vb) == 'table' and not doublenickel.enum.is_enum(vb)
 		if is_va_table and not is_vb_table then
 			return A_FIRST
 		elseif not is_va_table and is_vb_table then
@@ -89,7 +89,7 @@ imgui.extensions.TableField = function(key, value, padding)
 	end
 end
 
-TableOptions = tdengine.class.define('TableOptions')
+TableOptions = doublenickel.class.define('TableOptions')
 function TableOptions:init()
 	self.ignore_functions = false
 	self.ignored_fields = {}
@@ -104,7 +104,7 @@ imgui.extensions.Table = function(t, options)
 
 	for index, k in pairs(sorted_keys) do
 		local value = t[k]
-		if tdengine.editor.is_ignoring_field(t, k) then goto continue end
+		if doublenickel.editor.is_ignoring_field(t, k) then goto continue end
 		if options.ignored_fields[k] then goto continue end
 		if options.ignore_functions and type(value) == 'function' then goto continue end
 
@@ -125,15 +125,15 @@ imgui.extensions.TableMenuItem = function(name, t)
 end
 
 
-StructEditor = tdengine.class.define('StructEditor')
+StructEditor = doublenickel.class.define('StructEditor')
 
 function StructEditor:init(name, struct, color)
 	self.name = name
 	self.struct = struct
-	self.color = tdengine.colors.red:copy()
+	self.color = doublenickel.colors.red:copy()
 
 	self.colors = {
-		type_column = tdengine.colors.cadet_gray:copy()
+		type_column = doublenickel.colors.cadet_gray:copy()
 	}
 
 	self.padding = 12
@@ -144,32 +144,32 @@ function StructEditor:init(name, struct, color)
 	}
 
 	
-	local type_info = tdengine.ffi.inner_typeof(self.struct)
+	local type_info = doublenickel.ffi.inner_typeof(self.struct)
 	for member_info in type_info:members() do
 		self.columns.field_name = math.max(self.columns.field_name, imgui.CalcTextSize(member_info.name).x)
 	end
 
 	self.columns.field_type = imgui.CalcTextSize('i32*').x
 	for member_info in type_info:members() do
-		local inner_type = tdengine.ffi.inner_type(member_info)
-		local pretty_type = tdengine.ffi.pretty_ptr(inner_type)
+		local inner_type = doublenickel.ffi.inner_type(member_info)
+		local pretty_type = doublenickel.ffi.pretty_ptr(inner_type)
 		self.columns.field_type = math.max(
 			self.columns.field_type, 
 			imgui.CalcTextSize(pretty_type).x)
 	end
 
-	for column_name in tdengine.iterator.keys(self.columns) do
+	for column_name in doublenickel.iterator.keys(self.columns) do
 		self.columns[column_name] = self.columns[column_name] + self.padding
 	end
 end
 
 function StructEditor:draw()
-	local label = string.format('%s##%s', self.name, tdengine.ffi.address_of(self.struct))
+	local label = string.format('%s##%s', self.name, doublenickel.ffi.address_of(self.struct))
 
-	local type_info = tdengine.ffi.inner_typeof(self.struct) -- For ref types
+	local type_info = doublenickel.ffi.inner_typeof(self.struct) -- For ref types
 
 	if imgui.TreeNode(label) then
-		for member_info in tdengine.ffi.sorted_members(type_info) do
+		for member_info in doublenickel.ffi.sorted_members(type_info) do
 			self:member(self.struct, member_info)
 		end
 
@@ -195,7 +195,7 @@ end
 
 
 function StructEditor:member(struct, member_info)
-	local ctype = tdengine.enums.ctype
+	local ctype = doublenickel.enums.ctype
 
 	local inner_type = member_info.type
 
@@ -204,13 +204,13 @@ function StructEditor:member(struct, member_info)
 
 	elseif ctype.enum:match(inner_type.what) then
 		-- p(struct[member_info.name])
-		self:enum(member_info.name, tdengine.ffi.field_ptr(struct, member_info), struct[member_info.name], inner_type)
+		self:enum(member_info.name, doublenickel.ffi.field_ptr(struct, member_info), struct[member_info.name], inner_type)
 
 	elseif ctype.int:match(inner_type.what) and inner_type.bool then
-		self:bool(member_info.name, tdengine.ffi.field_ptr(struct, member_info))
+		self:bool(member_info.name, doublenickel.ffi.field_ptr(struct, member_info))
 
 	elseif ctype.int:match(inner_type.what) then
-		self:int(member_info.name, tdengine.ffi.field_ptr(struct, member_info))
+		self:int(member_info.name, doublenickel.ffi.field_ptr(struct, member_info))
 
 	elseif ctype.struct:match(inner_type.what) then
 		StructEditor:new(member_info.name, struct[member_info.name], self.color):draw()
@@ -224,7 +224,7 @@ end
 
 function StructEditor:name_column(field_name)
 	self:use_name_column()
-	imgui.PushStyleColor(ffi.C.ImGuiCol_Text, tdengine.editor.colors.scalar:to_u32())
+	imgui.PushStyleColor(ffi.C.ImGuiCol_Text, doublenickel.editor.colors.scalar:to_u32())
 	imgui.Text(field_name)
 	imgui.PopStyleColor()
 end
@@ -248,30 +248,30 @@ end
 
 function StructEditor:Float(field_name, ptr)
 	self:name_column(field_name)
-	self:type_column(tdengine.ffi.pretty_typeof(ptr))
+	self:type_column(doublenickel.ffi.pretty_typeof(ptr))
 
 	self:use_widget_column()
 
 	imgui.PushItemWidth(-1)
-	local label = string.format('##%s:%s', tdengine.ffi.address_of(ptr), field_name)
-	imgui.InputScalar(label, tdengine.ffi.imgui_datatypeof(ptr), ptr, nil, nil, '%.3f', 0)
+	local label = string.format('##%s:%s', doublenickel.ffi.address_of(ptr), field_name)
+	imgui.InputScalar(label, doublenickel.ffi.imgui_datatypeof(ptr), ptr, nil, nil, '%.3f', 0)
 	imgui.PopItemWidth()
 	imgui.Columns()
 end
 
 function StructEditor:CFloatMember(struct, member_info)
-	return self:Float(member_info.name, tdengine.ffi.field_ptr(struct, member_info))
+	return self:Float(member_info.name, doublenickel.ffi.field_ptr(struct, member_info))
 end
 
 
 function StructEditor:int(field_name, ptr)
 	self:name_column(field_name)
-	self:type_column(tdengine.ffi.pretty_typeof(ptr))
+	self:type_column(doublenickel.ffi.pretty_typeof(ptr))
 
 	self:use_widget_column()
 	imgui.PushItemWidth(-1)
-	local label = string.format('##%s:%s', tdengine.ffi.address_of(ptr), field_name)
-	imgui.InputScalar(label, tdengine.ffi.imgui_datatypeof(ptr), ptr, nil, nil, '%.3f', 0)
+	local label = string.format('##%s:%s', doublenickel.ffi.address_of(ptr), field_name)
+	imgui.InputScalar(label, doublenickel.ffi.imgui_datatypeof(ptr), ptr, nil, nil, '%.3f', 0)
 
 	-- ffi.C.igInputInt(label, ptr, 0, 0, 0)
 	imgui.PopItemWidth()
@@ -280,11 +280,11 @@ end
 
 function StructEditor:bool(field_name, ptr)
 	self:name_column(field_name)
-	self:type_column(tdengine.ffi.pretty_typeof(ptr))
+	self:type_column(doublenickel.ffi.pretty_typeof(ptr))
 
 	self:use_widget_column()
 	imgui.PushItemWidth(-1)
-	local label = string.format('##%s:%s', tdengine.ffi.address_of(ptr), field_name)
+	local label = string.format('##%s:%s', doublenickel.ffi.address_of(ptr), field_name)
 	ffi.C.igCheckbox(label, ptr)
 
 	-- ffi.C.igInputInt(label, ptr, 0, 0, 0)
@@ -295,13 +295,13 @@ end
 
 function StructEditor:pointer(field_name, ptr)
 	self:name_column(field_name)
-	self:type_column(tdengine.ffi.pretty_ptrof(ptr))
+	self:type_column(doublenickel.ffi.pretty_ptrof(ptr))
 
 	self:use_widget_column()
-	if tdengine.ffi.is_opaque(ptr) then
+	if doublenickel.ffi.is_opaque(ptr) then
 		imgui.Text('OPAQUE')
 	else
-		imgui.Text(tdengine.ffi.address_of(ptr))
+		imgui.Text(doublenickel.ffi.address_of(ptr))
 	end
 	imgui.Columns()
 end
@@ -309,16 +309,16 @@ end
 
 
 function StructEditor:enum(field_name, ptr, current_value, enum_type)
-	-- p(tdengine.ffi.typeof(ptr))
+	-- p(doublenickel.ffi.typeof(ptr))
 	local current_enum_info = enum_type:value(current_value)
 
 	self:name_column(field_name)
-	self:type_column(tdengine.ffi.pretty_type(enum_type))
+	self:type_column(doublenickel.ffi.pretty_type(enum_type))
 
 
 	self:use_widget_column()
 	imgui.PushItemWidth(-1)
-	local label = string.format('##%s:%s', tdengine.ffi.address_of(ptr), field_name)
+	local label = string.format('##%s:%s', doublenickel.ffi.address_of(ptr), field_name)
 	if imgui.BeginCombo(label, current_enum_info.name) then
 		for enum in enum_type:values() do
 			if imgui.Selectable(enum.name, enum.value == ptr) then
@@ -340,9 +340,9 @@ end
 
 
 function imgui.extensions.CArray(name, array)
-	local label = string.format('%s##%s', name, tdengine.ffi.address_of(array))
+	local label = string.format('%s##%s', name, doublenickel.ffi.address_of(array))
 	if imgui.TreeNode(label) then
-		local inner_type = tdengine.ffi.inner_typeof(array)
+		local inner_type = doublenickel.ffi.inner_typeof(array)
 		local element_type = inner_type.element_type
 
 		local num_elements = inner_type.size / inner_type.element_type.size
@@ -361,9 +361,9 @@ function imgui.extensions.CStruct(name, struct)
 end
 
 function imgui.extensions.CType(name, value)
-	local ctype = tdengine.enums.ctype
+	local ctype = doublenickel.enums.ctype
 
-	local inner_type = tdengine.ffi.inner_typeof(value)
+	local inner_type = doublenickel.ffi.inner_typeof(value)
 	if ctype.struct:match(inner_type.what) then
 		imgui.extensions.CStruct(name, value)
 	elseif ctype.array:match(inner_type.what) then
@@ -386,9 +386,9 @@ imgui.extensions.TableEditor = function(editing, params)
 		enter_returns_true = params.enter_returns_true or false,
 		on_end = params.on_end or nil,
 		is_table_editor = true,
-		key_id = tdengine.uuid_imgui(),
-		value_id = tdengine.uuid_imgui(),
-		type_id = tdengine.uuid_imgui(),
+		key_id = doublenickel.uuid_imgui(),
+		value_id = doublenickel.uuid_imgui(),
+		type_id = doublenickel.uuid_imgui(),
 		selected_type = 'string',
 		editing = editing,
 		children = {},
@@ -475,7 +475,7 @@ imgui.internal.draw_table_editor = function(editor)
 	for _, key in ipairs(sorted_keys) do
 	
 		local value = editor.editing[key]
-		local metadata = tdengine.editor.get_field_metadata(tdengine.class.get(editor.editing), key)
+		local metadata = doublenickel.editor.get_field_metadata(doublenickel.class.get(editor.editing), key)
 
 		-- Skip the variable if it's in the imgui_ignore for either the editor, or the table being edited
 		local display = true
@@ -484,14 +484,14 @@ imgui.internal.draw_table_editor = function(editor)
 			display = display and (not editor.editing.imgui_ignore[key])
 		end
 
-		if key == '__enum' then p(editor.editing[tdengine.editor.sentinel].ignore) end
-		if tdengine.editor.is_ignoring_field(editor.editing, key) then
+		if key == '__enum' then p(editor.editing[doublenickel.editor.sentinel].ignore) end
+		if doublenickel.editor.is_ignoring_field(editor.editing, key) then
 			display = false
 		end
 
 		-- Likewise, don't display imgui_ignore
 		if key == 'imgui_ignore' then display = false end
-		if key == tdengine.editor.sentinel then display = false end
+		if key == doublenickel.editor.sentinel then display = false end
 
 		-- Assign a UNIQUE label to this entry
 		local label = string.format('##%s', hash_table_entry(editor.editing, tostring(key)))
@@ -510,7 +510,7 @@ imgui.internal.draw_table_editor = function(editor)
 			imgui.extensions.TableField(key, value, padding)
 		elseif display and not metadata.read_only then
 			-- local variable_name_color = imgui.internal.table_editor_depth_color(editor.depth)
-			local variable_name_color = tdengine.editor.colors.scalar
+			local variable_name_color = doublenickel.editor.colors.scalar
 
 			-- Strings
 			if type(value) == 'string' then
@@ -586,7 +586,7 @@ imgui.internal.draw_table_editor = function(editor)
 				end
 			elseif type(value) == 'thread' then
 				-- Colors (at this point, we know it's a table)
-			elseif tdengine.is_color_like(value) then
+			elseif doublenickel.is_color_like(value) then
 				local picker_flags = 0
 
 				if imgui.TreeNode(display_key .. label) then
@@ -603,7 +603,7 @@ imgui.internal.draw_table_editor = function(editor)
 					imgui.Text('self referential')
 					imgui.PopItemWidth()
 				end
-			elseif tdengine.enum.is_enum(value) then
+			elseif doublenickel.enum.is_enum(value) then
 				imgui.extensions.VariableName(display_key, variable_name_color)
 				if imgui.IsItemClicked(1) then
 					open_item_context_menu = true;
@@ -614,7 +614,7 @@ imgui.internal.draw_table_editor = function(editor)
 				imgui.PushItemWidth(-1)
 
 				if imgui.BeginCombo(label, value:to_string()) then
-					local enum_data = tdengine.enum_data[value.__enum]
+					local enum_data = doublenickel.enum_data[value.__enum]
 					local enums = {}
 					for name, _ in pairs(enum_data) do
 						table.insert(enums, name)
@@ -705,7 +705,7 @@ imgui.internal.draw_table_editor = function(editor)
 	if editor.on_done then editor.on_done() end
 
 	for _, field in pairs(fields_changed) do
-		tdengine.editor.run_editor_callback(editor.editing, 'on_change_field', field)
+		doublenickel.editor.run_editor_callback(editor.editing, 'on_change_field', field)
 	end
 
 	return field_added, field_changed
@@ -779,7 +779,7 @@ end
 
 function imgui.internal.calc_alignment(keys)
 	local max_key_size = 0
-	for key in tdengine.iterator.values(keys) do
+	for key in doublenickel.iterator.values(keys) do
 		local display_key = tostring(key)
 		local key_size = imgui.CalcTextSize(display_key)
 		max_key_size = math.max(max_key_size, key_size.x)
@@ -798,8 +798,8 @@ end
 
 imgui.internal.table_editor_depth_color = function(depth)
 	local colors = {
-		tdengine.colors.celadon:copy(),
-		tdengine.colors.cool_gray:copy(),
+		doublenickel.colors.celadon:copy(),
+		doublenickel.colors.cool_gray:copy(),
 	}
 	return colors[(depth % 2) + 1]
 end
@@ -814,9 +814,9 @@ imgui.internal.propagate_table_editor_params = function(editor)
 end
 
 imgui.internal.clear_table_editor = function(editor)
-	editor.key_id = tdengine.uuid_imgui()
-	editor.value_id = tdengine.uuid_imgui()
-	editor.type_id = tdengine.uuid_imgui()
+	editor.key_id = doublenickel.uuid_imgui()
+	editor.value_id = doublenickel.uuid_imgui()
+	editor.type_id = doublenickel.uuid_imgui()
 	editor.children = {}
 end
 
@@ -824,7 +824,7 @@ end
 -- WIDGETS
 --
 imgui.extensions.VariableName = function(name)
-	imgui.PushStyleColor(ffi.C.ImGuiCol_Text, tdengine.editor.colors.scalar:to_u32())
+	imgui.PushStyleColor(ffi.C.ImGuiCol_Text, doublenickel.editor.colors.scalar:to_u32())
 	imgui.Text(tostring(name))
 	imgui.PopStyleColor()
 	if imgui.IsItemHovered() then
@@ -832,7 +832,7 @@ imgui.extensions.VariableName = function(name)
 		x, y = imgui.GetItemRectMin();
 		px, py = 5, 3
 
-		imgui.GetWindowDrawList():AddRectFilled(imgui.ImVec2(x - px, y - py), imgui.ImVec2(x + sx + px, y + sy + py), tdengine.editor.colors.scalar:to_u32())
+		imgui.GetWindowDrawList():AddRectFilled(imgui.ImVec2(x - px, y - py), imgui.ImVec2(x + sx + px, y + sy + py), doublenickel.editor.colors.scalar:to_u32())
 	end
 end
 
@@ -853,13 +853,13 @@ imgui.extensions.WhitespaceSeparator = function(whitespace)
 end
 
 imgui.extensions.CursorBubble = function(extents, color)
-	extents       = extents or tdengine.vec2(15, 15)
-	color         = color or tdengine.color32(0, 255, 128, 255)
+	extents       = extents or doublenickel.vec2(15, 15)
+	color         = color or doublenickel.color32(0, 255, 128, 255)
 
 	-- Draw a bubble around the cursor, which separates the nodes
-	local color   = tdengine.color32(0, 255, 128, 255)
-	local extents = tdengine.vec2(15, 15)
-	local middle  = tdengine.vec2(imgui.GetMousePos(0))
+	local color   = doublenickel.color32(0, 255, 128, 255)
+	local extents = doublenickel.vec2(15, 15)
+	local middle  = doublenickel.vec2(imgui.GetMousePos(0))
 	local min     = middle:subtract(extents:scale(.5))
 	local max     = middle:add(extents)
 	imgui.GetWindowDrawList():AddRectFilled(

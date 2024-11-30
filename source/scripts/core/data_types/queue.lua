@@ -1,8 +1,8 @@
-Queue = tdengine.class.define('Queue')
-tdengine.data_types.queue = Queue
+Queue = doublenickel.class.define('Queue')
+doublenickel.data_types.queue = Queue
 
 function Queue:init(capacity)
-  self.array = tdengine.data_types.array:new()
+  self.array = doublenickel.data_types.array:new()
   self.capacity = capacity
 end
 

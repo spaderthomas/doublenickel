@@ -1,4 +1,4 @@
-function tdengine.define_app()
-  local class = tdengine.subsystem.define('App')
+function doublenickel.define_app()
+  local class = doublenickel.subsystem.define('App')
   return class
 end

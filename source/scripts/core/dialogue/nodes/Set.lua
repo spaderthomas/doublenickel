@@ -1,4 +1,4 @@
-local Set = tdengine.node('Set')
+local Set = doublenickel.node('Set')
 
 Set.editor_fields = {
   'variable',
@@ -11,7 +11,7 @@ function Set:init()
 end
 
 function Set:enter(graph)
-  tdengine.state.set(self.variable, self.value)
+  doublenickel.state.set(self.variable, self.value)
   return dialogue_state.advancing
 end
 

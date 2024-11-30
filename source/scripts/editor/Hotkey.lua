@@ -1,6 +1,6 @@
-local Hotkey = tdengine.editor.define('Hotkey')
+local Hotkey = doublenickel.editor.define('Hotkey')
 function Hotkey:init()
-	self.input = ContextualInput:new(tdengine.enums.InputContext.Editor, tdengine.enums.CoordinateSystem.Game)
+	self.input = ContextualInput:new(doublenickel.enums.InputContext.Editor, doublenickel.enums.CoordinateSystem.Game)
 
   self.game_hotkeys = {
     control = {
@@ -25,21 +25,21 @@ function Hotkey:init()
 end
 
 function Hotkey:update()
-  if tdengine.is_packaged_build then return end
+  if doublenickel.is_packaged_build then return end
 
   self:check_game_hotkeys()
   self:check_editor_hotkeys()
 end
 
 function Hotkey:check_game_hotkeys()
-  self.input.context = tdengine.enums.InputContext.Game
+  self.input.context = doublenickel.enums.InputContext.Game
   
   self:check_control_hotkeys(self.game_hotkeys.control)
   self:check_single_hotkeys(self.game_hotkeys.single)
 end
 
 function Hotkey:check_editor_hotkeys()
-  self.input.context = tdengine.enums.InputContext.Editor
+  self.input.context = doublenickel.enums.InputContext.Editor
 
   self:check_control_hotkeys(self.editor_hotkeys.control)
   self:check_single_hotkeys(self.editor_hotkeys.single)
@@ -62,22 +62,22 @@ function Hotkey:check_single_hotkeys(hotkeys, channel)
 end
 
 function Hotkey:save_dialogue()
-  local dialogue_editor = tdengine.editor.find('DialogueEditor')
+  local dialogue_editor = doublenickel.editor.find('DialogueEditor')
   dialogue_editor:save(dialogue_editor.loaded)
 end
 
 function Hotkey:new_dialogue()
-  tdengine.editor.find('MainMenu').open_new_dialogue_modal = true
+  doublenickel.editor.find('MainMenu').open_new_dialogue_modal = true
 end
 
 function Hotkey:open_dialogue()
-  local directory = tdengine.ffi.dn_paths_resolve('dialogues'):to_interned()
+  local directory = doublenickel.ffi.dn_paths_resolve('dialogues'):to_interned()
   imgui.SetFileBrowserPwd(directory)
   imgui.file_browser_open()
 
   -- @hack: I wanted to move the hoykey code out of the main menu, but I forgot that it was
   -- doing more than just drawing a menu. Not a hard fix, just not right now.
-  local main_menu = tdengine.find_entity_editor('MainMenu')
+  local main_menu = doublenickel.find_entity_editor('MainMenu')
   main_menu.state = 'choosing_dialogue'
 end
 
@@ -85,24 +85,24 @@ end
 -- GAME WINDOW --
 -----------------
 function Hotkey:save_scene()
-  tdengine.find_entity_editor('SceneEditor'):save()
+  doublenickel.find_entity_editor('SceneEditor'):save()
 end
 
 function Hotkey:toggle_play_mode()
-  tdengine.find_entity_editor('SceneEditor'):toggle_play_mode()
+  doublenickel.find_entity_editor('SceneEditor'):toggle_play_mode()
 end
 
 function Hotkey:open_scene()
-  local scenes = tdengine.ffi.dn_paths_resolve('scenes'):to_interned()
+  local scenes = doublenickel.ffi.dn_paths_resolve('scenes'):to_interned()
   imgui.file_browser_set_work_dir(scenes)
   imgui.file_browser_open()
 
   -- @hack: I wanted to move the hoykey code out of the main menu, but I forgot that it was
   -- doing more than just drawing a menu. Not a hard fix, just not right now.
-  local main_menu = tdengine.editor.find('MainMenu')
+  local main_menu = doublenickel.editor.find('MainMenu')
   main_menu.state = 'choosing_scene'
 end
 
 function Hotkey:reset_state()
-  tdengine.state.load_file('default')
+  doublenickel.state.load_file('default')
 end

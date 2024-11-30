@@ -1,14 +1,14 @@
-imgui.extensions.StatePicker = tdengine.class.define('ImguiStatePicker')
+imgui.extensions.StatePicker = doublenickel.class.define('ImguiStatePicker')
 
 function imgui.extensions.StatePicker:init(state)
 	self.filter = InputFilter:new()
-	self.input = ContextualInput:new(tdengine.enums.InputContext.Editor, tdengine.enums.CoordinateSystem.Game)
+	self.input = ContextualInput:new(doublenickel.enums.InputContext.Editor, doublenickel.enums.CoordinateSystem.Game)
 	self.state = state or ''
 	self.is_open = false
 end
 
 function imgui.extensions.StatePicker:filter_state()
-	local sorted_state = tdengine.state.get_sorted_fields()
+	local sorted_state = doublenickel.state.get_sorted_fields()
 	local filtered_state = {}
 
 	for index, state in pairs(sorted_state) do
@@ -53,7 +53,7 @@ function imgui.extensions.StatePicker:update(width)
 		-- Only update the filter if the combo box is open
 		self.filter:update()
 		local state = self:filter_state()
-		imgui.PushStyleColor(ffi.C.ImGuiCol_Text, tdengine.color32(0, 255, 0, 255))
+		imgui.PushStyleColor(ffi.C.ImGuiCol_Text, doublenickel.color32(0, 255, 0, 255))
 		imgui.Text(self.filter.buffer)
 		imgui.PopStyleColor()
 

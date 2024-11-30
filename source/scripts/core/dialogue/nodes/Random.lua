@@ -1,4 +1,4 @@
-local Random = tdengine.node('Random')
+local Random = doublenickel.node('Random')
 
 function Random:init()
   self.children_chosen = {}

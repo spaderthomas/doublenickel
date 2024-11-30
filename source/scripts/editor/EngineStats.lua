@@ -1,4 +1,4 @@
-local EngineStats = tdengine.editor.define('EngineStats')
+local EngineStats = doublenickel.editor.define('EngineStats')
 
 function EngineStats:init(params)
   self.ded = {
@@ -9,9 +9,9 @@ function EngineStats:init(params)
     connecting = nil,
     disconnecting = nil,
     deleting = nil,
-    scrolling = tdengine.vec2(0, 0),
+    scrolling = doublenickel.vec2(0, 0),
     scroll_per_second = 100,
-    window_position = tdengine.vec2(0, 0),
+    window_position = doublenickel.vec2(0, 0),
     input_id = '##ded_editor',
     text_who_id = '##ded:detail:set_entity',
     set_var_id = '##ded:detail:set_var',
@@ -47,11 +47,11 @@ function EngineStats:init(params)
   self.screen_fade_elapsed = 0.0
   self.screen_fade_enabled = true
 
-  self.gui_animations = imgui.extensions.TableEditor(tdengine.gui.animation)
-  self.gui_scroll = imgui.extensions.TableEditor(tdengine.gui.scroll)
-  self.gui_drag = imgui.extensions.TableEditor(tdengine.gui.drag)
-  self.gui_menu = imgui.extensions.TableEditor(tdengine.gui.menu)
-  self.save_data = imgui.extensions.TableEditor(tdengine.scene.save_data)
+  self.gui_animations = imgui.extensions.TableEditor(doublenickel.gui.animation)
+  self.gui_scroll = imgui.extensions.TableEditor(doublenickel.gui.scroll)
+  self.gui_drag = imgui.extensions.TableEditor(doublenickel.gui.drag)
+  self.gui_menu = imgui.extensions.TableEditor(doublenickel.gui.menu)
+  self.save_data = imgui.extensions.TableEditor(doublenickel.scene.save_data)
   self.subsystems = {}
 
   self.metrics = { 
@@ -62,8 +62,8 @@ function EngineStats:init(params)
   self.particle_systems = {}
 
   self.cameras = {
-    Editor = tdengine.vec2(),
-    Game = tdengine.vec2(),
+    Editor = doublenickel.vec2(),
+    Game = doublenickel.vec2(),
   }
 
   self.action_data = {}
@@ -83,8 +83,8 @@ end
 function EngineStats:playground()
   if self.window then
     self.window:update()
-    local x = tdengine.ffi.dn_window_get_content_area()
-    tdengine.ffi.set_window_size(self.window:get_value(), x.y)
+    local x = doublenickel.ffi.dn_window_get_content_area()
+    doublenickel.ffi.set_window_size(self.window:get_value(), x.y)
 
     if self.window:is_done() then
       if self.window.once then
@@ -99,13 +99,13 @@ function EngineStats:playground()
 end
 
 function EngineStats:engine_viewer()
-  tdengine.editor.begin_window('Engine')
+  doublenickel.editor.begin_window('Engine')
 
-  tdengine.editor.push_font(EditorFonts.Bold)
+  doublenickel.editor.push_font(EditorFonts.Bold)
   imgui.Text('User')
   imgui.PopFont()
 
-  for name, subsystem in pairs(tdengine.subsystem.subsystems) do
+  for name, subsystem in pairs(doublenickel.subsystem.subsystems) do
     if not self.subsystems[name] then
       self.subsystems[name] = imgui.extensions.TableEditor(subsystem)
     end
@@ -116,9 +116,9 @@ function EngineStats:engine_viewer()
     end
   end
 
-  tdengine.lifecycle.run_callback(tdengine.lifecycle.callbacks.on_engine_viewer)
+  doublenickel.lifecycle.run_callback(doublenickel.lifecycle.callbacks.on_engine_viewer)
 
-  tdengine.editor.push_font(EditorFonts.Bold)
+  doublenickel.editor.push_font(EditorFonts.Bold)
   imgui.Text('Engine')
   imgui.PopFont()
 
@@ -130,18 +130,18 @@ function EngineStats:engine_viewer()
   end
 
   if imgui.TreeNode('Window') then
-    local main_view = tdengine.editor.find('GameViewManager'):find_main_view()
+    local main_view = doublenickel.editor.find('GameViewManager'):find_main_view()
     imgui.extensions.TableField('Main View', main_view.name)
-    imgui.extensions.Vec2('Content Area', tdengine.window.dn_window_get_content_area())
-    imgui.extensions.Vec2('Native Resolution', tdengine.window.dn_window_get_native_resolution())
-    imgui.extensions.Vec2('Game View', tdengine.window.get_game_area_size())
+    imgui.extensions.Vec2('Content Area', doublenickel.window.dn_window_get_content_area())
+    imgui.extensions.Vec2('Native Resolution', doublenickel.window.dn_window_get_native_resolution())
+    imgui.extensions.Vec2('Game View', doublenickel.window.get_game_area_size())
     imgui.TreePop()
   end
 
   if imgui.TreeNode('Input') then
     imgui.extensions.VariableName('Mode')
     imgui.SameLine()
-    local device = tdengine.input.get_input_device()
+    local device = doublenickel.input.get_input_device()
     if device == InputDevice.MouseAndKeyboard then
       imgui.Text('Mouse + Keyboard')
     elseif device == InputDevice.Controller then
@@ -150,21 +150,21 @@ function EngineStats:engine_viewer()
 
     imgui.extensions.VariableName('Context')
     imgui.SameLine()
-    imgui.Text(tdengine.input.active_context():to_string())
+    imgui.Text(doublenickel.input.active_context():to_string())
 
 
     imgui.Checkbox('Display Cursor', self, 'display_cursor')
 
     if self.display_cursor then
-      local world = tdengine.vec2(tdengine.ffi.dn_input_mouse(ffi.C.DN_COORD_UNIT_WORLD))
-      tdengine.draw_circle_l(world, 5, tdengine.colors.red)
+      local world = doublenickel.vec2(doublenickel.ffi.dn_input_mouse(ffi.C.DN_COORD_UNIT_WORLD))
+      doublenickel.draw_circle_l(world, 5, doublenickel.colors.red)
     end
 
     if imgui.TreeNode('Camera') then
-      local camera = tdengine.find_entity_editor('EditorCamera')
+      local camera = doublenickel.find_entity_editor('EditorCamera')
       imgui.extensions.Vec2('Editor', camera.offset:truncate(3))
 
-      local camera = tdengine.find_entity('Camera')
+      local camera = doublenickel.find_entity('Camera')
       if camera then
         imgui.extensions.Vec2('Game', camera.offset:truncate(3))
       end
@@ -173,10 +173,10 @@ function EngineStats:engine_viewer()
 
 
     if imgui.TreeNode('Mouse') then
-      imgui.extensions.Vec2('Screen', tdengine.ffi.dn_input_mouse(ffi.C.DN_COORD_UNIT_SCREEN), '%.3f')
-      imgui.extensions.Vec2('Window', tdengine.ffi.dn_input_mouse(ffi.C.DN_COORD_UNIT_WINDOW), '%.3f')
-      imgui.extensions.Vec2('Game  ', tdengine.ffi.dn_input_mouse(ffi.C.DN_COORD_UNIT_GAME), '%d')
-      imgui.extensions.Vec2('World ', tdengine.ffi.dn_input_mouse(ffi.C.DN_COORD_UNIT_WORLD), '%d')
+      imgui.extensions.Vec2('Screen', doublenickel.ffi.dn_input_mouse(ffi.C.DN_COORD_UNIT_SCREEN), '%.3f')
+      imgui.extensions.Vec2('Window', doublenickel.ffi.dn_input_mouse(ffi.C.DN_COORD_UNIT_WINDOW), '%.3f')
+      imgui.extensions.Vec2('Game  ', doublenickel.ffi.dn_input_mouse(ffi.C.DN_COORD_UNIT_GAME), '%d')
+      imgui.extensions.Vec2('World ', doublenickel.ffi.dn_input_mouse(ffi.C.DN_COORD_UNIT_WORLD), '%d')
 
       imgui.TreePop()
     end
@@ -185,24 +185,24 @@ function EngineStats:engine_viewer()
   end
 
   if imgui.TreeNode('Actions') then
-    imgui.Text(string.format('Active Action Set: %s', tdengine.action.get_active_set()))
-    imgui.Text(string.format('Action Set Cooldown: %d', tdengine.ffi.get_action_set_cooldown()))
+    imgui.Text(string.format('Active Action Set: %s', doublenickel.action.get_active_set()))
+    imgui.Text(string.format('Action Set Cooldown: %d', doublenickel.ffi.get_action_set_cooldown()))
 
-    local color_active = tdengine.color32(0, 200, 0, 255)
-    local color_inactive = tdengine.color32(200, 0, 0, 255)
+    local color_active = doublenickel.color32(0, 200, 0, 255)
+    local color_inactive = doublenickel.color32(200, 0, 0, 255)
 
-    local action_data = tdengine.action.data or {}
+    local action_data = doublenickel.action.data or {}
     local actions = action_data and action_data.actions or {}
     if imgui.TreeNode('Action State') then
       for _, action in pairs(action_data) do
-        local active = tdengine.ffi.was_digital_pressed(action)
+        local active = doublenickel.ffi.was_digital_pressed(action)
         local color = active and color_active or color_inactive
         imgui.PushStyleColor(ffi.C.ImGuiCol_Text, color)
         imgui.Text(action)
         imgui.PopStyleColor()
 
         if not self.action_data[action] then self.action_data[action] = 0 end
-        if active then self.action_data[action] = tdengine.frame end
+        if active then self.action_data[action] = doublenickel.frame end
 
         imgui.SameLine()
         imgui.Text(string.format('%d', self.action_data[action]))
@@ -220,38 +220,38 @@ function EngineStats:engine_viewer()
 
   if imgui.TreeNode('Audio') then
     self.audio = {
-      ['Master Cutoff'] = tdengine.audio.get_master_cutoff(),
-      ['Master Volume'] = tdengine.audio.get_master_volume(),
-      ['Master Volume Mod'] = tdengine.audio.get_master_volume_mod()
+      ['Master Cutoff'] = doublenickel.audio.get_master_cutoff(),
+      ['Master Volume'] = doublenickel.audio.get_master_volume(),
+      ['Master Volume Mod'] = doublenickel.audio.get_master_volume_mod()
     }
     imgui.extensions.Table(self.audio)
 
     if imgui.Button('Enable Audio') then
-      tdengine.audio.enable()
+      doublenickel.audio.enable()
     end
 
     imgui.SameLine()
     if imgui.Button('Disable Audio') then
-      tdengine.audio.disable()
+      doublenickel.audio.disable()
     end
 
     imgui.SameLine()
     if imgui.Button('Stop All') then
-      tdengine.audio.stop_all()
+      doublenickel.audio.stop_all()
     end
 
-    imgui.extensions.Table(tdengine.audio.internal)
+    imgui.extensions.Table(doublenickel.audio.internal)
     imgui.TreePop()
   end
 
   if imgui.TreeNode('Backgrounds') then
-    imgui.extensions.Table(tdengine.background.data)
+    imgui.extensions.Table(doublenickel.background.data)
     imgui.TreePop()
   end
 
   if imgui.TreeNode('Callbacks') then
     local keys = {}
-    for name, callback in pairs(tdengine.callback.data) do
+    for name, callback in pairs(doublenickel.callback.data) do
       table.insert(keys, name)
     end
     table.sort(keys)
@@ -262,22 +262,22 @@ function EngineStats:engine_viewer()
   end
 
   if imgui.TreeNode('Dialogue Metrics') then
-    imgui.extensions.Table(tdengine.dialogue.metrics)
+    imgui.extensions.Table(doublenickel.dialogue.metrics)
     imgui.TreePop()
   end
 
   if imgui.TreeNode('Enums') then
-    imgui.extensions.Table(tdengine.enum_data)
+    imgui.extensions.Table(doublenickel.enum_data)
     imgui.TreePop()
   end
 
   if imgui.TreeNode('Fonts') then
-    imgui.extensions.Table(tdengine.fonts.data)
+    imgui.extensions.Table(doublenickel.fonts.data)
     imgui.TreePop()
   end
 
   if imgui.TreeNode('GPU') then
-    imgui.extensions.Table(tdengine.gpu)
+    imgui.extensions.Table(doublenickel.gpu)
     imgui.TreePop()
   end
 
@@ -299,7 +299,7 @@ function EngineStats:engine_viewer()
     end
 
     if imgui.TreeNode('Menu Stack') then
-      imgui.extensions.Table(tdengine.gui.menu_stack)
+      imgui.extensions.Table(doublenickel.gui.menu_stack)
       imgui.TreePop()
     end
 
@@ -312,17 +312,17 @@ function EngineStats:engine_viewer()
   end
 
   if imgui.TreeNode('Images') then
-    imgui.extensions.Table(tdengine.texture.data)
+    imgui.extensions.Table(doublenickel.texture.data)
     imgui.TreePop()
   end
 
   if imgui.TreeNode('Particles') then
     if imgui.Button('Stop All') then
-      tdengine.ffi.stop_all_particles()
-      tdengine.ffi.lf_destroy_all()
+      doublenickel.ffi.stop_all_particles()
+      doublenickel.ffi.lf_destroy_all()
     end
 
-    local particle_systems = tdengine.find_entities('ParticleSystem')
+    local particle_systems = doublenickel.find_entities('ParticleSystem')
     for id, particle_system in pairs(particle_systems) do
       if not self.particle_systems[particle_system.uuid] then
         self.particle_systems[particle_system.uuid] = {
@@ -356,20 +356,20 @@ function EngineStats:engine_viewer()
   end
 
   if imgui.TreeNode('Subsystems') then
-    imgui.extensions.Table(tdengine.subsystem.subsystems)
+    imgui.extensions.Table(doublenickel.subsystem.subsystems)
     imgui.TreePop()
   end
 
   if imgui.TreeNode('Types') then
     local options = TableOptions:new()
     options.ignore_functions = false
-    imgui.extensions.Table(tdengine.types, options)
+    imgui.extensions.Table(doublenickel.types, options)
     imgui.TreePop()
   end
 
   if imgui.TreeNode('Utility') then
     if imgui.Button('Show Text Input') then
-      tdengine.ffi.dn_steam_open_text_input()
+      doublenickel.ffi.dn_steam_open_text_input()
     end
 
     if imgui.Button('Window') then
@@ -378,17 +378,17 @@ function EngineStats:engine_viewer()
     imgui.TreePop()
   end
 
-  tdengine.editor.end_window()
+  doublenickel.editor.end_window()
 end
 
 function EngineStats:calculate_framerate()
-  if self.fps_timer:update(tdengine.dt) then
+  if self.fps_timer:update(doublenickel.dt) then
     self.fps_timer:reset()
 
-    local metrics = tdengine.time_metric.query_all()
+    local metrics = doublenickel.time_metric.query_all()
     table.merge(metrics, self.metrics)
 
-    self.metrics.target_fps = tdengine.ffi.dn_engine_get_target_fps()
+    self.metrics.target_fps = doublenickel.ffi.dn_engine_get_target_fps()
     self.metrics.actual_fps = math.floor(1000.0 / self.metrics.frame.average)
   end
 end

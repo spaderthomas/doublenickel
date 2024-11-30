@@ -1,4 +1,4 @@
-local Function = tdengine.node('Function')
+local Function = doublenickel.node('Function')
 
 Function.editor_fields = {
   'name',
@@ -11,7 +11,7 @@ function Function:init()
 end
 
 function Function:enter(graph)
-  self.fn = coroutine.create(tdengine.callback.find(self.name))
+  self.fn = coroutine.create(doublenickel.callback.find(self.name))
   self:run_one()
   if self.is_done then
     return dialogue_state.advancing
@@ -49,7 +49,7 @@ end
 function Function:run_one()
   local success, value = coroutine.resume(self.fn, self.params)
   if not success then
-    tdengine.handle_error(value)
+    doublenickel.handle_error(value)
   else
     self.value = value
   end

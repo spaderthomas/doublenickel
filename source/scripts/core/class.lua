@@ -1,4 +1,4 @@
-function tdengine.is_instance_of(self, class)
+function doublenickel.is_instance_of(self, class)
   if type(class) == 'table' then
     class = class.name
   end
@@ -7,43 +7,43 @@ function tdengine.is_instance_of(self, class)
   return mt.__type == class
 end
 
-function tdengine.class.define(name)
-  tdengine.types[name] = {
+function doublenickel.class.define(name)
+  doublenickel.types[name] = {
     name = name,
     -- Static methods manipulate the class itself, like SomeClass:new()
     __static = {
       include = function(__class, mixin)
         for method_name, method in pairs(mixin) do
-          tdengine.types[name].__instance[method_name] = method
+          doublenickel.types[name].__instance[method_name] = method
         end
       end,
 
       include_lifecycle = function(__class, enum)
-        tdengine.types[name].__static:include_enum(tdengine.enums.LifecycleCallback)
+        doublenickel.types[name].__static:include_enum(doublenickel.enums.LifecycleCallback)
       end,
 
       include_update = function(__class, enum)
-        tdengine.types[name].__static:include_enum(tdengine.enums.UpdateCallback)
+        doublenickel.types[name].__static:include_enum(doublenickel.enums.UpdateCallback)
       end,
 
       include_enum = function(__class, enum)
         for as_enum, as_string, as_number in enum:iterate() do
-          tdengine.types[name].__instance[as_string] = function() end
+          doublenickel.types[name].__instance[as_string] = function() end
         end
       end,
 
       include_fields = function(__class, fields)
         for field_name, field in pairs(fields) do
-          tdengine.types[name].__fields[field_name] = field
+          doublenickel.types[name].__fields[field_name] = field
         end
       end,
 
       set_field_metadata = function(__class, field, metadata)
-        tdengine.editor.set_field_metadata(tdengine.types[name], field, metadata)
+        doublenickel.editor.set_field_metadata(doublenickel.types[name], field, metadata)
       end,
 
       set_field_metadatas = function(__class, metadatas)
-        tdengine.editor.set_field_metadatas(tdengine.types[name], metadatas)
+        doublenickel.editor.set_field_metadatas(doublenickel.types[name], metadatas)
       end,
 
       set_metamethod = function(__class, metamethod, fn)
@@ -51,14 +51,14 @@ function tdengine.class.define(name)
         -- would render the instance unusable. We can hack it in, though, by calling the internal
         -- __index before we try whatever the user gave us
         if metamethod == '__index' then
-          tdengine.types[name].__metamethods[metamethod] = function(__instance, key)
-            return tdengine.types[name].__metamethods.__default_index(__instance, key) or fn(__instance, key)
+          doublenickel.types[name].__metamethods[metamethod] = function(__instance, key)
+            return doublenickel.types[name].__metamethods.__default_index(__instance, key) or fn(__instance, key)
           end
         else
-          tdengine.types[name].__metamethods[metamethod] = fn
+          doublenickel.types[name].__metamethods[metamethod] = fn
         end
         -- if metamethod_n
-        -- tdengine.editor.set_field_metadatas(tdengine.types[name], metadatas)
+        -- doublenickel.editor.set_field_metadatas(doublenickel.types[name], metadatas)
       end,
 
 
@@ -67,17 +67,17 @@ function tdengine.class.define(name)
 
       allocate = function(__class, ...)
         local instance = {}
-        for field_name, field in pairs(tdengine.types[name].__fields) do
+        for field_name, field in pairs(doublenickel.types[name].__fields) do
           instance[field_name] = field
         end
 
-        setmetatable(instance, tdengine.types[name].__metamethods)
+        setmetatable(instance, doublenickel.types[name].__metamethods)
     
         -- setmetatable(instance, {
         --   __index = function(__instance, key)
         --     -- If some key isn't found on the instance, check the class' instance methods
         --     -- Look up the class in the global type table, so that it's not stale when hotloaded
-        --     return tdengine.types[name].__instance[key]
+        --     return doublenickel.types[name].__instance[key]
         --   end,
         --   __type = name
         -- })
@@ -86,13 +86,13 @@ function tdengine.class.define(name)
       end,
 
       new = function(__class, ...)
-        local instance = tdengine.types[name].__static.allocate(__class)
-        return tdengine.types[name].__static.construct(__class, instance, ...)
+        local instance = doublenickel.types[name].__static.allocate(__class)
+        return doublenickel.types[name].__static.construct(__class, instance, ...)
       end,
 
       construct = function(__class, instance, ...)
-        if tdengine.types[name].__instance.init then
-          tdengine.types[name].__instance.init(instance, ...)
+        if doublenickel.types[name].__instance.init then
+          doublenickel.types[name].__instance.init(instance, ...)
         end
     
         return instance
@@ -119,10 +119,10 @@ function tdengine.class.define(name)
     -- This metatable is applied to an instance when it is allocated
     __metamethods = {
       __index = function(__instance, key)
-        return rawget(tdengine.types[name].__instance, key)
+        return rawget(doublenickel.types[name].__instance, key)
       end,
       __default_index = function(__instance, key)
-        return rawget(tdengine.types[name].__instance, key)
+        return rawget(doublenickel.types[name].__instance, key)
       end,
       __type = name
     },
@@ -135,31 +135,31 @@ function tdengine.class.define(name)
   }
 
   -- This is the metatable for the class itself
-  setmetatable(tdengine.types[name], {
+  setmetatable(doublenickel.types[name], {
     __index = function(_, key)
-      return rawget(tdengine.types[name].__static, key) or rawget(tdengine.types[name].__instance, key)
+      return rawget(doublenickel.types[name].__static, key) or rawget(doublenickel.types[name].__instance, key)
     end,
     __newindex = function(__class, member_name, member)
-      tdengine.types[name].__instance[member_name] = member
+      doublenickel.types[name].__instance[member_name] = member
     end,
     __type = name
   })
 
-  return tdengine.types[name]
+  return doublenickel.types[name]
 end
 
-function tdengine.class.metatype(ctype, namespace)
+function doublenickel.class.metatype(ctype, namespace)
   -- Because LuaJIT (bafflingly and ostensibly for some optimization) makes metatypes immutable, we create the metatype once
   -- with a layer of indirection that looks up metamethods rather than calling them directly. Ultimately, we'd like all of the
   -- LuaJIT metatype's metamethods to point to the Lua class that we make
-  if not tdengine.types[ctype] then
+  if not doublenickel.types[ctype] then
     local metatype_indirection = {
       __index = function(t, k)
         if namespace then
-          local namespaced_fn = tdengine.ffi[namespace .. '_' .. k]
+          local namespaced_fn = doublenickel.ffi[namespace .. '_' .. k]
           if namespaced_fn then return namespaced_fn end
         end
-        return getmetatable(tdengine.types[ctype]).__index(t, k)
+        return getmetatable(doublenickel.types[ctype]).__index(t, k)
       end
     }
 
@@ -172,7 +172,7 @@ function tdengine.class.metatype(ctype, namespace)
   -- This does mean that our metatypes can't have extra fields on them. There's no reason this isn't possible; it would just
   -- take more metatable wrangling than I feel like doing right now (i.e. store everything besides the ctype in a table, look
   -- up fields in that table if not found on the ctype -- annoying!)
-  local type = tdengine.class.define(ctype)
+  local type = doublenickel.class.define(ctype)
   type.__static.allocate = function()
     return ffi.new(ctype)
   end
@@ -181,16 +181,16 @@ function tdengine.class.metatype(ctype, namespace)
 end
 
 
-function tdengine.class.find(name)
-  return tdengine.types[name]
+function doublenickel.class.find(name)
+  return doublenickel.types[name]
 end
 
-function tdengine.class.get(t)
-  if t.class then return tdengine.class.find(t:class()) end
+function doublenickel.class.get(t)
+  if t.class then return doublenickel.class.find(t:class()) end
 end
 
 
-function tdengine.add_class_metamethod(class, name, fn)
+function doublenickel.add_class_metamethod(class, name, fn)
   local metatable = getmetatable(class)
   metatable[name] = fn
   setmetatable(class, metatable)

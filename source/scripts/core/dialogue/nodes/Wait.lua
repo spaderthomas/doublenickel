@@ -1,4 +1,4 @@
-local Wait = tdengine.node('Wait')
+local Wait = doublenickel.node('Wait')
 
 Wait.editor_fields = {
   'time'
@@ -19,7 +19,7 @@ function Wait:enter(graph)
 end
 
 function Wait:process(graph)
-  self.elapsed = self.elapsed + tdengine.dt
+  self.elapsed = self.elapsed + doublenickel.dt
   if self.elapsed >= self.time then
     return dialogue_state.advancing
   end

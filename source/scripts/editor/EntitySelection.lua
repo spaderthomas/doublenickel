@@ -1,6 +1,6 @@
-local EntitySelection = tdengine.editor.define('EntitySelection')
+local EntitySelection = doublenickel.editor.define('EntitySelection')
 
-tdengine.enum.define(
+doublenickel.enum.define(
 	'EntitySelection',
 	{
 		None = 0,
@@ -9,11 +9,11 @@ tdengine.enum.define(
 )
 
 function EntitySelection:init()
-  self.state = tdengine.enums.EntitySelection.None
+  self.state = doublenickel.enums.EntitySelection.None
   self.selection = nil
   self.context_selection = nil
 
-  self.input = ContextualInput:new(tdengine.enums.InputContext.Game, tdengine.enums.CoordinateSystem.World)
+  self.input = ContextualInput:new(doublenickel.enums.InputContext.Game, doublenickel.enums.CoordinateSystem.World)
 
   self.hotkeys = {
     deselect = glfw.keys.ESCAPE,
@@ -33,9 +33,9 @@ function EntitySelection:update()
 end
 
 function EntitySelection:delete()
-  if not self.state == tdengine.enums.EntitySelection.Some then return end
+  if not self.state == doublenickel.enums.EntitySelection.Some then return end
 
-  tdengine.entity.destroy(self.selection.id)
+  doublenickel.entity.destroy(self.selection.id)
   self:deselect()
 end
 
@@ -47,12 +47,12 @@ function EntitySelection:select_collider(collider)
   if not collider then return self:deselect() end
 
   self.selection = collider:get_entity()
-  self.state = tdengine.enums.EntitySelection.Some
+  self.state = doublenickel.enums.EntitySelection.Some
 end
 
 function EntitySelection:deselect()
   self.selection = nil
-  self.state = tdengine.enums.EntitySelection.None
+  self.state = doublenickel.enums.EntitySelection.None
 end
 
 function EntitySelection:is_entity_selected(entity)

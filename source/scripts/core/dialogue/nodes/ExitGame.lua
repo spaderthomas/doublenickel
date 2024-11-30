@@ -1,11 +1,11 @@
-local ExitGame = tdengine.node('ExitGame')
+local ExitGame = doublenickel.node('ExitGame')
 
 function ExitGame:init()
 end
 
 function ExitGame:enter(graph)
-  if tdengine.is_packaged_build then
-    tdengine.ffi.set_exit_game()
+  if doublenickel.is_packaged_build then
+    doublenickel.ffi.set_exit_game()
   end
   return dialogue_state.processing
 end

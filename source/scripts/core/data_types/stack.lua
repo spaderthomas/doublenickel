@@ -1,5 +1,5 @@
-local Stack = tdengine.class.define('Stack')
-tdengine.data_types.stack = Stack
+local Stack = doublenickel.class.define('Stack')
+doublenickel.data_types.stack = Stack
 
 function Stack:init()
   self.stack = {}

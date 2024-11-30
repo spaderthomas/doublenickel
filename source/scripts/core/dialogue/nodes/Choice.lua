@@ -1,4 +1,4 @@
-local Choice = tdengine.node('Choice')
+local Choice = doublenickel.node('Choice')
 
 Choice.editor_fields = {
   'text',
@@ -24,12 +24,12 @@ function Choice:init()
   self.mute = false
 
   self.unlock = {}
-  self.unlock.combinator = tdengine.branch_combinators.op_and
+  self.unlock.combinator = doublenickel.branch_combinators.op_and
   self.unlock.branches = {}
 
   self.input = ContextualInput:new()
 
-  self.history = tdengine.dialogue.history
+  self.history = doublenickel.dialogue.history
 end
 
 ----------------
@@ -74,7 +74,7 @@ function Choice:short_text()
 end
 
 function Choice:get_combinator()
-  return tdengine.branch_combinators.op_and
+  return doublenickel.branch_combinators.op_and
 end
 
 function Choice:has_unlock_condition()

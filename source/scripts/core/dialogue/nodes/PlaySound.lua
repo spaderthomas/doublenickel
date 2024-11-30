@@ -1,4 +1,4 @@
-local PlaySound = tdengine.node('PlaySound')
+local PlaySound = doublenickel.node('PlaySound')
 
 PlaySound.editor_fields = {
   'sound',
@@ -11,8 +11,8 @@ function PlaySound:init()
 end
 
 function PlaySound:enter(graph)
-  self.handle = tdengine.audio.play(self.sound)
-  tdengine.audio.set_volume(self.handle, self.volume)
+  self.handle = doublenickel.audio.play(self.sound)
+  doublenickel.audio.set_volume(self.handle, self.volume)
 
   return dialogue_state.advancing
 end

@@ -1367,7 +1367,7 @@ typedef enum {
 ffi = require('ffi')
 bit = require('bit')
 
--- function tdengine.handle_error(message)
+-- function doublenickel.handle_error(message)
 --   -- Strip the message's filename the script filename to make it more readable
 --   local parts = split(message, ' ')
 --   local path = parts[1]
@@ -1385,7 +1385,7 @@ bit = require('bit')
 
 --   -- The stack trace contains absolute paths, which are just hard to read. Also, if the path is long, it is
 --   -- shortened with "...". Remove the absolute part of the path, including the "..."
---   local install_dir = tdengine.ffi.dn_paths_resolve('install'):to_interned()
+--   local install_dir = doublenickel.ffi.dn_paths_resolve('install'):to_interned()
 --   local escaped_install = install_dir:gsub('%.', '%%.')
 --   local last_path_element = install_dir:match("([^/]+)$")
 --   local pattern = '%.%.%.(.*)/' .. last_path_element
@@ -1401,26 +1401,26 @@ bit = require('bit')
 --   local error_message = string.format('lua runtime error:\n\t%s', message)
 --   local trace_message = string.format('stack trace:\n%s', stack_trace)
 
---   tdengine.debug.last_error = error_message
---   tdengine.debug.last_trace = trace_message
+--   doublenickel.debug.last_error = error_message
+--   doublenickel.debug.last_trace = trace_message
 
---   tdengine.dn_log(error_message)
---   tdengine.dn_log(trace_message)
+--   doublenickel.dn_log(error_message)
+--   doublenickel.dn_log(trace_message)
 
---   tdengine.debug.open_debugger(1)
---   --tdengine.analytics.submit_crash(error_message, trace_message)
+--   doublenickel.debug.open_debugger(1)
+--   --doublenickel.analytics.submit_crash(error_message, trace_message)
 
 --   return
 -- end
 
-function tdengine.handle_error()
+function doublenickel.handle_error()
   local stack_trace = debug.traceback()
   stack_trace = stack_trace:gsub('stack traceback:\n', '')
   stack_trace = stack_trace:gsub('\t', '  ')
 
   -- The stack trace contains absolute paths, which are just hard to read. Also, if the path is long, it is
   -- shortened with "...". Remove the absolute part of the path, including the "..."
-  local install_dir = tdengine.ffi.dn_paths_resolve('install'):to_interned()
+  local install_dir = doublenickel.ffi.dn_paths_resolve('install'):to_interned()
   local escaped_install = install_dir:gsub('%.', '%%.')
   local last_path_element = install_dir:match("([^/]+)$")
   local pattern = '%.%.%.(.*)/' .. last_path_element
@@ -1433,151 +1433,151 @@ function tdengine.handle_error()
   stack_trace = stack_trace:gsub(pattern, '')
 
   local trace_message = string.format('stack trace:\n%s', stack_trace)
-  tdengine.dn_log(trace_message)
+  doublenickel.dn_log(trace_message)
 
-  tdengine.debug.open_debugger(1)
+  doublenickel.debug.open_debugger(1)
 end
 
-function tdengine.init_phase_0()
-  tdengine.types = {}
-  tdengine.class = {}
-  tdengine.lifecycle = {}
+function doublenickel.init_phase_0()
+  doublenickel.types = {}
+  doublenickel.class = {}
+  doublenickel.lifecycle = {}
 
-  tdengine.entity = {}
-  tdengine.entity.entities = {}
-  tdengine.entity.created_entities = {}
-  tdengine.entity.destroyed_entities = {}
-  tdengine.entity.persistent_entities = {}
-  tdengine.entity.types = {}
-  tdengine.entity.next_id = 1
-  tdengine.persistent = {}
+  doublenickel.entity = {}
+  doublenickel.entity.entities = {}
+  doublenickel.entity.created_entities = {}
+  doublenickel.entity.destroyed_entities = {}
+  doublenickel.entity.persistent_entities = {}
+  doublenickel.entity.types = {}
+  doublenickel.entity.next_id = 1
+  doublenickel.persistent = {}
 
-  tdengine.component = {}
-  tdengine.component.types = {}
+  doublenickel.component = {}
+  doublenickel.component.types = {}
 
-  tdengine.internal = {}
-  tdengine.internal.enum_metatable = {}
+  doublenickel.internal = {}
+  doublenickel.internal.enum_metatable = {}
 
-  tdengine.debug = {}
+  doublenickel.debug = {}
 
-  tdengine.constants = {}
-  tdengine.enum = {}
-  tdengine.enums = {}
-  tdengine.enum_data = {}
+  doublenickel.constants = {}
+  doublenickel.enum = {}
+  doublenickel.enums = {}
+  doublenickel.enum_data = {}
 
-  tdengine.editor = {}
-  tdengine.editor.types = {}
-  tdengine.editor.sentinel = '__editor'
+  doublenickel.editor = {}
+  doublenickel.editor.types = {}
+  doublenickel.editor.sentinel = '__editor'
 
-  tdengine.save = {}
+  doublenickel.save = {}
 
-  tdengine.state = {}
-  tdengine.state.data = {}
+  doublenickel.state = {}
+  doublenickel.state.data = {}
 
-  tdengine.path_constants = {}
+  doublenickel.path_constants = {}
 
-  tdengine.quests = {}
+  doublenickel.quests = {}
 
-  tdengine.scene = {}
-  tdengine.scene.save_data = {}
-  tdengine.current_scene = nil
-  tdengine.queued_scene = nil
+  doublenickel.scene = {}
+  doublenickel.scene.save_data = {}
+  doublenickel.current_scene = nil
+  doublenickel.queued_scene = nil
 
-  tdengine.callback = {}
-  tdengine.callback.data = {}
+  doublenickel.callback = {}
+  doublenickel.callback.data = {}
 
-  tdengine.data_types = {}
+  doublenickel.data_types = {}
 
-  tdengine.dialogue = {}
-  tdengine.dialogue.node_type = {}
-  tdengine.dialogue.node_kind = {}
-  tdengine.dialogue.sorted_node_kinds = {}
-  tdengine.dialogue.metrics = {
+  doublenickel.dialogue = {}
+  doublenickel.dialogue.node_type = {}
+  doublenickel.dialogue.node_kind = {}
+  doublenickel.dialogue.sorted_node_kinds = {}
+  doublenickel.dialogue.metrics = {
     words = 0,
     nodes = 0,
     dialogues = {}
   }
-  tdengine.dialogue.cache = {}
-  tdengine.dialogue.characters = {}
+  doublenickel.dialogue.cache = {}
+  doublenickel.dialogue.characters = {}
 
-  tdengine.audio = {}
+  doublenickel.audio = {}
 
-  tdengine.animation = {}
-  tdengine.animation.data = {}
+  doublenickel.animation = {}
+  doublenickel.animation.data = {}
 
-  tdengine.texture = {}
-  tdengine.texture.data = {}
+  doublenickel.texture = {}
+  doublenickel.texture.data = {}
 
-  tdengine.background = {}
-  tdengine.background.data = {}
+  doublenickel.background = {}
+  doublenickel.background.data = {}
 
-  tdengine.input = {}
-  tdengine.input.data = {}
+  doublenickel.input = {}
+  doublenickel.input.data = {}
 
-  tdengine.physics = {}
-  tdengine.physics.requests = {}
-  tdengine.physics.debug = false
+  doublenickel.physics = {}
+  doublenickel.physics.requests = {}
+  doublenickel.physics.debug = false
 
-  tdengine.interaction = {}
-  tdengine.interaction.callbacks = {}
-  tdengine.interaction.check_flag = false
+  doublenickel.interaction = {}
+  doublenickel.interaction.callbacks = {}
+  doublenickel.interaction.check_flag = false
 
-  tdengine.interpolation = {}
+  doublenickel.interpolation = {}
 
-  tdengine.gui = {}
-  tdengine.gui.animation = {}
-  tdengine.gui.scroll = {}
-  tdengine.gui.drag = {}
-  tdengine.gui.menu = {}
+  doublenickel.gui = {}
+  doublenickel.gui.animation = {}
+  doublenickel.gui.scroll = {}
+  doublenickel.gui.drag = {}
+  doublenickel.gui.menu = {}
 
-  tdengine.window = {}
+  doublenickel.window = {}
 
-  tdengine.action = {}
-  tdengine.action.event_kind = {}
+  doublenickel.action = {}
+  doublenickel.action.event_kind = {}
 
-  tdengine.analytics = {}
+  doublenickel.analytics = {}
 
-  tdengine.fonts = {}
+  doublenickel.fonts = {}
 
-  tdengine.module = {}
+  doublenickel.module = {}
 
-  tdengine.paths = {}
+  doublenickel.paths = {}
 
-  tdengine.shaders = {}
+  doublenickel.shaders = {}
 
-  tdengine.gpu = {}
+  doublenickel.gpu = {}
 
-  tdengine.app = {}
+  doublenickel.app = {}
 
-  tdengine.iterator = {}
+  doublenickel.iterator = {}
 
-  tdengine.time_metric = {}
+  doublenickel.time_metric = {}
 
-  tdengine.subsystem = {}
-  tdengine.subsystem.types = {}
+  doublenickel.subsystem = {}
+  doublenickel.subsystem.types = {}
 
-  tdengine.math = {}
+  doublenickel.math = {}
 
-  tdengine.filesystem = {}
+  doublenickel.filesystem = {}
 
-  tdengine.asset = {}
+  doublenickel.asset = {}
 
-  tdengine.draw = {}
-  tdengine.draw.internal = {}
+  doublenickel.draw = {}
+  doublenickel.draw.internal = {}
 
-  tdengine.dt = 0
-  tdengine.elapsed_time = 0
-  tdengine.frame = 0
+  doublenickel.dt = 0
+  doublenickel.elapsed_time = 0
+  doublenickel.frame = 0
 
-  tdengine.tick = tdengine.is_packaged_build
-  tdengine.next_tick = tdengine.tick
+  doublenickel.tick = doublenickel.is_packaged_build
+  doublenickel.next_tick = doublenickel.tick
 
   imgui = {}
   imgui.extensions = {}
   imgui.internal = {}
 
   -- Bootstrap the FFI, so that we can resolve paths
-  tdengine.ffi = {}
+  doublenickel.ffi = {}
   ffi.cdef(ffi_header)
   
   -- Run a sanity check on the compiled size of all types and what the parser inside LuaJIT generates.
@@ -1677,41 +1677,41 @@ function tdengine.init_phase_0()
 
 end
 
-function tdengine.init_phase_1()
-  tdengine.enum.init()
-  tdengine.ffi.init()
-  tdengine.paths.init()
-  tdengine.math.init()
-  tdengine.time_metric.init()
-  tdengine.input.init()
-  tdengine.gpu.init()
-  tdengine.state.init()
-  tdengine.animation.load()
-  tdengine.texture.load()
-  tdengine.background.load()
-  tdengine.dialogue.init()
-  tdengine.audio.init()
-  tdengine.gui.init()
-  tdengine.scene.init()
-  tdengine.asset.init()
+function doublenickel.init_phase_1()
+  doublenickel.enum.init()
+  doublenickel.ffi.init()
+  doublenickel.paths.init()
+  doublenickel.math.init()
+  doublenickel.time_metric.init()
+  doublenickel.input.init()
+  doublenickel.gpu.init()
+  doublenickel.state.init()
+  doublenickel.animation.load()
+  doublenickel.texture.load()
+  doublenickel.background.load()
+  doublenickel.dialogue.init()
+  doublenickel.audio.init()
+  doublenickel.gui.init()
+  doublenickel.scene.init()
+  doublenickel.asset.init()
 end
 
-function tdengine.init_phase_2()
-  tdengine.subsystem.init()
-  tdengine.app = tdengine.subsystem.find('App')
+function doublenickel.init_phase_2()
+  doublenickel.subsystem.init()
+  doublenickel.app = doublenickel.subsystem.find('App')
 
-  tdengine.dn_log('App:on_init_game')
-  tdengine.app:on_init_game()
+  doublenickel.dn_log('App:on_init_game')
+  doublenickel.app:on_init_game()
 
-  tdengine.window.init()
-  tdengine.save.init()
-  tdengine.editor.init()
-  tdengine.persistent.init()
+  doublenickel.window.init()
+  doublenickel.save.init()
+  doublenickel.editor.init()
+  doublenickel.persistent.init()
 
-  tdengine.dn_log('lifecycle.on_start_game')
-  tdengine.lifecycle.run_callback(tdengine.lifecycle.callbacks.on_start_game)
+  doublenickel.dn_log('lifecycle.on_start_game')
+  doublenickel.lifecycle.run_callback(doublenickel.lifecycle.callbacks.on_start_game)
 end
 
-function tdengine.dn_log(...)
+function doublenickel.dn_log(...)
   print(string.format(...))
 end

@@ -1,6 +1,6 @@
-CircleEditor = tdengine.class.define('CircleEditor')
+CircleEditor = doublenickel.class.define('CircleEditor')
 
-CircleEditor.states = tdengine.enum.define(
+CircleEditor.states = doublenickel.enum.define(
 	'CircleEditorStates',
 	{
 		Idle = 0,
@@ -16,14 +16,14 @@ function CircleEditor:init(params)
 	self.editor = params
 	self.state = self.states.Idle
 
-	self.input = ContextualInput:new(tdengine.enums.InputContext.Game, tdengine.enums.CoordinateSystem.World)
+	self.input = ContextualInput:new(doublenickel.enums.InputContext.Game, doublenickel.enums.CoordinateSystem.World)
 
 	-- When you're just moving your mouse across the screen, it's really annoying to have the
 	-- colliders flicker as you move over the resize band. This just adds a slight delay where
 	-- if you're not hovered over the band for at least min_resize_hover_time, then it will
 	-- not draw the resize widget
 	self.resize = {
-		click_position = tdengine.vec2(),
+		click_position = doublenickel.vec2(),
 		min_hover_time = 0.075,
 		hover_time = 0,
 		select_epsilon = 8,
@@ -31,9 +31,9 @@ function CircleEditor:init(params)
 		new_radius = 0,
 		collider = nil,
 		interpolation = {
-			size = tdengine.interpolation.EaseOut:new({ time = 1, exponent = 3 }),
-			preview_alpha = tdengine.interpolation.EaseOut:new({ time = 1, exponent = 3 }),
-			hover = tdengine.interpolation.EaseInOut:new({ time = .5, exponent = 3 }),
+			size = doublenickel.interpolation.EaseOut:new({ time = 1, exponent = 3 }),
+			preview_alpha = doublenickel.interpolation.EaseOut:new({ time = 1, exponent = 3 }),
+			hover = doublenickel.interpolation.EaseInOut:new({ time = .5, exponent = 3 }),
 		},
 		preview_alpha = .25,
 		hover_alpha = .5
@@ -57,7 +57,7 @@ function CircleEditor:update()
 			return
 		end
 
-		self.resize.hover_time = self.resize.hover_time + tdengine.dt
+		self.resize.hover_time = self.resize.hover_time + doublenickel.dt
 		if self.resize.hover_time >= self.resize.min_hover_time then
 			self.resize.interpolation.hover:set_start(0)
 			self.resize.interpolation.hover:set_target(.5)
@@ -144,23 +144,23 @@ end
 function CircleEditor:draw_resize_hover()
 	local circle = self.resize.collider.impl
 
-	-- tdengine.ffi.set_world_space(true)
-	-- tdengine.ffi.set_layer(tdengine.editor.layers.collider_overlay)
-	-- tdengine.ffi.draw_ring_sdf(circle.position.x, circle.position.y, circle.radius, circle.radius + self.resize.select_epsilon, tdengine.colors.spring_green:alpha(self.resize.hover_alpha):to_vec4(), 1)
+	-- doublenickel.ffi.set_world_space(true)
+	-- doublenickel.ffi.set_layer(doublenickel.editor.layers.collider_overlay)
+	-- doublenickel.ffi.draw_ring_sdf(circle.position.x, circle.position.y, circle.radius, circle.radius + self.resize.select_epsilon, doublenickel.colors.spring_green:alpha(self.resize.hover_alpha):to_vec4(), 1)
 end
 
 function CircleEditor:draw_resize_preview()
 	local circle = self.resize.collider.impl
 
-	-- tdengine.ffi.set_world_space(true)
-	-- tdengine.ffi.set_layer(tdengine.editor.layers.collider_overlay)
-	-- tdengine.ffi.draw_circle_sdf(circle.position.x, circle.position.y, self.resize.new_radius, tdengine.colors.spring_green:alpha(self.resize.preview_alpha):to_vec4(), 1)
+	-- doublenickel.ffi.set_world_space(true)
+	-- doublenickel.ffi.set_layer(doublenickel.editor.layers.collider_overlay)
+	-- doublenickel.ffi.draw_circle_sdf(circle.position.x, circle.position.y, self.resize.new_radius, doublenickel.colors.spring_green:alpha(self.resize.preview_alpha):to_vec4(), 1)
 end
 
 function CircleEditor:iterate_colliders()
 	local function iterator()
-		for collider in tdengine.component.iterate('Collider') do
-			if collider.shape == tdengine.enums.ColliderShape.Circle then
+		for collider in doublenickel.component.iterate('Collider') do
+			if collider.shape == doublenickel.enums.ColliderShape.Circle then
 				coroutine.yield(collider)
 			end
 		end
@@ -203,9 +203,9 @@ end
 ---------
 -- BOX --
 ---------
-BoxEditor = tdengine.class.define('BoxEditor')
+BoxEditor = doublenickel.class.define('BoxEditor')
 
-BoxEditor.states = tdengine.enum.define(
+BoxEditor.states = doublenickel.enum.define(
 	'BoxEditorState',
 	{
 		Idle = 0,
@@ -219,24 +219,24 @@ BoxEditor.states = tdengine.enum.define(
 
 function BoxEditor:init(params)
 	self.state = self.states.Idle
-	self.input = ContextualInput:new(tdengine.enums.InputContext.Game, tdengine.enums.CoordinateSystem.World)
+	self.input = ContextualInput:new(doublenickel.enums.InputContext.Game, doublenickel.enums.CoordinateSystem.World)
 
 	self.resize = {
-		size_delta = tdengine.vec2(),
-		new_size = tdengine.vec2(),
+		size_delta = doublenickel.vec2(),
+		new_size = doublenickel.vec2(),
 		corner_radius = 4,
 		collider = nil,
-		corner = tdengine.vec2(),
+		corner = doublenickel.vec2(),
 		corners = {},
-		click_position = tdengine.vec2(),
+		click_position = doublenickel.vec2(),
 		hover_alpha = 0.5,
 		hover_time = 0,
 		min_hover_time = .1,
 		preview_alpha = 0.5,
 		interpolation = {
-			size = tdengine.interpolation.EaseOut2:new({ time = 1, exponent = 3 }),
-			preview_alpha = tdengine.interpolation.EaseOut:new({ time = 1, exponent = 3 }),
-			hover = tdengine.interpolation.EaseOut:new({ time = .5, exponent = 3 }),
+			size = doublenickel.interpolation.EaseOut2:new({ time = 1, exponent = 3 }),
+			preview_alpha = doublenickel.interpolation.EaseOut:new({ time = 1, exponent = 3 }),
+			hover = doublenickel.interpolation.EaseOut:new({ time = .5, exponent = 3 }),
 		},
 	}
 end
@@ -292,7 +292,7 @@ function BoxEditor:update()
 			return
 		end
 
-		self.resize.hover_time = self.resize.hover_time + tdengine.dt
+		self.resize.hover_time = self.resize.hover_time + doublenickel.dt
 		if self.resize.hover_time >= self.resize.min_hover_time then
 			self:interpolate_alpha_to(.5)
 			self.state = self.states.ResizeHover
@@ -365,8 +365,8 @@ end
 
 function BoxEditor:iterate_colliders()
 	local iterator = function()
-		for collider in tdengine.component.iterate('Collider') do
-			if collider.shape == tdengine.enums.ColliderShape.Box then
+		for collider in doublenickel.component.iterate('Collider') do
+			if collider.shape == doublenickel.enums.ColliderShape.Box then
 				coroutine.yield(collider)
 			end
 		end
@@ -378,20 +378,20 @@ end
 function BoxEditor:draw_resize_preview()
 	local preview_alpha = self.resize.interpolation.preview_alpha:get_value()
 
-	-- tdengine.ffi.set_world_space(true)
-	-- tdengine.ffi.set_layer(tdengine.editor.layers.collider_overlay)
+	-- doublenickel.ffi.set_world_space(true)
+	-- doublenickel.ffi.set_layer(doublenickel.editor.layers.collider_overlay)
 
 	-- local p = self.resize.collider:get_position()
-	-- tdengine.ffi.draw_quad(p.x, p.y, self.resize.new_size.x, self.resize.new_size.y, tdengine.colors.spring_green:alpha(preview_alpha):to_vec4())
+	-- doublenickel.ffi.draw_quad(p.x, p.y, self.resize.new_size.x, self.resize.new_size.y, doublenickel.colors.spring_green:alpha(preview_alpha):to_vec4())
 end
 
 function BoxEditor:draw_corners()
 	local hover_alpha = self.resize.interpolation.hover:get_value()
 
-	-- tdengine.ffi.set_world_space(true)
-	-- tdengine.ffi.set_layer(tdengine.editor.layers.collider_overlay)
+	-- doublenickel.ffi.set_world_space(true)
+	-- doublenickel.ffi.set_layer(doublenickel.editor.layers.collider_overlay)
 	-- for _, corner in pairs(self.resize.corners) do
-		-- tdengine.ffi.draw_circle_sdf(corner.x, corner.y, self.resize.corner_radius, tdengine.colors.spring_green:alpha(hover_alpha):to_vec4(), 1)
+		-- doublenickel.ffi.draw_circle_sdf(corner.x, corner.y, self.resize.corner_radius, doublenickel.colors.spring_green:alpha(hover_alpha):to_vec4(), 1)
 	-- end
 end
 
@@ -419,8 +419,8 @@ end
 function BoxEditor:try_consume()
 	if self:check_for_hovered_corner() then
 		self.resize.click_position = self.input:mouse()
-		self.resize.size_delta = tdengine.vec2()
-		self.resize.new_size = tdengine.vec2()
+		self.resize.size_delta = doublenickel.vec2()
+		self.resize.new_size = doublenickel.vec2()
 		self:interpolate_preview_alpha_to(.25)
 
 		self.resize.interpolation.hover:set_start(0)
@@ -444,9 +444,9 @@ end
 
 
 
-CapsuleEditor = tdengine.class.define('CapsuleEditor')
+CapsuleEditor = doublenickel.class.define('CapsuleEditor')
 
-CapsuleEditor.States = tdengine.enum.define(
+CapsuleEditor.States = doublenickel.enum.define(
 	'CapsuleEditorState',
 	{
 		Idle = 0
@@ -455,13 +455,13 @@ CapsuleEditor.States = tdengine.enum.define(
 
 function CapsuleEditor:init()
 	self.state = self.states.Idle
-	self.input = ContextualInput:new(tdengine.enums.InputContext.Game, tdengine.enums.CoordinateSystem.World)
+	self.input = ContextualInput:new(doublenickel.enums.InputContext.Game, doublenickel.enums.CoordinateSystem.World)
 end
 
 function CapsuleEditor:iterate_colliders()
 	local iterator = function()
-		for collider in tdengine.component.iterate('Collider') do
-			if collider.shape == tdengine.enums.ColliderShape.Capsule then
+		for collider in doublenickel.component.iterate('Collider') do
+			if collider.shape == doublenickel.enums.ColliderShape.Capsule then
 				coroutine.yield(collider)
 			end
 		end
@@ -474,9 +474,9 @@ end
 --
 -- COLLIDER EDITOR
 --
-local ColliderEditor = tdengine.editor.define('ColliderEditor')
+local ColliderEditor = doublenickel.editor.define('ColliderEditor')
 
-ColliderEditor.states = tdengine.enum.define(
+ColliderEditor.states = doublenickel.enum.define(
 	'ColliderEditorState',
 	{
 		Idle = 0,
@@ -492,19 +492,19 @@ function ColliderEditor:init()
 
 	self.style = {
 		dark = {
-			selected = tdengine.colors.paynes_gray:alpha(0.5),
-			hovered = tdengine.colors.paynes_gray:alpha(0.5),
-			idle = tdengine.colors.cadet_gray:alpha(0.5),
+			selected = doublenickel.colors.paynes_gray:alpha(0.5),
+			hovered = doublenickel.colors.paynes_gray:alpha(0.5),
+			idle = doublenickel.colors.cadet_gray:alpha(0.5),
 		},
 		light = {
-			selected = tdengine.colors.spring_green:alpha(0.5),
-			hovered = tdengine.colors.spring_green:alpha(0.5),
-			idle = tdengine.colors.white:alpha(0.5),
+			selected = doublenickel.colors.spring_green:alpha(0.5),
+			hovered = doublenickel.colors.spring_green:alpha(0.5),
+			idle = doublenickel.colors.white:alpha(0.5),
 		}
 	}
 
 	self.metadata = {}
-	self.input = ContextualInput:new(tdengine.enums.InputContext.Game, tdengine.enums.CoordinateSystem.World)
+	self.input = ContextualInput:new(doublenickel.enums.InputContext.Game, doublenickel.enums.CoordinateSystem.World)
 	self.drag_state = {}
 
 	self.shape_editors = {
@@ -539,10 +539,10 @@ end
 
 
 function ColliderEditor:draw()
-	-- tdengine.ffi.set_world_space(true)
-	-- tdengine.ffi.set_layer(tdengine.editor.layers.colliders)
+	-- doublenickel.ffi.set_world_space(true)
+	-- doublenickel.ffi.set_layer(doublenickel.editor.layers.colliders)
 
-	-- for collider in tdengine.component.iterate('Collider') do
+	-- for collider in doublenickel.component.iterate('Collider') do
 		-- local color = self:on_color(collider)
 		-- collider:show(color)
 	-- end
@@ -556,7 +556,7 @@ end
 
 
 function ColliderEditor:rebuild_metadata()
-	local colliders = tdengine.component.collect('Collider')
+	local colliders = doublenickel.component.collect('Collider')
 
 	local live_colliders = {}
 	for _, collider in colliders:iterate() do
@@ -580,14 +580,14 @@ function ColliderEditor:rebuild_metadata()
 
 	-- Update for every collider
 	local mouse = self.input:mouse()
-	for collider in tdengine.component.iterate('Collider') do
+	for collider in doublenickel.component.iterate('Collider') do
 		self.metadata[collider.id].hovered = collider:is_point_inside(mouse)
 	end
 end
 
 function ColliderEditor:find_hits(position)
-	local hits = tdengine.data_types.Array:new()
-	for collider in tdengine.component.iterate('Collider') do
+	local hits = doublenickel.data_types.Array:new()
+	for collider in doublenickel.component.iterate('Collider') do
 		if collider:is_point_inside(position) then
 			hits:add(collider)
 		end
@@ -604,7 +604,7 @@ function ColliderEditor:on_color(collider)
 		colors = self.style.light
 	end
 
-	if tdengine.find_entity_editor('EntitySelection'):is_collider_selected(collider) then
+	if doublenickel.find_entity_editor('EntitySelection'):is_collider_selected(collider) then
 		return colors.selected
 	elseif metadata.hovered then
 		return colors.hovered
@@ -628,7 +628,7 @@ function ColliderEditor:try_consume()
 	local hits = self:find_hits(mouse)
 	if not hits:is_empty() then
 		self.drag_state.collider = hits:back()
-		tdengine.find_entity_editor('EntitySelection'):select_collider(hits:back())
+		doublenickel.find_entity_editor('EntitySelection'):select_collider(hits:back())
 
 		self.state = self.states.DragCollider
 		return true

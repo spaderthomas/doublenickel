@@ -5,7 +5,7 @@ local state = {
 	choosing_scene = 'choosing_scene'
 }
 
-local MainMenu = tdengine.editor.define('MainMenu')
+local MainMenu = doublenickel.editor.define('MainMenu')
 
 function MainMenu:init(params)
 	self.open_save_layout_modal = false
@@ -13,7 +13,7 @@ function MainMenu:init(params)
 	self.open_save_dialogue_modal = false
 	self.state = state.idle
 
-	self.size = tdengine.vec2(6, 6)
+	self.size = doublenickel.vec2(6, 6)
 
 	self.ids = {
 		save_layout = '##ded:save_layout',
@@ -27,7 +27,7 @@ function MainMenu:init(params)
 	self.saved_layout_name = ''
 	self.saved_dialogue_name = ''
 
-	self.input = ContextualInput:new(tdengine.enums.InputContext.Editor, tdengine.enums.CoordinateSystem.Game)
+	self.input = ContextualInput:new(doublenickel.enums.InputContext.Editor, doublenickel.enums.CoordinateSystem.Game)
 end
 
 function MainMenu:update(dt)
@@ -38,7 +38,7 @@ function MainMenu:update(dt)
 		self:Dialogue()
 		self:Scene()
 
-		tdengine.lifecycle.run_callback(tdengine.lifecycle.callbacks.on_main_menu)
+		doublenickel.lifecycle.run_callback(doublenickel.lifecycle.callbacks.on_main_menu)
 		
 		imgui.EndMainMenuBar()
 	end
@@ -51,22 +51,22 @@ end
 function MainMenu:update_state()
 	if self.state == state.choosing_dialogue then
 		if imgui.file_browser_is_file_selected() then
-			local dialogue_editor = tdengine.find_entity_editor('DialogueEditor')
+			local dialogue_editor = doublenickel.find_entity_editor('DialogueEditor')
 			dialogue_editor:load(imgui.file_browser_get_selected_file())
 			self.state = state.idle
 		end
 	elseif self.state == state.choosing_state then
 		if imgui.file_browser_is_file_selected() then
-			tdengine.load_save_by_path(imgui.file_browser_get_selected_file())
+			doublenickel.load_save_by_path(imgui.file_browser_get_selected_file())
 			self.state = state.idle
 		end
 	elseif self.state == state.choosing_scene then
 		if imgui.file_browser_is_file_selected() then
 			local path = imgui.file_browser_get_selected_file()
-			local scene = tdengine.extract_filename(path)
-			scene = tdengine.strip_extension(scene)
+			local scene = doublenickel.extract_filename(path)
+			scene = doublenickel.strip_extension(scene)
 
-			local scene_editor = tdengine.find_entity_editor('SceneEditor')
+			local scene_editor = doublenickel.find_entity_editor('SceneEditor')
 			scene_editor:load(scene)
 
 			self.state = state.idle
@@ -93,7 +93,7 @@ function MainMenu:show_modals(dt)
 		imgui.Dummy(5, 5)
 
 		if imgui.Button('Save') then
-			tdengine.ffi.dn_imgui_save_layout(self.saved_layout_name)
+			doublenickel.ffi.dn_imgui_save_layout(self.saved_layout_name)
 			self.saved_layout_name = ''
 			imgui.CloseCurrentPopup()
 		end
@@ -120,7 +120,7 @@ function MainMenu:show_modals(dt)
 		imgui.Dummy(5, 5)
 
 		if imgui.Button('Save') then
-			local dialogue_editor = tdengine.find_entity_editor('DialogueEditor')
+			local dialogue_editor = doublenickel.find_entity_editor('DialogueEditor')
 			local success = dialogue_editor:save(self.saved_dialogue_name)
 
 			if success then
@@ -148,8 +148,8 @@ function MainMenu:show_modals(dt)
 		imgui.OpenPopup('New Dialogue')
 	end
 
-	local size = tdengine.vec2(250, 100)
-	tdengine.editor.center_next_window(size)
+	local size = doublenickel.vec2(250, 100)
+	doublenickel.editor.center_next_window(size)
 	imgui.SetNextWindowSize(size.x, size.y)
 	if imgui.BeginPopupModal('New Dialogue') then
 		imgui.Text('Name')
@@ -159,7 +159,7 @@ function MainMenu:show_modals(dt)
 		imgui.Dummy(5, 5)
 
 		if imgui.Button('Save') then
-			local dialogue_editor = tdengine.find_entity_editor('DialogueEditor')
+			local dialogue_editor = doublenickel.find_entity_editor('DialogueEditor')
 			dialogue_editor:new(self.saved_dialogue_name)
 
 			-- Clean up
@@ -189,9 +189,9 @@ function MainMenu:Dialogue()
 		end
 
 		-- The hotkey entity in the editor takes care of the hotkey part
-		local dialogue_editor = tdengine.find_entity_editor('DialogueEditor')
+		local dialogue_editor = doublenickel.find_entity_editor('DialogueEditor')
 		if imgui.MenuItem('Open', 'Ctrl+O') then
-			local directory = tdengine.ffi.dn_paths_resolve('dialogues'):to_interned()
+			local directory = doublenickel.ffi.dn_paths_resolve('dialogues'):to_interned()
 			imgui.file_browser_set_work_dir(directory)
 			imgui.file_browser_open()
 			self.state = state.choosing_dialogue
@@ -219,14 +219,14 @@ function MainMenu:Dialogue()
 			end
 
 			if imgui.MenuItem('Update Metrics') then
-				tdengine.dialogue.update_all_metrics()
+				doublenickel.dialogue.update_all_metrics()
 			end
 			imgui.EndMenu()
 		end
 
 		if imgui.BeginMenu('State') then
 			if imgui.MenuItem('Reset') then
-				tdengine.state.load_file('default')
+				doublenickel.state.load_file('default')
 			end
 
 			imgui.EndMenu() -- Tools
@@ -240,12 +240,12 @@ function MainMenu:Window()
 	if imgui.BeginMenu('Window') then
 		if imgui.BeginMenu('Layout') then
 			if imgui.BeginMenu('Open') then
-				local layout_dir = tdengine.ffi.dn_paths_resolve('layouts'):to_interned()
-				for entry in tdengine.filesystem.iterate_directory(layout_dir) do
+				local layout_dir = doublenickel.ffi.dn_paths_resolve('layouts'):to_interned()
+				for entry in doublenickel.filesystem.iterate_directory(layout_dir) do
 					local layout = entry.file_path:to_interned()
-					if imgui.MenuItem(tdengine.strip_extension(layout)) then
-						local file_name = tdengine.strip_extension(layout)
-						tdengine.ffi.dn_imgui_load_layout(file_name)
+					if imgui.MenuItem(doublenickel.strip_extension(layout)) then
+						local file_name = doublenickel.strip_extension(layout)
+						doublenickel.ffi.dn_imgui_load_layout(file_name)
 					end
 				end
 
@@ -260,7 +260,7 @@ function MainMenu:Window()
 		end
 
 		if imgui.MenuItem('Reinit Editor') then
-			tdengine.editor.init()
+			doublenickel.editor.init()
 		end
 
 		imgui.EndMenu() -- Layout
@@ -279,26 +279,26 @@ end
 function MainMenu:AssetCreate()
 	if imgui.BeginMenu('Create') then
 		if imgui.MenuItem('Animation') then
-			local editor = tdengine.find_entity_editor('AnimationEditor')
+			local editor = doublenickel.find_entity_editor('AnimationEditor')
 			editor:create('New Animation')
 			editor:edit('New Animation')
 			editor.popups:open_popup(editor.popup_kind.edit)
 		end
 
 		if imgui.MenuItem('Background') then
-			local editor = tdengine.find_entity_editor('BackgroundEditor')
+			local editor = doublenickel.find_entity_editor('BackgroundEditor')
 			editor:create()
 			editor.popups:open_popup(editor.popup_kind.edit)
 		end
 
 		if imgui.MenuItem('Character') then
-			local editor = tdengine.find_entity_editor('CharacterEditor')
+			local editor = doublenickel.find_entity_editor('CharacterEditor')
 			editor:setup_create_character()
 			editor.popups:open_popup(editor.popup_kind.edit)
 		end
 
 		if imgui.MenuItem('Texture Atlas') then
-			local editor = tdengine.find_entity_editor('TextureAtlasEditor')
+			local editor = doublenickel.find_entity_editor('TextureAtlasEditor')
 			editor:create()
 			editor.popups:open_popup(editor.popup_kind.edit)
 		end
@@ -313,14 +313,14 @@ function MainMenu:AssetEdit()
 		-- Animation
 		if imgui.BeginMenu('Animation') then
 			local animations = {}
-			for name, _ in pairs(tdengine.animation.data) do
+			for name, _ in pairs(doublenickel.animation.data) do
 				table.insert(animations, name)
 			end
 			table.sort(animations)
 
 			for index, name in pairs(animations) do
 				if imgui.MenuItem(name) then
-					local editor = tdengine.find_entity_editor('AnimationEditor')
+					local editor = doublenickel.find_entity_editor('AnimationEditor')
 					editor:edit(name)
 					editor.popups:open_popup(editor.popup_kind.edit)
 				end
@@ -332,14 +332,14 @@ function MainMenu:AssetEdit()
 		-- Background
 		if imgui.BeginMenu('Background') then
 			local backgrounds = {}
-			for name, _ in pairs(tdengine.background.data) do
+			for name, _ in pairs(doublenickel.background.data) do
 				table.insert(backgrounds, name)
 			end
 			table.sort(backgrounds)
 
 			for index, name in pairs(backgrounds) do
 				if imgui.MenuItem(name) then
-					local editor = tdengine.find_entity_editor('BackgroundEditor')
+					local editor = doublenickel.find_entity_editor('BackgroundEditor')
 					editor:edit(name)
 					editor.popups:open_popup(editor.popup_kind.edit)
 				end
@@ -351,14 +351,14 @@ function MainMenu:AssetEdit()
 		-- Character
 		if imgui.BeginMenu('Character') then
 			local characters = {}
-			for name, _ in pairs(tdengine.dialogue.characters) do
+			for name, _ in pairs(doublenickel.dialogue.characters) do
 				table.insert(characters, name)
 			end
 			table.sort(characters)
 
 			for index, character in pairs(characters) do
 				if imgui.MenuItem(character) then
-					local editor = tdengine.find_entity_editor('CharacterEditor')
+					local editor = doublenickel.find_entity_editor('CharacterEditor')
 					editor:edit_character(character)
 				end
 			end
@@ -368,14 +368,14 @@ function MainMenu:AssetEdit()
 
 		if imgui.BeginMenu('Texture Atlas') then
 			local atlases = {}
-			for name, _ in pairs(tdengine.texture.data.atlases) do
+			for name, _ in pairs(doublenickel.texture.data.atlases) do
 				table.insert(atlases, name)
 			end
 			table.sort(atlases)
 
 			for index, name in pairs(atlases) do
 				if imgui.MenuItem(name) then
-					local editor = tdengine.find_entity_editor('TextureAtlasEditor')
+					local editor = doublenickel.find_entity_editor('TextureAtlasEditor')
 					editor:edit(name)
 					editor.popups:open_popup(editor.popup_kind.edit)
 				end
@@ -391,15 +391,15 @@ end
 function MainMenu:AssetReload()
 	if imgui.BeginMenu('Reload') then
 		if imgui.MenuItem('Animations') then
-			tdengine.animation.load()
+			doublenickel.animation.load()
 		end
 
 		if imgui.MenuItem('Characters') then
-			tdengine.load_characters()
+			doublenickel.load_characters()
 		end
 
 		if imgui.MenuItem('Actions') then
-			tdengine.action.init()
+			doublenickel.action.init()
 		end
 		imgui.EndMenu()
 	end
@@ -407,11 +407,11 @@ end
 
 function MainMenu:Scene()
 	if imgui.BeginMenu('Scene') then
-		local collider_editor = tdengine.find_entity_editor('ColliderEditor').collider_editor
-		local scene_editor = tdengine.find_entity_editor('SceneEditor')
+		local collider_editor = doublenickel.find_entity_editor('ColliderEditor').collider_editor
+		local scene_editor = doublenickel.find_entity_editor('SceneEditor')
 
 		if imgui.BeginMenu('Open') then
-			local scenes = tdengine.filesystem.collect_named_directory('scenes')
+			local scenes = doublenickel.filesystem.collect_named_directory('scenes')
 			for index, name in pairs(scenes) do
 				scenes[index] = string.gsub(name, '.lua', '')
 			end
@@ -429,20 +429,20 @@ function MainMenu:Scene()
 			scene_editor:save()
 		end
 
-		if imgui.MenuItem('Play', 'F5', tdengine.tick) then
+		if imgui.MenuItem('Play', 'F5', doublenickel.tick) then
 			scene_editor:toggle_play_mode()
 		end
 
-		if imgui.MenuItem('Step Mode', 'F1', tdengine.step) then
-			tdengine.step = not tdengine.step
+		if imgui.MenuItem('Step Mode', 'F1', doublenickel.step) then
+			doublenickel.step = not doublenickel.step
 		end
 
 		if imgui.BeginMenu('Persistent Entities') then
 			if imgui.MenuItem('Save') then
-				tdengine.persistent.write()
+				doublenickel.persistent.write()
 			end
 			if imgui.MenuItem('Reload') then
-				tdengine.persistent.init()
+				doublenickel.persistent.init()
 			end
 			imgui.EndMenu()
 		end

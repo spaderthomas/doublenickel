@@ -1,4 +1,4 @@
-ForegroundProp = tdengine.entity.define('ForegroundProp')
+ForegroundProp = doublenickel.entity.define('ForegroundProp')
 
 ForegroundProp.components = {
   'Animation',
