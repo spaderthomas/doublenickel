@@ -32,6 +32,7 @@ DN_IMP char*       dn_string_copy_u8(const u8* str, u32 length, dn_allocator_t* 
 DN_API void        dn_string_copy(const char* str, char* buffer, u32 buffer_length);
 DN_API void        dn_string_copy_n(const char* str, u32 length, char* buffer, u32 buffer_length);
 DN_API char*       dn_string_to_cstr(dn_string_t str, dn_allocator_t* allocator);
+DN_API bool        dn_string_equal(dn_string_t a, dn_string_t b);
 #endif
 
 
@@ -64,8 +65,13 @@ void dn_string_copy(const char* str, char* buffer, u32 buffer_length) {
 }
 
 char* dn_string_to_cstr(dn_string_t str, dn_allocator_t* allocator) {
-  DN_UNTESTED();
-  return nullptr;
+  return dn_string_copy((char*)str.data, str.len, allocator);
+}
+
+bool dn_string_equal(dn_string_t a, dn_string_t b) {
+  if (a.len != b.len) return false;
+
+  return dn_os_is_memory_equal(a.data, b.data, a.len);
 }
 
 void dn_string_copy_n(const char* str, u32 length, char* buffer, u32 buffer_length) {

@@ -74,8 +74,4 @@ void main() {
 	else {
 		color = sdf_primitive(world, context);
 	}
-
-	// color = make_red(native_resolution.x / 320.0);
-	// color = make_red(.5);
-	// DBG_FLOAT(_master_time);
 }

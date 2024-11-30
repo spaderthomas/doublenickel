@@ -34,7 +34,7 @@ struct dn_gen_arena_t {
 	};
 
 	struct Iterator {
-		dn_gen_arena_t arena;
+		dn_gen_arena_t* arena;
 		u32 index;
 
 		Iterator& operator++() {

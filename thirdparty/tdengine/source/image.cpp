@@ -93,7 +93,7 @@ void TextureAtlas::calc_hash_and_mod_time() {
         files_hash = files_hash ^ file_name_hash;
 
         // 2: We check modtime for files that exist
-        auto this_file_mod_time = file_mod_time(file_path.c_str());
+        auto this_file_mod_time = dn_os_file_mod_time(file_path.c_str());
         if (this_file_mod_time > mod_time) {
           mod_time = this_file_mod_time;
         }
@@ -222,7 +222,7 @@ void TextureAtlas::build_from_source() {
       if (it->is_directory()) {
         add_directory(path.c_str());
       } else {
-        if (!is_png(path)) continue;
+        if (!dn_path_is_extension(path, dn_string_literal(".png"))) return;
         auto file_name = it->path().filename().string();
 
         auto sprite = find_sprite_no_default(file_name.c_str());
@@ -643,7 +643,7 @@ void init_screenshots() {
   for (directory_iterator it(screenshots); it != directory_iterator(); ++it) {
     auto path = it->path().string();
     dn_path_normalize_std(path);
-    if (!is_png(path)) continue;
+    if (!dn_path_is_extension(path, dn_string_literal(".png"))) continue;
 
     // Load the data
     i32 width;

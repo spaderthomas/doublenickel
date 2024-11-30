@@ -34,7 +34,6 @@
 #include "source/background.hpp"
 #include "source/fluid.hpp"
 #include "source/text.hpp"
-#include "source/draw.hpp"
 #include "source/audio.hpp"
 #include "source/action.hpp"
 #include "source/particle.hpp"
@@ -101,6 +100,8 @@
 #include "source/dn_steam.hpp"
 #define DN_STRING_IMPLEMENTATION
 #include "source/string.hpp"
+#define DN_TEST_IMPLEMENTATION
+#include "source/test.hpp"
 #define DN_TIME_METRICS_IMPLEMENTATION
 #include "source/time_metrics.hpp"
 #define DN_WINDOW_IMPLEMENTATION
@@ -108,7 +109,6 @@
 
 
 #include "source/text.cpp"
-#include "source/draw.cpp"
 #include "source/background.cpp" // INVERT (I need something to load large images though, in general)
 #include "source/image.cpp" // HALF (Screenshots should be reworked, probably? I'm referencing a named path when I initialize)
 #include "source/fluid.cpp" // GAME
@@ -120,6 +120,7 @@
 int dn_main(dn_app_descriptor_t app) {
   dn_allocators_init();
   dn_random_init();
+  dn_test_init();
   dn_app_init(app);
   init_paths();
   dn_log_init();

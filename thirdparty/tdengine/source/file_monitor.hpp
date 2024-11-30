@@ -49,7 +49,7 @@ struct FileMonitor {
 	void process_changes();
 	void issue_one_read(DirectoryInfo* info);
 	void emit_changes();
-	void add_change(char* file_path, char* file_name, dn_file_change_event_t events);
+	void add_change(char* file_path, dn_string_t file_name, dn_file_change_event_t events);
 	bool check_cache(char* file_path, float64 time);
 	CacheEntry* find_cache_entry(char* file_path);
 };
@@ -196,10 +196,10 @@ void FileMonitor::process_changes() {
 
 			// Construct the full path
 			char* full_path = dn::allocator::alloc<char>(&dn_allocators.bump, DN_MAX_PATH_LEN);
-			char* partial_path = wide_to_utf8((uint16*)&notify->FileName[0], notify->FileNameLength / 2);
+			char* partial_path = dn_string_16_to_8((uint16*)&notify->FileName[0], notify->FileNameLength / 2);
 			snprintf(full_path, DN_MAX_PATH_LEN, "%s/%s", info->path, partial_path);
 			dn_path_normalize_cstr(full_path);
-			char* file_name = extract_file_name(full_path);
+			dn_string_t file_name = dn_path_extract_file_name(full_path);
 
 			this->add_change(full_path, file_name, events);
 
@@ -214,7 +214,7 @@ void FileMonitor::process_changes() {
 	emit_changes();
 }
 
-void FileMonitor::add_change(char* file_path, char* file_name, dn_file_change_event_t events) {
+void FileMonitor::add_change(char* file_path, dn_string_t file_name, dn_file_change_event_t events) {
 	auto time = glfwGetTime();
 
 	// We don't care about directory updates. They're annoying and hard to understand
@@ -222,9 +222,9 @@ void FileMonitor::add_change(char* file_path, char* file_name, dn_file_change_ev
 	if (dn_os_is_directory(file_path)) return;
 
 	// Exclude some annoying files
-	if (file_name) {
-		if (file_name[0] == '.' && file_name[1] == '#') return;
-		if (file_name[0] ==  '#') return;
+	if (file_name.data) {
+		if (file_name.data[0] == '.' && file_name.data[1] == '#') return;
+		if (file_name.data[0] ==  '#') return;
 	}
 
 	// We need to debounce duplicate changes. Here's a good explanation of why Windows
@@ -243,7 +243,7 @@ void FileMonitor::add_change(char* file_path, char* file_name, dn_file_change_ev
 
 	auto change = dn_array_push(&this->changes);
 	change->file_path = file_path;
-	change->file_name = file_name;
+	change->file_name = dn_string_to_cstr(file_name, &dn_allocators.bump);
 	change->events = events;
 	change->time = time;
 }

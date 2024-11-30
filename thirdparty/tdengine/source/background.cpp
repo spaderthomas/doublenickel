@@ -27,7 +27,7 @@ void init_backgrounds() {
 
 		// Figure out whether the source has been modified since we tiled it
 		//lua.parse_float64("mod_time", &background->mod_time);
-		background->filesystem_mod_time = file_mod_time(background->source_image_full_path);
+		background->filesystem_mod_time = dn_os_file_mod_time(background->source_image_full_path);
 
 		if (background->is_dirty()) {
 			// The source image has been modified. We need to rebuild the background's tiles.

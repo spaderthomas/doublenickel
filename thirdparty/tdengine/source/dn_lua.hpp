@@ -45,7 +45,7 @@ void dn_lua_init() {
     if (event->events & DN_FILE_CHANGE_EVENT_REMOVED) return;
 
     // Any other files we happen to create should be skipped
-    if (!path_util::is_lua(event->file_path)) return;
+    if (!dn_path_is_extension(event->file_path, dn_string_literal(".lua"))) return;
     
     auto stripped_path = dn_paths_strip("install", event->file_path);
     dn_log("Hotloading script: %s", stripped_path);
@@ -198,7 +198,7 @@ i32 dn_lua_format_file_load_error_l(dn_lua_interpreter_t l) {
 }
 
 bool dn_lua_script_file(const char* file_path) {
-  if (!path_util::is_lua(file_path)) return true;
+  if (!dn_path_is_extension(file_path, dn_string_literal(".lua"))) return false;
 
   dn_lua_interpreter_t l = dn_lua.state;
   i32 initial_stack_size = lua_gettop(l);

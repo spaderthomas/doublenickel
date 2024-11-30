@@ -696,7 +696,7 @@ void dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
           auto& binding = uniforms.bindings[i];
           auto uniform = binding.uniform;
 
-          i32 index = find_uniform_index(uniform->name);
+          i32 index = glGetUniformLocation(command_buffer->pipeline->raster.shader->program, uniform->name);
 
           switch(binding.uniform->kind) {
             case GPU_UNIFORM_MATRIX4: glUniformMatrix4fv(index, 1, GL_FALSE, (const float*)&binding.data.mat4); break;

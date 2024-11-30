@@ -54,5 +54,3 @@ Defer<F> operator+( dn_defer_dummy, F&& f )
 }
 
 #define dn_defer auto _dn_defer( __LINE__ ) = dn_defer_dummy( ) + [ & ]( )
-
-
