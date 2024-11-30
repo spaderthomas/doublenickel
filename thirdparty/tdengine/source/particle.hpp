@@ -109,6 +109,8 @@ struct ParticleSystemHandle {
 	operator bool();
 };
 
+dn_array_t<ParticleSystem, 64> particle_systems;
+
 void init_particles();
 
 ParticleSystem* find_particle_system(ParticleSystemHandle handle);

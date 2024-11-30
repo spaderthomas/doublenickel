@@ -551,7 +551,9 @@ void ParticleSystem::despawn_particle(Particle* particle) {
 // ENTRY POINTS //
 //////////////////
 void init_particles() {
-	particle_systems.size = particle_systems.capacity;
+	dn_array_init(&particle_systems);
+	dn_array_fill(&particle_systems, dn_zero_initialize());
+	// particle_systems.size = particle_systems.capacity;
 }
 
 ParticleSystem* find_particle_system(ParticleSystemHandle handle) {

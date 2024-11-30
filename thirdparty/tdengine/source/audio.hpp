@@ -71,6 +71,8 @@ typedef struct {
   float master_volume_mod;
   FileMonitor* file_monitor;
   dn_array_t<float> sample_buffer;
+  dn_array_t<dn_audio_info_t> sounds;
+  dn_array_t<dn_audio_instance_t> instances;
 } dn_audio_t;
 dn_audio_t dn_audio;
 std::recursive_mutex dn_audio_mutex;
@@ -194,8 +196,8 @@ void dn_audio_init(dn_audio_config_t config) {
 
   // We use this array like a free list, so it is always full and we determine which elements are current
   // based on a flag in the element itself.
-  active_sounds.size = active_sounds.capacity;
-  dn_array_for(active_sounds, active_sound) {
+  dn_audio.instances.size = dn_audio.instances.capacity;
+  dn_array_for(dn_audio.instances, active_sound) {
     active_sound->occupied = false;
   }
 
@@ -204,7 +206,7 @@ void dn_audio_init(dn_audio_config_t config) {
 
 void dn_audio_add_samples(dn_audio_instance_t* active_sound, int samples_requested, int offset) {
   for (int32 i = 0; i < samples_requested; i++) {
-    auto info = sound_infos[active_sound->info.index];
+    auto info = dn_audio.sounds[active_sound->info.index];
     auto index = active_sound->next_sample++;
 
     if (index == info->num_samples) {
@@ -252,12 +254,12 @@ void dn_audio_update(float* buffer, int frames_requested, int num_channels) {
 
   std::unique_lock lock(dn_audio_mutex);
 
-  dn_array_for(active_sounds, active_sound) {
+  dn_array_for(dn_audio.instances, active_sound) {
     if (!active_sound->occupied) continue;
     if (active_sound->paused) continue;
     if (!dn_gen_arena_handle_valid(active_sound->info)) continue;
     
-    auto info = sound_infos[active_sound->info.index];
+    auto info = dn_audio.sounds[active_sound->info.index];
     if (active_sound->info.generation != info->generation) {
       dn_audio_stop_ex(active_sound);
       continue;
@@ -271,7 +273,7 @@ void dn_audio_update(float* buffer, int frames_requested, int num_channels) {
   while (chaining_sounds) {
     chaining_sounds = false;
     
-    dn_array_for(active_sounds, active_sound) {
+    dn_array_for(dn_audio.instances, active_sound) {
       if (!active_sound->occupied) continue;
       if (active_sound->paused) continue;
 
@@ -330,7 +332,7 @@ void dn_audio_shutdown() {
 bool dn_audio_is_any_playing() {
   std::unique_lock lock(dn_audio_mutex);
   
-  dn_array_for(active_sounds, active_sound) {
+  dn_array_for(dn_audio.instances, active_sound) {
     if (active_sound->occupied) return true;
   }
 
@@ -341,7 +343,7 @@ dn_audio_info_t* dn_audio_find_no_default(const char* name) {
   std::unique_lock lock(dn_audio_mutex);
 
   auto hash = dn_hash_cstr_dumb(name);
-  dn_array_for(sound_infos, info) {
+  dn_array_for(dn_audio.sounds, info) {
     if (info->hash == hash) return info;
   }
 
@@ -357,8 +359,8 @@ dn_audio_info_t* dn_audio_find(const char* name) {
 dn_audio_instance_handle_t dn_audio_reserve() {
   std::unique_lock lock(dn_audio_mutex);
   
-  for (u32 index = 0; index < active_sounds.size; index++) {
-    auto active_sound = active_sounds[index];
+  for (u32 index = 0; index < dn_audio.instances.size; index++) {
+    auto active_sound = dn_audio.instances[index];
     if (!active_sound->occupied) {
       active_sound->occupied = true;
       return { 
@@ -376,7 +378,7 @@ dn_audio_instance_t* dn_audio_resolve(dn_audio_instance_handle_t handle) {
 
   if (!dn_gen_arena_handle_valid(handle)) return nullptr;
   
-  auto active_sound = active_sounds[handle.index];
+  auto active_sound = dn_audio.instances[handle.index];
   if (handle.generation != active_sound->generation) return nullptr;
 
   return active_sound;
@@ -389,7 +391,7 @@ dn_audio_instance_handle_t dn_audio_play_sound_ex(dn_audio_info_t* sound, bool l
   if (!dn_gen_arena_handle_valid(handle)) return handle;
 
   auto active_sound = dn_audio_resolve(handle);
-  active_sound->info = { dn_array_indexof(&sound_infos, sound), sound->generation };
+  active_sound->info = { dn_array_indexof(&dn_audio.sounds, sound), sound->generation };
   active_sound->volume = 1.f;
   active_sound->next_sample = 0;
   active_sound->loop = loop;
@@ -422,7 +424,7 @@ void dn_audio_stop_ex(dn_audio_instance_t* active_sound) {
 
 dn_audio_info_t* alloc_sound(const char* file_name) {
   auto sound = dn_audio_find_no_default(file_name);
-  if (!sound) sound = dn_array_push(&sound_infos);
+  if (!sound) sound = dn_array_push(&dn_audio.sounds);
   sound->generation++;
 
   return sound;
@@ -550,7 +552,7 @@ void dn_audio_stop(dn_audio_instance_handle_t handle) {
 }
 
 void dn_audio_stop_all() {
-  dn_array_for(active_sounds, active_sound) {
+  dn_array_for(dn_audio.instances, active_sound) {
     dn_audio_stop_ex(active_sound);
   }
 }

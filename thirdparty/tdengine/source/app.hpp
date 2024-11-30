@@ -88,7 +88,6 @@ int dn_main(dn_app_descriptor_t app) {
   dn_input_init();
   dn_time_metrics_init();
   dn_file_monitors_init();
-  init_buffers();
   dn_lua_init();
   init_actions();
   dn_lua_init_game();
