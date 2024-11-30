@@ -71,7 +71,7 @@ void dn_lua_init() {
   lua_getglobal(l, "tdengine");
   DEFER_POP(l);
   lua_pushstring(l, "is_packaged_build");
-#if defined(FM_EDITOR)
+#if defined(DN_EDITOR)
   lua_pushboolean(l, false);
 #else
   lua_pushboolean(l, true);

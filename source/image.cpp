@@ -43,7 +43,7 @@ RectPackId* TextureAtlas::find_pack_item(i32 id) {
 
 bool TextureAtlas::is_dirty() {
   bool dirty = false;
-  #ifdef FM_EDITOR
+  #ifdef DN_EDITOR
   dirty |= mod_time > cfg_mod_time;
   dirty |= files_hash != cfg_files_hash;
 

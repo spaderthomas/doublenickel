@@ -77,7 +77,7 @@ void FileMonitor::init(FileChangeCallback callback, dn_file_change_event_t event
 }
 
 bool FileMonitor::add_directory(const char* directory_path) {
-#if defined(FM_EDITOR)
+#if defined(DN_EDITOR)
 	dn_log_flags(DN_LOG_FLAG_FILE, "%s: added %s", __func__, directory_path);
 				   
 	auto event = CreateEventW(NULL, false, false, NULL);

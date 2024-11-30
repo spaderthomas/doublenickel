@@ -163,7 +163,7 @@ void _dn_paths_set_install_roots() {
 }
 
 void _dn_paths_set_write_path() { 
-#if defined(FM_EDITOR)
+#if defined(DN_EDITOR)
   dn_paths_add_ex("write", _dn_paths_build_root_path(dn_app.write_path));
 #else
   auto appdata_dir = dn::allocator::alloc<char>(&dn_allocators.bump, DN_MAX_PATH_LEN);
