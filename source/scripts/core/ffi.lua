@@ -534,7 +534,7 @@ end
 ------------
 -- MATRIX --
 ------------
-Matrix3 = doublenickel.class.metatype('Matrix3')
+Matrix3 = doublenickel.class.metatype('dn_matrix3_t')
 Matrix3:set_metamethod('__index', function(self, key)
   print('x')
   if type(key) == 'number' then
@@ -573,7 +573,7 @@ function Matrix3:serialize()
 end
 
 
-Matrix4 = doublenickel.class.metatype('Matrix4')
+Matrix4 = doublenickel.class.metatype('dn_matrix4_t')
 
 function Matrix4:init(data)
   if data then

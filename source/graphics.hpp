@@ -146,9 +146,9 @@ typedef struct {
 // UNIFORMS //
 //////////////
 typedef union {
-  Matrix4 mat4;
-  Matrix3 mat3;
-  Matrix2 mat2;
+  dn_matrix4_t mat4;
+  dn_matrix3_t mat3;
+  dn_matrix2_t mat2;
   dn_vector4_t vec4;
   dn_vector3_t vec3;
   dn_vector2_t vec2;
@@ -291,7 +291,7 @@ typedef struct {
   u32 layer;
   bool world_space;
   dn_vector2_t camera;
-  Matrix4 projection;
+  dn_matrix4_t projection;
 } dn_gpu_renderer_state_t;
 
 typedef struct {
@@ -365,8 +365,8 @@ typedef struct {
 // DN GPU //
 ////////////
 typedef struct {
-  Matrix4 view;
-  Matrix4 projection;
+  dn_matrix4_t view;
+  dn_matrix4_t projection;
   dn_vector2_t camera;
   dn_vector2_t native_resolution;
   dn_vector2_t output_resolution;

@@ -47,15 +47,15 @@ typedef struct {
 
 typedef struct {
   float data [2] [2];
-} Matrix2;
+} dn_matrix2_t;
 
 typedef struct {
   float data [3] [3];
-} Matrix3;
+} dn_matrix3_t;
 
 typedef struct {
   float data [4] [4];
-} Matrix4;
+} dn_matrix4_t;
 
 // These are just in Lua, so I can add a metatype to returned strings for a nice interning API.
 // dn_tstring_t is a temporary string; i.e., one allocated with temporary storage. There's nothing different
@@ -640,9 +640,9 @@ typedef struct dn_gpu_shader_t dn_gpu_shader_t;
 // UNIFORMS //
 //////////////
 typedef union {
-  Matrix4 mat4;
-  Matrix3 mat3;
-  Matrix2 mat2;
+  dn_matrix4_t mat4;
+  dn_matrix3_t mat3;
+  dn_matrix2_t mat2;
   dn_vector4_t vec4;
   dn_vector3_t vec3;
   dn_vector2_t vec2;
@@ -784,7 +784,7 @@ typedef struct {
   u32 layer;
   bool world_space;
   dn_vector2_t camera;
-  Matrix4 projection;
+  dn_matrix4_t projection;
 } dn_gpu_renderer_state_t;
 
 typedef struct {
