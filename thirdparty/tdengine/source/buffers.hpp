@@ -1,20 +1,3 @@
-// Infos: chunks of contiguous memory that are initialized and then static
-#define FONT_INFO_SIZE 64
-dn_array_t<dn_baked_font_t> font_infos;
-#define GLYPH_INFO_SIZE FONT_INFO_SIZE * 128
-dn_array_t<dn_baked_glyph_t> glyph_infos;
-#define VX_INFO_SIZE GLYPH_INFO_SIZE * 6
-dn_array_t<Vector2>   text_vx_data;
-#define TEXT_UV_DATA_SIZE GLYPH_INFO_SIZE * 6
-dn_array_t<Vector2>   text_uv_data;
-#define TC_INFO_SIZE VX_INFO_SIZE
-dn_array_t<Vector2>   tc_data;
-#define IMAGE_INFO_SIZE 256
-dn_array_t<Texture> image_infos;
-#define SPRITE_INFO_SIZE 1024
-dn_array_t<Sprite> sprite_infos;
-#define ATLAS_INFO_SIZE 64
-dn_array_t<TextureAtlas> atlas_infos;
 #define SOUND_INFO_SIZE 1024
 dn_array_t<dn_audio_info_t> sound_infos;
 #define ACTIVE_SOUND_SIZE 64
@@ -26,14 +9,6 @@ dn_array_t<ParticleSystem> particle_systems;
 void init_buffers() { 
 	dn_log_flags(DN_LOG_FLAG_FILE, "initializing buffers");
 	
-	dn_array_init(&font_infos,        FONT_INFO_SIZE);
-	dn_array_init(&glyph_infos,       GLYPH_INFO_SIZE);
-	dn_array_init(&text_vx_data,      VX_INFO_SIZE);
-	dn_array_init(&text_uv_data,      TEXT_UV_DATA_SIZE);
-	dn_array_init(&image_infos,       IMAGE_INFO_SIZE);
-	dn_array_init(&tc_data,           TC_INFO_SIZE);
-	dn_array_init(&sprite_infos,      SPRITE_INFO_SIZE);
-	dn_array_init(&atlas_infos,       ATLAS_INFO_SIZE);
 	dn_array_init(&sound_infos,       SOUND_INFO_SIZE);
 	dn_array_init(&active_sounds,     ACTIVE_SOUND_SIZE);
 	dn_array_init(&particle_systems,  PARTICLE_SYSTEMS_SIZE);

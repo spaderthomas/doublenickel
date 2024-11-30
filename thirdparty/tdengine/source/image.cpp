@@ -497,7 +497,7 @@ void init_texture_atlas() {
   
   lua_pushnil(l);
   while (lua_next(l, -2)) {
-    auto atlas = dn_array_push(&atlas_infos);
+    auto atlas = dn_array_push(&dn_images.atlases);
     atlas->init();
 
     // Mod time
@@ -549,7 +549,7 @@ void init_texture_atlas() {
   lua_pop(l, 1); // pop data.atlases
   return;
   // Load texture atlases; most are loaded async, except for a few important early ones
-  dn_array_for(atlas_infos, atlas) {
+  dn_array_for(dn_images.atlases, atlas) {
     // Step 1: Ensure that the atlas is up-to-date with its source images and load it into memory
     if (atlas->is_dirty()) {
       // Dirty atlases need to be rebuilt from source (i.e. load every constituent PNG, pack them into an atlas,
@@ -679,7 +679,7 @@ u32 find_texture_handle(const char* name) {
 Texture* find_texture(dn_hash_t hash) {
   std::lock_guard lock(image_mutex);
   
-  dn_array_for(image_infos, image) {
+  dn_array_for(dn_images.textures, image) {
     if (image->hash == hash) return image;
   }
 
@@ -692,7 +692,7 @@ Sprite* find_sprite_no_default(const char* name) {
   if (!name) return nullptr;
 
   auto hash = dn_hash_cstr_dumb(name);
-  dn_array_for(sprite_infos, sprite) {
+  dn_array_for(dn_images.sprites, sprite) {
     if (sprite->hash == hash) return sprite;
   }
   
@@ -707,7 +707,7 @@ Sprite* find_sprite(const char* name) {
 }
 
 Vector2* alloc_uvs_no_lock() {
-  return dn_array_push(&tc_data, Vector2(), 6);
+  return dn_array_push(&dn_images.uv_data, Vector2(), 6);
 }
 
 Vector2* alloc_uvs() {
@@ -717,7 +717,7 @@ Vector2* alloc_uvs() {
 
 Texture* alloc_texture() {
   std::lock_guard lock(image_mutex);
-  return dn_array_push(&image_infos);
+  return dn_array_push(&dn_images.textures);
 }
 
 Sprite* alloc_sprite() {
@@ -735,7 +735,14 @@ Sprite* alloc_sprite() {
   // your lifetimes get all tangled up and you have no way to reason about when a thing is valid or not. But it's not
   // worth rewriting a bunch of code just for this simple case; just a note for the future. 
   std::lock_guard lock(image_mutex);
-  auto sprite = dn_array_push(&sprite_infos);
+  auto sprite = dn_array_push(&dn_images.sprites);
   sprite->uv = alloc_uvs_no_lock();
   return sprite;
+}
+
+DN_IMP void dn_images_init() {
+  dn_array_init(&dn_images.uv_data);
+  dn_array_init(&dn_images.textures);
+  dn_array_init(&dn_images.sprites);
+  dn_array_init(&dn_images.atlases);
 }

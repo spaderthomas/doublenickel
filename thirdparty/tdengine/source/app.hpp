@@ -67,6 +67,7 @@ void dn_app_configure(dn_app_config_t config) {
   dn_audio_init(config.audio);
   dn_font_init(config.font);
   dn_gpu_init(config.gpu);
+  dn_images_init();
   dn_noise_init();
   init_texture_atlas(); // Invert control
   init_backgrounds(); // Invert control

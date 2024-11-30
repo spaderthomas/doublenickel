@@ -101,5 +101,15 @@ void create_sprite_ex(Sprite* sprite, const char* id, unsigned char* data, i32 w
 std::mutex image_mutex;
 std::mutex image_config_mutex;
 
+typedef struct {
+  dn_array_t<Vector2, 65536> uv_data;
+  dn_array_t<Texture, 256> textures;
+  dn_array_t<Sprite, 1024> sprites;
+  dn_array_t<TextureAtlas, 64> atlases;
+} dn_images_t;
+dn_images_t dn_images;
+
+DN_IMP void dn_images_init();
+
 DN_API void take_screenshot();
 DN_API void write_screenshot_to_png(const char* file_name);
