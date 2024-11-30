@@ -81,7 +81,7 @@ int dn_main(dn_app_descriptor_t app) {
   dn_random_init();
   dn_test_init();
   dn_app_init(app);
-  init_paths();
+  dn_paths_init();
   dn_log_init();
   dn_engine_init();
   dn_input_init();

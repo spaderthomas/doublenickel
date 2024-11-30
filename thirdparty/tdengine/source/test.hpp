@@ -1,3 +1,8 @@
+#ifndef DN_TEST_H
+#define DN_TEST_H
+void dn_test_init();
+#endif
+
 #ifdef DN_TEST_IMPLEMENTATION
 // void test_convert_mag() {
 // 	Vector2 magnitude;
@@ -172,14 +177,18 @@ void dn_bump_allocator_test() {
 	assert(dn_allocators.bump.allocations[sizeof(u32) * 8] == sizeof(u32) * 16);
 }
 
+void dn_path_test() {
+	DN_ASSERT(dn_path_is_extension("file.png", dn_string_literal(".png")));
+	DN_ASSERT(dn_string_equal(
+		dn_string_literal("file.png"), 
+		dn_path_extract_file_name("C:/Users/jg/file.png")
+	));
+}
+
 void dn_test_init() {
 	dn_bump_allocator_test();
 	dn_gen_arena_test();
 	// test_convert_point();
 	dn_path_test();
-}
-#else
-void dn_test_init() {
-
 }
 #endif

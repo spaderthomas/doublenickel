@@ -19,6 +19,7 @@ DN_API void dn_log(const char* fmt, ...);
 DN_API void dn_log_flags(dn_log_flags_t flags, const char* fmt, ...);
 DN_IMP void dn_log_v(dn_log_flags_t flags, const char* fmt, va_list fmt_args);
 DN_IMP void dn_log_zero();
+DN_IMP void dn_log_init();
 #endif
 
 #ifdef DN_LOG_IMPLEMENTATION

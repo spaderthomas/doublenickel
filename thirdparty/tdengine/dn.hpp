@@ -44,6 +44,7 @@
 #include "source/graphics.hpp"
 #include "source/sdf.hpp"
 #include "source/app.hpp"
+#include "source/test.hpp"
 #endif
 
 #ifdef DN_IMPLEMENTATION

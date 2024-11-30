@@ -100,12 +100,4 @@ dn_string_t dn_path_strip_extension(const char* file_name) {
 
 	return { .data = (u8*)stripped, .len = (u32)length };
 }
-
-void dn_path_test() {
-	DN_ASSERT(dn_path_is_extension("file.png", dn_string_literal(".png")));
-	DN_ASSERT(dn_string_equal(
-		dn_string_literal("file.png"), 
-		dn_path_extract_file_name("C:/Users/jg/file.png")
-	));
-}
 #endif
