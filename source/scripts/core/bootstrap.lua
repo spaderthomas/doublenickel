@@ -30,7 +30,7 @@ typedef double f64;
 typedef struct {
   float x;
   float y;
-} Vector2;
+} dn_vector2_t;
 
 typedef struct {
   float x;
@@ -344,39 +344,39 @@ typedef enum {
 } dn_coord_t;
 
 typedef struct {
-  Vector2 camera;
-  Vector2 framebuffer_position;
-  Vector2 framebuffer_size;
+  dn_vector2_t camera;
+  dn_vector2_t framebuffer_position;
+  dn_vector2_t framebuffer_size;
 } dn_coord_data_t;
 
 dn_coord_data_t dn_coord_get();
 void            dn_coord_set_camera(float x, float y);
 void            dn_coord_set_framebuffer_position(float x, float y);
 void            dn_coord_set_framebuffer_size(float x, float y);
-Vector2         dn_coord_screen_to_window(float x, float y);
-Vector2         dn_coord_screen_to_game(float x, float y);
-Vector2         dn_coord_screen_to_world(float x, float y);
-Vector2         dn_coord_window_to_screen(float x, float y);
-Vector2         dn_coord_window_to_game(float x, float y);
-Vector2         dn_coord_window_to_world(float x, float y);
-Vector2         dn_coord_game_to_screen(float x, float y);
-Vector2         dn_coord_game_to_window(float x, float y);
-Vector2         dn_coord_game_to_world(float x, float y);
-Vector2         dn_coord_world_to_screen(float x, float y);
-Vector2         dn_coord_world_to_window(float x, float y);
-Vector2         dn_coord_world_to_game(float x, float y);
-Vector2         dn_coord_screen_to_window_mag(float x, float y);
-Vector2         dn_coord_screen_to_game_mag(float x, float y);
-Vector2         dn_coord_screen_to_world_mag(float x, float y);
-Vector2         dn_coord_window_to_screen_mag(float x, float y);
-Vector2         dn_coord_window_to_game_mag(float x, float y);
-Vector2         dn_coord_window_to_world_mag(float x, float y);
-Vector2         dn_coord_game_to_screen_mag(float x, float y);
-Vector2         dn_coord_game_to_window_mag(float x, float y);
-Vector2         dn_coord_game_to_world_mag(float x, float y);
-Vector2         dn_coord_world_to_screen_mag(float x, float y);
-Vector2         dn_coord_world_to_window_mag(float x, float y);
-Vector2         dn_coord_world_to_game_mag(float x, float y);
+dn_vector2_t         dn_coord_screen_to_window(float x, float y);
+dn_vector2_t         dn_coord_screen_to_game(float x, float y);
+dn_vector2_t         dn_coord_screen_to_world(float x, float y);
+dn_vector2_t         dn_coord_window_to_screen(float x, float y);
+dn_vector2_t         dn_coord_window_to_game(float x, float y);
+dn_vector2_t         dn_coord_window_to_world(float x, float y);
+dn_vector2_t         dn_coord_game_to_screen(float x, float y);
+dn_vector2_t         dn_coord_game_to_window(float x, float y);
+dn_vector2_t         dn_coord_game_to_world(float x, float y);
+dn_vector2_t         dn_coord_world_to_screen(float x, float y);
+dn_vector2_t         dn_coord_world_to_window(float x, float y);
+dn_vector2_t         dn_coord_world_to_game(float x, float y);
+dn_vector2_t         dn_coord_screen_to_window_mag(float x, float y);
+dn_vector2_t         dn_coord_screen_to_game_mag(float x, float y);
+dn_vector2_t         dn_coord_screen_to_world_mag(float x, float y);
+dn_vector2_t         dn_coord_window_to_screen_mag(float x, float y);
+dn_vector2_t         dn_coord_window_to_game_mag(float x, float y);
+dn_vector2_t         dn_coord_window_to_world_mag(float x, float y);
+dn_vector2_t         dn_coord_game_to_screen_mag(float x, float y);
+dn_vector2_t         dn_coord_game_to_window_mag(float x, float y);
+dn_vector2_t         dn_coord_game_to_world_mag(float x, float y);
+dn_vector2_t         dn_coord_world_to_screen_mag(float x, float y);
+dn_vector2_t         dn_coord_world_to_window_mag(float x, float y);
+dn_vector2_t         dn_coord_world_to_game_mag(float x, float y);
 
 typedef enum {
   DN_INPUT_DEVICE_MOUSE_AND_KEYBOARD = 0,
@@ -388,9 +388,9 @@ bool              dn_input_released(int key);
 bool              dn_input_down(int key);
 bool              dn_input_mod_down(int mod);
 bool              dn_input_chord_pressed(int mod, int key);
-Vector2           dn_input_scroll();
-Vector2           dn_input_mouse(dn_coord_t unit);
-Vector2           dn_input_mouse_delta(dn_coord_t unit);
+dn_vector2_t           dn_input_scroll();
+dn_vector2_t           dn_input_mouse(dn_coord_t unit);
+dn_vector2_t           dn_input_mouse_delta(dn_coord_t unit);
 u32               dn_input_shift_key(u32 key);
 dn_input_device_t dn_input_get_device();
 
@@ -406,8 +406,8 @@ dn_input_device_t dn_input_get_device();
 
 typedef struct {
   char text [1024];
-  Vector2 position;
-  Vector2 padding;
+  dn_vector2_t position;
+  dn_vector2_t padding;
   Vector4 color;
   void* font;
   float wrap;
@@ -493,15 +493,15 @@ typedef struct {
   const char* title;
   const char* icon;
   dn_display_mode_t display_mode;
-  Vector2 native_resolution;
+  dn_vector2_t native_resolution;
   dn_window_flags_t flags;
 } dn_window_config_t;
 
 dn_window_config_t dn_window_config_default();
 void               dn_window_init(dn_window_config_t descriptor);
 void               dn_window_set_native_resolution(float width, float height);
-Vector2            dn_window_get_content_area();
-Vector2            dn_window_get_native_resolution();
+dn_vector2_t            dn_window_get_content_area();
+dn_vector2_t            dn_window_get_native_resolution();
 void               dn_window_set_icon(const char* path);
 void               dn_window_set_display_mode(dn_display_mode_t mode);
 dn_display_mode_t  dn_window_get_display_mode();
@@ -645,7 +645,7 @@ typedef union {
   Matrix2 mat2;
   Vector4 vec4;
   Vector3 vec3;
-  Vector2 vec2;
+  dn_vector2_t vec2;
   float f32;
   i32 texture;
   i32 i32;
@@ -692,14 +692,14 @@ typedef struct {
 ///////////////////////
 typedef struct {
   dn_asset_name_t name;
-  Vector2 size;
+  dn_vector2_t size;
 } dn_gpu_render_target_descriptor_t;
 
 typedef struct {
   dn_asset_name_t name;
   u32 handle;
   u32 color_buffer;
-  Vector2 size;
+  dn_vector2_t size;
 } dn_gpu_render_target_t;
 
 
@@ -775,15 +775,15 @@ typedef struct {
 } dn_gpu_raster_state_t;
 
 typedef struct {
-  Vector2 position;
-  Vector2 size;
+  dn_vector2_t position;
+  dn_vector2_t size;
   bool enabled;
 } dn_gpu_scissor_state_t;
 
 typedef struct {
   u32 layer;
   bool world_space;
-  Vector2 camera;
+  dn_vector2_t camera;
   Matrix4 projection;
 } dn_gpu_renderer_state_t;
 
@@ -853,7 +853,7 @@ void                     dn_gpu_apply_bindings(dn_gpu_command_buffer_t* command_
 void                     dn_gpu_bind_render_state(dn_gpu_command_buffer_t* command_buffer, dn_gpu_renderer_state_t render);
 void                     dn_gpu_set_layer(dn_gpu_command_buffer_t* command_buffer, u32 layer);
 void                     dn_gpu_set_world_space(dn_gpu_command_buffer_t* command_buffer, bool world_space);
-void                     dn_gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, Vector2 camera);
+void                     dn_gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, dn_vector2_t camera);
 dn_gpu_pipeline_t*       dn_gpu_pipeline_create(dn_gpu_pipeline_descriptor_t descriptor);
 dn_gpu_uniform_t*        dn_gpu_uniform_create(dn_gpu_uniform_descriptor_t descriptor);
 dn_gpu_buffer_t*         dn_gpu_buffer_create(dn_gpu_buffer_descriptor_t descriptor);
@@ -924,8 +924,8 @@ typedef enum {
 // SDF BUFFER DATA //
 /////////////////////
 typedef struct {
-  Vector2 position;
-  Vector2 uv;
+  dn_vector2_t position;
+  dn_vector2_t uv;
 } dn_sdf_vertex_t;
 
 typedef struct {
@@ -950,7 +950,7 @@ typedef struct {
 ////////////////////
 typedef struct {
   Vector3 color;
-  Vector2 position;
+  dn_vector2_t position;
   float rotation;
   float edge_thickness;
   dn_sdf_shape_t shape;
@@ -969,7 +969,7 @@ typedef struct {
 
 typedef struct {
   dn_sdf_header_t header;
-  Vector2 size;
+  dn_vector2_t size;
 } dn_sdf_oriented_box_t;
 
 typedef struct {
@@ -1247,19 +1247,19 @@ void write_screenshot_to_png(const char* file_name);
 typedef struct {
   Vector3 position;
   Vector4 color;
-  Vector2 uv;
+  dn_vector2_t uv;
 } Vertex;
 
 
-void draw_quad(Vector2 position, Vector2 size, Vector4 color);
-void draw_line(Vector2 start, Vector2 end, f32 thickness, Vector4 color);
+void draw_quad(dn_vector2_t position, dn_vector2_t size, Vector4 color);
+void draw_line(dn_vector2_t start, dn_vector2_t end, f32 thickness, Vector4 color);
 void draw_circle(f32 px, f32 py, f32 radius, Vector4 color);
 void draw_circle_sdf(f32 px, f32 py, f32 radius, Vector4 color, f32 edge_thickness);
 void draw_ring_sdf(f32 px, f32 py, f32 inner_radius, f32 radius, Vector4 color, f32 edge_thickness);
 void draw_image(const char* name, f32 px, f32 py);
 void draw_image_size(const char* name, f32 px, f32 py, f32 dx, f32 dy);
 void draw_image_ex(const char* name, float px, float py, float dx, float dy, float opacity);
-void draw_image_pro(u32 texture, f32 px, f32 py, f32 dx, f32 dy, Vector2* uv, f32 opacity);
+void draw_image_pro(u32 texture, f32 px, f32 py, f32 dx, f32 dy, dn_vector2_t* uv, f32 opacity);
 void draw_text(const char* text, f32 px, f32 py);
 void draw_text_ex(const char* text, f32 px, f32 py, Vector4 color, const char* font, f32 wrap);
 void draw_prepared_text(dn_prepared_text_t* text);

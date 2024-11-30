@@ -29,7 +29,7 @@ typedef struct {
   const char* title;
   const char* icon;
   dn_display_mode_t display_mode;
-  Vector2 native_resolution;
+  dn_vector2_t native_resolution;
   dn_window_flags_t flags;
 } dn_window_config_t;
 
@@ -37,10 +37,10 @@ typedef struct {
   GLFWwindow* handle;
   dn_window_flags_t flags;
   dn_display_mode_t display_mode;
-  Vector2I windowed_position;
-  Vector2 native_resolution;
-  Vector2 requested_area;
-  Vector2 content_area;
+  dn_vector2_tI windowed_position;
+  dn_vector2_t native_resolution;
+  dn_vector2_t requested_area;
+  dn_vector2_t content_area;
 } dn_window_t;
 dn_window_t window;
 
@@ -48,8 +48,8 @@ DN_IMP void               dn_window_shutdown();
 DN_API dn_window_config_t dn_window_config_default();
 DN_API void               dn_window_init(dn_window_config_t config);
 DN_API void               dn_window_set_native_resolution(float width, float height);
-DN_API Vector2            dn_window_get_content_area();
-DN_API Vector2            dn_window_get_native_resolution();
+DN_API dn_vector2_t            dn_window_get_content_area();
+DN_API dn_vector2_t            dn_window_get_native_resolution();
 DN_API void               dn_window_set_icon(const char* path);
 DN_API void               dn_window_set_display_mode(dn_display_mode_t mode);
 DN_API dn_display_mode_t  dn_window_get_display_mode();
@@ -237,11 +237,11 @@ void dn_window_set_cursor_visible(bool visible) {
   glfwSetInputMode(window.handle, GLFW_CURSOR, visible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
 }
 
-Vector2 dn_window_get_native_resolution() {
+dn_vector2_t dn_window_get_native_resolution() {
   return window.native_resolution;
 }
 
-Vector2 dn_window_get_content_area() {
+dn_vector2_t dn_window_get_content_area() {
   return window.content_area;
 }
 #endif

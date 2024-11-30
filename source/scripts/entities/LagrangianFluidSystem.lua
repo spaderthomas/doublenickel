@@ -97,8 +97,8 @@ function LagrangianFluidSystem:draw()
 
   local distance = self.bounding_volume.b:subtract(self.pa)
   doublenickel.ffi.draw_line(
-    ffi.new('Vector2', self.bounding_volume.a.x, self.bounding_volume.a.y),
-    ffi.new('Vector2', self.bounding_volume.b.x, self.bounding_volume.b.y),
+    ffi.new('dn_vector2_t', self.bounding_volume.a.x, self.bounding_volume.a.y),
+    ffi.new('dn_vector2_t', self.bounding_volume.b.x, self.bounding_volume.b.y),
     self.bounding_volume.radius * 2,
     color)
 

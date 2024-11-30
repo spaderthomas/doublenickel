@@ -6,7 +6,7 @@ enum class ParticleKind : i32 {
 };
 
 struct ParticleQuad {
-	Vector2 size;
+	dn_vector2_t size;
 };
 
 struct ParticleCircle {
@@ -15,7 +15,7 @@ struct ParticleCircle {
 
 struct ParticleImage {
 	Sprite* sprite;
-	Vector2 size;
+	dn_vector2_t size;
 };
 
 union ParticleData {
@@ -25,7 +25,7 @@ union ParticleData {
 };
 
 struct Particle {
-	Vector2 position;
+	dn_vector2_t position;
 	Interpolator2 velocity;
 
 	float lifetime;
@@ -72,10 +72,10 @@ struct ParticleSystem {
 	ParticleImage image;
 	Vector4 color;
 	ParticlePositionMode position_mode;
-	Vector2 position;
-	Vector2 area;
+	dn_vector2_t position;
+	dn_vector2_t area;
 	Interpolator2 velocity;
-	Vector2 velocity_jitter;
+	dn_vector2_t velocity_jitter;
 	bool jitter_base_velocity;
 	bool jitter_max_velocity;
 	int32 layer;
@@ -83,7 +83,7 @@ struct ParticleSystem {
 	float spawn_rate;
 	float lifetime;
 	int warmup_iter;
-	Vector2 gravity_source;
+	dn_vector2_t gravity_source;
 	float gravity_intensity;
 	bool gravity_enabled;
 	float size_jitter;

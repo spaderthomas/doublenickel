@@ -85,7 +85,7 @@ local vec2_mixin = {
     return doublenickel.vec2(self)
   end,
   to_ctype = function(self)
-    return ffi.new('Vector2', self.x, self.y)
+    return ffi.new('dn_vector2_t', self.x, self.y)
   end
 }
 

@@ -5,8 +5,8 @@ void dn_test_init();
 
 #ifdef DN_TEST_IMPLEMENTATION
 // void test_convert_mag() {
-// 	Vector2 magnitude;
-// 	Vector2 result;
+// 	dn_vector2_t magnitude;
+// 	dn_vector2_t result;
 
 // 	// The screen is twice as big as the texture we're rendering the game to. The framebuffer is half
 // 	// the size of the game texture, and it's centered on the screen.
@@ -68,8 +68,8 @@ void dn_test_init();
 // }
 
 // void test_convert_point() {
-// 	Vector2 point;
-// 	Vector2 result;
+// 	dn_vector2_t point;
+// 	dn_vector2_t result;
 
 // 	static constexpr int32 NATIVE = 1000;
 	
@@ -85,7 +85,7 @@ void dn_test_init();
 // 	render.camera.x = NATIVE / 2;
 // 	render.camera.y = NATIVE / 2;
 
-// 	point = Vector2(1.f, 1.f);
+// 	point = dn_vector2_t(1.f, 1.f);
 
 // 	// SCREEN -> *
 // 	result = Coord::convert(point, Coord::T::Screen, Coord::T::Window);
@@ -111,7 +111,7 @@ void dn_test_init();
 // 	assert(result.x == .5);
 
 // 	// GAME -> *
-// 	point = Vector2(1000, 1000);
+// 	point = dn_vector2_t(1000, 1000);
 // 	result = Coord::convert(point, Coord::T::Game, Coord::T::Screen);
 // 	assert(result.x == .5f);
 	
@@ -122,7 +122,7 @@ void dn_test_init();
 // 	assert(result.x == 1500);
 
 // 	// WORLD -> *
-// 	point = Vector2(1500, 1500);
+// 	point = dn_vector2_t(1500, 1500);
 // 	result = Coord::convert(point, Coord::T::World, Coord::T::Screen);
 // 	assert(result.x == .5f);
 	

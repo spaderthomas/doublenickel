@@ -135,10 +135,10 @@ void set_particle_size(ParticleSystemHandle handle, float x, float y) {
 	if (!particle_system) return;
 
 	if (particle_system->particle_kind == ParticleKind::Quad) {
-		particle_system->quad.size = Vector2(x, y);
+		particle_system->quad.size = dn_vector2_t(x, y);
 	}
 	else if (particle_system->particle_kind == ParticleKind::Image) {
-		particle_system->image.size = Vector2(x, y);
+		particle_system->image.size = dn_vector2_t(x, y);
 	}
 }
 
@@ -171,7 +171,7 @@ void set_particle_position(ParticleSystemHandle handle, float x, float y) {
 	auto particle_system = find_particle_system(handle);
 	if (!particle_system) return;
 	
-	particle_system->position = Vector2(x, y);
+	particle_system->position = dn_vector2_t(x, y);
 }
 
 void set_particle_kind(ParticleSystemHandle handle, ParticleKind particle_kind) {
@@ -203,7 +203,7 @@ void set_particle_area(ParticleSystemHandle handle, float x, float y) {
 	auto particle_system = find_particle_system(handle);
 	if (!particle_system) return;
 	
-	particle_system->area = Vector2(x, y);
+	particle_system->area = dn_vector2_t(x, y);
 }
 
 void set_particle_velocity_fn(ParticleSystemHandle handle, InterpolationFn function) {
@@ -217,21 +217,21 @@ void set_particle_velocity_base(ParticleSystemHandle handle, float x, float y) {
 	auto particle_system = find_particle_system(handle);
 	if (!particle_system) return;
 
-	particle_system->velocity.start = Vector2(x, y);
+	particle_system->velocity.start = dn_vector2_t(x, y);
 }
 
 void set_particle_velocity_max(ParticleSystemHandle handle, float x, float y) {
 	auto particle_system = find_particle_system(handle);
 	if (!particle_system) return;
 	
-	particle_system->velocity.target = Vector2(x, y);
+	particle_system->velocity.target = dn_vector2_t(x, y);
 }
 
 void set_particle_velocity_jitter(ParticleSystemHandle handle, float x, float y) {
 	auto particle_system = find_particle_system(handle);
 	if (!particle_system) return;
 	
-	particle_system->velocity_jitter = Vector2(x, y);
+	particle_system->velocity_jitter = dn_vector2_t(x, y);
 }
 
 void set_particle_jitter_base_velocity(ParticleSystemHandle handle, bool jitter) {
@@ -311,7 +311,7 @@ void set_particle_gravity_source(ParticleSystemHandle handle, float x, float y) 
 	auto particle_system = find_particle_system(handle);
 	if (!particle_system) return;
 
-	particle_system->gravity_source = Vector2(x, y);
+	particle_system->gravity_source = dn_vector2_t(x, y);
 }
 
 void set_particle_gravity_intensity(ParticleSystemHandle handle, float intensity) {
@@ -351,18 +351,18 @@ void ParticleSystem::init() {
 	// DEFAULT PARTICLE SYSTEM PARAMETERS
 	particle_kind = ParticleKind::Quad;
 	position_mode = ParticlePositionMode::Bottom;
-	position = Vector2(0.f, 0.f);
-	area = Vector2(100.f, 100.f);
+	position = dn_vector2_t(0.f, 0.f);
+	area = dn_vector2_t(100.f, 100.f);
 	velocity.function = InterpolationFn::Linear;
-	velocity.start = Vector2(1.f, 1.f);
-	velocity.target = Vector2(10.f, 10.f);
+	velocity.start = dn_vector2_t(1.f, 1.f);
+	velocity.target = dn_vector2_t(10.f, 10.f);
 	velocity.speed = 1.f;
 	max_spawn = 100;
 	spawn_rate = 1.f;
 	lifetime = 1.f;
 	layer = 31;
 	warmup_iter = 0; 
-	gravity_source = Vector2(0.f, 0.f); 
+	gravity_source = dn_vector2_t(0.f, 0.f); 
 	gravity_intensity = 1.f; 
 	gravity_enabled = false;
 	master_opacity = 1.f;

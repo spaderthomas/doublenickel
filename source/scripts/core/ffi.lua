@@ -600,7 +600,7 @@ end
 ------------
 -- VECTOR --
 ------------
-Vector2 = doublenickel.class.metatype('Vector2')
+Vector2 = doublenickel.class.metatype('dn_vector2_t')
 function Vector2:init(x, y)
   self.x = x or self.x
   self.y = y or self.y

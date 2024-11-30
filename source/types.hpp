@@ -36,10 +36,10 @@ typedef char dn_asset_name_t [DN_ASSET_NAME_LEN];
 
 typedef char* dn_tstring_t;
 
-typedef HMM_Vec2 Vector2;
+typedef HMM_Vec2 dn_vector2_t;
 typedef HMM_Vec3 Vector3;
 typedef HMM_Vec4 Vector4;
-struct Vector2I {
+struct dn_vector2_tI {
 	int32 x = 0;
 	int32 y = 0;
 };

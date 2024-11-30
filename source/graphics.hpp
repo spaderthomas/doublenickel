@@ -151,7 +151,7 @@ typedef union {
   Matrix2 mat2;
   Vector4 vec4;
   Vector3 vec3;
-  Vector2 vec2;
+  dn_vector2_t vec2;
   float f32;
   i32 texture;
   i32 i32;
@@ -198,14 +198,14 @@ typedef struct {
 ///////////////////////
 typedef struct {
   dn_asset_name_t name;
-  Vector2 size;
+  dn_vector2_t size;
 } dn_gpu_render_target_descriptor_t;
 
 typedef struct {
   dn_asset_name_t name;
   u32 handle;
   u32 color_buffer;
-  Vector2 size;
+  dn_vector2_t size;
 } dn_gpu_render_target_t;
 
 
@@ -282,15 +282,15 @@ typedef struct {
 } dn_gpu_raster_state_t;
 
 typedef struct {
-  Vector2 position;
-  Vector2 size;
+  dn_vector2_t position;
+  dn_vector2_t size;
   bool enabled;
 } dn_gpu_scissor_state_t;
 
 typedef struct {
   u32 layer;
   bool world_space;
-  Vector2 camera;
+  dn_vector2_t camera;
   Matrix4 projection;
 } dn_gpu_renderer_state_t;
 
@@ -367,9 +367,9 @@ typedef struct {
 typedef struct {
   Matrix4 view;
   Matrix4 projection;
-  Vector2 camera;
-  Vector2 native_resolution;
-  Vector2 output_resolution;
+  dn_vector2_t camera;
+  dn_vector2_t native_resolution;
+  dn_vector2_t output_resolution;
   float master_time;
 } dn_gpu_uniforms_t;
 
@@ -416,7 +416,7 @@ DN_API void                      dn_gpu_apply_bindings(dn_gpu_command_buffer_t* 
 DN_API void                      dn_gpu_bind_render_state(dn_gpu_command_buffer_t* command_buffer, dn_gpu_renderer_state_t render);
 DN_API void                      dn_gpu_set_layer(dn_gpu_command_buffer_t* command_buffer, u32 layer);
 DN_API void                      dn_gpu_set_world_space(dn_gpu_command_buffer_t* command_buffer, bool world_space);
-DN_API void                      dn_gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, Vector2 camera);
+DN_API void                      dn_gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, dn_vector2_t camera);
 DN_API dn_gpu_pipeline_t*        dn_gpu_pipeline_create(dn_gpu_pipeline_descriptor_t descriptor);
 DN_API dn_gpu_uniform_t*         dn_gpu_uniform_create(dn_gpu_uniform_descriptor_t descriptor);
 DN_API dn_gpu_buffer_t*          dn_gpu_buffer_create(dn_gpu_buffer_descriptor_t descriptor);
@@ -867,8 +867,8 @@ void dn_gpu_set_world_space(dn_gpu_command_buffer_t* command_buffer, bool world_
   });
 }
 
-void dn_gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, Vector2 camera) {
-  if (dn_os_is_memory_equal(&command_buffer->render.camera,  &camera, sizeof(Vector2))) return;
+void dn_gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, dn_vector2_t camera) {
+  if (dn_os_is_memory_equal(&command_buffer->render.camera,  &camera, sizeof(dn_vector2_t))) return;
 
   dn_array_push(&command_buffer->commands, {
     .op = GPU_COMMAND_OP_SET_CAMERA,

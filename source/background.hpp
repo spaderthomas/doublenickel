@@ -16,7 +16,7 @@ struct Background {
 	char* source_image_full_path;
 	dn_array_t<char*, 64> tiles;
 	dn_array_t<char*, 64> tile_full_paths;
-	dn_array_t<Vector2I, 64> tile_positions;
+	dn_array_t<dn_vector2_tI, 64> tile_positions;
 	i32 width;
 	i32 height;
 	i32 channels;

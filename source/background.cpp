@@ -159,8 +159,8 @@ bool Background::add_tile() {
 		dn_array_push(&tile_positions);
 	} else {
 		// Otherwise, advance the previous tile one column, and move to the next row if needed.
-		Vector2I last_tile_position = *dn_array_back(&tile_positions);
-		Vector2I tile_position = { 0, 0 };
+		dn_vector2_tI last_tile_position = *dn_array_back(&tile_positions);
+		dn_vector2_tI tile_position = { 0, 0 };
 		tile_position.x = last_tile_position.x + Background::TILE_SIZE;
 		tile_position.y = last_tile_position.y;
 		if (tile_position.x >= width) {
@@ -333,7 +333,7 @@ void Background::load_tiles() {
 		sprite->size = { texture->width, texture->height };
 
 		// Each tile spans the entire image, so use trivial UVs
-		Vector2 uv [6] = dn_quad_literal(0, 1, 0, 1);
+		dn_vector2_t uv [6] = dn_quad_literal(0, 1, 0, 1);
 		for (u32 i = 0; i < 6; i++) sprite->uv[i] = uv[i];
 
 		// Mark the data to be loaded to the GPU
@@ -393,7 +393,7 @@ void TileProcessor::process(Background* background) {
 		u32 tile = current_tile++;
 		mutex.unlock();
 
-		Vector2I source_position = *background->tile_positions[tile];
+		dn_vector2_tI source_position = *background->tile_positions[tile];
 		char*    tile_path       = *background->tile_full_paths[tile];
 		memset(tile_data, 0, Background::TILE_SIZE * Background::TILE_SIZE * sizeof(u32));
 			

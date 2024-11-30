@@ -17,8 +17,8 @@ struct Sprite {
   char file_path [DN_MAX_PATH_LEN];
   dn_hash_t hash;
   dn_hash_t texture;
-  Vector2* uv;
-  Vector2I size;
+  dn_vector2_t* uv;
+  dn_vector2_tI size;
 };
 Sprite* find_sprite(const char* name);
 Sprite* find_sprite_no_default(const char* name);
@@ -93,7 +93,7 @@ void init_screenshots();
 void update_textures();
 Sprite* alloc_sprite();
 Texture* alloc_texture();
-Vector2* alloc_uvs();
+dn_vector2_t* alloc_uvs();
 void create_sprite(const char* id, const char* file_path);
 void create_sprite(const char* id, unsigned char* data, i32 width, i32 height, i32 channels);
 void create_sprite_ex(Sprite* sprite, const char* id, unsigned char* data, i32 width, i32 height, i32 channels);
@@ -102,7 +102,7 @@ std::mutex image_mutex;
 std::mutex image_config_mutex;
 
 typedef struct {
-  dn_array_t<Vector2, 65536> uv_data;
+  dn_array_t<dn_vector2_t, 65536> uv_data;
   dn_array_t<Texture, 256> textures;
   dn_array_t<Sprite, 1024> sprites;
   dn_array_t<TextureAtlas, 64> atlases;

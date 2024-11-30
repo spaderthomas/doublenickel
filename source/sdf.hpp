@@ -33,8 +33,8 @@ typedef enum {
 // SDF BUFFER DATA //
 /////////////////////
 typedef struct {
-  Vector2 position;
-  Vector2 uv;
+  dn_vector2_t position;
+  dn_vector2_t uv;
 } dn_sdf_vertex_t;
 
 typedef struct {
@@ -59,7 +59,7 @@ typedef struct {
 ////////////////////
 typedef struct {
   Vector3 color;
-  Vector2 position;
+  dn_vector2_t position;
   float rotation;
   float edge_thickness;
   dn_sdf_shape_t shape;
@@ -78,7 +78,7 @@ typedef struct {
 
 typedef struct {
   dn_sdf_header_t header;
-  Vector2 size;
+  dn_vector2_t size;
 } dn_sdf_oriented_box_t;
 
 
@@ -183,7 +183,7 @@ dn_sdf_renderer_t dn_sdf_renderer_create(u32 buffer_size) {
     })
   };
 
-  Vector2 vertices [6] = dn_quad_literal(0.5, -0.5, -0.5, 0.5);
+  dn_vector2_t vertices [6] = dn_quad_literal(0.5, -0.5, -0.5, 0.5);
   for (u32 i = 0; i < 6; i++) {
     dn_sdf_vertex_t vertex = {
       .position = vertices[i],

@@ -4,8 +4,8 @@
 struct dn_prepared_text_t {
 	// @dn: This should be temporary storage 99% of the time
 	char text [MAX_TEXT_LEN] = { 0 };
-	Vector2 position;
-	Vector2 padding;
+	dn_vector2_t position;
+	dn_vector2_t padding;
 	Vector4 color;
 	dn_baked_font_t* font;
 	float wrap;

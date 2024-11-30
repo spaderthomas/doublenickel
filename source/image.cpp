@@ -173,7 +173,7 @@ void TextureAtlas::build_from_config() {
         DEFER_POP(l);
           
         for (i32 i = 0; i < 6; i++) {
-          Vector2& uv = sprite->uv[i];
+          dn_vector2_t& uv = sprite->uv[i];
             
           lua_pushnumber(l, i * 2 + 1);
           lua_gettable(l, -2);
@@ -269,8 +269,8 @@ void TextureAtlas::build_from_source() {
     float32 left   = rect->x            / (float32)TEXTURE_ATLAS_SIZE;
     float32 right  = (rect->x + size.x) / (float32)TEXTURE_ATLAS_SIZE;
       
-    Vector2 uv [6] = dn_quad_literal(top, bottom, left, right);
-    memcpy(item->sprite->uv, uv, sizeof(Vector2) * 6);
+    dn_vector2_t uv [6] = dn_quad_literal(top, bottom, left, right);
+    memcpy(item->sprite->uv, uv, sizeof(dn_vector2_t) * 6);
 
     // Copy the sprite into the image buffer
     u32* image = item->data;
@@ -626,11 +626,11 @@ void create_sprite_ex(Sprite* sprite, const char* id, u8* data, i32 width, i32 h
   
   sprite->hash = dn_hash_cstr_dumb(id);
   sprite->texture = texture->hash;
-  sprite->size = Vector2I(width, height);
+  sprite->size = dn_vector2_tI(width, height);
   strncpy(sprite->file_path, id, DN_MAX_PATH_LEN);
 
-  Vector2 uv [6] = dn_quad_literal(0, 1, 0, 1);
-  memcpy(sprite->uv, uv, sizeof(Vector2) * 6);
+  dn_vector2_t uv [6] = dn_quad_literal(0, 1, 0, 1);
+  memcpy(sprite->uv, uv, sizeof(dn_vector2_t) * 6);
 }
 
 /////////////////
@@ -706,11 +706,11 @@ Sprite* find_sprite(const char* name) {
   return find_sprite_no_default("debug.png");
 }
 
-Vector2* alloc_uvs_no_lock() {
-  return dn_array_push(&dn_images.uv_data, Vector2(), 6);
+dn_vector2_t* alloc_uvs_no_lock() {
+  return dn_array_push(&dn_images.uv_data, dn_vector2_t(), 6);
 }
 
-Vector2* alloc_uvs() {
+dn_vector2_t* alloc_uvs() {
   std::lock_guard lock(image_mutex);
   return alloc_uvs_no_lock();
 }
