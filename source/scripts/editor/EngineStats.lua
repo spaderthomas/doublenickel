@@ -132,9 +132,9 @@ function EngineStats:engine_viewer()
   if imgui.TreeNode('Window') then
     local main_view = doublenickel.editor.find('GameViewManager'):find_main_view()
     imgui.extensions.TableField('Main View', main_view.name)
-    imgui.extensions.Vec2('Content Area', doublenickel.window.dn_window_get_content_area())
-    imgui.extensions.Vec2('Native Resolution', doublenickel.window.dn_window_get_native_resolution())
-    imgui.extensions.Vec2('Game View', doublenickel.window.get_game_area_size())
+    imgui.extensions.Vec2('Content Area', dn.window_get_content_area(), '%d') 
+    imgui.extensions.Vec2('Native Resolution', doublenickel.window.dn_window_get_native_resolution(), '%d')
+    imgui.extensions.Vec2('Game View', doublenickel.window.get_game_area_size(), '%d')
     imgui.TreePop()
   end
 

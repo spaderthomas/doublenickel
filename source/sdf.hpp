@@ -105,34 +105,34 @@ DN_API void                     dn_sdf_oriented_box_ex(dn_sdf_renderer_t* render
 DN_API void                     dn_sdf_grid(dn_sdf_renderer_t* renderer, u32 grid_width, u32 grid_size);
 #endif
 
-#ifdef DN_DN_SDF_IMPLEMENTATION
+#ifdef DN_SDF_IMPLEMENTATION
 dn_sdf_renderer_t dn_sdf_renderer_create(u32 buffer_size) {
   dn_sdf_renderer_t renderer = {
     .state = DN_SDF_RENDERER_STATE_NONE,
 
     .vertices = dn_gpu_backed_buffer_create({
-      .name = "dn_sdf_renderer_tVertices",
+      .name = "SdfVertices",
       .kind = DN_GPU_BUFFER_KIND_ARRAY,
       .usage = DN_GPU_BUFFER_USAGE_STATIC,
       .capacity = buffer_size,
       .element_size = sizeof(dn_sdf_vertex_t)
     }),
     .instances = dn_gpu_backed_buffer_create({
-      .name = "dn_sdf_renderer_tInstances",
+      .name = "SdfInstances",
       .kind = DN_GPU_BUFFER_KIND_ARRAY,
       .usage = DN_GPU_BUFFER_USAGE_DYNAMIC,
       .capacity = buffer_size,
       .element_size = sizeof(dn_sdf_instance_t)
     }),
     .combinations = dn_gpu_backed_buffer_create({
-      .name = "dn_sdf_renderer_tCombinations",
+      .name = "SdfCombinations",
       .kind = DN_GPU_BUFFER_KIND_STORAGE,
       .usage = DN_GPU_BUFFER_USAGE_DYNAMIC,
       .capacity = buffer_size,
       .element_size = sizeof(u32)
     }),
     .shape_data = dn_gpu_backed_buffer_create({
-      .name = "dn_sdf_renderer_tShapeData",
+      .name = "SdfShapeData",
       .kind = DN_GPU_BUFFER_KIND_STORAGE,
       .usage = DN_GPU_BUFFER_USAGE_DYNAMIC,
       .capacity = buffer_size,
