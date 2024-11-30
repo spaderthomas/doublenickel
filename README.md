@@ -16,7 +16,10 @@ This is by no means a comprehensive list, just the things I find most important.
 ## how do i use this?
 Well, you probably shouldn't -- yet. I'm still working on porting over features from Deep Copy, and things are likely to break. That being said, the framework is very much usable, and I use it every day.
 
-If you're a source code person, check out the [example repo]() to get a taste for what applications built with `doublenickel` look like.
+If you're a source code person, check out the [example repo](https://github.com/spaderthomas/dn_examples) to get a taste for what applications built with `doublenickel` look like. It's a little bare right now -- I'm working on porting all the tech demos I've been working on into their own examples. In addition to the usual basic examples (i.e. how to use the core systems), I'll also have:
+- A demo of the SDF shape renderer
+- An example of normal mapping and volumetric lighting of low resolution 2D scenes
+- Eulerian and Lagrangian fluid simulations
 
 ## why?
 Writing your own game engine is pure folly, but writing your own game is very reasonable and productive. Commercial engines are fine, but I enjoy writing all the software for my games, and I wanted to keep the real and hard fought benefits I gained from making my first commercial game:
