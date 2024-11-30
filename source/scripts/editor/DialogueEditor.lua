@@ -488,7 +488,7 @@ function DialogueEditor:load(name_or_path)
 		return
 	end
 
-	local file_path = doublenickel.ffi.dn_paths_resolve_format('dialogue_metadata', file_name):to_interned()
+	local file_path = dn.paths_resolve_format('dialogue_metadata', file_name):to_interned()
 	self.gnodes = doublenickel.module.read(file_path)
 	for id, gnode in pairs(self.gnodes) do
 		gnode.position = doublenickel.vec2(gnode.position)
@@ -552,7 +552,7 @@ function DialogueEditor:save_impl(dialogue_name)
 		}
 	end
 
-	local file_path = doublenickel.ffi.dn_paths_resolve_format('dialogue_metadata', dialogue_name):to_interned()
+	local file_path = dn.paths_resolve_format('dialogue_metadata', dialogue_name):to_interned()
 	doublenickel.module.write(file_path, gnodes, doublenickel.module.WriteOptions.Compact)
 
 	-- Bookkeeping: Update the word count and mark the graph as clean
@@ -574,16 +574,16 @@ function DialogueEditor:new(name)
 	self.nodes = self.data.nodes
 	self.gnodes = self.data.gnodes
 
-	local directory = doublenickel.ffi.dn_paths_resolve_format('dialogue_folder', name):to_interned()
-	doublenickel.ffi.dn_os_remove_directory(directory)
-	doublenickel.ffi.dn_os_create_directory(directory)
+	local directory = dn.paths_resolve_format('dialogue_folder', name):to_interned()
+	dn.os_remove_directory(directory)
+	dn.os_create_directory(directory)
 	self:save(name)
 	self:load(name)
 end
 
 function DialogueEditor:delete(name)
-	local directory = doublenickel.ffi.dn_paths_resolve_format('dialogue_folder', name):to_interned()
-	doublenickel.ffi.dn_os_remove_directory(directory)
+	local directory = dn.paths_resolve_format('dialogue_folder', name):to_interned()
+	dn.os_remove_directory(directory)
 
 	self:new('default')
 end

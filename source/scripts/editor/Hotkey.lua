@@ -71,7 +71,7 @@ function Hotkey:new_dialogue()
 end
 
 function Hotkey:open_dialogue()
-  local directory = doublenickel.ffi.dn_paths_resolve('dialogues'):to_interned()
+  local directory = dn.paths_resolve('dialogues'):to_interned()
   imgui.SetFileBrowserPwd(directory)
   imgui.file_browser_open()
 
@@ -93,7 +93,7 @@ function Hotkey:toggle_play_mode()
 end
 
 function Hotkey:open_scene()
-  local scenes = doublenickel.ffi.dn_paths_resolve('scenes'):to_interned()
+  local scenes = dn.paths_resolve('scenes'):to_interned()
   imgui.file_browser_set_work_dir(scenes)
   imgui.file_browser_open()
 

@@ -21,14 +21,14 @@ function doublenickel.state.write(file_name, state)
     value.__editor = nil
   end
 
-  local file_path = doublenickel.ffi.dn_paths_resolve_format('state', file_name):to_interned()
+  local file_path = dn.paths_resolve_format('state', file_name):to_interned()
   state = state or doublenickel.state.data
 
   doublenickel.module.write(file_path, state, doublenickel.module.WriteOptions.Pretty)
 end
 
 function doublenickel.state.read_file(file_name)
-  local file_path = doublenickel.ffi.dn_paths_resolve_format('state', file_name):to_interned()
+  local file_path = dn.paths_resolve_format('state', file_name):to_interned()
   return doublenickel.state.read(file_path)
 end
 

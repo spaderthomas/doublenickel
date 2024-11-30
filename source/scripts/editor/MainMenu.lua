@@ -93,7 +93,7 @@ function MainMenu:show_modals(dt)
 		imgui.Dummy(5, 5)
 
 		if imgui.Button('Save') then
-			doublenickel.ffi.dn_imgui_save_layout(self.saved_layout_name)
+			dn.imgui_save_layout(self.saved_layout_name)
 			self.saved_layout_name = ''
 			imgui.CloseCurrentPopup()
 		end
@@ -191,7 +191,7 @@ function MainMenu:Dialogue()
 		-- The hotkey entity in the editor takes care of the hotkey part
 		local dialogue_editor = doublenickel.find_entity_editor('DialogueEditor')
 		if imgui.MenuItem('Open', 'Ctrl+O') then
-			local directory = doublenickel.ffi.dn_paths_resolve('dialogues'):to_interned()
+			local directory = dn.paths_resolve('dialogues'):to_interned()
 			imgui.file_browser_set_work_dir(directory)
 			imgui.file_browser_open()
 			self.state = state.choosing_dialogue
@@ -240,12 +240,12 @@ function MainMenu:Window()
 	if imgui.BeginMenu('Window') then
 		if imgui.BeginMenu('Layout') then
 			if imgui.BeginMenu('Open') then
-				local layout_dir = doublenickel.ffi.dn_paths_resolve('layouts'):to_interned()
+				local layout_dir = dn.paths_resolve('layouts'):to_interned()
 				for entry in doublenickel.filesystem.iterate_directory(layout_dir) do
 					local layout = entry.file_path:to_interned()
 					if imgui.MenuItem(doublenickel.strip_extension(layout)) then
 						local file_name = doublenickel.strip_extension(layout)
-						doublenickel.ffi.dn_imgui_load_layout(file_name)
+						dn.imgui_load_layout(file_name)
 					end
 				end
 

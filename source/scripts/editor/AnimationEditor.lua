@@ -98,7 +98,7 @@ function AnimationEditor:popup()
 	local done = false
 
 	local window = doublenickel.vec2(450, 600)
-	local wx = doublenickel.ffi.dn_window_get_content_area().x
+	local wx = dn.window_get_content_area().x
 	imgui.SetCursorPosX((wx / 2) - (window.x / 2))
 	imgui.SetNextWindowSize(window:unpack())
 
@@ -151,8 +151,8 @@ function AnimationEditor:popup()
 		end
 
 		imgui.InputText(self.ids.import, self, 'import_dir')
-		local import_path = doublenickel.ffi.dn_paths_resolve_format('dn_image', self.import_dir):to_interned()
-		local import_valid = doublenickel.ffi.dn_os_does_path_exist(import_path) and #self.import_dir > 0
+		local import_path = dn.paths_resolve_format('dn_image', self.import_dir):to_interned()
+		local import_valid = dn.os_does_path_exist(import_path) and #self.import_dir > 0
 		imgui.SameLine()
 
 		if imgui.Button('Import') then

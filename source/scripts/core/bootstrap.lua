@@ -1385,7 +1385,7 @@ bit = require('bit')
 
 --   -- The stack trace contains absolute paths, which are just hard to read. Also, if the path is long, it is
 --   -- shortened with "...". Remove the absolute part of the path, including the "..."
---   local install_dir = doublenickel.ffi.dn_paths_resolve('install'):to_interned()
+--   local install_dir = dn.paths_resolve('install'):to_interned()
 --   local escaped_install = install_dir:gsub('%.', '%%.')
 --   local last_path_element = install_dir:match("([^/]+)$")
 --   local pattern = '%.%.%.(.*)/' .. last_path_element
@@ -1420,7 +1420,7 @@ function doublenickel.handle_error()
 
   -- The stack trace contains absolute paths, which are just hard to read. Also, if the path is long, it is
   -- shortened with "...". Remove the absolute part of the path, including the "..."
-  local install_dir = doublenickel.ffi.dn_paths_resolve('install'):to_interned()
+  local install_dir = dn.paths_resolve('install'):to_interned()
   local escaped_install = install_dir:gsub('%.', '%%.')
   local last_path_element = install_dir:match("([^/]+)$")
   local pattern = '%.%.%.(.*)/' .. last_path_element
@@ -1578,6 +1578,7 @@ function doublenickel.init_phase_0()
 
   -- Bootstrap the FFI, so that we can resolve paths
   doublenickel.ffi = {}
+  dn = {}
   ffi.cdef(ffi_header)
   
   -- Run a sanity check on the compiled size of all types and what the parser inside LuaJIT generates.

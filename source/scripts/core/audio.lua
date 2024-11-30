@@ -22,23 +22,23 @@ function doublenickel.audio.play(sound, loop)
     if #sound == 0 then return end
 
     if loop then
-      return doublenickel.ffi.dn_audio_play_looped(sound)
+      return dn.audio_play_looped(sound)
     else
-      return doublenickel.ffi.dn_audio_play_sound(sound)
+      return dn.audio_play_sound(sound)
     end
   end
 end
 
 function doublenickel.audio.play_after(after_handle, ...)
   local handle = doublenickel.audio.play(...)
-  doublenickel.ffi.dn_audio_queue(after_handle, handle);
+  dn.audio_queue(after_handle, handle);
 
   return handle
 end
 
 function doublenickel.audio.is_playing(handle)
   if not handle then return false end
-  return doublenickel.ffi.dn_audio_is_playing(handle)
+  return dn.audio_is_playing(handle)
 end
 
 function doublenickel.audio.play_interpolated(sound, interpolator, loop)
@@ -76,11 +76,11 @@ function doublenickel.audio.stop_after_interpolate(handle)
 end
 
 function doublenickel.audio.stop(handle)
-  if handle then doublenickel.ffi.dn_audio_stop(handle) end
+  if handle then dn.audio_stop(handle) end
 end
 
 function doublenickel.audio.stop_all()
-  doublenickel.ffi.dn_audio_stop_all()
+  dn.audio_stop_all()
 end
 
 function doublenickel.audio.defer_stop(handle, time)
@@ -91,19 +91,19 @@ function doublenickel.audio.defer_stop(handle, time)
 end
 
 function doublenickel.audio.pause(handle)
-  return doublenickel.ffi.dn_audio_pause(handle)
+  return dn.audio_pause(handle)
 end
 
 function doublenickel.audio.unpause(handle)
-  return doublenickel.ffi.dn_audio_resume(handle)
+  return dn.audio_resume(handle)
 end
 
 function doublenickel.audio.set_volume(handle, volume)
-  if handle then doublenickel.ffi.dn_audio_set_volume(handle, volume) end
+  if handle then dn.audio_set_volume(handle, volume) end
 end
 
 function doublenickel.audio.dn_audio_set_master_volume(volume)
-  doublenickel.ffi.dn_audio_set_master_volume(volume)
+  dn.audio_set_master_volume(volume)
 end
 
 function doublenickel.audio.dn_audio_set_master_volume_mod(volume_mod)
@@ -114,23 +114,23 @@ function doublenickel.audio.dn_audio_set_master_volume_mod(volume_mod)
 end
 
 function doublenickel.audio.set_cutoff(handle, cutoff)
-  if handle then doublenickel.ffi.dn_audio_set_filter_cutoff(handle, cutoff) end
+  if handle then dn.audio_set_filter_cutoff(handle, cutoff) end
 end
 
 function doublenickel.audio.dn_audio_set_master_filter_cutoff(cutoff)
-  doublenickel.ffi.dn_audio_set_master_filter_cutoff(cutoff)
+  dn.audio_set_master_filter_cutoff(cutoff)
 end
 
 function doublenickel.audio.get_master_cutoff()
-  return doublenickel.ffi.dn_audio_get_master_filter_cutoff()
+  return dn.audio_get_master_filter_cutoff()
 end
 
 function doublenickel.audio.get_master_volume()
-  return doublenickel.ffi.dn_audio_get_master_volume()
+  return dn.audio_get_master_volume()
 end
 
 function doublenickel.audio.get_master_volume_mod()
-  return doublenickel.ffi.dn_audio_get_master_volume_mod()
+  return dn.audio_get_master_volume_mod()
 end
 
 function doublenickel.audio.enable()
@@ -184,7 +184,7 @@ local function update_interpolation()
 
   local master_volume_mod = doublenickel.audio.internal.interpolation.master_volume_mod
   master_volume_mod:update()
-  doublenickel.ffi.dn_audio_set_master_volume_mod(master_volume_mod:get_value())
+  dn.audio_set_master_volume_mod(master_volume_mod:get_value())
 end
 
 local function update_deferred_stop()

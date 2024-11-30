@@ -98,7 +98,7 @@ local function make_text(text, font, color, wrap, precise)
   item.color = color or doublenickel.colors.white
   item.wrap = wrap or 0
   item.precise = ternary(precise, true, false)
-  item.prepared = doublenickel.ffi.dn_prepare_text_ex(item.text, 0, 0, item.font, item.wrap, item.color:to_vec4(), item.precise)
+  item.prepared = dn.prepare_text_ex(item.text, 0, 0, item.font, item.wrap, item.color:to_vec4(), item.precise)
 
   if item.precise then
     item.size = doublenickel.vec2(item.prepared.width, item.prepared.height)
@@ -1451,7 +1451,7 @@ local function update_animations()
       --    each frame. This is """"slow""" but dead simple in every possible way. (Also it's not slow)
       for index, item in animation.hide_data.draw_list:iterate() do
         if item.kind == GuiItem.kinds.text then
-          item.prepared = doublenickel.ffi.dn_prepare_text_ex(item.text, 0, 0, item.font, item.wrap,
+          item.prepared = dn.prepare_text_ex(item.text, 0, 0, item.font, item.wrap,
             doublenickel.color_to_vec4(item.color), item.precise)
         end
       end

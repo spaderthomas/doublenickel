@@ -40,7 +40,7 @@ function doublenickel.editor.configure(config)
   end
 
   doublenickel.editor.find('SceneEditor'):load(config.scene)
-  doublenickel.ffi.dn_imgui_load_layout(config.layout)
+  dn.imgui_load_layout(config.layout)
 end
 
 
@@ -122,7 +122,7 @@ end
 
 
 function doublenickel.editor.center_next_window(size)
-  local screen = doublenickel.vec2(doublenickel.ffi.dn_window_get_content_area())
+  local screen = doublenickel.vec2(dn.window_get_content_area())
   local position = screen:scale(.5):subtract(size:scale(.5))
   imgui.SetNextWindowPos(position:unpack())
   imgui.SetNextWindowSize(size:unpack())

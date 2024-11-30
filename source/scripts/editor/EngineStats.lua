@@ -83,7 +83,7 @@ end
 function EngineStats:playground()
   if self.window then
     self.window:update()
-    local x = doublenickel.ffi.dn_window_get_content_area()
+    local x = dn.window_get_content_area()
     doublenickel.ffi.set_window_size(self.window:get_value(), x.y)
 
     if self.window:is_done() then
@@ -156,7 +156,7 @@ function EngineStats:engine_viewer()
     imgui.Checkbox('Display Cursor', self, 'display_cursor')
 
     if self.display_cursor then
-      local world = doublenickel.vec2(doublenickel.ffi.dn_input_mouse(ffi.C.DN_COORD_UNIT_WORLD))
+      local world = doublenickel.vec2(dn.input_mouse(ffi.C.DN_COORD_UNIT_WORLD))
       doublenickel.draw_circle_l(world, 5, doublenickel.colors.red)
     end
 
@@ -173,10 +173,10 @@ function EngineStats:engine_viewer()
 
 
     if imgui.TreeNode('Mouse') then
-      imgui.extensions.Vec2('Screen', doublenickel.ffi.dn_input_mouse(ffi.C.DN_COORD_UNIT_SCREEN), '%.3f')
-      imgui.extensions.Vec2('Window', doublenickel.ffi.dn_input_mouse(ffi.C.DN_COORD_UNIT_WINDOW), '%.3f')
-      imgui.extensions.Vec2('Game  ', doublenickel.ffi.dn_input_mouse(ffi.C.DN_COORD_UNIT_GAME), '%d')
-      imgui.extensions.Vec2('World ', doublenickel.ffi.dn_input_mouse(ffi.C.DN_COORD_UNIT_WORLD), '%d')
+      imgui.extensions.Vec2('Screen', dn.input_mouse(ffi.C.DN_COORD_UNIT_SCREEN), '%.3f')
+      imgui.extensions.Vec2('Window', dn.input_mouse(ffi.C.DN_COORD_UNIT_WINDOW), '%.3f')
+      imgui.extensions.Vec2('Game  ', dn.input_mouse(ffi.C.DN_COORD_UNIT_GAME), '%d')
+      imgui.extensions.Vec2('World ', dn.input_mouse(ffi.C.DN_COORD_UNIT_WORLD), '%d')
 
       imgui.TreePop()
     end
@@ -369,7 +369,7 @@ function EngineStats:engine_viewer()
 
   if imgui.TreeNode('Utility') then
     if imgui.Button('Show Text Input') then
-      doublenickel.ffi.dn_steam_open_text_input()
+      dn.steam_open_text_input()
     end
 
     if imgui.Button('Window') then
@@ -388,7 +388,7 @@ function EngineStats:calculate_framerate()
     local metrics = doublenickel.time_metric.query_all()
     table.merge(metrics, self.metrics)
 
-    self.metrics.target_fps = doublenickel.ffi.dn_engine_get_target_fps()
+    self.metrics.target_fps = dn.engine_get_target_fps()
     self.metrics.actual_fps = math.floor(1000.0 / self.metrics.frame.average)
   end
 end

@@ -110,8 +110,8 @@ function Camera:update_sway()
     local t = self.perlin.speed * doublenickel.elapsed_time
     local amp_max = self.perlin.amplitude
     local amp_min = self.perlin.amplitude * -1
-    local nx = doublenickel.ffi.dn_noise_perlin_scaled(t, 0, amp_min, amp_max)
-    local ny = doublenickel.ffi.dn_noise_perlin_scaled(0, t, amp_min, amp_max)
+    local nx = dn.noise_perlin_scaled(t, 0, amp_min, amp_max)
+    local ny = dn.noise_perlin_scaled(0, t, amp_min, amp_max)
 
     self.perlin.interpolation:update()
     local blend = self.perlin.interpolation:get_value()

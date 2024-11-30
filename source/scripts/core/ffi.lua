@@ -31,6 +31,8 @@ function doublenickel.ffi.init()
     }
   )
 
+  dn = doublenickel.ffi.namespace('dn')
+
   local string_metatable = {
     __index = {
       to_interned = function(self)
@@ -508,25 +510,25 @@ end
 dn_allocator_t = doublenickel.class.metatype('dn_allocator_t')
 
 function dn_allocator_t:find(name)
-  return doublenickel.ffi.dn_allocator_find(name)
+  return dn.allocator_find(name)
 end
 
 function dn_allocator_t:add(name)
-  return doublenickel.ffi.dn_allocator_add(self, name)
+  return dn.allocator_add(self, name)
 end
 
 function dn_allocator_t:alloc(size)
-  return doublenickel.ffi.dn_allocator_alloc(self, size)
+  return dn.allocator_alloc(self, size)
 end
 
 function dn_allocator_t:free(pointer)
-  return doublenickel.ffi.dn_allocator_free(self, pointer)
+  return dn.allocator_free(self, pointer)
 end
 
 function dn_allocator_t:alloc_array(ctype, n)
   return ffi.cast(
     doublenickel.ffi.ptr_type(ctype), 
-    doublenickel.ffi.dn_allocator_alloc(self, ffi.sizeof(ctype) * n)
+    dn.allocator_alloc(self, ffi.sizeof(ctype) * n)
   )
 end
 
@@ -800,7 +802,7 @@ end
 
 GpuBufferLayout = doublenickel.class.metatype('dn_gpu_buffer_layout_t')
 function GpuBufferLayout:init(params)
-  local allocator = doublenickel.ffi.dn_allocator_find('standard')
+  local allocator = dn.allocator_find('standard')
 
   self.num_vertex_attributes = #params.vertex_attributes
   self.vertex_attributes = allocator:alloc_array('dn_gpu_vertex_attribute_t', self.num_vertex_attributes)
@@ -817,7 +819,7 @@ end
 
 GpuPipelineDescriptor = doublenickel.class.metatype('dn_gpu_pipeline_descriptor_t')
 function GpuPipelineDescriptor:init(params)
-  local allocator = doublenickel.ffi.dn_allocator_find('standard')
+  local allocator = dn.allocator_find('standard')
 
   self.raster = dn_gpu_raster_state_t:new(params.raster)
 
@@ -880,7 +882,7 @@ end
 
 GpuBufferBinding = doublenickel.class.metatype('dn_gpu_buffer_binding_t')
 function GpuBufferBinding:init(params)
-  local allocator = doublenickel.ffi.dn_allocator_find('standard')
+  local allocator = dn.allocator_find('standard')
 
   if params.vertex then
     self.vertex.count = #params.vertex
@@ -913,7 +915,7 @@ end
 ---------
 WindowConfig = doublenickel.class.metatype('dn_window_config_t')
 function WindowConfig:init(params)
-  local default = doublenickel.ffi.dn_window_config_default();
+  local default = dn.window_config_default();
   self.title = params.title or default.title
   self.icon = params.icon or default.icon
   self.native_resolution = params.native_resolution or default.native_resolution
@@ -923,7 +925,7 @@ end
 
 AudioConfig = doublenickel.class.metatype('dn_audio_config_t')
 function AudioConfig:init(params)
-  local allocator = doublenickel.ffi.dn_allocator_find('bump')
+  local allocator = dn.allocator_find('bump')
 
   self.num_dirs = #params.dirs
   self.dirs = allocator:alloc_array('dn_path_t', #params.dirs)
@@ -953,7 +955,7 @@ end
 
 FontConfig = doublenickel.class.metatype('dn_font_config_t')
 function FontConfig:init(params)
-  local allocator = doublenickel.ffi.dn_allocator_find('bump')
+  local allocator = dn.allocator_find('bump')
 
   self.num_fonts = #params.fonts
   self.fonts = allocator:alloc_array('dn_font_descriptor_t', #params.fonts)
@@ -964,7 +966,7 @@ end
 
 GpuConfig = doublenickel.class.metatype('dn_gpu_config_t')
 function GpuConfig:init(params)
-  local allocator = doublenickel.ffi.dn_allocator_find('bump')
+  local allocator = dn.allocator_find('bump')
 
   self.shader_path = params.shader_path or nil
 
@@ -994,9 +996,9 @@ end
 
 AppConfig = doublenickel.class.metatype('dn_app_config_t')
 function AppConfig:init(params)
-  self.window = params.window or doublenickel.ffi.dn_window_config_default()
-  self.audio = params.audio or doublenickel.ffi.dn_audio_config_default()
-  self.font = params.font or doublenickel.ffi.dn_font_config_default()
+  self.window = params.window or dn.window_config_default()
+  self.audio = params.audio or dn.audio_config_default()
+  self.font = params.font or dn.font_config_default()
   self.gpu = params.gpu or ffi.new('dn_gpu_config_t')
   self.asset = params.asset or ffi.new('dn_asset_config_t')
   self.steam = params.steam or ffi.new('dn_steam_config_t')
@@ -1007,7 +1009,7 @@ end
 ------------------
 -- FFI WRAPPERS --
 ------------------
-function doublenickel.ffi.dn_window_get_display_mode()
+function dn.window_get_display_mode()
   return doublenickel.enums.DisplayMode(ffi.C.dn_window_get_display_mode())
 end
 

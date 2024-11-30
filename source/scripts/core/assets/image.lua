@@ -15,8 +15,8 @@ doublenickel.layers = {
 }
 
 function doublenickel.animation.load()
-  local info = doublenickel.ffi.dn_paths_resolve('animation_info'):to_interned()
-  if doublenickel.ffi.dn_os_does_path_exist(info) then
+  local info = dn.paths_resolve('animation_info'):to_interned()
+  if dn.os_does_path_exist(info) then
     doublenickel.animation.data = doublenickel.module.read_from_named_path('animation_info')
   else
     doublenickel.animation.data = {}

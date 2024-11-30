@@ -23,7 +23,7 @@ doublenickel.module.WriteOptions = doublenickel.enum.define(
 )
 
 function doublenickel.module.write_to_named_path(name, data, pretty)
-  local file_path = doublenickel.ffi.dn_paths_resolve(name):to_interned()
+  local file_path = dn.paths_resolve(name):to_interned()
   local is_pretty = pretty == doublenickel.module.WriteOptions.Pretty
 
   doublenickel.write_file_to_return_table(file_path, data, pretty)
@@ -40,6 +40,6 @@ function doublenickel.module.read(file_path)
 end
 
 function doublenickel.module.read_from_named_path(name)
-  local file_path = doublenickel.ffi.dn_paths_resolve(name):to_interned()
+  local file_path = dn.paths_resolve(name):to_interned()
   return doublenickel.module.read(file_path)
 end

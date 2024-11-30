@@ -84,7 +84,7 @@ end
 function CharacterEditor:invalid_popup()
   local sx = 500
   local sy = 150
-  local wx = doublenickel.ffi.dn_window_get_content_area().x
+  local wx = dn.window_get_content_area().x
   imgui.SetCursorPosX((wx / 2) - (sx / 2))
   imgui.SetNextWindowSize(sx, sy)
 

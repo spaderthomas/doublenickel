@@ -46,7 +46,7 @@ function GameView:update()
 
   end
 
-  local render_target = doublenickel.ffi.dn_gpu_render_target_find(self.render_target:to_qualified_string())
+  local render_target = dn.gpu_render_target_find(self.render_target:to_qualified_string())
   imgui.Image(
     render_target.color_buffer,
     imgui.ImVec2(self.size.x, self.size.y),
