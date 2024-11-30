@@ -1,12 +1,13 @@
 #version 450 core
- 
-//////////////
-// UNIFORMS //
-//////////////
-uniform float master_time;
-uniform vec2 camera;
-uniform vec2 output_resolution;
-uniform vec2 native_resolution;
+
+layout (std140) uniform DnUniformBlock {
+	mat4  view;
+	mat4  projection;
+	vec2  camera;
+	vec2  native_resolution;
+	vec2  output_resolution;
+	float master_time;
+};
 
 
 ///////////////

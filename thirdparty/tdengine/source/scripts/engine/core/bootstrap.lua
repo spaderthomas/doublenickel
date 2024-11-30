@@ -727,6 +727,12 @@ typedef struct {
 } dn_gpu_uniform_binding_t;
 
 typedef struct {
+  dn_asset_name_t name;
+  dn_gpu_buffer_t* buffer;
+  u32 binding_index;
+} dn_gpu_uniform_buffer_binding_t;
+
+typedef struct {
   __declspec(align(16)) struct {
     dn_gpu_vertex_buffer_binding_t bindings [8];
     u32 count;
@@ -742,9 +748,10 @@ typedef struct {
     u32 count;
   } storage;
 
-  // UBO
-  // SSBO
-} dn_gpu_buffer_binding_t;
+  __declspec(align(16)) struct {
+    dn_gpu_uniform_buffer_binding_t bindings [8];
+    u32 count;
+  } uniform_buffers;} dn_gpu_buffer_binding_t;
 
 
 //////////////////
@@ -1573,18 +1580,24 @@ function tdengine.init_phase_0()
   --
   -- The only reason this is here is because I *have* seen MSVC generate a different size than what 
   -- the FFI reports. See the types in the header which are force aligned to 16 bytes.
+  local type_mismatch = false
   local type_infos = ffi.C.dn_engine_query_types()
   for i = 0, type_infos.count - 1 do
     local type_info = type_infos.data[i]
     local ffi_size = ffi.sizeof(ffi.string(type_info.name))
     
     if ffi_size ~= type_info.size then
+      type_mismatch = true
       print(string.format(
         'Found type mismatch; type = %s, ffi_size = %d, compiled_size = %d',
         ffi.string(type_info.name),
         ffi_size, type_info.size)
       )
     end
+  end
+  if type_mismatch then 
+    ffi.C.dn_engine_set_exit_game(true) -- Technically useless, since the game will explode without bootstrapping
+    return 
   end
 
   -- Bootstrap the engine paths, so we can load the rest of the scripts

@@ -85,6 +85,7 @@ dn_type_info_list_t dn_engine_query_types() {
     dn_type_info(dn_gpu_storage_buffer_binding_t),
     dn_type_info(dn_gpu_uniform_t),
     dn_type_info(dn_gpu_uniform_binding_t),
+    dn_type_info(dn_gpu_uniform_buffer_binding_t),
     dn_type_info(dn_gpu_uniform_descriptor_t),
     dn_type_info(dn_gpu_uniform_data_t),
     dn_type_info(dn_gpu_vertex_attr_info_t),

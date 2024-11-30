@@ -7,6 +7,13 @@ i32 find_uniform_index(const char* name) {
 	return glGetUniformLocation(program, name);
 }
 
+i32 dn_gpu_find_uniform_block_index(const char* name) {
+	i32 program = 0;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &program);
+	return glGetUniformBlockIndex(program, name);
+}
+
+
 void set_uniform_immediate_vec4(const char* name, HMM_Vec4 vec) {
 	i32 index = find_uniform_index(name);
 	glUniform4f(index, vec.X, vec.Y, vec.Z, vec.W);

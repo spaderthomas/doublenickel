@@ -19,7 +19,7 @@
 #define DN_API extern "C" __declspec(dllexport)
 #define DN_IMP
 
-#define DN_ALIGN(n) __declspec(align(n))
+#define dn_align(n) __declspec(align(n))
 #define DN_ASSERT(condition) assert(condition)
 #define DN_UNTESTED() DN_ASSERT(false)
 

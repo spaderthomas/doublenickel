@@ -1,5 +1,5 @@
-#ifndef APP_H
-#define APP_H
+#ifndef DN_APP_H
+#define DN_APP_H
 /* 
 Since Doublenickel is intended to be consumed via source, and since it contains iterpreted code which needs
 to be located at runtime (as opposed to just C++ source), we need a way to locate those sources. Also, a core
@@ -49,7 +49,7 @@ DN_IMP void dn_app_default();
 DN_API void dn_app_configure(dn_app_config_t config);
 #endif
 
-#ifdef APP_IMPLEMENTATION
+#ifdef DN_APP_IMPLEMENTATION
 void dn_app_init(dn_app_descriptor_t descriptor) {
   snprintf(dn_app.install_path, DN_MAX_PATH_LEN, "%s", descriptor.install_path);
   snprintf(dn_app.engine_path, DN_MAX_PATH_LEN, "%s/%s", descriptor.install_path, descriptor.engine_path);

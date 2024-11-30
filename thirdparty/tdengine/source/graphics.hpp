@@ -48,6 +48,7 @@ typedef enum {
 typedef enum {
   GPU_BUFFER_KIND_STORAGE = 0,
   GPU_BUFFER_KIND_ARRAY = 1,
+  GPU_BUFFER_KIND_UNIFORM = 2,
 } dn_gpu_buffer_kind_t;
 
 typedef enum {
@@ -238,23 +239,31 @@ typedef struct {
 } dn_gpu_uniform_binding_t;
 
 typedef struct {
-  DN_ALIGN(16) struct {
+  dn_asset_name_t name;
+  dn_gpu_buffer_t* buffer;
+  u32 binding_index;
+} dn_gpu_uniform_buffer_binding_t;
+
+typedef struct {
+  dn_align(16) struct {
     dn_gpu_vertex_buffer_binding_t bindings [8];
     u32 count;
   } vertex;
 
-  DN_ALIGN(16) struct {
+  dn_align(16) struct {
     dn_gpu_uniform_binding_t bindings [8];
     u32 count;
   } uniforms;
 
-  DN_ALIGN(16) struct {
+  dn_align(16) struct {
     dn_gpu_storage_buffer_binding_t bindings [8];
     u32 count;
   } storage;
 
-  // UBO
-  // SSBO
+  dn_align(16) struct {
+    dn_gpu_uniform_buffer_binding_t bindings [8];
+    u32 count;
+  } uniform_buffers;
 } dn_gpu_buffer_binding_t;
 
 
@@ -356,6 +365,15 @@ typedef struct {
 // DN GPU //
 ////////////
 typedef struct {
+  Matrix4 view;
+  Matrix4 projection;
+  Vector2 camera;
+  Vector2 native_resolution;
+  Vector2 output_resolution;
+  float master_time;
+} dn_gpu_uniforms_t;
+
+typedef struct {
   const char* shader_path;
   dn_gpu_shader_descriptor_t* shaders;
   u32 num_shaders;
@@ -375,6 +393,12 @@ typedef struct {
 
   FileMonitor* shader_monitor;
   dn_fixed_array<dn_path_t, 16> search_paths;
+
+  struct {
+    dn_gpu_buffer_t* buffer;
+    dn_gpu_uniform_buffer_binding_t binding;
+    dn_gpu_uniforms_t data;
+  } builtin_uniforms;
 } dn_gpu_t;
 dn_gpu_t dn_gpu;
 
@@ -418,7 +442,7 @@ DN_API void                      dn_gpu_memory_barrier(dn_gpu_memory_barrier_t b
 DN_API void                      dn_gpu_dispatch_compute(dn_gpu_buffer_t* buffer, u32 size);
 DN_API void                      dn_gpu_swap_buffers();
 DN_API void                      dn_gpu_error_clear();
-DN_API dn_tstring_t                   dn_gpu_error_read();
+DN_API dn_tstring_t              dn_gpu_error_read();
 DN_API void                      dn_gpu_error_log_one();
 DN_API void                      dn_gpu_error_log_all();
 DN_API void                      dn_gpu_set_resource_name(dn_gpu_resource_id_t id, u32 handle, u32 name_len, const char* name);
@@ -441,6 +465,7 @@ DN_IMP u32                       dn_gpu_blend_func_to_gl_blend_func(dn_gpu_blend
 DN_IMP u32                       dn_gpu_blend_mode_to_gl_blend_mode(dn_gpu_blend_mode_t mode);
 DN_IMP u32                       dn_gpu_resource_id_to_gl_id(dn_gpu_resource_id_t id);
 DN_IMP u32                       dn_gpu_memory_barrier_to_gl_barrier(dn_gpu_memory_barrier_t barrier);
+DN_IMP void dn_gpu_apply_uniform_buffer_binding(dn_gpu_command_buffer_t* command_buffer, dn_gpu_uniform_buffer_binding_t* binding);
 #endif // GRAPHICS_H
 
 
@@ -471,6 +496,36 @@ void dn_gpu_init(dn_gpu_config_t config) {
   dn_gpu.shader_monitor = dn_file_monitors_add();
   dn_gpu.shader_monitor->init(reload_all_shaders, DN_FILE_CHANGE_EVENT_MODIFIED, nullptr);
   dn_gpu.shader_monitor->add_directory(config.shader_path);
+  dn_gpu.shader_monitor->add_directory(dn_paths_resolve("dn_shaders"));
+
+
+  dn_log("%s: Initializing default uniform block", __func__);
+  dn_gpu.builtin_uniforms.buffer = dn_gpu_buffer_create({
+    .name = "dn_uniform_buffer_default",
+    .kind = GPU_BUFFER_KIND_UNIFORM,
+    .usage = GPU_BUFFER_USAGE_DYNAMIC,
+    .capacity = 1,
+    .element_size = sizeof(dn_gpu_uniforms_t)
+  });
+
+  dn_gpu.builtin_uniforms.binding = {
+    .name = "DnUniformBlock",
+    .buffer = dn_gpu.builtin_uniforms.buffer,
+    .binding_index = 0
+  };
+
+  // dn_gpu.uniforms.data = {
+  //   .view = dn_zero_initialize(),
+  //   .projection = dn_zero_initialize(),
+  //   .camera = dn_zero_initialize(),
+  //   .native_resolution = dn_zero_initialize(),
+  //   .output_resolution = dn_zero_initialize(),
+  //   .master_time = 0.5,
+  // };
+
+  // dn_gpu_buffer_sync(dn_gpu.uniforms.buffer, &dn_gpu.uniforms.data, sizeof(dn_gpu_uniforms_t));
+
+
 
   // Add default search paths and shaders
   dn_log("%s: Initializing default shader include directories", __func__);
@@ -581,12 +636,6 @@ void dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
       case GPU_COMMAND_OP_BIND_PIPELINE: {
         glUseProgram(command.pipeline->raster.shader->program);
 
-        auto target = command_buffer->render_pass.color.attachment;
-        set_uniform_immediate_f32("master_time", engine.elapsed_time);
-        set_uniform_immediate_mat4("projection", HMM_Orthographic_RH_NO(0, target->size.x, 0, target->size.y, GPU_NEAR_PLANE, GPU_FAR_PLANE));
-        set_uniform_immediate_vec2("output_resolution", target->size);
-        set_uniform_immediate_vec2("native_resolution", window.native_resolution);
-
         if (command.pipeline->blend.fn == GPU_BLEND_FUNC_NONE) {
           glDisable(GL_BLEND);
         }
@@ -663,6 +712,12 @@ void dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
           }
         }
 
+        auto& uniform_buffers = command.bindings.uniform_buffers;
+        dn_for(i, uniform_buffers.count) {
+          auto& binding = uniform_buffers.bindings[i];
+          dn_gpu_apply_uniform_buffer_binding(command_buffer, &binding);
+        }
+
         auto& storage = command.bindings.storage;
         for (u32 i = 0; i < storage.count; i++) {
           auto& binding = storage.bindings[i];
@@ -701,12 +756,21 @@ void dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
       } break;
 
       case GPU_COMMAND_OP_DRAW: {      
-        auto view_transform = command_buffer->render.world_space ? 
-          HMM_Translate(HMM_V3(-command_buffer->render.camera.x, -command_buffer->render.camera.y, 0.f)) :
-          HMM_M4D(1.0);
-
-        set_uniform_immediate_mat4("view", view_transform);
-        set_uniform_immediate_vec2("camera", command_buffer->render.camera);
+        auto target = command_buffer->render_pass.color.attachment;
+        dn_gpu.builtin_uniforms.data = {
+          .view = command_buffer->render.world_space ? 
+            HMM_Translate(HMM_V3(-command_buffer->render.camera.x, -command_buffer->render.camera.y, 0.f)) :
+            HMM_M4D(1.0),
+          .projection = HMM_Orthographic_RH_NO(0, target->size.x, 0, target->size.y, GPU_NEAR_PLANE, GPU_FAR_PLANE),
+          .camera = command_buffer->render.camera,
+          .native_resolution = window.native_resolution,
+          .output_resolution = target->size,
+          .master_time = engine.elapsed_time
+        };
+        dn_gpu_buffer_sync(dn_gpu.builtin_uniforms.buffer, &dn_gpu.builtin_uniforms.data, sizeof(dn_gpu_uniforms_t));
+        dn_gpu_apply_uniform_buffer_binding(command_buffer, &dn_gpu.builtin_uniforms.binding);
+        
+        
 
         auto primitive = dn_gpu_draw_primitive_to_gl_draw_primitive(pipeline.raster.primitive);
         switch (command.draw.mode) {
@@ -1238,6 +1302,7 @@ u32 dn_gpu_buffer_kind_to_gl_buffer_kind(dn_gpu_buffer_kind_t kind) {
   switch (kind) {
     case GPU_BUFFER_KIND_STORAGE: return GL_SHADER_STORAGE_BUFFER; break;
     case GPU_BUFFER_KIND_ARRAY: return GL_ARRAY_BUFFER; break;
+    case GPU_BUFFER_KIND_UNIFORM: return GL_UNIFORM_BUFFER; break;
   }
 
   DN_ASSERT(false);
@@ -1259,6 +1324,7 @@ u32 dn_gpu_buffer_kind_to_gl_barrier(dn_gpu_buffer_kind_t kind) {
   switch (kind) {
     case GPU_BUFFER_KIND_STORAGE: return GL_SHADER_STORAGE_BARRIER_BIT; break;
     case GPU_BUFFER_KIND_ARRAY: return GL_BUFFER_UPDATE_BARRIER_BIT; break;
+    case GPU_BUFFER_KIND_UNIFORM: return GL_UNIFORM_BARRIER_BIT; break;
   }
 
   DN_ASSERT(false);
@@ -1302,6 +1368,14 @@ u32 dn_gpu_vertex_layout_calculate_stride(dn_gpu_buffer_layout_t* layout) {
 
   return stride;
 }
+
+void dn_gpu_apply_uniform_buffer_binding(dn_gpu_command_buffer_t* command_buffer, dn_gpu_uniform_buffer_binding_t* binding) {
+  auto program = command_buffer->pipeline->raster.shader->program;
+  auto location = glGetUniformBlockIndex(program, binding->name);
+  glUniformBlockBinding(program, location, binding->binding_index); 
+  dn_gpu_buffer_bind_base(binding->buffer, binding->binding_index);
+}
+
 
 
 ///////////////////

@@ -9,10 +9,6 @@ layout (location = 2) in uvec2 index;
 out vec2 f_uv;
 out uvec2 f_index;
 
-uniform mat4 projection;
-uniform mat4 view;
-
-
 void main() {
 	SdfIndex sdf_index;
 	sdf_index.shape = index.x;
