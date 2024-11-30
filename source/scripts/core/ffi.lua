@@ -47,28 +47,28 @@ function doublenickel.ffi.init()
   Sdf = doublenickel.enum.define(
     'Sdf',
     {
-      Circle = doublenickel.ffi.SDF_SHAPE_CIRCLE,
-      Ring = doublenickel.ffi.SDF_SHAPE_RING,
-      Box = doublenickel.ffi.SDF_SHAPE_BOX,
-      OrientedBox = doublenickel.ffi.SDF_SHAPE_ORIENTED_BOX,
-      Combine = doublenickel.ffi.SDF_SHAPE_COMBINE
+      Circle = doublenickel.ffi.DN_SDF_SHAPE_CIRCLE,
+      Ring = doublenickel.ffi.DN_SDF_SHAPE_RING,
+      Box = doublenickel.ffi.DN_SDF_SHAPE_BOX,
+      OrientedBox = doublenickel.ffi.DN_SDF_SHAPE_ORIENTED_BOX,
+      Combine = doublenickel.ffi.DN_SDF_SHAPE_COMBINE
     }
   )
 
   SdfCombineOp = doublenickel.enum.define(
     'SdfCombineOp',
     {
-      Union = doublenickel.ffi.SDF_COMBINE_OP_UNION,
-      Intersection = doublenickel.ffi.SDF_COMBINE_OP_INTERSECTION,
-      Subtraction = doublenickel.ffi.SDF_COMBINE_OP_SUBTRACTION,
+      Union = doublenickel.ffi.DN_SDF_COMBINE_OP_UNION,
+      Intersection = doublenickel.ffi.DN_SDF_COMBINE_OP_INTERSECTION,
+      Subtraction = doublenickel.ffi.DN_SDF_COMBINE_OP_SUBTRACTION,
     }
   )
 
   SdfSmoothingKernel = doublenickel.enum.define(
     'SdfSmoothingKernel',
     {
-      None = doublenickel.ffi.SDF_SMOOTH_KERNEL_NONE,
-      PolynomialQuadratic = doublenickel.ffi.SDF_SMOOTH_KERNEL_POLYNOMIAL_QUADRATIC,
+      None = doublenickel.ffi.DN_SDF_SMOOTH_KERNEL_NONE,
+      PolynomialQuadratic = doublenickel.ffi.DN_SDF_SMOOTH_KERNEL_POLYNOMIAL_QUADRATIC,
     }
   )
 
@@ -114,51 +114,51 @@ function doublenickel.ffi.init()
   GpuResourceId = doublenickel.enum.define(
     'GpuResourceId',
     {
-      Framebuffer = doublenickel.ffi.GPU_RESOURCE_FRAMEBUFFER,
-      Shader = doublenickel.ffi.GPU_RESOURCE_SHADER,
-      Program = doublenickel.ffi.GPU_RESOURCE_PROGRAM,
+      Framebuffer = doublenickel.ffi.DN_GPU_RESOURCE_FRAMEBUFFER,
+      Shader = doublenickel.ffi.DN_GPU_RESOURCE_SHADER,
+      Program = doublenickel.ffi.DN_GPU_RESOURCE_PROGRAM,
     }
   )
 
   GpuShaderKind = doublenickel.enum.define(
     'GpuShaderKind',
     {
-      Graphics = doublenickel.ffi.GPU_SHADER_GRAPHICS,
-      Compute = doublenickel.ffi.GPU_SHADER_COMPUTE,
+      Graphics = doublenickel.ffi.DN_GPU_SHADER_GRAPHICS,
+      Compute = doublenickel.ffi.DN_GPU_SHADER_COMPUTE,
     }
   )
 
   GpuDrawMode = doublenickel.enum.define(
     'GpuDrawMode',
     {
-      Arrays = doublenickel.ffi.GPU_DRAW_MODE_ARRAYS,
-      Instance = doublenickel.ffi.GPU_DRAW_MODE_INSTANCE,
+      Arrays = doublenickel.ffi.DN_GPU_DRAW_MODE_ARRAYS,
+      Instance = doublenickel.ffi.DN_GPU_DRAW_MODE_INSTANCE,
     }
   )
 
   GpuDrawPrimitive = doublenickel.enum.define(
     'GpuDrawPrimitive',
     {
-      Triangles = doublenickel.ffi.GPU_PRIMITIVE_TRIANGLES,
+      Triangles = doublenickel.ffi.DN_GPU_PRIMITIVE_TRIANGLES,
     }
   )
 
   GpuVertexAttributeKind = doublenickel.enum.define(
     'GpuVertexAttributeKind',
     {
-      Float = doublenickel.ffi.GPU_VERTEX_ATTRIBUTE_FLOAT,
-      U32 = doublenickel.ffi.GPU_VERTEX_ATTRIBUTE_U32,
+      Float = doublenickel.ffi.DN_GPU_VERTEX_ATTRIBUTE_FLOAT,
+      U32 = doublenickel.ffi.DN_GPU_VERTEX_ATTRIBUTE_U32,
     }
   )
 
   GpuBlendFunction = doublenickel.enum.define(
     'GpuBlendFunction',
     {
-      Add = doublenickel.ffi.GPU_BLEND_FUNC_ADD,
-      Subtract = doublenickel.ffi.GPU_BLEND_FUNC_SUBTRACT,
-      ReverseSubtract = doublenickel.ffi.GPU_BLEND_FUNC_REVERSE_SUBTRACT,
-      Min = doublenickel.ffi.GPU_BLEND_FUNC_MIN,
-      Max = doublenickel.ffi.GPU_BLEND_FUNC_MAX,
+      Add = doublenickel.ffi.DN_GPU_BLEND_FUNC_ADD,
+      Subtract = doublenickel.ffi.DN_GPU_BLEND_FUNC_SUBTRACT,
+      ReverseSubtract = doublenickel.ffi.DN_GPU_BLEND_FUNC_REVERSE_SUBTRACT,
+      Min = doublenickel.ffi.DN_GPU_BLEND_FUNC_MIN,
+      Max = doublenickel.ffi.DN_GPU_BLEND_FUNC_MAX,
 
     }
   )
@@ -166,17 +166,17 @@ function doublenickel.ffi.init()
   GpuUniformKind = doublenickel.enum.define(
     'GpuUniformKind',
     {
-      None =    doublenickel.ffi.GPU_UNIFORM_NONE,
-      Matrix4 = doublenickel.ffi.GPU_UNIFORM_MATRIX4,
-      Matrix3 = doublenickel.ffi.GPU_UNIFORM_MATRIX3,
-      Matrix2 = doublenickel.ffi.GPU_UNIFORM_MATRIX2,
-      Vector4 = doublenickel.ffi.GPU_UNIFORM_VECTOR4,
-      Vector3 = doublenickel.ffi.GPU_UNIFORM_VECTOR3,
-      Vector2 = doublenickel.ffi.GPU_UNIFORM_VECTOR2,
-      F32 =     doublenickel.ffi.GPU_UNIFORM_F32,
-      I32 =     doublenickel.ffi.GPU_UNIFORM_I32,
-      Texture = doublenickel.ffi.GPU_UNIFORM_TEXTURE,
-      Enum =    doublenickel.ffi.GPU_UNIFORM_ENUM,
+      None =    doublenickel.ffi.DN_GPU_UNIFORM_NONE,
+      Matrix4 = doublenickel.ffi.DN_GPU_UNIFORM_MATRIX4,
+      Matrix3 = doublenickel.ffi.DN_GPU_UNIFORM_MATRIX3,
+      Matrix2 = doublenickel.ffi.DN_GPU_UNIFORM_MATRIX2,
+      Vector4 = doublenickel.ffi.DN_GPU_UNIFORM_VECTOR4,
+      Vector3 = doublenickel.ffi.DN_GPU_UNIFORM_VECTOR3,
+      Vector2 = doublenickel.ffi.DN_GPU_UNIFORM_VECTOR2,
+      F32 =     doublenickel.ffi.DN_GPU_UNIFORM_F32,
+      I32 =     doublenickel.ffi.DN_GPU_UNIFORM_I32,
+      Texture = doublenickel.ffi.DN_GPU_UNIFORM_TEXTURE,
+      Enum =    doublenickel.ffi.DN_GPU_UNIFORM_ENUM,
     }
   )
 
@@ -184,17 +184,17 @@ function doublenickel.ffi.init()
   GpuBufferUsage = doublenickel.enum.define(
     'GpuBufferUsage',
     {
-      Static =  doublenickel.ffi.GPU_BUFFER_USAGE_STATIC,
-      Dynamic = doublenickel.ffi.GPU_BUFFER_USAGE_DYNAMIC,
-      Stream =  doublenickel.ffi.GPU_BUFFER_USAGE_STREAM,
+      Static =  doublenickel.ffi.DN_GPU_BUFFER_USAGE_STATIC,
+      Dynamic = doublenickel.ffi.DN_GPU_BUFFER_USAGE_DYNAMIC,
+      Stream =  doublenickel.ffi.DN_GPU_BUFFER_USAGE_STREAM,
     }
   )
 
   GpuBufferKind = doublenickel.enum.define(
     'GpuBufferKind',
     {
-      Storage = doublenickel.ffi.GPU_BUFFER_KIND_STORAGE,
-      Array = doublenickel.ffi.GPU_BUFFER_KIND_ARRAY,
+      Storage = doublenickel.ffi.DN_GPU_BUFFER_KIND_STORAGE,
+      Array = doublenickel.ffi.DN_GPU_BUFFER_KIND_ARRAY,
     }
   )
 
@@ -218,8 +218,8 @@ function doublenickel.ffi.init()
   GpuMemoryBarrier = doublenickel.enum.define(
     'GpuMemoryBarrier',
     {
-      ShaderStorage = doublenickel.ffi.GPU_MEMORY_BARRIER_STORAGE,
-      BufferUpdate = doublenickel.ffi.GPU_MEMORY_BARRIER_BUFFER_UPDATE,
+      ShaderStorage = doublenickel.ffi.DN_GPU_MEMORY_BARRIER_STORAGE,
+      BufferUpdate = doublenickel.ffi.DN_GPU_MEMORY_BARRIER_BUFFER_UPDATE,
     }
   )
 
@@ -239,8 +239,8 @@ function doublenickel.ffi.init()
   GpuLoadOp = doublenickel.enum.define(
     'GpuLoadOp',
     {
-      None = doublenickel.ffi.GPU_LOAD_OP_NONE,
-      Clear = doublenickel.ffi.GPU_LOAD_OP_CLEAR,
+      None = doublenickel.ffi.DN_GPU_LOAD_OP_NONE,
+      Clear = doublenickel.ffi.DN_GPU_LOAD_OP_CLEAR,
     }
   )
 
