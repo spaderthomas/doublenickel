@@ -1633,17 +1633,12 @@ function tdengine.init_phase_0()
     return collected_paths
   end
   
-  local file_path = ffi.string(ffi.C.dn_paths_resolve('engine_paths').data)
+  local file_path = ffi.string(ffi.C.dn_paths_resolve('dn_install').data)
   local path_info = dofile(file_path)
 
-  local engine_paths = collect_paths(path_info.engine_paths)
-  for index, path in pairs(engine_paths) do
+  local dn_install_paths = collect_paths(path_info.dn_install)
+  for index, path in pairs(dn_install_paths) do
     ffi.C.dn_paths_add_engine_subpath(path.name, path.path)
-  end
-
-  local install_paths = collect_paths(path_info.install_paths)
-  for index, path in pairs(install_paths) do
-    ffi.C.dn_paths_add_install_subpath(path.name, path.path)
   end
 
   local app_paths = collect_paths(path_info.app_paths)

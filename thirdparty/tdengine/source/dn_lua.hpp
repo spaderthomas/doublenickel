@@ -81,7 +81,7 @@ void dn_lua_init() {
   // PHASE 0:
   // Load the bootstrap file, which creates tables for each module and loads the
   // most basic packages needed to load the rest of the code (e.g. classes and enums)
-  auto bootstrap = dn_paths_resolve("bootstrap");
+  auto bootstrap = dn_paths_resolve("dn_bootstrap");
   dn_lua_script_file(bootstrap);
 
   lua_pushstring(l, "init_phase_0");
@@ -97,9 +97,9 @@ void dn_lua_init() {
   // With the base tables created, we can now do things like define classes
   // and entity types. In this phase, load the core engine packages and then
   // any static engine data
-  dn_lua_script_named_dir("engine_libs");
-  dn_lua_script_named_dir("engine_core");
-  dn_lua_script_named_dir("engine_editor");
+  dn_lua_script_named_dir("dn_libs");
+  dn_lua_script_named_dir("dn_core");
+  dn_lua_script_named_dir("dn_editor");
 
   lua_pushstring(l, "init_phase_1");
   lua_gettable(l, -2);
@@ -118,9 +118,9 @@ void dn_lua_init_game() {
   // Lua itself has been initialized, and we've loaded in other assets our scripts
   // may use (shaders, fonts, etc). The last step is to load the game scripts and
   // configure the game itself through Lua
-  dn_array_push(&dn_lua.script_dirs, dn_paths_resolve_ex("engine_components", &dn_allocators.standard));
-  dn_array_push(&dn_lua.script_dirs, dn_paths_resolve_ex("engine_editor", &dn_allocators.standard));
-  dn_array_push(&dn_lua.script_dirs, dn_paths_resolve_ex("engine_entities", &dn_allocators.standard));
+  dn_array_push(&dn_lua.script_dirs, dn_paths_resolve_ex("dn_components", &dn_allocators.standard));
+  dn_array_push(&dn_lua.script_dirs, dn_paths_resolve_ex("dn_editor", &dn_allocators.standard));
+  dn_array_push(&dn_lua.script_dirs, dn_paths_resolve_ex("dn_entities", &dn_allocators.standard));
   dn_array_push(&dn_lua.script_dirs, dn_paths_resolve_ex("app", &dn_allocators.standard));
 
   dn_array_for(dn_lua.script_dirs, directory) {

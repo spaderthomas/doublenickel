@@ -71,8 +71,8 @@ typedef struct {
   float master_volume_mod;
   FileMonitor* file_monitor;
   dn_array_t<float> sample_buffer;
-  dn_array_t<dn_audio_info_t> sounds;
-  dn_array_t<dn_audio_instance_t> instances;
+  dn_array_t<dn_audio_info_t, 1024> sounds;
+  dn_array_t<dn_audio_instance_t, 128> instances;
 } dn_audio_t;
 dn_audio_t dn_audio;
 std::recursive_mutex dn_audio_mutex;
@@ -163,6 +163,9 @@ void dn_audio_init(dn_audio_config_t config) {
     .file_monitor = dn_file_monitors_add(),
     .sample_buffer = {0}
   };
+
+  dn_array_init(&dn_audio.sounds);
+  dn_array_init(&dn_audio.instances);
 
   dn_low_pass_filter_set_cutoff(&dn_audio.filter, 10000);
 

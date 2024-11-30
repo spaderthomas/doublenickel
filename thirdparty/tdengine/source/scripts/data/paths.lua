@@ -1,8 +1,7 @@
 return {
 	write_paths = {
-		app_write = 'boonbane',
 	},
-	engine_paths = {
+	dn_install = {
 		dn_assets = {
 			path = 'asset',
 			children = {
@@ -30,30 +29,28 @@ return {
 				},
 			}
 		},
-		engine_scripts = {
-			path = 'source/scripts/engine',
+		dn_scripts = {
+			path = 'source/scripts',
 			children = {
-				engine_components = 'components',
-				engine_core = {
+				dn_components = 'components',
+				dn_core = {
 					path = 'core',
 					children = {
 						engine_script = '%s'
 					}
 				},
-				engine_data = {
+				dn_data = {
 					path = 'data',
 					children = {
 						editor_scene = 'editor.lua',
 						cimgui_header = 'cimgui.lua',
 					}
 				},
-				engine_editor = 'editor',
-				engine_entities = 'entities',
-				engine_libs = 'third_party',
+				dn_editor = 'editor',
+				dn_entities = 'entities',
+				dn_libs = 'third_party',
 			}
 		},
-	},
-	install_paths = {
 	},
 	app_paths = {
 		app_entry_point = 'App.lua',
