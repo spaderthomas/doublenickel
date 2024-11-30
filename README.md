@@ -1,3 +1,4 @@
+![doublenickel](doc/boonbane.png)
 `doublenickel` is a header only framework for building games and tech demos on Windows, written in a minimal C-style C++ and scripted with LuaJIT.
 
 ## overview
@@ -20,6 +21,7 @@ If you're a source code person, check out the [example repo](https://github.com/
 - A demo of the SDF shape renderer
 - An example of normal mapping and volumetric lighting of low resolution 2D scenes
 - Eulerian and Lagrangian fluid simulations
+- A scanline shader, made in an effort to replicate Animal Well's
 
 ## why?
 Writing your own game engine is pure folly, but writing your own game is very reasonable and productive. Commercial engines are fine, but I enjoy writing all the software for my games, and I wanted to keep the real and hard fought benefits I gained from making my first commercial game:
