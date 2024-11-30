@@ -708,7 +708,6 @@ void dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
             case DN_GPU_UNIFORM_F32:     glUniform1fv(index, 1, (const float*)&binding.data.f32); break;
             case DN_GPU_UNIFORM_TEXTURE: glActiveTexture(GL_TEXTURE0 + binding.binding_index); glBindTexture(GL_TEXTURE_2D, binding.data.texture); break;
             case DN_GPU_UNIFORM_ENUM:    glUniform1iv(index, 1, (const i32*)&binding.data.i32); break;
-
           }
         }
 

@@ -201,17 +201,16 @@ function doublenickel.ffi.init()
   UniformKind = doublenickel.enum.define(
     'UniformKind',
     {
-      Matrix4        = doublenickel.ffi.UniformKind_Matrix4,
-      Matrix3        = doublenickel.ffi.UniformKind_Matrix3,
-      Vector4        = doublenickel.ffi.UniformKind_Vector4,
-      Vector3        = doublenickel.ffi.UniformKind_Vector3,
-      Vector2        = doublenickel.ffi.UniformKind_Vector2,
-      F32            = doublenickel.ffi.UniformKind_F32,
-      I32            = doublenickel.ffi.UniformKind_I32,
-      Texture        = doublenickel.ffi.UniformKind_Texture,
-      PipelineOutput = doublenickel.ffi.UniformKind_PipelineOutput,
-      RenderTarget   = doublenickel.ffi.UniformKind_RenderTarget,
-      Enum = 201,
+      Matrix4        = doublenickel.ffi.DN_GPU_UNIFORM_MATRIX4,
+      Matrix3        = doublenickel.ffi.DN_GPU_UNIFORM_MATRIX3,
+      Matrix2        = doublenickel.ffi.DN_GPU_UNIFORM_MATRIX2,
+      Vector4        = doublenickel.ffi.DN_GPU_UNIFORM_VECTOR4,
+      Vector3        = doublenickel.ffi.DN_GPU_UNIFORM_VECTOR3,
+      Vector2        = doublenickel.ffi.DN_GPU_UNIFORM_VECTOR2,
+      F32            = doublenickel.ffi.DN_GPU_UNIFORM_F32,
+      I32            = doublenickel.ffi.DN_GPU_UNIFORM_I32,
+      Texture        = doublenickel.ffi.DN_GPU_UNIFORM_TEXTURE,
+      Enum = doublenickel.ffi.DN_GPU_UNIFORM_ENUM,
     }
   )
 
