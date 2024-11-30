@@ -1,5 +1,4 @@
 #define DN_IMPLEMENTATION
-#define DN_USE_DEFAULT_PROJECT_STRUCTURE
 #include "dn.hpp"
 
 int main(int num_args, char** args) {

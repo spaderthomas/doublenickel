@@ -116,44 +116,4 @@
 
 // I should probably nuke this, because the particle system should be a GPU implementation
 #include "source/particle.cpp"
-
-int dn_main(dn_app_descriptor_t app) {
-  dn_allocators_init();
-  dn_random_init();
-  dn_test_init();
-  dn_app_init(app);
-  init_paths();
-  dn_log_init();
-  dn_engine_init();
-  dn_input_init();
-  dn_time_metrics_init();
-  dn_file_monitors_init();
-  init_buffers();
-  dn_lua_init();
-  init_actions();
-  dn_lua_init_game();
-
-  while(!dn_engine_should_exit()) {
-    dn_engine_update();
-    dn_allocators_update();
-    dn_file_monitors_update();
-    dn_assets_update();
-    dn_imgui_update();
-    dn_input_update();
-    update_actions();
-    dn_lua_update();
-    dn_time_metrics_update();
-  }
-
-  dn_audio_shutdown();
-  dn_steam_shutdown();
-  dn_imgui_shutdown();
-  dn_window_shutdown();
-
-  return 0;
-}
-
-// int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-//  return main();
-// }
 #endif
