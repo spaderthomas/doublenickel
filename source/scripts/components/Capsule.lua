@@ -1,4 +1,4 @@
-ColliderCapsule = tdengine.component.define('ColliderCapsule')
+ColliderCapsule = doublenickel.component.define('ColliderCapsule')
 
 function ColliderCapsule:init(params)
   params = params or {}
@@ -27,12 +27,12 @@ end
 
 function ColliderCapsule:get_center()
   log.warn('unimplemented')
-  return tdengine.vec2()
+  return doublenickel.vec2()
 end
 
 function ColliderCapsule:get_position()
   log.warn('unimplemented')
-  return tdengine.vec2()
+  return doublenickel.vec2()
 end
 
 function ColliderCapsule:get_xmin()

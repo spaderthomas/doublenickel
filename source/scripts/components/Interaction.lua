@@ -1,4 +1,4 @@
-Interaction = tdengine.component.define('Interaction')
+Interaction = doublenickel.component.define('Interaction')
 
 Interaction.editor_fields = {
   'callback',
@@ -16,13 +16,13 @@ function Interaction:init(params)
   params.collider = params.collider or {}
   self.collider = add_component(nil, 'Collider', {
     shape = params.collider.shape or Collider.shapes.Circle,
-    kind = tdengine.enums.ColliderKind.Static,
+    kind = doublenickel.enums.ColliderKind.Static,
     impl = params.collider.impl
   })
 
-  self.callbacks = tdengine.data_types.array:new()
+  self.callbacks = doublenickel.data_types.array:new()
 
-  self.align_offset = tdengine.vec2()
+  self.align_offset = doublenickel.vec2()
 
   if params.align_position == nil then
     self.align_position = true

@@ -1,4 +1,4 @@
-local Increment = tdengine.node('Increment')
+local Increment = doublenickel.node('Increment')
 
 Increment.editor_fields = {
   'variable',
@@ -11,7 +11,7 @@ function Increment:init()
 end
 
 function Increment:enter(graph)
-  tdengine.state.increment(self.variable, self.step)
+  doublenickel.state.increment(self.variable, self.step)
   return dialogue_state.advancing
 end
 

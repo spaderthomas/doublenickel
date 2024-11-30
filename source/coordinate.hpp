@@ -22,9 +22,9 @@ typedef enum {
 } dn_coord_t;
 
 typedef struct {
-	Vector2 camera;
-	Vector2 framebuffer_position;
-	Vector2 framebuffer_size;
+	dn_vector2_t camera;
+	dn_vector2_t framebuffer_position;
+	dn_vector2_t framebuffer_size;
 } dn_coord_data_t;
 dn_coord_data_t dn_coord_data;
 
@@ -32,30 +32,30 @@ DN_API dn_coord_data_t dn_coord_get();
 DN_API void            dn_coord_set_camera(float x, float y);
 DN_API void            dn_coord_set_framebuffer_position(float x, float y);
 DN_API void            dn_coord_set_framebuffer_size(float x, float y);
-DN_API Vector2         dn_coord_screen_to_window(float x, float y);
-DN_API Vector2         dn_coord_screen_to_game(float x, float y);
-DN_API Vector2         dn_coord_screen_to_world(float x, float y);
-DN_API Vector2         dn_coord_window_to_screen(float x, float y);
-DN_API Vector2         dn_coord_window_to_game(float x, float y);
-DN_API Vector2         dn_coord_window_to_world(float x, float y);
-DN_API Vector2         dn_coord_game_to_screen(float x, float y);
-DN_API Vector2         dn_coord_game_to_window(float x, float y);
-DN_API Vector2         dn_coord_game_to_world(float x, float y);
-DN_API Vector2         dn_coord_world_to_screen(float x, float y);
-DN_API Vector2         dn_coord_world_to_window(float x, float y);
-DN_API Vector2         dn_coord_world_to_game(float x, float y);
-DN_API Vector2         dn_coord_screen_to_window_mag(float x, float y);
-DN_API Vector2         dn_coord_screen_to_game_mag(float x, float y);
-DN_API Vector2         dn_coord_screen_to_world_mag(float x, float y);
-DN_API Vector2         dn_coord_window_to_screen_mag(float x, float y);
-DN_API Vector2         dn_coord_window_to_game_mag(float x, float y);
-DN_API Vector2         dn_coord_window_to_world_mag(float x, float y);
-DN_API Vector2         dn_coord_game_to_screen_mag(float x, float y);
-DN_API Vector2         dn_coord_game_to_window_mag(float x, float y);
-DN_API Vector2         dn_coord_game_to_world_mag(float x, float y);
-DN_API Vector2         dn_coord_world_to_screen_mag(float x, float y);
-DN_API Vector2         dn_coord_world_to_window_mag(float x, float y);
-DN_API Vector2         dn_coord_world_to_game_mag(float x, float y);
+DN_API dn_vector2_t         dn_coord_screen_to_window(float x, float y);
+DN_API dn_vector2_t         dn_coord_screen_to_game(float x, float y);
+DN_API dn_vector2_t         dn_coord_screen_to_world(float x, float y);
+DN_API dn_vector2_t         dn_coord_window_to_screen(float x, float y);
+DN_API dn_vector2_t         dn_coord_window_to_game(float x, float y);
+DN_API dn_vector2_t         dn_coord_window_to_world(float x, float y);
+DN_API dn_vector2_t         dn_coord_game_to_screen(float x, float y);
+DN_API dn_vector2_t         dn_coord_game_to_window(float x, float y);
+DN_API dn_vector2_t         dn_coord_game_to_world(float x, float y);
+DN_API dn_vector2_t         dn_coord_world_to_screen(float x, float y);
+DN_API dn_vector2_t         dn_coord_world_to_window(float x, float y);
+DN_API dn_vector2_t         dn_coord_world_to_game(float x, float y);
+DN_API dn_vector2_t         dn_coord_screen_to_window_mag(float x, float y);
+DN_API dn_vector2_t         dn_coord_screen_to_game_mag(float x, float y);
+DN_API dn_vector2_t         dn_coord_screen_to_world_mag(float x, float y);
+DN_API dn_vector2_t         dn_coord_window_to_screen_mag(float x, float y);
+DN_API dn_vector2_t         dn_coord_window_to_game_mag(float x, float y);
+DN_API dn_vector2_t         dn_coord_window_to_world_mag(float x, float y);
+DN_API dn_vector2_t         dn_coord_game_to_screen_mag(float x, float y);
+DN_API dn_vector2_t         dn_coord_game_to_window_mag(float x, float y);
+DN_API dn_vector2_t         dn_coord_game_to_world_mag(float x, float y);
+DN_API dn_vector2_t         dn_coord_world_to_screen_mag(float x, float y);
+DN_API dn_vector2_t         dn_coord_world_to_window_mag(float x, float y);
+DN_API dn_vector2_t         dn_coord_world_to_game_mag(float x, float y);
                
 #endif
 
@@ -76,7 +76,7 @@ void dn_coord_set_framebuffer_size(float x, float y) {
 	dn_coord_data.framebuffer_size = { .x = x, .y = y };
 }
 
-Vector2 dn_coord_screen_to_window(float x, float y) {
+dn_vector2_t dn_coord_screen_to_window(float x, float y) {
 	auto framebuffer_bottom = window.content_area.y - (dn_coord_data.framebuffer_position.y + dn_coord_data.framebuffer_size.y);
 	return { 
 		.x = ((x * window.content_area.x) - dn_coord_data.framebuffer_position.x) / dn_coord_data.framebuffer_size.x,
@@ -84,81 +84,81 @@ Vector2 dn_coord_screen_to_window(float x, float y) {
 	};
 }
 
-Vector2 dn_coord_screen_to_game(float x, float y) {
+dn_vector2_t dn_coord_screen_to_game(float x, float y) {
 	auto win = dn_coord_screen_to_window(x, y);
 	return dn_coord_window_to_game(win.x, win.y);
 }
 
-Vector2 dn_coord_screen_to_world(float x, float y) {
+dn_vector2_t dn_coord_screen_to_world(float x, float y) {
 	auto win = dn_coord_screen_to_window(x, y);
 	auto game = dn_coord_window_to_game(win.x, win.y);
 	return dn_coord_game_to_world(game.x, game.y);
 }
 
-Vector2 dn_coord_window_to_screen(float x, float y) {
+dn_vector2_t dn_coord_window_to_screen(float x, float y) {
 	return {
 		.x = ((x * dn_coord_data.framebuffer_size.x) + dn_coord_data.framebuffer_position.x) / window.content_area.x,
 		.y = ((y * dn_coord_data.framebuffer_size.y) + dn_coord_data.framebuffer_position.y) / window.content_area.y,
 	};
 }
 
-Vector2 dn_coord_window_to_game(float x, float y) {
+dn_vector2_t dn_coord_window_to_game(float x, float y) {
 	return {
 		.x = x * window.native_resolution.x,
 		.y = y * window.native_resolution.y
 	};
 }
 
-Vector2 dn_coord_window_to_world(float x, float y) {
+dn_vector2_t dn_coord_window_to_world(float x, float y) {
 	auto game = dn_coord_window_to_game(x, y);
 	return dn_coord_game_to_world(game.x, game.y);
 }
 
-Vector2 dn_coord_game_to_screen(float x, float y) {
+dn_vector2_t dn_coord_game_to_screen(float x, float y) {
 	auto win = dn_coord_game_to_window(x, y);
 	return dn_coord_window_to_screen(win.x, win.y);
 }
 
-Vector2 dn_coord_game_to_window(float x, float y) {
+dn_vector2_t dn_coord_game_to_window(float x, float y) {
 	return {
 		.x = x / window.native_resolution.x,
 		.y = y / window.native_resolution.y,
 	};
 }
 
-Vector2 dn_coord_game_to_world(float x, float y) {
+dn_vector2_t dn_coord_game_to_world(float x, float y) {
 	return {
 		.x = x + dn_coord_data.camera.x,
 		.y = y + dn_coord_data.camera.y,
 	};
 }
 
-Vector2 dn_coord_world_to_screen(float x, float y) {
+dn_vector2_t dn_coord_world_to_screen(float x, float y) {
 	auto game = dn_coord_world_to_game(x, y);
 	auto win = dn_coord_game_to_window(game.x, game.y);
 	return dn_coord_window_to_screen(win.x, win.y);
 }
 
-Vector2 dn_coord_world_to_window(float x, float y) {
+dn_vector2_t dn_coord_world_to_window(float x, float y) {
 	auto game = dn_coord_world_to_game(x, y);
 	return dn_coord_game_to_window(game.x, game.y);
 }
 
-Vector2 dn_coord_world_to_game(float x, float y) {
+dn_vector2_t dn_coord_world_to_game(float x, float y) {
 	return {
 		.x = x - dn_coord_data.camera.x,
 		.y = y - dn_coord_data.camera.y,
 	};
 }
      
-Vector2 dn_coord_screen_to_window_mag(float x, float y) {
+dn_vector2_t dn_coord_screen_to_window_mag(float x, float y) {
 	return {
 		.x = x * window.content_area.x / dn_coord_data.framebuffer_size.x,
 		.y = y * window.content_area.y / dn_coord_data.framebuffer_size.y,
 	};
 }
 
-Vector2 dn_coord_screen_to_game_mag(float x, float y) {
+dn_vector2_t dn_coord_screen_to_game_mag(float x, float y) {
 	auto win = dn_coord_screen_to_window_mag(x, y);
 	return {
 		.x = win.x * window.native_resolution.x,
@@ -166,60 +166,60 @@ Vector2 dn_coord_screen_to_game_mag(float x, float y) {
 	};
 }
 
-Vector2 dn_coord_screen_to_world_mag(float x, float y) {
+dn_vector2_t dn_coord_screen_to_world_mag(float x, float y) {
 	auto win = dn_coord_screen_to_window_mag(x, y);
 	auto game = dn_coord_window_to_game_mag(win.x, win.y);
 	return dn_coord_game_to_world_mag(game.x, game.y);
 }
 
-Vector2 dn_coord_window_to_screen_mag(float x, float y) {
+dn_vector2_t dn_coord_window_to_screen_mag(float x, float y) {
 	return {
 		.x = x * dn_coord_data.framebuffer_size.x / window.content_area.x,
 		.y = y * dn_coord_data.framebuffer_size.y / window.content_area.y,
 	};
 }
 
-Vector2 dn_coord_window_to_game_mag(float x, float y) {
+dn_vector2_t dn_coord_window_to_game_mag(float x, float y) {
 	return {
 		.x = x * window.native_resolution.x,
 		.y = y * window.native_resolution.y,
 	};
 }
-Vector2 dn_coord_window_to_world_mag(float x, float y) {
+dn_vector2_t dn_coord_window_to_world_mag(float x, float y) {
 	return {
 		.x = x * window.native_resolution.x,
 		.y = y * window.native_resolution.y,
 	};
 }
 
-Vector2 dn_coord_game_to_screen_mag(float x, float y) {
+dn_vector2_t dn_coord_game_to_screen_mag(float x, float y) {
 	auto w = dn_coord_game_to_window_mag(x, y);
 	return dn_coord_window_to_screen_mag(w.x, w.y);
 }
 
-Vector2 dn_coord_game_to_window_mag(float x, float y) {
+dn_vector2_t dn_coord_game_to_window_mag(float x, float y) {
 	return {
 		.x = x / window.native_resolution.x,
 		.y = y / window.native_resolution.y,
 	};
 }
 
-Vector2 dn_coord_game_to_world_mag(float x, float y) {
+dn_vector2_t dn_coord_game_to_world_mag(float x, float y) {
 	return {
 		.x = x,
 		.y = y
 	};
 }
 
-Vector2 dn_coord_world_to_screen_mag(float x, float y) {
+dn_vector2_t dn_coord_world_to_screen_mag(float x, float y) {
 	return dn_coord_game_to_screen_mag(x, y);
 }
 
-Vector2 dn_coord_world_to_window_mag(float x, float y) {
+dn_vector2_t dn_coord_world_to_window_mag(float x, float y) {
 	return dn_coord_game_to_window_mag(x, y);
 
 }
-Vector2 dn_coord_world_to_game_mag(float x, float y) {
+dn_vector2_t dn_coord_world_to_game_mag(float x, float y) {
 	return {
 		.x = x, 
 		.y = y

@@ -1,4 +1,4 @@
-function tdengine.write_file_to_return_table(filepath, t, pretty)
+function doublenickel.write_file_to_return_table(filepath, t, pretty)
   if t == nil then dbg() end
 
   if pretty == nil then pretty = false end
@@ -6,7 +6,7 @@ function tdengine.write_file_to_return_table(filepath, t, pretty)
   local serialized_data = table.serialize(t, pretty)
   local file = assert(io.open(filepath, 'w'))
   if not file then
-    log.warn('tdengine.write_file_to_return_table(): cannot open file, file = %s', filepath)
+    log.warn('doublenickel.write_file_to_return_table(): cannot open file, file = %s', filepath)
   end
 
   file:write('return ')
@@ -14,7 +14,7 @@ function tdengine.write_file_to_return_table(filepath, t, pretty)
   file:close()
 end
 
-tdengine.module.WriteOptions = tdengine.enum.define(
+doublenickel.module.WriteOptions = doublenickel.enum.define(
   'ModuleWriteOptions',
   {
     Compact = 1,
@@ -22,24 +22,24 @@ tdengine.module.WriteOptions = tdengine.enum.define(
   }
 )
 
-function tdengine.module.write_to_named_path(name, data, pretty)
-  local file_path = tdengine.ffi.dn_paths_resolve(name):to_interned()
-  local is_pretty = pretty == tdengine.module.WriteOptions.Pretty
+function doublenickel.module.write_to_named_path(name, data, pretty)
+  local file_path = dn.paths_resolve(name):to_interned()
+  local is_pretty = pretty == doublenickel.module.WriteOptions.Pretty
 
-  tdengine.write_file_to_return_table(file_path, data, pretty)
+  doublenickel.write_file_to_return_table(file_path, data, pretty)
 end
 
-function tdengine.module.write(file_path, data, pretty)
-  local is_pretty = pretty == tdengine.module.WriteOptions.Pretty
+function doublenickel.module.write(file_path, data, pretty)
+  local is_pretty = pretty == doublenickel.module.WriteOptions.Pretty
 
-  tdengine.write_file_to_return_table(file_path, data, pretty)
+  doublenickel.write_file_to_return_table(file_path, data, pretty)
 end
 
-function tdengine.module.read(file_path)
+function doublenickel.module.read(file_path)
   return dofile(file_path)
 end
 
-function tdengine.module.read_from_named_path(name)
-  local file_path = tdengine.ffi.dn_paths_resolve(name):to_interned()
-  return tdengine.module.read(file_path)
+function doublenickel.module.read_from_named_path(name)
+  local file_path = dn.paths_resolve(name):to_interned()
+  return doublenickel.module.read(file_path)
 end

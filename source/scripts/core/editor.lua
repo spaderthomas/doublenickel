@@ -1,9 +1,9 @@
-local self = tdengine.editor
+local self = doublenickel.editor
 
 ----------------
 -- PUBLIC API --
 ----------------
-EditorFonts = tdengine.enum.define(
+EditorFonts = doublenickel.enum.define(
   'EditorFonts',
   {
     Regular = 0,
@@ -11,7 +11,7 @@ EditorFonts = tdengine.enum.define(
   }
 )
 
-EditorConfig = tdengine.class.define('EditorConfig')
+EditorConfig = doublenickel.class.define('EditorConfig')
 function EditorConfig:init(params)
   self.grid_enabled = params.grid_enabled
   self.grid_size = params.grid_size or 12
@@ -28,37 +28,37 @@ function EditorConfig:init(params)
   }
 end
 
-function tdengine.editor.configure(config)
+function doublenickel.editor.configure(config)
   self.config = config
 
-  tdengine.editor.find('EditorUtility').enabled.grid = config.grid_enabled
-  tdengine.editor.find('EditorUtility').style.grid.size = config.grid_size
-  tdengine.editor.find('DialogueEditor').hidden = config.hide_dialogue_editor
+  doublenickel.editor.find('EditorUtility').enabled.grid = config.grid_enabled
+  doublenickel.editor.find('EditorUtility').style.grid.size = config.grid_size
+  doublenickel.editor.find('DialogueEditor').hidden = config.hide_dialogue_editor
 
-  for view in tdengine.iterator.values(config.game_views) do
-    tdengine.editor.find('GameViewManager'):add_view(view)
+  for view in doublenickel.iterator.values(config.game_views) do
+    doublenickel.editor.find('GameViewManager'):add_view(view)
   end
 
-  tdengine.editor.find('SceneEditor'):load(config.scene)
-  tdengine.ffi.dn_imgui_load_layout(config.layout)
+  doublenickel.editor.find('SceneEditor'):load(config.scene)
+  dn.imgui_load_layout(config.layout)
 end
 
 
-function tdengine.editor.define(name)
-  local class = tdengine.class.define(name)
+function doublenickel.editor.define(name)
+  local class = doublenickel.class.define(name)
   class:include_lifecycle()
   class:include_update()
 
-  tdengine.editor.types[name] = class
+  doublenickel.editor.types[name] = class
 
   return class
 end
 
-function tdengine.editor.find(name)
-  return tdengine.editor.entities[name]
+function doublenickel.editor.find(name)
+  return doublenickel.editor.entities[name]
 end
 
-function tdengine.editor.begin_window(name, flags)
+function doublenickel.editor.begin_window(name, flags)
   flags = flags or 0
   imgui.Begin(name)
   self:set_window_focus(name, imgui.IsWindowFocused())
@@ -66,12 +66,12 @@ function tdengine.editor.begin_window(name, flags)
   self.window_stack:push(name)
 end
 
-function tdengine.editor.end_window()
+function doublenickel.editor.end_window()
   self.window_stack:pop()
   imgui.End()
 end
 
-function tdengine.editor.push_font(font)
+function doublenickel.editor.push_font(font)
   if EditorFonts.Regular:match(font) then
     imgui.PushFont(self.config.fonts.regular, self.config.fonts.size)
   elseif EditorFonts.Bold:match(font) then
@@ -79,7 +79,7 @@ function tdengine.editor.push_font(font)
   end
 end
 
-function tdengine.editor.begin_child(name, x, y, flags)
+function doublenickel.editor.begin_child(name, x, y, flags)
   imgui.BeginChild(name, imgui.ImVec2(x, y), true, flags)
 
   -- If a child window is focused (or hovered), it will mark the parent (i.e. the part of the parent window
@@ -98,31 +98,31 @@ function tdengine.editor.begin_child(name, x, y, flags)
   self:set_window_hover(parent, current_hover or imgui.IsWindowHovered())
 end
 
-function tdengine.editor.end_child()
+function doublenickel.editor.end_child()
   imgui.EndChild()
 end
 
-function tdengine.editor.is_window_focused(name)
+function doublenickel.editor.is_window_focused(name)
   name = name or self.window_stack:peek()
   return self.focus_state[name]
 end
 
-function tdengine.editor.set_window_focus(name, focus)
+function doublenickel.editor.set_window_focus(name, focus)
   self.focus_state[name] = focus
 end
 
-function tdengine.editor.is_window_hovered(name)
+function doublenickel.editor.is_window_hovered(name)
   name = name or self.window_stack:peek()
   return self.hover_state[name]
 end
 
-function tdengine.editor.set_window_hover(name, hover)
+function doublenickel.editor.set_window_hover(name, hover)
   self.hover_state[name] = hover
 end
 
 
-function tdengine.editor.center_next_window(size)
-  local screen = tdengine.vec2(tdengine.ffi.dn_window_get_content_area())
+function doublenickel.editor.center_next_window(size)
+  local screen = doublenickel.vec2(dn.window_get_content_area())
   local position = screen:scale(.5):subtract(size:scale(.5))
   imgui.SetNextWindowPos(position:unpack())
   imgui.SetNextWindowSize(size:unpack())
@@ -132,7 +132,7 @@ end
 ---------------------
 -- EDITOR METADATA --
 ---------------------
-tdengine.editor.MetadataKind = tdengine.enum.define(
+doublenickel.editor.MetadataKind = doublenickel.enum.define(
   'EditorMetadata',
   {
     Ignore = 0,
@@ -141,7 +141,7 @@ tdengine.editor.MetadataKind = tdengine.enum.define(
   }
 )
 
-FieldMetadata = tdengine.class.define('FieldMetadata')
+FieldMetadata = doublenickel.class.define('FieldMetadata')
 
 function FieldMetadata:init(field, metadata)
   metadata = metadata or {}
@@ -162,84 +162,84 @@ FieldMetadata.Presets = {
   }
 }
 
-tdengine.editor.FieldMetadata = FieldMetadata
-tdengine.editor.default_metadata = FieldMetadata:new()
+doublenickel.editor.FieldMetadata = FieldMetadata
+doublenickel.editor.default_metadata = FieldMetadata:new()
 
 
 local function ensure_editor_sentinel(t)
-  if not t[tdengine.editor.sentinel] then
-    t[tdengine.editor.sentinel] = {}
+  if not t[doublenickel.editor.sentinel] then
+    t[doublenickel.editor.sentinel] = {}
   end
 end
 
 local function ensure_editor_metadata(t, metadata_kind)
   ensure_editor_sentinel(t)
-  if not t[tdengine.editor.sentinel][metadata_kind:to_string()] then
-    t[tdengine.editor.sentinel][metadata_kind:to_string()] = {}
+  if not t[doublenickel.editor.sentinel][metadata_kind:to_string()] then
+    t[doublenickel.editor.sentinel][metadata_kind:to_string()] = {}
   end
 end
 
 local function find_metadata(t, metadata_kind) 
   ensure_editor_metadata(t, metadata_kind)
-  return t[tdengine.editor.sentinel][metadata_kind:to_string()]
+  return t[doublenickel.editor.sentinel][metadata_kind:to_string()]
 end
 
-function tdengine.editor.ignore_field(t, field)
-  ensure_editor_metadata(t, tdengine.editor.MetadataKind.Ignore)
-  t[tdengine.editor.sentinel].ignore[field] = true
+function doublenickel.editor.ignore_field(t, field)
+  ensure_editor_metadata(t, doublenickel.editor.MetadataKind.Ignore)
+  t[doublenickel.editor.sentinel].ignore[field] = true
 end
 
-function tdengine.editor.is_ignoring_field(t, field)
+function doublenickel.editor.is_ignoring_field(t, field)
   -- Globally ignore the intrusive editor table
-  if field == tdengine.editor.sentinel then return true end
+  if field == doublenickel.editor.sentinel then return true end
 
-  if not t[tdengine.editor.sentinel] then return false end
-  if not t[tdengine.editor.sentinel].ignore then return false end
+  if not t[doublenickel.editor.sentinel] then return false end
+  if not t[doublenickel.editor.sentinel].ignore then return false end
 
-  return t[tdengine.editor.sentinel].ignore[field]
+  return t[doublenickel.editor.sentinel].ignore[field]
 end
 
-function tdengine.editor.set_field_metadata(t, field, metadata)
-  local table_metadata = find_metadata(t, tdengine.editor.MetadataKind.Field)
+function doublenickel.editor.set_field_metadata(t, field, metadata)
+  local table_metadata = find_metadata(t, doublenickel.editor.MetadataKind.Field)
   table_metadata[field] = FieldMetadata:new(field, metadata)
 end
 
-function tdengine.editor.set_field_metadatas(t, metadatas)
+function doublenickel.editor.set_field_metadatas(t, metadatas)
   for field, metadata in pairs(metadatas) do
-    tdengine.editor.set_field_metadata(t, field, metadata)
+    doublenickel.editor.set_field_metadata(t, field, metadata)
   end
 end
 
 
-function tdengine.editor.get_field_metadata(t, field)
-  local metadata = table.get_or_nil(t, tdengine.editor.sentinel, tdengine.editor.MetadataKind.Field:to_string(), field)
+function doublenickel.editor.get_field_metadata(t, field)
+  local metadata = table.get_or_nil(t, doublenickel.editor.sentinel, doublenickel.editor.MetadataKind.Field:to_string(), field)
   if metadata then 
     return metadata, true
   end
  
-  return tdengine.editor.default_metadata, false
+  return doublenickel.editor.default_metadata, false
 end
 
 
 ----------------------
 -- EDITOR CALLBACKS --
 ----------------------
-function tdengine.editor.set_editor_callbacks(t, callbacks)
+function doublenickel.editor.set_editor_callbacks(t, callbacks)
   ensure_editor_sentinel(t)
-  t[tdengine.editor.sentinel].callbacks = callbacks
+  t[doublenickel.editor.sentinel].callbacks = callbacks
 end
 
-function tdengine.editor.run_editor_callback(t, callback, ...)
-  if not t[tdengine.editor.sentinel] then return end
-  if not t[tdengine.editor.sentinel].callbacks then return end
+function doublenickel.editor.run_editor_callback(t, callback, ...)
+  if not t[doublenickel.editor.sentinel] then return end
+  if not t[doublenickel.editor.sentinel].callbacks then return end
 
-  local callback = t[tdengine.editor.sentinel].callbacks[callback]
+  local callback = t[doublenickel.editor.sentinel].callbacks[callback]
   if not callback then return end
 
   return callback(...)
 end
 
-tdengine.editor.layers = {
+doublenickel.editor.layers = {
   grid = 90,
   colliders = 110,
   collider_overlay = 120,
@@ -249,27 +249,27 @@ tdengine.editor.layers = {
 --------------
 -- INTERNAL --
 --------------
-function tdengine.editor.init()
-  tdengine.dn_log('tdengine.editor.init')
+function doublenickel.editor.init()
+  doublenickel.dn_log('doublenickel.editor.init')
   self.focus_state = {}
   self.hover_state = {}
-  self.window_stack = tdengine.data_types.stack:new()
+  self.window_stack = doublenickel.data_types.stack:new()
 
-  tdengine.editor.entities = {}
-  for name, class in pairs(tdengine.editor.types) do
-    tdengine.editor.entities[name] = class:new()
+  doublenickel.editor.entities = {}
+  for name, class in pairs(doublenickel.editor.types) do
+    doublenickel.editor.entities[name] = class:new()
   end
 
-  tdengine.editor.colors = {
-    main_list = tdengine.colors.white:copy(),
-    cdata_member = tdengine.colors.red:copy(),
-    lua_member = tdengine.colors.green:copy(),
-    scalar = tdengine.colors.zomp:copy(),
+  doublenickel.editor.colors = {
+    main_list = doublenickel.colors.white:copy(),
+    cdata_member = doublenickel.colors.red:copy(),
+    lua_member = doublenickel.colors.green:copy(),
+    scalar = doublenickel.colors.zomp:copy(),
   }
 end
 
-function tdengine.editor.update()
-  for editor in tdengine.iterator.values(tdengine.editor.entities) do
+function doublenickel.editor.update()
+  for editor in doublenickel.iterator.values(doublenickel.editor.entities) do
     editor:update()
     editor:draw()
   end

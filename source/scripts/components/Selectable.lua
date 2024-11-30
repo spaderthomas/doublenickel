@@ -1,4 +1,4 @@
-Selectable = tdengine.component.define('Selectable')
+Selectable = doublenickel.component.define('Selectable')
 
 function Selectable:init()
   self.on_hover = function() end

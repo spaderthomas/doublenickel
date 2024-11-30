@@ -10,7 +10,7 @@ float interpolate_linear(float a, float b, float t) {
 	return ((1 - t) * a) + (t * b);
 }
 
-Vector2 interpolate_linear2(Vector2 a, Vector2 b, float t) {
+dn_vector2_t interpolate_linear2(dn_vector2_t a, dn_vector2_t b, float t) {
 	return { interpolate_linear(a.x, b.x, t), interpolate_linear(a.y, b.y, t) };
 }
 
@@ -80,8 +80,8 @@ void Interpolator::set_duration(float duration) {
 // INTERPOLATOR 2 //
 ////////////////////
 struct Interpolator2 {
-	Vector2 start;
-	Vector2 target;
+	dn_vector2_t start;
+	dn_vector2_t target;
 	float progress = 0.f;
 	
 	float speed = 1.f;
@@ -91,10 +91,10 @@ struct Interpolator2 {
 	void update();
 	void reset();
 	bool is_done();
-	Vector2 get_value();
+	dn_vector2_t get_value();
 
-	void set_start(Vector2 start);
-	void set_target(Vector2 target);
+	void set_start(dn_vector2_t start);
+	void set_target(dn_vector2_t target);
 	void set_speed(float speed);
 	void set_duration(float duration);
 };
@@ -112,7 +112,7 @@ bool Interpolator2::is_done() {
 	return this->progress == 1.f;
 }
 
-Vector2 Interpolator2::get_value() {
+dn_vector2_t Interpolator2::get_value() {
 	if (this->function == InterpolationFn::Linear) {
 		return interpolate_linear2(this->start, this->target, this->progress);
 	}
@@ -120,11 +120,11 @@ Vector2 Interpolator2::get_value() {
 	return interpolate_linear2(this->start, this->target, this->progress);
 }
 
-void Interpolator2::set_start(Vector2 start) {
+void Interpolator2::set_start(dn_vector2_t start) {
 	this->start = start;
 }
 
-void Interpolator2::set_target(Vector2 target) {
+void Interpolator2::set_target(dn_vector2_t target) {
 	this->target = target;
 }
 

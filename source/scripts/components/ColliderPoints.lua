@@ -1,9 +1,9 @@
-ColliderPoints = tdengine.component.define('ColliderPoints')
+ColliderPoints = doublenickel.component.define('ColliderPoints')
 
 function ColliderPoints:init(params)
   params = params or {}
 
-  self.points = tdengine.data_types.array:new()
+  self.points = doublenickel.data_types.array:new()
 
   local points = params.points or {}
   for _, point in pairs(points) do
@@ -73,7 +73,7 @@ function ColliderPoints:show(color)
     local next_point = self.points:at(index + 1)
     if not next_point then next_point = self.points:at(1) end
 
-    tdengine.ffi.draw_line(point.x, point.y, next_point.x, next_point.y, 5, color)
+    doublenickel.ffi.draw_line(point.x, point.y, next_point.x, next_point.y, 5, color)
   end
 end
 
@@ -129,5 +129,5 @@ end
 
 function ColliderPoints:center_image(image)
   log.warn('unimplemented: ColliderPoints:center_image')
-  return tdengine.vec2()
+  return doublenickel.vec2()
 end

@@ -1,4 +1,4 @@
-local DevMarker = tdengine.node('DevMarker')
+local DevMarker = doublenickel.node('DevMarker')
 DevMarker.editor_fields = {
   'text',
 }

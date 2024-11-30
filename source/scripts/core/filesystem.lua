@@ -1,8 +1,8 @@
-function tdengine.extract_filename(path)
+function doublenickel.extract_filename(path)
   return path:match("([^/\\]+)$")
 end
 
-function tdengine.is_extension(path, extension)
+function doublenickel.is_extension(path, extension)
   local ext_len = string.len(extension)
   local path_len = string.len(path)
   if ext_len > path_len then return false end
@@ -11,21 +11,21 @@ function tdengine.is_extension(path, extension)
   return last == extension
 end
 
-function tdengine.has_extension(path)
+function doublenickel.has_extension(path)
   return string.find(path, '%.')
 end
 
-function tdengine.strip_extension(path)
-  local extension = tdengine.has_extension(path)
+function doublenickel.strip_extension(path)
+  local extension = doublenickel.has_extension(path)
   if not extension then return path end
 
   return path:sub(1, extension - 1)
 end
 
-function tdengine.filesystem.iterate_directory(path)
+function doublenickel.filesystem.iterate_directory(path)
   local function iterator()
-    local entry_list = tdengine.ffi.dn_os_scan_directory(path)
-    for entry in tdengine.iterator.carray(entry_list.data, entry_list.count) do
+    local entry_list = dn.os_scan_directory(path)
+    for entry in doublenickel.iterator.carray(entry_list.data, entry_list.count) do
       coroutine.yield(entry)
     end
   end
@@ -33,16 +33,16 @@ function tdengine.filesystem.iterate_directory(path)
   return coroutine.wrap(iterator)
 end
 
-function tdengine.filesystem.collect_directory(path)
+function doublenickel.filesystem.collect_directory(path)
   local files = {}
-  for entry in tdengine.filesystem.iterate_directory(path) do
+  for entry in doublenickel.filesystem.iterate_directory(path) do
     table.insert(files, entry.file_name:to_interned())
   end
 
   return files
 end
 
-function tdengine.filesystem.collect_named_directory(name)
-  local path = tdengine.ffi.dn_paths_resolve(name):to_interned()
-  return tdengine.filesystem.collect_directory(path)
+function doublenickel.filesystem.collect_named_directory(name)
+  local path = dn.paths_resolve(name):to_interned()
+  return doublenickel.filesystem.collect_directory(path)
 end

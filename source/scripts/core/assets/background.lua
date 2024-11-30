@@ -1,22 +1,22 @@
-function tdengine.background.load()
-	local info = tdengine.ffi.dn_paths_resolve('background_info'):to_interned()
-  if tdengine.ffi.dn_os_does_path_exist(info) then
-		tdengine.background.data = tdengine.module.read_from_named_path('background_info')
+function doublenickel.background.load()
+	local info = dn.paths_resolve('background_info'):to_interned()
+  if dn.os_does_path_exist(info) then
+		doublenickel.background.data = doublenickel.module.read_from_named_path('background_info')
 	else
-		tdengine.background.data = {}
+		doublenickel.background.data = {}
   end
 end
 
-function tdengine.background.save()
-	tdengine.module.write_to_named_path('background_info', tdengine.background.data, tdengine.module.WriteOptions.Pretty)
+function doublenickel.background.save()
+	doublenickel.module.write_to_named_path('background_info', doublenickel.background.data, doublenickel.module.WriteOptions.Pretty)
 end
 
-function tdengine.background.find(name)
-	return tdengine.background.data[name]
+function doublenickel.background.find(name)
+	return doublenickel.background.data[name]
 end
 
-function tdengine.background.add(name, file)
-	tdengine.background.data[name] = {
+function doublenickel.background.add(name, file)
+	doublenickel.background.data[name] = {
 		mod_time = 0,
 		size = {
 			x = 0,
@@ -27,6 +27,6 @@ function tdengine.background.add(name, file)
 	}
 end
 
-function tdengine.background.remove(name)
-	tdengine.background.data[name] = nil
+function doublenickel.background.remove(name)
+	doublenickel.background.data[name] = nil
 end

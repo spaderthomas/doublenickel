@@ -10,7 +10,7 @@ DN_API void        dn_path_from_cstr(dn_path_t path, const char* a);
 DN_API void        dn_path_join(dn_path_t path, const char* a, const char* b);
 DN_API dn_string_t dn_path_strip_extension(const char* file_name);
 DN_API dn_string_t dn_path_extract_file_name(const char* full_path);
-DN_API char*       dn_string_16_to_8(uint16* str, u32 length);
+DN_API char*       dn_string_16_to_8(u16* str, u32 length);
 DN_IMP bool        dn_path_is_extension(std::string_view str, dn_string_t extension);
 
 namespace path_util {
@@ -79,7 +79,7 @@ dn_string_t dn_path_extract_file_name(const char* full_path) {
 	};
 }
 
-char* dn_string_16_to_8(uint16* str, u32 length) {
+char* dn_string_16_to_8(u16* str, u32 length) {
 	dn_tstring_t utf8 = dn::allocator::alloc<char>(&dn_allocators.bump, length + 1);
 	WideCharToMultiByte(CP_UTF8, 0, (LPCWCH)str, length, utf8, length, NULL, NULL);
 	return utf8;

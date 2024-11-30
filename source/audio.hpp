@@ -30,7 +30,7 @@ typedef struct {
   dn_hash_t hash;
   u32 num_channels;
   u32 sample_rate;
-  drwav_uint64 num_frames;
+  u64 num_frames;
   u32 num_samples;
   float* samples;
   u32 generation;
@@ -208,7 +208,7 @@ void dn_audio_init(dn_audio_config_t config) {
 }
 
 void dn_audio_add_samples(dn_audio_instance_t* active_sound, int samples_requested, int offset) {
-  for (int32 i = 0; i < samples_requested; i++) {
+  for (i32 i = 0; i < samples_requested; i++) {
     auto info = dn_audio.sounds[active_sound->info.index];
     auto index = active_sound->next_sample++;
 
@@ -243,7 +243,7 @@ void dn_audio_update(float* buffer, int frames_requested, int num_channels) {
   if (!frames_requested) return;
 
   // Cap the number of samples so we don't overwrite the buffer
-  int32 samples_requested = frames_requested * num_channels;
+  i32 samples_requested = frames_requested * num_channels;
   if (samples_requested > dn_audio.sample_buffer.capacity) {
     dn_log("requested too many audio samples: %d", samples_requested);
     samples_requested = dn_audio.sample_buffer.capacity;

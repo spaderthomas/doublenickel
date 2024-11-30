@@ -1,45 +1,45 @@
 ------------
 -- ENUMS  --
 ------------
-tdengine.branch_ops = {
+doublenickel.branch_ops = {
   eq = 1,
   geq = 2,
   leq = 3,
 }
 
-tdengine.branch_op_names = {
-  [tdengine.branch_ops.eq] = '==',
-  [tdengine.branch_ops.geq] = '>=',
-  [tdengine.branch_ops.leq] = '<=',
+doublenickel.branch_op_names = {
+  [doublenickel.branch_ops.eq] = '==',
+  [doublenickel.branch_ops.geq] = '>=',
+  [doublenickel.branch_ops.leq] = '<=',
 }
 
-tdengine.branch_op_symbols = {
-  [tdengine.branch_ops.eq] = '==',
-  [tdengine.branch_ops.geq] = '>=',
-  [tdengine.branch_ops.leq] = '<=',
+doublenickel.branch_op_symbols = {
+  [doublenickel.branch_ops.eq] = '==',
+  [doublenickel.branch_ops.geq] = '>=',
+  [doublenickel.branch_ops.leq] = '<=',
 }
 
-tdengine.branch_combinators = {
+doublenickel.branch_combinators = {
   op_and = 1,
   op_or  = 2
 }
 
-tdengine.branch_combinator_names = {
-  [tdengine.branch_combinators.op_and] = 'and',
-  [tdengine.branch_combinators.op_or]  = 'or',
+doublenickel.branch_combinator_names = {
+  [doublenickel.branch_combinators.op_and] = 'and',
+  [doublenickel.branch_combinators.op_or]  = 'or',
 }
 
-tdengine.branch_compatibility = {
+doublenickel.branch_compatibility = {
   ['number'] = {
-    tdengine.branch_ops.eq,
-    tdengine.branch_ops.geq,
-    tdengine.branch_ops.leq,
+    doublenickel.branch_ops.eq,
+    doublenickel.branch_ops.geq,
+    doublenickel.branch_ops.leq,
   },
   ['boolean'] = {
-    tdengine.branch_ops.eq,
+    doublenickel.branch_ops.eq,
   },
   ['string'] = {
-    tdengine.branch_ops.eq,
+    doublenickel.branch_ops.eq,
   }
 }
 
@@ -50,7 +50,7 @@ tdengine.branch_compatibility = {
 function make_default_branch()
   local default = {
     variable = 'Fallback.FallbackState',
-    op = tdengine.branch_ops.eq,
+    op = doublenickel.branch_ops.eq,
     value = true
   }
   return default
@@ -61,7 +61,7 @@ end
 -- BRANCH COMPATIBILITY --
 --------------------------
 function get_valid_ops_for_value(value)
-  return tdengine.branch_compatibility[type(value)]
+  return doublenickel.branch_compatibility[type(value)]
 end
 
 
@@ -114,9 +114,9 @@ function evaluate_branches(branches, combinator)
     if outcome.pass == true then has_true = true end
   end
 
-  if combinator == tdengine.branch_combinators.op_and then
+  if combinator == doublenickel.branch_combinators.op_and then
     return (not has_false), outcomes
-  elseif combinator == tdengine.branch_combinators.op_or then
+  elseif combinator == doublenickel.branch_combinators.op_or then
     return has_true, outcomes
   end
 end
@@ -126,15 +126,15 @@ function evaluate_single_branch(branch)
   local outcome = nil
   local roll = 0
   local stat = 0
-  if branch.op == tdengine.branch_ops.eq then
-    --local outcome = tdengine.state.find(branch.variable)
-    outcome = index_string(tdengine.state.data, branch.variable)
+  if branch.op == doublenickel.branch_ops.eq then
+    --local outcome = doublenickel.state.find(branch.variable)
+    outcome = index_string(doublenickel.state.data, branch.variable)
     pass = branch.value == outcome
-  elseif branch.op == tdengine.branch_ops.geq then
-    outcome = index_string(tdengine.state.data, branch.variable)
+  elseif branch.op == doublenickel.branch_ops.geq then
+    outcome = index_string(doublenickel.state.data, branch.variable)
     pass = outcome >= branch.value
-  elseif branch.op == tdengine.branch_ops.leq then
-    outcome = index_string(tdengine.state.data, branch.variable)
+  elseif branch.op == doublenickel.branch_ops.leq then
+    outcome = index_string(doublenickel.state.data, branch.variable)
     pass = outcome < branch.value
   end
 

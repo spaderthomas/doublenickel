@@ -1,112 +1,112 @@
 #ifndef DN_GRAPHICS_H
 #define DN_GRAPHICS_H
 
-#define GPU_NEAR_PLANE -100.0
-#define GPU_FAR_PLANE 100.0
+#define DN_GPU_NEAR_PLANE -100.0
+#define DN_GPU_FAR_PLANE 100.0
 
 
 typedef enum {
-  GPU_COMMAND_OP_BIND_BUFFERS = 10,
-  GPU_COMMAND_OP_BEGIN_RENDER_PASS = 20,
-  GPU_COMMAND_OP_END_RENDER_PASS = 21,
-  GPU_COMMAND_OP_BIND_PIPELINE = 30,
-  GPU_COMMAND_OP_SET_CAMERA = 40,
-  GPU_COMMAND_OP_SET_LAYER = 41,
-  GPU_COMMAND_OP_SET_WORLD_SPACE = 42,
-  GPU_COMMAND_OP_SET_SCISSOR = 43,
-  GPU_COMMAND_OP_DRAW = 70,
+  DN_GPU_COMMAND_OP_BIND_BUFFERS = 10,
+  DN_GPU_COMMAND_OP_BEGIN_RENDER_PASS = 20,
+  DN_GPU_COMMAND_OP_END_RENDER_PASS = 21,
+  DN_GPU_COMMAND_OP_BIND_PIPELINE = 30,
+  DN_GPU_COMMAND_OP_SET_CAMERA = 40,
+  DN_GPU_COMMAND_OP_SET_LAYER = 41,
+  DN_GPU_COMMAND_OP_SET_WORLD_SPACE = 42,
+  DN_GPU_COMMAND_OP_SET_SCISSOR = 43,
+  DN_GPU_COMMAND_OP_DRAW = 70,
 } dn_gpu_command_op_t;
 
 typedef enum {
-  GPU_PRIMITIVE_TRIANGLES = 0
+  DN_GPU_PRIMITIVE_TRIANGLES = 0
 } dn_gpu_draw_primitive_t;
 
 typedef enum {
-  GPU_DRAW_MODE_ARRAYS = 0,
-  GPU_DRAW_MODE_INSTANCE = 1,
+  DN_GPU_DRAW_MODE_ARRAYS = 0,
+  DN_GPU_DRAW_MODE_INSTANCE = 1,
 } dn_gpu_draw_mode_t;
 
 typedef enum {
-  GPU_VERTEX_ATTRIBUTE_FLOAT = 0,
-  GPU_VERTEX_ATTRIBUTE_U32 = 1,
+  DN_GPU_VERTEX_ATTRIBUTE_FLOAT = 0,
+  DN_GPU_VERTEX_ATTRIBUTE_U32 = 1,
 } dn_gpu_vertex_attribute_kind_t;
 
 typedef enum {
-  GPU_UNIFORM_NONE = 0,
-  GPU_UNIFORM_MATRIX4 = 1,
-  GPU_UNIFORM_MATRIX3 = 2,
-  GPU_UNIFORM_MATRIX2 = 3,
-  GPU_UNIFORM_VECTOR4 = 4,
-  GPU_UNIFORM_VECTOR3 = 5,
-  GPU_UNIFORM_VECTOR2 = 6,
-  GPU_UNIFORM_I32 = 7,
-  GPU_UNIFORM_F32 = 8,
-  GPU_UNIFORM_TEXTURE = 9,
-  GPU_UNIFORM_ENUM = 10,
+  DN_GPU_UNIFORM_NONE = 0,
+  DN_GPU_UNIFORM_MATRIX4 = 1,
+  DN_GPU_UNIFORM_MATRIX3 = 2,
+  DN_GPU_UNIFORM_MATRIX2 = 3,
+  DN_GPU_UNIFORM_VECTOR4 = 4,
+  DN_GPU_UNIFORM_VECTOR3 = 5,
+  DN_GPU_UNIFORM_VECTOR2 = 6,
+  DN_GPU_UNIFORM_I32 = 7,
+  DN_GPU_UNIFORM_F32 = 8,
+  DN_GPU_UNIFORM_TEXTURE = 9,
+  DN_GPU_UNIFORM_ENUM = 10,
 } dn_gpu_uniform_kind_t;
 
 typedef enum {
-  GPU_BUFFER_KIND_STORAGE = 0,
-  GPU_BUFFER_KIND_ARRAY = 1,
-  GPU_BUFFER_KIND_UNIFORM = 2,
+  DN_GPU_BUFFER_KIND_STORAGE = 0,
+  DN_GPU_BUFFER_KIND_ARRAY = 1,
+  DN_GPU_BUFFER_KIND_UNIFORM = 2,
 } dn_gpu_buffer_kind_t;
 
 typedef enum {
-  GPU_BUFFER_USAGE_STATIC = 0,
-  GPU_BUFFER_USAGE_DYNAMIC = 1,
-  GPU_BUFFER_USAGE_STREAM = 2,
+  DN_GPU_BUFFER_USAGE_STATIC = 0,
+  DN_GPU_BUFFER_USAGE_DYNAMIC = 1,
+  DN_GPU_BUFFER_USAGE_STREAM = 2,
 } dn_gpu_buffer_usage_t;
 
 typedef enum {
-  GPU_BLEND_FUNC_NONE,
-  GPU_BLEND_FUNC_ADD,
-  GPU_BLEND_FUNC_SUBTRACT,
-  GPU_BLEND_FUNC_REVERSE_SUBTRACT,
-  GPU_BLEND_FUNC_MIN,
-  GPU_BLEND_FUNC_MAX
+  DN_GPU_BLEND_FUNC_NONE,
+  DN_GPU_BLEND_FUNC_ADD,
+  DN_GPU_BLEND_FUNC_SUBTRACT,
+  DN_GPU_BLEND_FUNC_REVERSE_SUBTRACT,
+  DN_GPU_BLEND_FUNC_MIN,
+  DN_GPU_BLEND_FUNC_MAX
 } dn_gpu_blend_func_t;
 
 typedef enum {
-  GPU_BLEND_MODE_ZERO,
-  GPU_BLEND_MODE_ONE,
-  GPU_BLEND_MODE_SRC_COLOR,
-  GPU_BLEND_MODE_ONE_MINUS_SRC_COLOR,
-  GPU_BLEND_MODE_DST_COLOR,
-  GPU_BLEND_MODE_ONE_MINUS_DST_COLOR,
-  GPU_BLEND_MODE_SRC_ALPHA,
-  GPU_BLEND_MODE_ONE_MINUS_SRC_ALPHA,
-  GPU_BLEND_MODE_DST_ALPHA,
-  GPU_BLEND_MODE_ONE_MINUS_DST_ALPHA,
-  GPU_BLEND_MODE_CONSTANT_COLOR,
-  GPU_BLEND_MODE_ONE_MINUS_CONSTANT_COLOR,
-  GPU_BLEND_MODE_CONSTANT_ALPHA,
-  GPU_BLEND_MODE_ONE_MINUS_CONSTANT_ALPHA,
-  GPU_BLEND_MODE_SRC_ALPHA_SATURATE,
-  GPU_BLEND_MODE_SRC1_COLOR,
-  GPU_BLEND_MODE_ONE_MINUS_SRC1_COLOR,
-  GPU_BLEND_MODE_SRC1_ALPHA,
-  GPU_BLEND_MODE_ONE_MINUS_SRC1_ALPHA
+  DN_GPU_BLEND_MODE_ZERO,
+  DN_GPU_BLEND_MODE_ONE,
+  DN_GPU_BLEND_MODE_SRC_COLOR,
+  DN_GPU_BLEND_MODE_ONE_MINUS_SRC_COLOR,
+  DN_GPU_BLEND_MODE_DST_COLOR,
+  DN_GPU_BLEND_MODE_ONE_MINUS_DST_COLOR,
+  DN_GPU_BLEND_MODE_SRC_ALPHA,
+  DN_GPU_BLEND_MODE_ONE_MINUS_SRC_ALPHA,
+  DN_GPU_BLEND_MODE_DST_ALPHA,
+  DN_GPU_BLEND_MODE_ONE_MINUS_DST_ALPHA,
+  DN_GPU_BLEND_MODE_CONSTANT_COLOR,
+  DN_GPU_BLEND_MODE_ONE_MINUS_CONSTANT_COLOR,
+  DN_GPU_BLEND_MODE_CONSTANT_ALPHA,
+  DN_GPU_BLEND_MODE_ONE_MINUS_CONSTANT_ALPHA,
+  DN_GPU_BLEND_MODE_SRC_ALPHA_SATURATE,
+  DN_GPU_BLEND_MODE_SRC1_COLOR,
+  DN_GPU_BLEND_MODE_ONE_MINUS_SRC1_COLOR,
+  DN_GPU_BLEND_MODE_SRC1_ALPHA,
+  DN_GPU_BLEND_MODE_ONE_MINUS_SRC1_ALPHA
 } dn_gpu_blend_mode_t;
 
 typedef enum {
-  GPU_LOAD_OP_NONE = 0,
-  GPU_LOAD_OP_CLEAR = 1
+  DN_GPU_LOAD_OP_NONE = 0,
+  DN_GPU_LOAD_OP_CLEAR = 1
 } dn_gpu_load_op_t;
 
 typedef enum {
-  GPU_RESOURCE_FRAMEBUFFER = 0,
-  GPU_RESOURCE_SHADER = 1,
-  GPU_RESOURCE_PROGRAM = 2,
+  DN_GPU_RESOURCE_FRAMEBUFFER = 0,
+  DN_GPU_RESOURCE_SHADER = 1,
+  DN_GPU_RESOURCE_PROGRAM = 2,
 } dn_gpu_resource_id_t;
 
 typedef enum {
-  GPU_MEMORY_BARRIER_STORAGE = 0,
-  GPU_MEMORY_BARRIER_BUFFER_UPDATE = 1,
+  DN_GPU_MEMORY_BARRIER_STORAGE = 0,
+  DN_GPU_MEMORY_BARRIER_BUFFER_UPDATE = 1,
 } dn_gpu_memory_barrier_t;
 
 typedef enum {
-  GPU_SHADER_GRAPHICS = 0,
-  GPU_SHADER_COMPUTE = 1,
+  DN_GPU_SHADER_GRAPHICS = 0,
+  DN_GPU_SHADER_COMPUTE = 1,
 } dn_gpu_shader_kind_t;
 
 /////////////
@@ -146,12 +146,12 @@ typedef struct {
 // UNIFORMS //
 //////////////
 typedef union {
-  Matrix4 mat4;
-  Matrix3 mat3;
-  Matrix2 mat2;
-  Vector4 vec4;
-  Vector3 vec3;
-  Vector2 vec2;
+  dn_matrix4_t mat4;
+  dn_matrix3_t mat3;
+  dn_matrix2_t mat2;
+  dn_vector4_t vec4;
+  dn_vector3_t vec3;
+  dn_vector2_t vec2;
   float f32;
   i32 texture;
   i32 i32;
@@ -198,14 +198,14 @@ typedef struct {
 ///////////////////////
 typedef struct {
   dn_asset_name_t name;
-  Vector2 size;
+  dn_vector2_t size;
 } dn_gpu_render_target_descriptor_t;
 
 typedef struct {
   dn_asset_name_t name;
   u32 handle;
   u32 color_buffer;
-  Vector2 size;
+  dn_vector2_t size;
 } dn_gpu_render_target_t;
 
 
@@ -282,16 +282,16 @@ typedef struct {
 } dn_gpu_raster_state_t;
 
 typedef struct {
-  Vector2 position;
-  Vector2 size;
+  dn_vector2_t position;
+  dn_vector2_t size;
   bool enabled;
 } dn_gpu_scissor_state_t;
 
 typedef struct {
   u32 layer;
   bool world_space;
-  Vector2 camera;
-  Matrix4 projection;
+  dn_vector2_t camera;
+  dn_matrix4_t projection;
 } dn_gpu_renderer_state_t;
 
 typedef struct {
@@ -365,11 +365,11 @@ typedef struct {
 // DN GPU //
 ////////////
 typedef struct {
-  Matrix4 view;
-  Matrix4 projection;
-  Vector2 camera;
-  Vector2 native_resolution;
-  Vector2 output_resolution;
+  dn_matrix4_t view;
+  dn_matrix4_t projection;
+  dn_vector2_t camera;
+  dn_vector2_t native_resolution;
+  dn_vector2_t output_resolution;
   float master_time;
 } dn_gpu_uniforms_t;
 
@@ -416,7 +416,7 @@ DN_API void                      dn_gpu_apply_bindings(dn_gpu_command_buffer_t* 
 DN_API void                      dn_gpu_bind_render_state(dn_gpu_command_buffer_t* command_buffer, dn_gpu_renderer_state_t render);
 DN_API void                      dn_gpu_set_layer(dn_gpu_command_buffer_t* command_buffer, u32 layer);
 DN_API void                      dn_gpu_set_world_space(dn_gpu_command_buffer_t* command_buffer, bool world_space);
-DN_API void                      dn_gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, Vector2 camera);
+DN_API void                      dn_gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, dn_vector2_t camera);
 DN_API dn_gpu_pipeline_t*        dn_gpu_pipeline_create(dn_gpu_pipeline_descriptor_t descriptor);
 DN_API dn_gpu_uniform_t*         dn_gpu_uniform_create(dn_gpu_uniform_descriptor_t descriptor);
 DN_API dn_gpu_buffer_t*          dn_gpu_buffer_create(dn_gpu_buffer_descriptor_t descriptor);
@@ -502,8 +502,8 @@ void dn_gpu_init(dn_gpu_config_t config) {
   dn_log("%s: Initializing default uniform block", __func__);
   dn_gpu.builtin_uniforms.buffer = dn_gpu_buffer_create({
     .name = "dn_uniform_buffer_default",
-    .kind = GPU_BUFFER_KIND_UNIFORM,
-    .usage = GPU_BUFFER_USAGE_DYNAMIC,
+    .kind = DN_GPU_BUFFER_KIND_UNIFORM,
+    .usage = DN_GPU_BUFFER_USAGE_DYNAMIC,
     .capacity = 1,
     .element_size = sizeof(dn_gpu_uniforms_t)
   });
@@ -544,25 +544,25 @@ void dn_gpu_init(dn_gpu_config_t config) {
       .name = "shape",
       .vertex_shader = dn_paths_resolve_format("dn_shader", "sdf/shape.vertex"),
       .fragment_shader = dn_paths_resolve_format("dn_shader", "sdf/shape.fragment"),
-      .kind = GPU_SHADER_GRAPHICS
+      .kind = DN_GPU_SHADER_GRAPHICS
     },
     {
         .name = "solid",
         .vertex_shader = dn_paths_resolve_format("dn_shader", "solid/solid.vertex"),
         .fragment_shader = dn_paths_resolve_format("dn_shader", "solid/solid.fragment"),
-        .kind = GPU_SHADER_GRAPHICS,
+        .kind = DN_GPU_SHADER_GRAPHICS,
     },
     {
         .name = "sprite",
         .vertex_shader = dn_paths_resolve_format("dn_shader", "sprite/sprite.vertex"),
         .fragment_shader = dn_paths_resolve_format("dn_shader", "sprite/sprite.fragment"),
-        .kind = GPU_SHADER_GRAPHICS,
+        .kind = DN_GPU_SHADER_GRAPHICS,
     },
     {
         .name = "text",
         .vertex_shader = dn_paths_resolve_format("dn_shader", "text/text.vertex"),
         .fragment_shader = dn_paths_resolve_format("dn_shader", "text/text.fragment"),
-        .kind = GPU_SHADER_GRAPHICS,
+        .kind = DN_GPU_SHADER_GRAPHICS,
     },
   };
   for (u32 i = 0; i < DN_ARR_LEN(default_shaders); i++) {
@@ -616,9 +616,9 @@ void dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
     auto& pipeline = *command_buffer->pipeline;
 
     switch (command.op) {
-      case GPU_COMMAND_OP_BEGIN_RENDER_PASS: {
+      case DN_GPU_COMMAND_OP_BEGIN_RENDER_PASS: {
         switch (command.render_pass.color.load) {
-          case GPU_LOAD_OP_CLEAR: {
+          case DN_GPU_LOAD_OP_CLEAR: {
             dn_gpu_render_target_clear(command.render_pass.color.attachment);
           }
         }
@@ -627,16 +627,16 @@ void dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
         command_buffer->render_pass = command.render_pass;
       } break;
 
-      case GPU_COMMAND_OP_END_RENDER_PASS: {
+      case DN_GPU_COMMAND_OP_END_RENDER_PASS: {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glDisable(GL_SCISSOR_TEST);
       } break;
 
-      case GPU_COMMAND_OP_BIND_PIPELINE: {
+      case DN_GPU_COMMAND_OP_BIND_PIPELINE: {
         glUseProgram(command.pipeline->raster.shader->program);
 
-        if (command.pipeline->blend.fn == GPU_BLEND_FUNC_NONE) {
+        if (command.pipeline->blend.fn == DN_GPU_BLEND_FUNC_NONE) {
           glDisable(GL_BLEND);
         }
         else {
@@ -652,7 +652,7 @@ void dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
         command_buffer->pipeline = command.pipeline;
       } break;
 
-      case GPU_COMMAND_OP_BIND_BUFFERS: {
+      case DN_GPU_COMMAND_OP_BIND_BUFFERS: {
         // VERTEX BUFFERS
         auto& vertex_buffers = command.bindings.vertex;
         auto& pipeline = *command_buffer->pipeline;
@@ -675,8 +675,8 @@ void dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
             auto attribute = buffer_layout.vertex_attributes[i];
             
             switch(attribute.kind) {
-              case GPU_VERTEX_ATTRIBUTE_FLOAT: glVertexAttribPointer(attribute_index, attribute.count, GL_FLOAT,        GL_FALSE, stride, dn_gpu_u32_to_gl_void_pointer(offset)); break;
-              case GPU_VERTEX_ATTRIBUTE_U32:   glVertexAttribIPointer(attribute_index, attribute.count, GL_UNSIGNED_INT,           stride, dn_gpu_u32_to_gl_void_pointer(offset)); break;
+              case DN_GPU_VERTEX_ATTRIBUTE_FLOAT: glVertexAttribPointer(attribute_index, attribute.count, GL_FLOAT,        GL_FALSE, stride, dn_gpu_u32_to_gl_void_pointer(offset)); break;
+              case DN_GPU_VERTEX_ATTRIBUTE_U32:   glVertexAttribIPointer(attribute_index, attribute.count, GL_UNSIGNED_INT,           stride, dn_gpu_u32_to_gl_void_pointer(offset)); break;
               default: {
                 assert(false);
               } break;
@@ -699,16 +699,15 @@ void dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
           i32 index = glGetUniformLocation(command_buffer->pipeline->raster.shader->program, uniform->name);
 
           switch(binding.uniform->kind) {
-            case GPU_UNIFORM_MATRIX4: glUniformMatrix4fv(index, 1, GL_FALSE, (const float*)&binding.data.mat4); break;
-            case GPU_UNIFORM_MATRIX3: glUniformMatrix3fv(index, 1, GL_FALSE, (const float*)&binding.data.mat3); break;
-            case GPU_UNIFORM_MATRIX2: glUniformMatrix2fv(index, 1, GL_FALSE, (const float*)&binding.data.mat2); break;
-            case GPU_UNIFORM_VECTOR4: glUniform4fv(index, 1, (const float*)&binding.data.vec4); break;
-            case GPU_UNIFORM_VECTOR3: glUniform3fv(index, 1, (const float*)&binding.data.vec3); break;
-            case GPU_UNIFORM_VECTOR2: glUniform2fv(index, 1, (const float*)&binding.data.vec2); break;
-            case GPU_UNIFORM_F32:     glUniform1fv(index, 1, (const float*)&binding.data.f32); break;
-            case GPU_UNIFORM_TEXTURE: glActiveTexture(GL_TEXTURE0 + binding.binding_index); glBindTexture(GL_TEXTURE_2D, binding.data.texture); break;
-            case GPU_UNIFORM_ENUM:    glUniform1iv(index, 1, (const i32*)&binding.data.i32); break;
-
+            case DN_GPU_UNIFORM_MATRIX4: glUniformMatrix4fv(index, 1, GL_FALSE, (const float*)&binding.data.mat4); break;
+            case DN_GPU_UNIFORM_MATRIX3: glUniformMatrix3fv(index, 1, GL_FALSE, (const float*)&binding.data.mat3); break;
+            case DN_GPU_UNIFORM_MATRIX2: glUniformMatrix2fv(index, 1, GL_FALSE, (const float*)&binding.data.mat2); break;
+            case DN_GPU_UNIFORM_VECTOR4: glUniform4fv(index, 1, (const float*)&binding.data.vec4); break;
+            case DN_GPU_UNIFORM_VECTOR3: glUniform3fv(index, 1, (const float*)&binding.data.vec3); break;
+            case DN_GPU_UNIFORM_VECTOR2: glUniform2fv(index, 1, (const float*)&binding.data.vec2); break;
+            case DN_GPU_UNIFORM_F32:     glUniform1fv(index, 1, (const float*)&binding.data.f32); break;
+            case DN_GPU_UNIFORM_TEXTURE: glActiveTexture(GL_TEXTURE0 + binding.binding_index); glBindTexture(GL_TEXTURE_2D, binding.data.texture); break;
+            case DN_GPU_UNIFORM_ENUM:    glUniform1iv(index, 1, (const i32*)&binding.data.i32); break;
           }
         }
 
@@ -722,14 +721,14 @@ void dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
         for (u32 i = 0; i < storage.count; i++) {
           auto& binding = storage.bindings[i];
 
-          assert(binding.buffer->kind == GPU_BUFFER_KIND_STORAGE);
+          assert(binding.buffer->kind == DN_GPU_BUFFER_KIND_STORAGE);
           glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding.base, binding.buffer->handle);
         }
 
         command_buffer->bindings = command.bindings;
       } break;
 
-      case GPU_COMMAND_OP_SET_SCISSOR: {
+      case DN_GPU_COMMAND_OP_SET_SCISSOR: {
         if (command.scissor.enabled != command_buffer->scissor.enabled) {
           if (command.scissor.enabled) {
             glEnable(GL_SCISSOR_TEST);
@@ -745,23 +744,23 @@ void dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
         command_buffer->scissor = command.scissor;
       } break;
 
-      case GPU_COMMAND_OP_SET_WORLD_SPACE: {
+      case DN_GPU_COMMAND_OP_SET_WORLD_SPACE: {
         command_buffer->render.world_space = command.render.world_space;
       } break;
-      case GPU_COMMAND_OP_SET_CAMERA: {
+      case DN_GPU_COMMAND_OP_SET_CAMERA: {
         command_buffer->render.camera = command.render.camera;
       } break;
-      case GPU_COMMAND_OP_SET_LAYER: {
+      case DN_GPU_COMMAND_OP_SET_LAYER: {
         command_buffer->render.layer = command.render.layer;
       } break;
 
-      case GPU_COMMAND_OP_DRAW: {      
+      case DN_GPU_COMMAND_OP_DRAW: {      
         auto target = command_buffer->render_pass.color.attachment;
         dn_gpu.builtin_uniforms.data = {
           .view = command_buffer->render.world_space ? 
             HMM_Translate(HMM_V3(-command_buffer->render.camera.x, -command_buffer->render.camera.y, 0.f)) :
             HMM_M4D(1.0),
-          .projection = HMM_Orthographic_RH_NO(0, target->size.x, 0, target->size.y, GPU_NEAR_PLANE, GPU_FAR_PLANE),
+          .projection = HMM_Orthographic_RH_NO(0, target->size.x, 0, target->size.y, DN_GPU_NEAR_PLANE, DN_GPU_FAR_PLANE),
           .camera = command_buffer->render.camera,
           .native_resolution = window.native_resolution,
           .output_resolution = target->size,
@@ -774,8 +773,8 @@ void dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
 
         auto primitive = dn_gpu_draw_primitive_to_gl_draw_primitive(pipeline.raster.primitive);
         switch (command.draw.mode) {
-          case GPU_DRAW_MODE_ARRAYS: glDrawArrays(primitive, command.draw.vertex_offset, command.draw.num_vertices); break;
-          case GPU_DRAW_MODE_INSTANCE: glDrawArraysInstanced(primitive, command.draw.vertex_offset, command.draw.num_vertices, command.draw.num_instances); break;
+          case DN_GPU_DRAW_MODE_ARRAYS: glDrawArrays(primitive, command.draw.vertex_offset, command.draw.num_vertices); break;
+          case DN_GPU_DRAW_MODE_INSTANCE: glDrawArraysInstanced(primitive, command.draw.vertex_offset, command.draw.num_vertices, command.draw.num_instances); break;
         }
       } break;
     }
@@ -789,7 +788,7 @@ void dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
 
 void dn_gpu_command_buffer_draw(dn_gpu_command_buffer_t* command_buffer, dn_gpu_draw_call_t draw_call) {
   dn_array_push(&command_buffer->commands, {
-    .op = GPU_COMMAND_OP_DRAW,
+    .op = DN_GPU_COMMAND_OP_DRAW,
     .draw = draw_call
   });
 }
@@ -810,7 +809,7 @@ dn_gpu_pipeline_t* dn_gpu_pipeline_create(dn_gpu_pipeline_descriptor_t descripto
 
 void dn_gpu_bind_pipeline(dn_gpu_command_buffer_t* command_buffer, dn_gpu_pipeline_t* pipeline) {
   dn_array_push(&command_buffer->commands, {
-    .op = GPU_COMMAND_OP_BIND_PIPELINE,
+    .op = DN_GPU_COMMAND_OP_BIND_PIPELINE,
     .pipeline = pipeline
   });
 }
@@ -821,14 +820,14 @@ void dn_gpu_bind_pipeline(dn_gpu_command_buffer_t* command_buffer, dn_gpu_pipeli
 /////////////
 void dn_gpu_begin_render_pass(dn_gpu_command_buffer_t* command_buffer, dn_gpu_render_pass_t render_pass) {
   dn_array_push(&command_buffer->commands, {
-    .op = GPU_COMMAND_OP_BEGIN_RENDER_PASS,
+    .op = DN_GPU_COMMAND_OP_BEGIN_RENDER_PASS,
     .render_pass = render_pass
   });
 }
 
 void dn_gpu_end_render_pass(dn_gpu_command_buffer_t* command_buffer) {
   dn_array_push(&command_buffer->commands, {
-    .op = GPU_COMMAND_OP_END_RENDER_PASS,
+    .op = DN_GPU_COMMAND_OP_END_RENDER_PASS,
   });
 }
 
@@ -836,7 +835,7 @@ void dn_gpu_apply_bindings(dn_gpu_command_buffer_t* command_buffer, dn_gpu_buffe
   if (dn_os_is_memory_equal(&command_buffer->bindings, &bindings, sizeof(dn_gpu_buffer_binding_t))) return;
 
   dn_array_push(&command_buffer->commands, {
-    .op = GPU_COMMAND_OP_BIND_BUFFERS,
+    .op = DN_GPU_COMMAND_OP_BIND_BUFFERS,
     .bindings = bindings
   });
 }
@@ -849,7 +848,7 @@ void dn_gpu_set_layer(dn_gpu_command_buffer_t* command_buffer, u32 layer) {
   if (command_buffer->render.layer == layer) return;
 
   dn_array_push(&command_buffer->commands, {
-    .op = GPU_COMMAND_OP_SET_LAYER,
+    .op = DN_GPU_COMMAND_OP_SET_LAYER,
     .render = {
       .layer = layer
     }
@@ -860,18 +859,18 @@ void dn_gpu_set_world_space(dn_gpu_command_buffer_t* command_buffer, bool world_
   if (command_buffer->render.world_space == world_space) return;
 
   dn_array_push(&command_buffer->commands, {
-    .op = GPU_COMMAND_OP_SET_WORLD_SPACE,
+    .op = DN_GPU_COMMAND_OP_SET_WORLD_SPACE,
     .render = {
       .world_space = world_space
     }
   });
 }
 
-void dn_gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, Vector2 camera) {
-  if (dn_os_is_memory_equal(&command_buffer->render.camera,  &camera, sizeof(Vector2))) return;
+void dn_gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, dn_vector2_t camera) {
+  if (dn_os_is_memory_equal(&command_buffer->render.camera,  &camera, sizeof(dn_vector2_t))) return;
 
   dn_array_push(&command_buffer->commands, {
-    .op = GPU_COMMAND_OP_SET_CAMERA,
+    .op = DN_GPU_COMMAND_OP_SET_CAMERA,
     .render = {
       .camera = camera
     }
@@ -971,8 +970,8 @@ void dn_gpu_backed_buffer_sync(dn_gpu_backed_buffer_t* buffer) {
 ////////////////
 dn_gpu_shader_t* dn_gpu_shader_create(dn_gpu_shader_descriptor_t descriptor) {
   switch (descriptor.kind) {
-    case GPU_SHADER_GRAPHICS: dn_log("%s: GPU_SHADER_GRAPHICS (%s) (%s)", __func__, descriptor.vertex_shader, descriptor.fragment_shader); break;
-    case GPU_SHADER_COMPUTE: dn_log("%s: GPU_SHADER_COMPUTE (%s)", __func__, descriptor.compute_shader); break;
+    case DN_GPU_SHADER_GRAPHICS: dn_log("%s: DN_GPU_SHADER_GRAPHICS (%s) (%s)", __func__, descriptor.vertex_shader, descriptor.fragment_shader); break;
+    case DN_GPU_SHADER_COMPUTE: dn_log("%s: DN_GPU_SHADER_COMPUTE (%s)", __func__, descriptor.compute_shader); break;
   }
   
   auto shader = dn_array_push(&dn_gpu.shaders);
@@ -1049,8 +1048,8 @@ void check_shader_linkage(u32 program, const char* file_path) {
 ////////////////
 void dn_gpu_shader_init(dn_gpu_shader_t* shader, dn_gpu_shader_descriptor_t descriptor) {
   switch (descriptor.kind) {
-    case GPU_SHADER_COMPUTE: {
-      shader->kind = GPU_SHADER_COMPUTE;
+    case DN_GPU_SHADER_COMPUTE: {
+      shader->kind = DN_GPU_SHADER_COMPUTE;
       dn_string_copy(descriptor.name, shader->name, DN_ASSET_NAME_LEN);
       shader->compute.path = dn_string_copy(descriptor.compute_shader);
       auto source = build_shader_source(shader->compute.path);
@@ -1067,8 +1066,8 @@ void dn_gpu_shader_init(dn_gpu_shader_t* shader, dn_gpu_shader_descriptor_t desc
       check_shader_linkage(shader->program, shader->compute.path);
 
     } break;
-    case GPU_SHADER_GRAPHICS: {
-      shader->kind = GPU_SHADER_GRAPHICS;
+    case DN_GPU_SHADER_GRAPHICS: {
+      shader->kind = DN_GPU_SHADER_GRAPHICS;
       dn_string_copy(descriptor.name, shader->name, DN_ASSET_NAME_LEN);
       shader->graphics.vertex_path = dn_string_copy(descriptor.vertex_shader);
       shader->graphics.fragment_path = dn_string_copy(descriptor.fragment_shader);
@@ -1107,7 +1106,7 @@ void dn_gpu_shader_init(dn_gpu_shader_t* shader, dn_gpu_shader_descriptor_t desc
       // Link into a shader program
       glLinkProgram(shader->program);
       check_shader_linkage(shader->program, shader->graphics.vertex_path);
-      dn_gpu_set_resource_name(GPU_RESOURCE_PROGRAM, shader->program, strlen(shader->name), shader->name);
+      dn_gpu_set_resource_name(DN_GPU_RESOURCE_PROGRAM, shader->program, strlen(shader->name), shader->name);
     } break;
   }
 }
@@ -1116,7 +1115,7 @@ void dn_gpu_shader_reload(dn_gpu_shader_t* shader) {
   glDeleteProgram(shader->program);
 
   switch (shader->kind) {
-    case GPU_SHADER_GRAPHICS: {
+    case DN_GPU_SHADER_GRAPHICS: {
       glDeleteShader(shader->graphics.vertex_shader);
       glDeleteShader(shader->graphics.fragment_shader);
       dn_gpu_shader_init(shader, {
@@ -1124,17 +1123,17 @@ void dn_gpu_shader_reload(dn_gpu_shader_t* shader) {
         .vertex_shader = shader->graphics.vertex_path,
         .fragment_shader = shader->graphics.fragment_path,
         .compute_shader = NULL,
-        .kind = GPU_SHADER_GRAPHICS,
+        .kind = DN_GPU_SHADER_GRAPHICS,
       });
     } break;
-    case GPU_SHADER_COMPUTE: {
+    case DN_GPU_SHADER_COMPUTE: {
       glDeleteShader(shader->compute.shader);
       dn_gpu_shader_init(shader, {
         .name = shader->name,
         .vertex_shader = NULL,
         .fragment_shader = NULL,
         .compute_shader = shader->compute.path,
-        .kind = GPU_SHADER_COMPUTE,
+        .kind = DN_GPU_SHADER_COMPUTE,
       });
     } break;
     default: {
@@ -1234,7 +1233,7 @@ void dn_gpu_swap_buffers() {
 /////////////////////
 u32 dn_gpu_draw_primitive_to_gl_draw_primitive(dn_gpu_draw_primitive_t primitive) {
   switch (primitive) {
-    case GPU_PRIMITIVE_TRIANGLES: return GL_TRIANGLES;
+    case DN_GPU_PRIMITIVE_TRIANGLES: return GL_TRIANGLES;
   }
 
   assert(false);
@@ -1243,12 +1242,12 @@ u32 dn_gpu_draw_primitive_to_gl_draw_primitive(dn_gpu_draw_primitive_t primitive
 
 u32 dn_gpu_blend_func_to_gl_blend_func(dn_gpu_blend_func_t func) {
   switch (func) {
-    case GPU_BLEND_FUNC_NONE:             return 0; break;
-    case GPU_BLEND_FUNC_ADD:              return GL_FUNC_ADD; break;
-    case GPU_BLEND_FUNC_SUBTRACT:         return GL_FUNC_SUBTRACT; break;
-    case GPU_BLEND_FUNC_REVERSE_SUBTRACT: return GL_FUNC_REVERSE_SUBTRACT; break;
-    case GPU_BLEND_FUNC_MIN:              return GL_MIN; break;
-    case GPU_BLEND_FUNC_MAX:              return GL_MAX; break;
+    case DN_GPU_BLEND_FUNC_NONE:             return 0; break;
+    case DN_GPU_BLEND_FUNC_ADD:              return GL_FUNC_ADD; break;
+    case DN_GPU_BLEND_FUNC_SUBTRACT:         return GL_FUNC_SUBTRACT; break;
+    case DN_GPU_BLEND_FUNC_REVERSE_SUBTRACT: return GL_FUNC_REVERSE_SUBTRACT; break;
+    case DN_GPU_BLEND_FUNC_MIN:              return GL_MIN; break;
+    case DN_GPU_BLEND_FUNC_MAX:              return GL_MAX; break;
   };
 
   DN_ASSERT(false);
@@ -1257,20 +1256,20 @@ u32 dn_gpu_blend_func_to_gl_blend_func(dn_gpu_blend_func_t func) {
 
 u32 dn_gpu_blend_mode_to_gl_blend_mode(dn_gpu_blend_mode_t mode) {
   switch (mode) {
-    case GPU_BLEND_MODE_ZERO: return GL_ZERO; break;
-    case GPU_BLEND_MODE_ONE: return GL_ONE; break;
-    case GPU_BLEND_MODE_SRC_COLOR: return GL_SRC_COLOR; break;
-    case GPU_BLEND_MODE_ONE_MINUS_SRC_COLOR: return GL_ONE_MINUS_SRC_COLOR; break;
-    case GPU_BLEND_MODE_DST_COLOR: return GL_DST_COLOR; break;
-    case GPU_BLEND_MODE_ONE_MINUS_DST_COLOR: return GL_ONE_MINUS_DST_COLOR; break;
-    case GPU_BLEND_MODE_SRC_ALPHA: return GL_SRC_ALPHA; break;
-    case GPU_BLEND_MODE_ONE_MINUS_SRC_ALPHA: return GL_ONE_MINUS_SRC_ALPHA; break;
-    case GPU_BLEND_MODE_DST_ALPHA: return GL_DST_ALPHA; break;
-    case GPU_BLEND_MODE_ONE_MINUS_DST_ALPHA: return GL_ONE_MINUS_DST_ALPHA; break;
-    case GPU_BLEND_MODE_CONSTANT_COLOR: return GL_CONSTANT_COLOR; break;
-    case GPU_BLEND_MODE_ONE_MINUS_CONSTANT_COLOR: return GL_ONE_MINUS_CONSTANT_COLOR; break;
-    case GPU_BLEND_MODE_CONSTANT_ALPHA: return GL_CONSTANT_ALPHA; break;
-    case GPU_BLEND_MODE_ONE_MINUS_CONSTANT_ALPHA: return GL_ONE_MINUS_CONSTANT_ALPHA; break;
+    case DN_GPU_BLEND_MODE_ZERO: return GL_ZERO; break;
+    case DN_GPU_BLEND_MODE_ONE: return GL_ONE; break;
+    case DN_GPU_BLEND_MODE_SRC_COLOR: return GL_SRC_COLOR; break;
+    case DN_GPU_BLEND_MODE_ONE_MINUS_SRC_COLOR: return GL_ONE_MINUS_SRC_COLOR; break;
+    case DN_GPU_BLEND_MODE_DST_COLOR: return GL_DST_COLOR; break;
+    case DN_GPU_BLEND_MODE_ONE_MINUS_DST_COLOR: return GL_ONE_MINUS_DST_COLOR; break;
+    case DN_GPU_BLEND_MODE_SRC_ALPHA: return GL_SRC_ALPHA; break;
+    case DN_GPU_BLEND_MODE_ONE_MINUS_SRC_ALPHA: return GL_ONE_MINUS_SRC_ALPHA; break;
+    case DN_GPU_BLEND_MODE_DST_ALPHA: return GL_DST_ALPHA; break;
+    case DN_GPU_BLEND_MODE_ONE_MINUS_DST_ALPHA: return GL_ONE_MINUS_DST_ALPHA; break;
+    case DN_GPU_BLEND_MODE_CONSTANT_COLOR: return GL_CONSTANT_COLOR; break;
+    case DN_GPU_BLEND_MODE_ONE_MINUS_CONSTANT_COLOR: return GL_ONE_MINUS_CONSTANT_COLOR; break;
+    case DN_GPU_BLEND_MODE_CONSTANT_ALPHA: return GL_CONSTANT_ALPHA; break;
+    case DN_GPU_BLEND_MODE_ONE_MINUS_CONSTANT_ALPHA: return GL_ONE_MINUS_CONSTANT_ALPHA; break;
   }
 
   DN_ASSERT(false);
@@ -1279,9 +1278,9 @@ u32 dn_gpu_blend_mode_to_gl_blend_mode(dn_gpu_blend_mode_t mode) {
 
 u32 dn_gpu_resource_id_to_gl_id(dn_gpu_resource_id_t id) {
   switch (id) {
-    case GPU_RESOURCE_FRAMEBUFFER: return GL_FRAMEBUFFER; break;
-    case GPU_RESOURCE_SHADER: return GL_SHADER; break;
-    case GPU_RESOURCE_PROGRAM: return GL_PROGRAM; break;
+    case DN_GPU_RESOURCE_FRAMEBUFFER: return GL_FRAMEBUFFER; break;
+    case DN_GPU_RESOURCE_SHADER: return GL_SHADER; break;
+    case DN_GPU_RESOURCE_PROGRAM: return GL_PROGRAM; break;
   }
   
   DN_ASSERT(false);
@@ -1290,8 +1289,8 @@ u32 dn_gpu_resource_id_to_gl_id(dn_gpu_resource_id_t id) {
 
 u32 dn_gpu_memory_barrier_to_gl_barrier(dn_gpu_memory_barrier_t barrier) {
   switch (barrier) {
-    case GPU_MEMORY_BARRIER_STORAGE: return GL_SHADER_STORAGE_BARRIER_BIT; break;
-    case GPU_MEMORY_BARRIER_BUFFER_UPDATE: return GL_BUFFER_UPDATE_BARRIER_BIT; break;
+    case DN_GPU_MEMORY_BARRIER_STORAGE: return GL_SHADER_STORAGE_BARRIER_BIT; break;
+    case DN_GPU_MEMORY_BARRIER_BUFFER_UPDATE: return GL_BUFFER_UPDATE_BARRIER_BIT; break;
   }
   
   DN_ASSERT(false);
@@ -1300,9 +1299,9 @@ u32 dn_gpu_memory_barrier_to_gl_barrier(dn_gpu_memory_barrier_t barrier) {
 
 u32 dn_gpu_buffer_kind_to_gl_buffer_kind(dn_gpu_buffer_kind_t kind) {
   switch (kind) {
-    case GPU_BUFFER_KIND_STORAGE: return GL_SHADER_STORAGE_BUFFER; break;
-    case GPU_BUFFER_KIND_ARRAY: return GL_ARRAY_BUFFER; break;
-    case GPU_BUFFER_KIND_UNIFORM: return GL_UNIFORM_BUFFER; break;
+    case DN_GPU_BUFFER_KIND_STORAGE: return GL_SHADER_STORAGE_BUFFER; break;
+    case DN_GPU_BUFFER_KIND_ARRAY: return GL_ARRAY_BUFFER; break;
+    case DN_GPU_BUFFER_KIND_UNIFORM: return GL_UNIFORM_BUFFER; break;
   }
 
   DN_ASSERT(false);
@@ -1311,9 +1310,9 @@ u32 dn_gpu_buffer_kind_to_gl_buffer_kind(dn_gpu_buffer_kind_t kind) {
 
 u32 dn_gpu_buffer_usage_to_gl_buffer_usage(dn_gpu_buffer_usage_t usage) {
   switch (usage) {
-    case GPU_BUFFER_USAGE_STATIC: return GL_STATIC_DRAW; break;
-    case GPU_BUFFER_USAGE_DYNAMIC: return GL_DYNAMIC_DRAW; break;
-    case GPU_BUFFER_USAGE_STREAM: return GL_STREAM_DRAW; break;
+    case DN_GPU_BUFFER_USAGE_STATIC: return GL_STATIC_DRAW; break;
+    case DN_GPU_BUFFER_USAGE_DYNAMIC: return GL_DYNAMIC_DRAW; break;
+    case DN_GPU_BUFFER_USAGE_STREAM: return GL_STREAM_DRAW; break;
   }
 
   DN_ASSERT(false);
@@ -1322,9 +1321,9 @@ u32 dn_gpu_buffer_usage_to_gl_buffer_usage(dn_gpu_buffer_usage_t usage) {
 
 u32 dn_gpu_buffer_kind_to_gl_barrier(dn_gpu_buffer_kind_t kind) {
   switch (kind) {
-    case GPU_BUFFER_KIND_STORAGE: return GL_SHADER_STORAGE_BARRIER_BIT; break;
-    case GPU_BUFFER_KIND_ARRAY: return GL_BUFFER_UPDATE_BARRIER_BIT; break;
-    case GPU_BUFFER_KIND_UNIFORM: return GL_UNIFORM_BARRIER_BIT; break;
+    case DN_GPU_BUFFER_KIND_STORAGE: return GL_SHADER_STORAGE_BARRIER_BIT; break;
+    case DN_GPU_BUFFER_KIND_ARRAY: return GL_BUFFER_UPDATE_BARRIER_BIT; break;
+    case DN_GPU_BUFFER_KIND_UNIFORM: return GL_UNIFORM_BARRIER_BIT; break;
   }
 
   DN_ASSERT(false);
@@ -1333,13 +1332,13 @@ u32 dn_gpu_buffer_kind_to_gl_barrier(dn_gpu_buffer_kind_t kind) {
 
 dn_gpu_vertex_attr_info_t dn_gpu_vertex_attribute_info(dn_gpu_vertex_attribute_kind_t kind) {
   switch (kind) {
-    case GPU_VERTEX_ATTRIBUTE_FLOAT: {
+    case DN_GPU_VERTEX_ATTRIBUTE_FLOAT: {
       return {
         .size = sizeof(GLfloat),
         .value = GL_FLOAT,
       };
     } break;
-    case GPU_VERTEX_ATTRIBUTE_U32: {
+    case DN_GPU_VERTEX_ATTRIBUTE_U32: {
       return {
         .size = sizeof(GLuint),
         .value = GL_UNSIGNED_INT,

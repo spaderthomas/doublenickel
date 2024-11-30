@@ -106,7 +106,7 @@ void dn_hash_encode_hex(char* destination, const char* data, size_t len) {
 
 void dn_hash_encode_base64(char* destination, const char* source, size_t len) {
   static const char* base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-  uint32_t val = 0;
+  u32 val = 0;
   int valb = -6;
 
   int i = 0;

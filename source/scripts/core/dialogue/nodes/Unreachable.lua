@@ -1,4 +1,4 @@
-local Unreachable = tdengine.node('Unreachable')
+local Unreachable = doublenickel.node('Unreachable')
 
 function Unreachable:init()
 end

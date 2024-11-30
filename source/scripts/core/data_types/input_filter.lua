@@ -1,7 +1,7 @@
-InputFilter = tdengine.class.define('InputFilter')
+InputFilter = doublenickel.class.define('InputFilter')
 
 function InputFilter:init()
-  self.input = ContextualInput:new(tdengine.enums.InputContext.Editor)
+  self.input = ContextualInput:new(doublenickel.enums.InputContext.Editor)
 
   self.buffer = ''
   self.backspace = InputBuffer:new()

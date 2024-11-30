@@ -2,7 +2,7 @@
 .vs/
 .vscode/
 **/deepcopy.log
-**/tdengine.log
+**/doublenickel.log
 **/*.luac
 **/.DS_Store
 **/__pycache__
@@ -12,7 +12,7 @@ build/windows/bytecode
 build/windows/x64
 build/windows/.vs
 build/windows/DeepCopy
-build/windows/tdengine.vcxproj.user
+build/windows/doublenickel.vcxproj.user
 build/linux/firmament
 build/steam
 src/build_info.hpp

@@ -1,4 +1,4 @@
-Wall = tdengine.entity.define('Wall')
+Wall = doublenickel.entity.define('Wall')
 
 Wall.components = {
   'Collider',

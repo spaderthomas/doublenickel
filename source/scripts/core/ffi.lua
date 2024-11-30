@@ -1,4 +1,4 @@
-function tdengine.ffi.namespaced_metatype(namespace, struct_name)
+function doublenickel.ffi.namespaced_metatype(namespace, struct_name)
   ffi.metatype(struct_name, {
     __index = function(struct_instance, fn_name)
       return ffi.C[namespace .. '_' .. fn_name]
@@ -6,7 +6,7 @@ function tdengine.ffi.namespaced_metatype(namespace, struct_name)
   })
 end
 
-function tdengine.ffi.namespace(prefix)
+function doublenickel.ffi.namespace(prefix)
   local namespace = {}
   setmetatable(namespace, {
     __index = function(__namespace, fn_name)
@@ -17,9 +17,9 @@ function tdengine.ffi.namespace(prefix)
 end
 
 
-function tdengine.ffi.init()
+function doublenickel.ffi.init()
   setmetatable(
-    tdengine.ffi,
+    doublenickel.ffi,
     {
       __index = function(self, key)
         local wrapper = rawget(self, key)
@@ -31,10 +31,12 @@ function tdengine.ffi.init()
     }
   )
 
+  dn = doublenickel.ffi.namespace('dn')
+
   local string_metatable = {
     __index = {
       to_interned = function(self)
-        if tdengine.ffi.is_nil(self.data) then dbg() end
+        if doublenickel.ffi.is_nil(self.data) then dbg() end
         return ffi.string(self.data)
       end,
     }
@@ -42,46 +44,46 @@ function tdengine.ffi.init()
   ffi.metatype('dn_tstring_t', string_metatable)
   ffi.metatype('string', string_metatable)
 
-  Sdf = tdengine.enum.define(
+  Sdf = doublenickel.enum.define(
     'Sdf',
     {
-      Circle = tdengine.ffi.SDF_SHAPE_CIRCLE,
-      Ring = tdengine.ffi.SDF_SHAPE_RING,
-      Box = tdengine.ffi.SDF_SHAPE_BOX,
-      OrientedBox = tdengine.ffi.SDF_SHAPE_ORIENTED_BOX,
-      Combine = tdengine.ffi.SDF_SHAPE_COMBINE
+      Circle = doublenickel.ffi.DN_SDF_SHAPE_CIRCLE,
+      Ring = doublenickel.ffi.DN_SDF_SHAPE_RING,
+      Box = doublenickel.ffi.DN_SDF_SHAPE_BOX,
+      OrientedBox = doublenickel.ffi.DN_SDF_SHAPE_ORIENTED_BOX,
+      Combine = doublenickel.ffi.DN_SDF_SHAPE_COMBINE
     }
   )
 
-  SdfCombineOp = tdengine.enum.define(
+  SdfCombineOp = doublenickel.enum.define(
     'SdfCombineOp',
     {
-      Union = tdengine.ffi.SDF_COMBINE_OP_UNION,
-      Intersection = tdengine.ffi.SDF_COMBINE_OP_INTERSECTION,
-      Subtraction = tdengine.ffi.SDF_COMBINE_OP_SUBTRACTION,
+      Union = doublenickel.ffi.DN_SDF_COMBINE_OP_UNION,
+      Intersection = doublenickel.ffi.DN_SDF_COMBINE_OP_INTERSECTION,
+      Subtraction = doublenickel.ffi.DN_SDF_COMBINE_OP_SUBTRACTION,
     }
   )
 
-  SdfSmoothingKernel = tdengine.enum.define(
+  SdfSmoothingKernel = doublenickel.enum.define(
     'SdfSmoothingKernel',
     {
-      None = tdengine.ffi.SDF_SMOOTH_KERNEL_NONE,
-      PolynomialQuadratic = tdengine.ffi.SDF_SMOOTH_KERNEL_POLYNOMIAL_QUADRATIC,
+      None = doublenickel.ffi.DN_SDF_SMOOTH_KERNEL_NONE,
+      PolynomialQuadratic = doublenickel.ffi.DN_SDF_SMOOTH_KERNEL_POLYNOMIAL_QUADRATIC,
     }
   )
 
 
-  CoordinateSystem = tdengine.enum.define(
+  CoordinateSystem = doublenickel.enum.define(
     'CoordinateSystem',
     {
-      World = tdengine.ffi.DN_COORD_UNIT_WORLD,
-      Screen = tdengine.ffi.DN_COORD_UNIT_SCREEN,
-      Window = tdengine.ffi.DN_COORD_UNIT_WINDOW,
-      Game = tdengine.ffi.DN_COORD_UNIT_GAME,
+      World = doublenickel.ffi.DN_COORD_UNIT_WORLD,
+      Screen = doublenickel.ffi.DN_COORD_UNIT_SCREEN,
+      Window = doublenickel.ffi.DN_COORD_UNIT_WINDOW,
+      Game = doublenickel.ffi.DN_COORD_UNIT_GAME,
     }
   )
 
-  InputDevice = tdengine.enum.define(
+  InputDevice = doublenickel.enum.define(
     'InputDevice',
     {
       MouseAndKeyboard = 0,
@@ -89,139 +91,138 @@ function tdengine.ffi.init()
     }
   )
 
-  ParticleKind = tdengine.enum.define(
+  ParticleKind = doublenickel.enum.define(
     'ParticleKind',
     {
-      Quad = tdengine.ffi.ParticleKind_Quad,
-      Circle = tdengine.ffi.ParticleKind_Circle,
-      Image = tdengine.ffi.ParticleKind_Image,
-      Invalid = tdengine.ffi.ParticleKind_Invalid,
+      Quad = doublenickel.ffi.ParticleKind_Quad,
+      Circle = doublenickel.ffi.ParticleKind_Circle,
+      Image = doublenickel.ffi.ParticleKind_Image,
+      Invalid = doublenickel.ffi.ParticleKind_Invalid,
     }
   )
 
-  WindowFlags = tdengine.enum.define(
+  WindowFlags = doublenickel.enum.define(
     'WindowFlags',
     {
-      None = tdengine.ffi.DN_WINDOW_FLAG_NONE,
-      Windowed = tdengine.ffi.DN_WINDOW_FLAG_WINDOWED,
-      Border = tdengine.ffi.DN_WINDOW_FLAG_BORDER,
-      Vsync = tdengine.ffi.DN_WINDOW_FLAG_VSYNC,
+      None = doublenickel.ffi.DN_WINDOW_FLAG_NONE,
+      Windowed = doublenickel.ffi.DN_WINDOW_FLAG_WINDOWED,
+      Border = doublenickel.ffi.DN_WINDOW_FLAG_BORDER,
+      Vsync = doublenickel.ffi.DN_WINDOW_FLAG_VSYNC,
     }
   )
 
-  GpuResourceId = tdengine.enum.define(
+  GpuResourceId = doublenickel.enum.define(
     'GpuResourceId',
     {
-      Framebuffer = tdengine.ffi.GPU_RESOURCE_FRAMEBUFFER,
-      Shader = tdengine.ffi.GPU_RESOURCE_SHADER,
-      Program = tdengine.ffi.GPU_RESOURCE_PROGRAM,
+      Framebuffer = doublenickel.ffi.DN_GPU_RESOURCE_FRAMEBUFFER,
+      Shader = doublenickel.ffi.DN_GPU_RESOURCE_SHADER,
+      Program = doublenickel.ffi.DN_GPU_RESOURCE_PROGRAM,
     }
   )
 
-  GpuShaderKind = tdengine.enum.define(
+  GpuShaderKind = doublenickel.enum.define(
     'GpuShaderKind',
     {
-      Graphics = tdengine.ffi.GPU_SHADER_GRAPHICS,
-      Compute = tdengine.ffi.GPU_SHADER_COMPUTE,
+      Graphics = doublenickel.ffi.DN_GPU_SHADER_GRAPHICS,
+      Compute = doublenickel.ffi.DN_GPU_SHADER_COMPUTE,
     }
   )
 
-  GpuDrawMode = tdengine.enum.define(
+  GpuDrawMode = doublenickel.enum.define(
     'GpuDrawMode',
     {
-      Arrays = tdengine.ffi.GPU_DRAW_MODE_ARRAYS,
-      Instance = tdengine.ffi.GPU_DRAW_MODE_INSTANCE,
+      Arrays = doublenickel.ffi.DN_GPU_DRAW_MODE_ARRAYS,
+      Instance = doublenickel.ffi.DN_GPU_DRAW_MODE_INSTANCE,
     }
   )
 
-  GpuDrawPrimitive = tdengine.enum.define(
+  GpuDrawPrimitive = doublenickel.enum.define(
     'GpuDrawPrimitive',
     {
-      Triangles = tdengine.ffi.GPU_PRIMITIVE_TRIANGLES,
+      Triangles = doublenickel.ffi.DN_GPU_PRIMITIVE_TRIANGLES,
     }
   )
 
-  GpuVertexAttributeKind = tdengine.enum.define(
+  GpuVertexAttributeKind = doublenickel.enum.define(
     'GpuVertexAttributeKind',
     {
-      Float = tdengine.ffi.GPU_VERTEX_ATTRIBUTE_FLOAT,
-      U32 = tdengine.ffi.GPU_VERTEX_ATTRIBUTE_U32,
+      Float = doublenickel.ffi.DN_GPU_VERTEX_ATTRIBUTE_FLOAT,
+      U32 = doublenickel.ffi.DN_GPU_VERTEX_ATTRIBUTE_U32,
     }
   )
 
-  GpuBlendFunction = tdengine.enum.define(
+  GpuBlendFunction = doublenickel.enum.define(
     'GpuBlendFunction',
     {
-      Add = tdengine.ffi.GPU_BLEND_FUNC_ADD,
-      Subtract = tdengine.ffi.GPU_BLEND_FUNC_SUBTRACT,
-      ReverseSubtract = tdengine.ffi.GPU_BLEND_FUNC_REVERSE_SUBTRACT,
-      Min = tdengine.ffi.GPU_BLEND_FUNC_MIN,
-      Max = tdengine.ffi.GPU_BLEND_FUNC_MAX,
+      Add = doublenickel.ffi.DN_GPU_BLEND_FUNC_ADD,
+      Subtract = doublenickel.ffi.DN_GPU_BLEND_FUNC_SUBTRACT,
+      ReverseSubtract = doublenickel.ffi.DN_GPU_BLEND_FUNC_REVERSE_SUBTRACT,
+      Min = doublenickel.ffi.DN_GPU_BLEND_FUNC_MIN,
+      Max = doublenickel.ffi.DN_GPU_BLEND_FUNC_MAX,
 
     }
   )
 
-  GpuUniformKind = tdengine.enum.define(
+  GpuUniformKind = doublenickel.enum.define(
     'GpuUniformKind',
     {
-      None =    tdengine.ffi.GPU_UNIFORM_NONE,
-      Matrix4 = tdengine.ffi.GPU_UNIFORM_MATRIX4,
-      Matrix3 = tdengine.ffi.GPU_UNIFORM_MATRIX3,
-      Matrix2 = tdengine.ffi.GPU_UNIFORM_MATRIX2,
-      Vector4 = tdengine.ffi.GPU_UNIFORM_VECTOR4,
-      Vector3 = tdengine.ffi.GPU_UNIFORM_VECTOR3,
-      Vector2 = tdengine.ffi.GPU_UNIFORM_VECTOR2,
-      F32 =     tdengine.ffi.GPU_UNIFORM_F32,
-      I32 =     tdengine.ffi.GPU_UNIFORM_I32,
-      Texture = tdengine.ffi.GPU_UNIFORM_TEXTURE,
-      Enum =    tdengine.ffi.GPU_UNIFORM_ENUM,
+      None =    doublenickel.ffi.DN_GPU_UNIFORM_NONE,
+      Matrix4 = doublenickel.ffi.DN_GPU_UNIFORM_MATRIX4,
+      Matrix3 = doublenickel.ffi.DN_GPU_UNIFORM_MATRIX3,
+      Matrix2 = doublenickel.ffi.DN_GPU_UNIFORM_MATRIX2,
+      Vector4 = doublenickel.ffi.DN_GPU_UNIFORM_VECTOR4,
+      Vector3 = doublenickel.ffi.DN_GPU_UNIFORM_VECTOR3,
+      Vector2 = doublenickel.ffi.DN_GPU_UNIFORM_VECTOR2,
+      F32 =     doublenickel.ffi.DN_GPU_UNIFORM_F32,
+      I32 =     doublenickel.ffi.DN_GPU_UNIFORM_I32,
+      Texture = doublenickel.ffi.DN_GPU_UNIFORM_TEXTURE,
+      Enum =    doublenickel.ffi.DN_GPU_UNIFORM_ENUM,
     }
   )
 
 
-  GpuBufferUsage = tdengine.enum.define(
+  GpuBufferUsage = doublenickel.enum.define(
     'GpuBufferUsage',
     {
-      Static =  tdengine.ffi.GPU_BUFFER_USAGE_STATIC,
-      Dynamic = tdengine.ffi.GPU_BUFFER_USAGE_DYNAMIC,
-      Stream =  tdengine.ffi.GPU_BUFFER_USAGE_STREAM,
+      Static =  doublenickel.ffi.DN_GPU_BUFFER_USAGE_STATIC,
+      Dynamic = doublenickel.ffi.DN_GPU_BUFFER_USAGE_DYNAMIC,
+      Stream =  doublenickel.ffi.DN_GPU_BUFFER_USAGE_STREAM,
     }
   )
 
-  GpuBufferKind = tdengine.enum.define(
+  GpuBufferKind = doublenickel.enum.define(
     'GpuBufferKind',
     {
-      Storage = tdengine.ffi.GPU_BUFFER_KIND_STORAGE,
-      Array = tdengine.ffi.GPU_BUFFER_KIND_ARRAY,
+      Storage = doublenickel.ffi.DN_GPU_BUFFER_KIND_STORAGE,
+      Array = doublenickel.ffi.DN_GPU_BUFFER_KIND_ARRAY,
     }
   )
 
-  UniformKind = tdengine.enum.define(
+  UniformKind = doublenickel.enum.define(
     'UniformKind',
     {
-      Matrix4        = tdengine.ffi.UniformKind_Matrix4,
-      Matrix3        = tdengine.ffi.UniformKind_Matrix3,
-      Vector4        = tdengine.ffi.UniformKind_Vector4,
-      Vector3        = tdengine.ffi.UniformKind_Vector3,
-      Vector2        = tdengine.ffi.UniformKind_Vector2,
-      F32            = tdengine.ffi.UniformKind_F32,
-      I32            = tdengine.ffi.UniformKind_I32,
-      Texture        = tdengine.ffi.UniformKind_Texture,
-      PipelineOutput = tdengine.ffi.UniformKind_PipelineOutput,
-      RenderTarget   = tdengine.ffi.UniformKind_RenderTarget,
-      Enum = 201,
+      Matrix4        = doublenickel.ffi.DN_GPU_UNIFORM_MATRIX4,
+      Matrix3        = doublenickel.ffi.DN_GPU_UNIFORM_MATRIX3,
+      Matrix2        = doublenickel.ffi.DN_GPU_UNIFORM_MATRIX2,
+      Vector4        = doublenickel.ffi.DN_GPU_UNIFORM_VECTOR4,
+      Vector3        = doublenickel.ffi.DN_GPU_UNIFORM_VECTOR3,
+      Vector2        = doublenickel.ffi.DN_GPU_UNIFORM_VECTOR2,
+      F32            = doublenickel.ffi.DN_GPU_UNIFORM_F32,
+      I32            = doublenickel.ffi.DN_GPU_UNIFORM_I32,
+      Texture        = doublenickel.ffi.DN_GPU_UNIFORM_TEXTURE,
+      Enum = doublenickel.ffi.DN_GPU_UNIFORM_ENUM,
     }
   )
 
-  GpuMemoryBarrier = tdengine.enum.define(
+  GpuMemoryBarrier = doublenickel.enum.define(
     'GpuMemoryBarrier',
     {
-      ShaderStorage = tdengine.ffi.GPU_MEMORY_BARRIER_STORAGE,
-      BufferUpdate = tdengine.ffi.GPU_MEMORY_BARRIER_BUFFER_UPDATE,
+      ShaderStorage = doublenickel.ffi.DN_GPU_MEMORY_BARRIER_STORAGE,
+      BufferUpdate = doublenickel.ffi.DN_GPU_MEMORY_BARRIER_BUFFER_UPDATE,
     }
   )
 
-  DisplayMode = tdengine.enum.define(
+  DisplayMode = doublenickel.enum.define(
     'DisplayMode',
     {
       p480 = ffi.C.DN_DISPLAY_MODE_480,
@@ -234,11 +235,11 @@ function tdengine.ffi.init()
     }
   )
 
-  GpuLoadOp = tdengine.enum.define(
+  GpuLoadOp = doublenickel.enum.define(
     'GpuLoadOp',
     {
-      None = tdengine.ffi.GPU_LOAD_OP_NONE,
-      Clear = tdengine.ffi.GPU_LOAD_OP_CLEAR,
+      None = doublenickel.ffi.DN_GPU_LOAD_OP_NONE,
+      Clear = doublenickel.ffi.DN_GPU_LOAD_OP_CLEAR,
     }
   )
 
@@ -251,7 +252,7 @@ end
 ----------------
 -- REFLECTION --
 ----------------
-tdengine.enum.define(
+doublenickel.enum.define(
   'ctype',
   {
     void = 0,
@@ -270,19 +271,19 @@ tdengine.enum.define(
   }
 )
 
-function tdengine.ffi.is_nil(cdata)
+function doublenickel.ffi.is_nil(cdata)
   return cdata == nil
 end
 
-function tdengine.ffi.field_ptr(cdata, member)
-  local inner_type = tdengine.ffi.inner_type(member)
-  local type_name = tdengine.ffi.type_name(inner_type)
+function doublenickel.ffi.field_ptr(cdata, member)
+  local inner_type = doublenickel.ffi.inner_type(member)
+  local type_name = doublenickel.ffi.type_name(inner_type)
   local byte_ptr = ffi.cast('u8*', cdata)
   return ffi.cast(type_name .. '*', byte_ptr + member.offset)
 end
 
-function tdengine.ffi.type_name(inner_type)
-  local ctype = tdengine.enums.ctype
+function doublenickel.ffi.type_name(inner_type)
+  local ctype = doublenickel.enums.ctype
 
   local type_name = inner_type.what
   if ctype.float:match(inner_type.what) then
@@ -320,8 +321,8 @@ function tdengine.ffi.type_name(inner_type)
   return type_name
 end
 
-function tdengine.ffi.imgui_datatype(inner_type)
-  local ctype = tdengine.enums.ctype
+function doublenickel.ffi.imgui_datatype(inner_type)
+  local ctype = doublenickel.enums.ctype
 
   local type_name = inner_type.what
   if ctype.float:match(inner_type.what) then
@@ -357,14 +358,14 @@ function tdengine.ffi.imgui_datatype(inner_type)
   return type_name
 end
 
-function tdengine.ffi.imgui_datatypeof(cdata)
-  return tdengine.ffi.imgui_datatype(tdengine.ffi.inner_typeof(cdata))
+function doublenickel.ffi.imgui_datatypeof(cdata)
+  return doublenickel.ffi.imgui_datatype(doublenickel.ffi.inner_typeof(cdata))
 end
 
-function tdengine.ffi.pretty_type(type_info)
-  local ctype = tdengine.enums.ctype
+function doublenickel.ffi.pretty_type(type_info)
+  local ctype = doublenickel.enums.ctype
 
-  local inner_type = tdengine.ffi.inner_type(type_info)
+  local inner_type = doublenickel.ffi.inner_type(type_info)
 
   -- p(type_info)
   local type_name = inner_type.what
@@ -414,32 +415,32 @@ function tdengine.ffi.pretty_type(type_info)
 
 end
 
-function tdengine.ffi.pretty_typeof(cdata)
-  return tdengine.ffi.pretty_type(tdengine.ffi.typeof(cdata))
+function doublenickel.ffi.pretty_typeof(cdata)
+  return doublenickel.ffi.pretty_type(doublenickel.ffi.typeof(cdata))
 end
 
-function tdengine.ffi.pretty_ptr(type_info)
-  return string.format('%s*', tdengine.ffi.pretty_type(type_info))
+function doublenickel.ffi.pretty_ptr(type_info)
+  return string.format('%s*', doublenickel.ffi.pretty_type(type_info))
 end
 
-function tdengine.ffi.pretty_ptrof(cdata)
-  return string.format('%s*', tdengine.ffi.pretty_type(tdengine.ffi.typeof(cdata)))
+function doublenickel.ffi.pretty_ptrof(cdata)
+  return string.format('%s*', doublenickel.ffi.pretty_type(doublenickel.ffi.typeof(cdata)))
 end
 
-function tdengine.ffi.address_of(cdata)
+function doublenickel.ffi.address_of(cdata)
   -- Not for actual addressing; just for printing
   local s = tostring(cdata)
   local parts = s:split(':')
   return parts[2]:gsub(' ', '')
 end
 
-function tdengine.ffi.is_composite_type(type_info)
+function doublenickel.ffi.is_composite_type(type_info)
   return
-    tdengine.enums.ctype.struct:match(type_info.what) or
-    tdengine.enums.ctype.array:match(type_info.what)
+    doublenickel.enums.ctype.struct:match(type_info.what) or
+    doublenickel.enums.ctype.array:match(type_info.what)
 end
 
-function tdengine.ffi.sorted_members(type_info)
+function doublenickel.ffi.sorted_members(type_info)
   local members = {}
   for member in type_info:members() do
     table.insert(members, member)
@@ -449,8 +450,8 @@ function tdengine.ffi.sorted_members(type_info)
     local A_FIRST = true
     local B_FIRST = false
 
-    local is_a_composite = tdengine.ffi.is_composite_type(a)
-    local is_b_composite = tdengine.ffi.is_composite_type(b)
+    local is_a_composite = doublenickel.ffi.is_composite_type(a)
+    local is_b_composite = doublenickel.ffi.is_composite_type(b)
 
     if is_a_composite and not is_b_composite then
       return A_FIRST
@@ -461,26 +462,26 @@ function tdengine.ffi.sorted_members(type_info)
     end
   end)
 
-  return tdengine.iterator.values(members)
+  return doublenickel.iterator.values(members)
 end
 
-function tdengine.ffi.typeof(cdata)
+function doublenickel.ffi.typeof(cdata)
   return reflect.typeof(cdata)
 end
 
-function tdengine.ffi.inner_typeof(cdata)
-  return tdengine.ffi.inner_type(reflect.typeof(cdata))
+function doublenickel.ffi.inner_typeof(cdata)
+  return doublenickel.ffi.inner_type(reflect.typeof(cdata))
 end
 
-function tdengine.ffi.inner_type(type_info)
-  local ctype = tdengine.enums.ctype
+function doublenickel.ffi.inner_type(type_info)
+  local ctype = doublenickel.enums.ctype
 
   if ctype.ref:match(type_info.what) then
     type_info = type_info.element_type
   elseif ctype.ptr:match(type_info.what) then
     type_info = type_info.element_type
   elseif ctype.field:match(type_info.what) then
-    type_info = tdengine.ffi.inner_type(type_info.type)
+    type_info = doublenickel.ffi.inner_type(type_info.type)
   elseif ctype.enum:match(type_info.what) then
     type_info = type_info.type
   end
@@ -488,11 +489,11 @@ function tdengine.ffi.inner_type(type_info)
   return type_info
 end
 
-function tdengine.ffi.is_opaque(cdata)
-  return tdengine.ffi.inner_typeof(cdata).size == 'none'
+function doublenickel.ffi.is_opaque(cdata)
+  return doublenickel.ffi.inner_typeof(cdata).size == 'none'
 end
 
-function tdengine.ffi.ptr_type(ctype)
+function doublenickel.ffi.ptr_type(ctype)
   return string.format('%s *', ctype)
 end
 
@@ -505,28 +506,28 @@ end
 ----------------------
 -- MEMORY ALLOCATOR --
 ----------------------
-dn_allocator_t = tdengine.class.metatype('dn_allocator_t')
+dn_allocator_t = doublenickel.class.metatype('dn_allocator_t')
 
 function dn_allocator_t:find(name)
-  return tdengine.ffi.dn_allocator_find(name)
+  return dn.allocator_find(name)
 end
 
 function dn_allocator_t:add(name)
-  return tdengine.ffi.dn_allocator_add(self, name)
+  return dn.allocator_add(self, name)
 end
 
 function dn_allocator_t:alloc(size)
-  return tdengine.ffi.dn_allocator_alloc(self, size)
+  return dn.allocator_alloc(self, size)
 end
 
 function dn_allocator_t:free(pointer)
-  return tdengine.ffi.dn_allocator_free(self, pointer)
+  return dn.allocator_free(self, pointer)
 end
 
 function dn_allocator_t:alloc_array(ctype, n)
   return ffi.cast(
-    tdengine.ffi.ptr_type(ctype), 
-    tdengine.ffi.dn_allocator_alloc(self, ffi.sizeof(ctype) * n)
+    doublenickel.ffi.ptr_type(ctype), 
+    dn.allocator_alloc(self, ffi.sizeof(ctype) * n)
   )
 end
 
@@ -534,7 +535,7 @@ end
 ------------
 -- MATRIX --
 ------------
-Matrix3 = tdengine.class.metatype('Matrix3')
+Matrix3 = doublenickel.class.metatype('dn_matrix3_t')
 Matrix3:set_metamethod('__index', function(self, key)
   print('x')
   if type(key) == 'number' then
@@ -573,7 +574,7 @@ function Matrix3:serialize()
 end
 
 
-Matrix4 = tdengine.class.metatype('Matrix4')
+Matrix4 = doublenickel.class.metatype('dn_matrix4_t')
 
 function Matrix4:init(data)
   if data then
@@ -600,7 +601,7 @@ end
 ------------
 -- VECTOR --
 ------------
-Vector2 = tdengine.class.metatype('Vector2')
+Vector2 = doublenickel.class.metatype('dn_vector2_t')
 function Vector2:init(x, y)
   self.x = x or self.x
   self.y = y or self.y
@@ -610,7 +611,7 @@ function Vector2:scale(scalar)
   return Vector2:new(self.x * scalar, self.y * scalar)
 end
 
-Vector3 = tdengine.class.metatype('Vector3')
+Vector3 = doublenickel.class.metatype('dn_vector3_t')
 function  Vector3:init(x, y, z)
   self.x = x or self.x
   self.y = y or self.y
@@ -618,7 +619,7 @@ function  Vector3:init(x, y, z)
 end
 
 
-Vector4 = tdengine.class.metatype('Vector4')
+Vector4 = doublenickel.class.metatype('dn_vector4_t')
 function Vector4:init(x, y, z, w)
   self.x = x or self.x
   self.y = y or self.y
@@ -626,7 +627,7 @@ function Vector4:init(x, y, z, w)
   self.w = w or self.w
 end
 
-Vertex = tdengine.class.metatype('Vertex')
+Vertex = doublenickel.class.metatype('Vertex')
 function Vertex:Quad(top, bottom, left, right)
   local vertices = ffi.new('Vertex [6]')
 
@@ -642,7 +643,7 @@ end
 
 
 
-CpuBuffer = tdengine.class.define('CpuBuffer')
+CpuBuffer = doublenickel.class.define('CpuBuffer')
 
 function CpuBuffer:init(ctype, capacity)
   self.size = 0
@@ -652,7 +653,7 @@ function CpuBuffer:init(ctype, capacity)
 end
 
 function CpuBuffer:push(element)
-  -- tdengine.debug.assert(self.size < self.capacity)
+  -- doublenickel.debug.assert(self.size < self.capacity)
 
   if element then self.data[self.size] = element end
   self.size = self.size + 1
@@ -669,7 +670,7 @@ function CpuBuffer:fast_push(value)
   self.size = self.size + 1
 end
 
-function tdengine.class.define_fast(name)
+function doublenickel.class.define_fast(name)
 
 end
 
@@ -683,7 +684,7 @@ setmetatable(FastCpuBuffer, {
   }
 })
 
-BackedGpuBuffer = tdengine.class.define('BackedGpuBuffer')
+BackedGpuBuffer = doublenickel.class.define('BackedGpuBuffer')
 function BackedGpuBuffer:init(ctype, capacity, gpu_buffer)
   self.ctype = ctype
   self.cpu_buffer = CpuBuffer:new(ctype, capacity)
@@ -692,7 +693,7 @@ end
 
 function BackedGpuBuffer:owned(ctype, capacity, gpu_buffer_descriptor)
   gpu_buffer_descriptor.size = ffi.sizeof(ctype) * capacity
-  return BackedGpuBuffer:new(ctype, capacity, tdengine.ffi.gpu_buffer_create(gpu_buffer_descriptor))
+  return BackedGpuBuffer:new(ctype, capacity, doublenickel.ffi.gpu_buffer_create(gpu_buffer_descriptor))
 end
 
 function BackedGpuBuffer:fast_clear()
@@ -708,7 +709,7 @@ function BackedGpuBuffer:size()
 end
 
 function BackedGpuBuffer:sync()
-  tdengine.ffi.gpu_buffer_sync_subdata(
+  doublenickel.ffi.gpu_buffer_sync_subdata(
     self.gpu_buffer:to_ctype(), self.cpu_buffer.data,
     ffi.sizeof(self.ctype) * self.cpu_buffer.size,
     0)
@@ -716,12 +717,12 @@ end
 
 
 
-GpuBuffer = tdengine.class.define('GpuBuffer')
+GpuBuffer = doublenickel.class.define('GpuBuffer')
 
 function GpuBuffer:init(ctype, capacity, gpu_buffer)
   self.ctype = ctype
   self.capacity = capacity
-  self.buffer = gpu_buffer or tdengine.ffi.gpu_buffer_create(GpuBufferDescriptor:new({
+  self.buffer = gpu_buffer or doublenickel.ffi.gpu_buffer_create(GpuBufferDescriptor:new({
     kind = GpuBufferKind.Storage,
     usage = GpuBufferUsage.Static,
     size = ffi.sizeof(ctype) * capacity
@@ -733,19 +734,19 @@ function GpuBuffer:to_ctype()
 end
 
 function GpuBuffer:zero()
-  tdengine.ffi.gpu_buffer_zero(self.buffer, self.capacity * ffi.sizeof(self.ctype))
+  doublenickel.ffi.gpu_buffer_zero(self.buffer, self.capacity * ffi.sizeof(self.ctype))
 end
 
 function GpuBuffer:bind_base(base)
-  tdengine.ffi.gpu_buffer_bind_base(self.buffer, base)
+  doublenickel.ffi.gpu_buffer_bind_base(self.buffer, base)
 end
 
 ---------------------
 -- GPU DESCRIPTORS --
 ---------------------
-GpuShaderDescriptor = tdengine.class.metatype('dn_gpu_shader_descriptor_t')
+GpuShaderDescriptor = doublenickel.class.metatype('dn_gpu_shader_descriptor_t')
 function GpuShaderDescriptor:init(params)
-  if tdengine.enum.is_enum(params.name) then
+  if doublenickel.enum.is_enum(params.name) then
     self.name = params.name:to_qualified_string()
   else
     self.name = params.name
@@ -761,9 +762,9 @@ function GpuShaderDescriptor:init(params)
   end
 end
 
-GpuRenderTargetDescriptor = tdengine.class.metatype('dn_gpu_render_target_descriptor_t')
+GpuRenderTargetDescriptor = doublenickel.class.metatype('dn_gpu_render_target_descriptor_t')
 function GpuRenderTargetDescriptor:init(params)
-  if tdengine.enum.is_enum(params.name) then
+  if doublenickel.enum.is_enum(params.name) then
     self.name = params.name:to_qualified_string()
   else
     self.name = params.name
@@ -772,35 +773,35 @@ function GpuRenderTargetDescriptor:init(params)
   self.size = params.size
 end
 
-GpuBufferDescriptor = tdengine.class.metatype('dn_gpu_buffer_descriptor_t')
+GpuBufferDescriptor = doublenickel.class.metatype('dn_gpu_buffer_descriptor_t')
 function GpuBufferDescriptor:init(params)
-  self.kind = tdengine.enum.load(params.kind):to_number()
-  self.usage = tdengine.enum.load(params.usage):to_number()
+  self.kind = doublenickel.enum.load(params.kind):to_number()
+  self.usage = doublenickel.enum.load(params.usage):to_number()
   self.capacity = params.size
   self.element_size = 1
 end
 
-GpuUniformDescriptor = tdengine.class.metatype('dn_gpu_uniform_descriptor_t')
+GpuUniformDescriptor = doublenickel.class.metatype('dn_gpu_uniform_descriptor_t')
 function GpuUniformDescriptor:init(params)
   self.name = params.name
-  self.kind = tdengine.enum.load(params.kind):to_number()
+  self.kind = doublenickel.enum.load(params.kind):to_number()
 end
 
-GpuCommandBufferDescriptor = tdengine.class.metatype('dn_gpu_command_buffer_descriptor_t')
+GpuCommandBufferDescriptor = doublenickel.class.metatype('dn_gpu_command_buffer_descriptor_t')
 function GpuCommandBufferDescriptor:init(params)
   self.max_commands = params.max_commands
 end
 
-GpuVertexAttribute = tdengine.class.metatype('dn_gpu_vertex_attribute_t')
+GpuVertexAttribute = doublenickel.class.metatype('dn_gpu_vertex_attribute_t')
 function GpuVertexAttribute:init(params)
-  self.kind = tdengine.enum.load(params.kind):to_number()
+  self.kind = doublenickel.enum.load(params.kind):to_number()
   self.count = params.count
   self.divisor = params.divisor or 0
 end
 
-GpuBufferLayout = tdengine.class.metatype('dn_gpu_buffer_layout_t')
+GpuBufferLayout = doublenickel.class.metatype('dn_gpu_buffer_layout_t')
 function GpuBufferLayout:init(params)
-  local allocator = tdengine.ffi.dn_allocator_find('standard')
+  local allocator = dn.allocator_find('standard')
 
   self.num_vertex_attributes = #params.vertex_attributes
   self.vertex_attributes = allocator:alloc_array('dn_gpu_vertex_attribute_t', self.num_vertex_attributes)
@@ -809,15 +810,15 @@ function GpuBufferLayout:init(params)
   end
 end
 
-GpuRasterState = tdengine.class.metatype('dn_gpu_raster_state_t')
+GpuRasterState = doublenickel.class.metatype('dn_gpu_raster_state_t')
 function GpuRasterState:init(params)
-  self.shader = tdengine.gpu.find(params.shader)
-  self.primitive = tdengine.enum.load(params.primitive):to_number()
+  self.shader = doublenickel.gpu.find(params.shader)
+  self.primitive = doublenickel.enum.load(params.primitive):to_number()
 end
 
-GpuPipelineDescriptor = tdengine.class.metatype('dn_gpu_pipeline_descriptor_t')
+GpuPipelineDescriptor = doublenickel.class.metatype('dn_gpu_pipeline_descriptor_t')
 function GpuPipelineDescriptor:init(params)
-  local allocator = tdengine.ffi.dn_allocator_find('standard')
+  local allocator = dn.allocator_find('standard')
 
   self.raster = dn_gpu_raster_state_t:new(params.raster)
 
@@ -828,19 +829,19 @@ function GpuPipelineDescriptor:init(params)
   end
 end
 
-GpuRenderPass = tdengine.class.metatype('dn_gpu_render_pass_t')
+GpuRenderPass = doublenickel.class.metatype('dn_gpu_render_pass_t')
 function GpuRenderPass:init(params)
   if params.color then
-    params.color.attachment = tdengine.enum.load(params.color.attachment)
-    self.color.attachment = tdengine.asset.find(params.color.attachment)
-    self.color.load = tdengine.enum.load(params.color.load):to_number()
+    params.color.attachment = doublenickel.enum.load(params.color.attachment)
+    self.color.attachment = doublenickel.asset.find(params.color.attachment)
+    self.color.load = doublenickel.enum.load(params.color.load):to_number()
 
-    tdengine.debug.assert(not tdengine.ffi.is_nil(self.color.attachment))
+    doublenickel.debug.assert(not doublenickel.ffi.is_nil(self.color.attachment))
   end
 
 end
 
-GpuUniformBinding = tdengine.class.metatype('dn_gpu_uniform_binding_t')
+GpuUniformBinding = doublenickel.class.metatype('dn_gpu_uniform_binding_t')
 function GpuUniformBinding:init(params)
   self.uniform = params.uniform
   self.binding_index = params.binding_index or 0
@@ -853,34 +854,34 @@ function GpuUniformBinding:init(params)
   elseif GpuUniformKind.Vector2:match(self.uniform.kind) then self.data.vec2 = params.value
   elseif GpuUniformKind.F32:match(self.uniform.kind)     then self.data.f32 = params.value
   elseif GpuUniformKind.I32:match(self.uniform.kind)     then self.data.i32 = params.value
-  elseif GpuUniformKind.Enum:match(self.uniform.kind)    then self.data.i32 = tdengine.enum.load(params.value):to_number()
+  elseif GpuUniformKind.Enum:match(self.uniform.kind)    then self.data.i32 = doublenickel.enum.load(params.value):to_number()
   elseif GpuUniformKind.Texture:match(self.uniform.kind) then self.data.texture = params.value
-  else   tdengine.debug.assert(false) end
+  else   doublenickel.debug.assert(false) end
 end
 
-GpuVertexBufferBinding = tdengine.class.metatype('dn_gpu_vertex_buffer_binding_t')
+GpuVertexBufferBinding = doublenickel.class.metatype('dn_gpu_vertex_buffer_binding_t')
 function GpuVertexBufferBinding:init(buffer)
   if type(buffer) == 'cdata' then
     self.buffer = buffer
   else
-    self.buffer = tdengine.gpu.find(buffer)
+    self.buffer = doublenickel.gpu.find(buffer)
   end
 end
 
-GpuStorageBufferBinding = tdengine.class.metatype('dn_gpu_storage_buffer_binding_t')
+GpuStorageBufferBinding = doublenickel.class.metatype('dn_gpu_storage_buffer_binding_t')
 function GpuStorageBufferBinding:init(params)
   if type(params.buffer) == 'cdata' then
     self.buffer = params.buffer
   else
-    self.buffer = tdengine.gpu.find(params.buffer)
+    self.buffer = doublenickel.gpu.find(params.buffer)
   end
 
   self.base = params.base
 end
 
-GpuBufferBinding = tdengine.class.metatype('dn_gpu_buffer_binding_t')
+GpuBufferBinding = doublenickel.class.metatype('dn_gpu_buffer_binding_t')
 function GpuBufferBinding:init(params)
-  local allocator = tdengine.ffi.dn_allocator_find('standard')
+  local allocator = dn.allocator_find('standard')
 
   if params.vertex then
     self.vertex.count = #params.vertex
@@ -911,9 +912,9 @@ end
 ---------
 -- APP --
 ---------
-WindowConfig = tdengine.class.metatype('dn_window_config_t')
+WindowConfig = doublenickel.class.metatype('dn_window_config_t')
 function WindowConfig:init(params)
-  local default = tdengine.ffi.dn_window_config_default();
+  local default = dn.window_config_default();
   self.title = params.title or default.title
   self.icon = params.icon or default.icon
   self.native_resolution = params.native_resolution or default.native_resolution
@@ -921,9 +922,9 @@ function WindowConfig:init(params)
   self.display_mode = params.display_mode or default.display_mode
 end
 
-AudioConfig = tdengine.class.metatype('dn_audio_config_t')
+AudioConfig = doublenickel.class.metatype('dn_audio_config_t')
 function AudioConfig:init(params)
-  local allocator = tdengine.ffi.dn_allocator_find('bump')
+  local allocator = dn.allocator_find('bump')
 
   self.num_dirs = #params.dirs
   self.dirs = allocator:alloc_array('dn_path_t', #params.dirs)
@@ -932,9 +933,9 @@ function AudioConfig:init(params)
   end
 end
 
-FontDescriptor = tdengine.class.metatype('dn_font_descriptor_t')
+FontDescriptor = doublenickel.class.metatype('dn_font_descriptor_t')
 function FontDescriptor:init(params)
-  if tdengine.enum.is_enum(params.id) then
+  if doublenickel.enum.is_enum(params.id) then
     self.id = params.id:to_qualified_string()
   else
     self.id = params.id
@@ -943,7 +944,7 @@ function FontDescriptor:init(params)
   self.file_path = params.file_path
 
   self.sizes = {0}
-  for i in tdengine.iterator.keys(params.sizes) do
+  for i in doublenickel.iterator.keys(params.sizes) do
     self.sizes[i - 1] = params.sizes[i]
   end
   self.flags = 0
@@ -951,9 +952,9 @@ function FontDescriptor:init(params)
   if params.imgui         then self.flags = bit.bor(self.flags, ffi.C.DN_FONT_FLAG_IMGUI) end
 end
 
-FontConfig = tdengine.class.metatype('dn_font_config_t')
+FontConfig = doublenickel.class.metatype('dn_font_config_t')
 function FontConfig:init(params)
-  local allocator = tdengine.ffi.dn_allocator_find('bump')
+  local allocator = dn.allocator_find('bump')
 
   self.num_fonts = #params.fonts
   self.fonts = allocator:alloc_array('dn_font_descriptor_t', #params.fonts)
@@ -962,9 +963,9 @@ function FontConfig:init(params)
   end
 end
 
-GpuConfig = tdengine.class.metatype('dn_gpu_config_t')
+GpuConfig = doublenickel.class.metatype('dn_gpu_config_t')
 function GpuConfig:init(params)
-  local allocator = tdengine.ffi.dn_allocator_find('bump')
+  local allocator = dn.allocator_find('bump')
 
   self.shader_path = params.shader_path or nil
 
@@ -987,16 +988,16 @@ function GpuConfig:init(params)
   end
 end
 
-SteamConfig = tdengine.class.metatype('dn_steam_config_t')
+SteamConfig = doublenickel.class.metatype('dn_steam_config_t')
 function SteamConfig:init(params)
   self.app_id = params.app_id
 end
 
-AppConfig = tdengine.class.metatype('dn_app_config_t')
+AppConfig = doublenickel.class.metatype('dn_app_config_t')
 function AppConfig:init(params)
-  self.window = params.window or tdengine.ffi.dn_window_config_default()
-  self.audio = params.audio or tdengine.ffi.dn_audio_config_default()
-  self.font = params.font or tdengine.ffi.dn_font_config_default()
+  self.window = params.window or dn.window_config_default()
+  self.audio = params.audio or dn.audio_config_default()
+  self.font = params.font or dn.font_config_default()
   self.gpu = params.gpu or ffi.new('dn_gpu_config_t')
   self.asset = params.asset or ffi.new('dn_asset_config_t')
   self.steam = params.steam or ffi.new('dn_steam_config_t')
@@ -1007,15 +1008,15 @@ end
 ------------------
 -- FFI WRAPPERS --
 ------------------
-function tdengine.ffi.dn_window_get_display_mode()
-  return tdengine.enums.DisplayMode(ffi.C.dn_window_get_display_mode())
+function dn.window_get_display_mode()
+  return doublenickel.enums.DisplayMode(ffi.C.dn_window_get_display_mode())
 end
 
-function tdengine.ffi.set_camera()
+function doublenickel.ffi.set_camera()
 end
 
 
-function tdengine.ffi.push_fullscreen_quad()
+function doublenickel.ffi.push_fullscreen_quad()
   local n = ffi.C.dn_window_get_native_resolution()
   local uvs = nil
   local opacity = 1.0

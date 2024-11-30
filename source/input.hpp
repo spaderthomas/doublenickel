@@ -12,12 +12,12 @@ typedef enum {
 } dn_input_device_t;
 
 typedef struct {
-	Vector2 framebuffer_position;
-	Vector2 framebuffer_size;
-	Vector2 camera;
-	Vector2 mouse;
-	Vector2 mouse_delta;
-	Vector2 scroll;
+	dn_vector2_t framebuffer_position;
+	dn_vector2_t framebuffer_size;
+	dn_vector2_t camera;
+	dn_vector2_t mouse;
+	dn_vector2_t mouse_delta;
+	dn_vector2_t scroll;
 	bool got_keyboard_input;
 	bool got_mouse_input;
 
@@ -34,9 +34,9 @@ DN_API bool              dn_input_released(int key);
 DN_API bool              dn_input_down(int key);
 DN_API bool              dn_input_mod_down(int mod);
 DN_API bool              dn_input_chord_pressed(int mod, int key);
-DN_API Vector2           dn_input_scroll();
-DN_API Vector2           dn_input_mouse(dn_coord_t unit);
-DN_API Vector2           dn_input_mouse_delta(dn_coord_t unit);
+DN_API dn_vector2_t           dn_input_scroll();
+DN_API dn_vector2_t           dn_input_mouse(dn_coord_t unit);
+DN_API dn_vector2_t           dn_input_mouse_delta(dn_coord_t unit);
 DN_API u32               dn_input_shift_key(u32 key);
 DN_API dn_input_device_t dn_input_get_device();
 DN_IMP void              dn_input_init();
@@ -262,7 +262,7 @@ bool dn_input_chord_pressed(int mod, int key) {
 	return dn_input_mod_down(mod) && dn_input_pressed(key);
 }
 
-Vector2 dn_input_mouse(dn_coord_t unit) {
+dn_vector2_t dn_input_mouse(dn_coord_t unit) {
 	auto& input = dn_input;
 	switch (unit) {
 		case DN_COORD_UNIT_SCREEN: return input.mouse; break;
@@ -275,7 +275,7 @@ Vector2 dn_input_mouse(dn_coord_t unit) {
 	return {0};
 }
 
-Vector2 dn_input_mouse_delta(dn_coord_t unit) {
+dn_vector2_t dn_input_mouse_delta(dn_coord_t unit) {
 	auto& input = dn_input;
 	switch (unit) {
 		case DN_COORD_UNIT_SCREEN: return input.mouse_delta; break;
@@ -288,7 +288,7 @@ Vector2 dn_input_mouse_delta(dn_coord_t unit) {
 	return {0};
 }
 
-Vector2 dn_input_scroll() {
+dn_vector2_t dn_input_scroll() {
 	auto& input = dn_input;
 	return input.scroll;
 }

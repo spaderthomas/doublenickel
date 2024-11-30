@@ -1,4 +1,4 @@
-Render = tdengine.component.define('Render')
+Render = doublenickel.component.define('Render')
 
 Render.editor_fields = {
   'render_pass'

@@ -1,4 +1,4 @@
-InputBuffer = tdengine.class.define('InputBuffer')
+InputBuffer = doublenickel.class.define('InputBuffer')
 
 function InputBuffer:init()
   self.key = glfw.keys.A
@@ -11,7 +11,7 @@ function InputBuffer:init()
 end
 
 function InputBuffer:update(dt)
-  dt = dt or tdengine.dt
+  dt = dt or doublenickel.dt
 
   if self.input:pressed(self.key) then
     self.time = self.delay

@@ -1,24 +1,24 @@
-function tdengine.update_game(dt)
-  tdengine.ffi.dn_time_metric_begin('update')
+function doublenickel.update_game(dt)
+  dn.time_metric_begin('update')
   
-  tdengine.dt = dt
-  tdengine.elapsed_time = tdengine.elapsed_time + dt
-  tdengine.frame = tdengine.frame + 1
+  doublenickel.dt = dt
+  doublenickel.elapsed_time = doublenickel.elapsed_time + dt
+  doublenickel.frame = doublenickel.frame + 1
 
-  tdengine.input.update()
+  doublenickel.input.update()
 
-  tdengine.lifecycle.run_callback(tdengine.lifecycle.callbacks.on_begin_frame)
+  doublenickel.lifecycle.run_callback(doublenickel.lifecycle.callbacks.on_begin_frame)
 
-  tdengine.editor.update()
-  tdengine.scene.update()
-  tdengine.entity.update()
-  tdengine.subsystem.update()
-  tdengine.gui.update()
-  tdengine.audio.update()
+  doublenickel.editor.update()
+  doublenickel.scene.update()
+  doublenickel.entity.update()
+  doublenickel.subsystem.update()
+  doublenickel.gui.update()
+  doublenickel.audio.update()
 
-  tdengine.lifecycle.run_callback(tdengine.lifecycle.callbacks.on_end_frame)
+  doublenickel.lifecycle.run_callback(doublenickel.lifecycle.callbacks.on_end_frame)
   
-  tdengine.ffi.dn_time_metric_end('update')
+  dn.time_metric_end('update')
 
-  tdengine.gpu.render()
+  doublenickel.gpu.render()
 end

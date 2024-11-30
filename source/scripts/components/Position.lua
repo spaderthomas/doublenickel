@@ -1,4 +1,4 @@
-local Position = tdengine.component.define('Position')
+local Position = doublenickel.component.define('Position')
 
 Position.editor_fields = {
   'x',

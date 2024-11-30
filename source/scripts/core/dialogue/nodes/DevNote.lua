@@ -1,4 +1,4 @@
-local DevNote = tdengine.node('DevNote')
+local DevNote = doublenickel.node('DevNote')
 DevNote.editor_fields = {
   'text',
   'must_be_fixed'

@@ -11,11 +11,11 @@ typedef enum {
 } dn_font_flags_t;
 
 typedef struct {
-  Vector2* verts;
-  Vector2* uv;
-  Vector2 size;
-  Vector2 bearing;
-  Vector2 advance;
+  dn_vector2_t* verts;
+  dn_vector2_t* uv;
+  dn_vector2_t size;
+  dn_vector2_t bearing;
+  dn_vector2_t advance;
   float descender;
 } dn_baked_glyph_t;
 
@@ -28,11 +28,11 @@ typedef struct {
   u32 size;
   u32 texture;
   ImFont* imfont;
-  Vector2 resolution;
+  dn_vector2_t resolution;
    
   dn_baked_glyph_t* glyphs;
-  Vector2 max_advance;
-  Vector2 max_glyph;
+  dn_vector2_t max_advance;
+  dn_vector2_t max_glyph;
   float line_spacing;
 
 } dn_baked_font_t;
@@ -52,8 +52,8 @@ typedef struct {
 typedef struct {
   dn_fixed_array<dn_baked_font_t, 64> baked_fonts;
   dn_fixed_array<dn_baked_glyph_t, 8192> baked_glyphs;
-  dn_fixed_array<Vector2, 65536> vertex_data;
-  dn_fixed_array<Vector2, 65536> uv_data;
+  dn_fixed_array<dn_vector2_t, 65536> vertex_data;
+  dn_fixed_array<dn_vector2_t, 65536> uv_data;
 
   dn_baked_font_t* default_font;
 } dn_fonts_t;
@@ -204,7 +204,7 @@ void dn_font_bake(dn_font_descriptor_t desc) {
     auto buffer = dn::allocator::alloc<char>(&dn_allocators.bump, tex_width * tex_height);
 
     // Read each character's bitmap into the image buffer
-    Vector2 point = { 0 };
+    dn_vector2_t point = { 0 };
     for (GLubyte c = 0; c < num_glyphs; c++) {
       i32 failure = FT_Load_Char(face, c, FT_LOAD_RENDER);
       if (failure) {
@@ -261,7 +261,7 @@ void dn_font_bake(dn_font_descriptor_t desc) {
       float top    = glyph.size.y - glyph.descender;
       float right  = left + glyph.size.x;
       float bottom = top - glyph.size.y;
-      Vector2 vertices[6] = {
+      dn_vector2_t vertices[6] = {
           { left,  top },
           { left,  bottom },
           { right, bottom },
@@ -276,7 +276,7 @@ void dn_font_bake(dn_font_descriptor_t desc) {
       float uv_right = (point.x + face->glyph->bitmap.width) / tex_width;
       float uv_top = 1 - (point.y / tex_height); // Y-axis coordinates are flipped, because we flip the texture
       float uv_bottom = 1 - ((point.y + face->glyph->bitmap.rows) / tex_height);
-      Vector2 uv[6] = {
+      dn_vector2_t uv[6] = {
           { uv_left,  uv_top },
           { uv_left,  uv_bottom },
           { uv_right, uv_bottom },

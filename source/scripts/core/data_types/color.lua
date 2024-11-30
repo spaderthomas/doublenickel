@@ -1,22 +1,22 @@
-tdengine.enum.define(
+doublenickel.enum.define(
 	'ReadableTextColor', {
 		Light = 0,
 		Dark = 1
 	}
 )
 
-function tdengine.color(r, g, b, a)
+function doublenickel.color(r, g, b, a)
 	if not r then
-		return tdengine.colors.white:copy()
+		return doublenickel.colors.white:copy()
 	elseif ffi.istype('float [4]', r) then
 		local float_array = r
-		return tdengine.color(float_array[0], float_array[1], float_array[2], float_array[3])
+		return doublenickel.color(float_array[0], float_array[1], float_array[2], float_array[3])
 	elseif type(r) == 'table' then
 		local source = r
 		if source.r and source.g and source.b and source.a then
-			return tdengine.color(source.r, source.g, source.b, source.a)
+			return doublenickel.color(source.r, source.g, source.b, source.a)
 		else
-			return tdengine.colors.white:copy()
+			return doublenickel.colors.white:copy()
 		end
 	end
 
@@ -30,7 +30,7 @@ function tdengine.color(r, g, b, a)
 	-- Kind of hacky, because this was never a class so I'm not using the class tools I already have.
 	-- But I don't care too much, and this works fine. The gist is that if you say something like:
 	--
-	--  local color = tdengine.colors.black
+	--  local color = doublenickel.colors.black
 	--  color.r = 1.0
 	--
 	-- Then black is globally modified. It's unintuitive that you have to call :copy(), but it's better
@@ -38,13 +38,13 @@ function tdengine.color(r, g, b, a)
 	local mt = {
 		__index = {
 			copy = function(self)
-				return tdengine.color(self)
+				return doublenickel.color(self)
 			end,
 			to_ctype = function(self)
 				return self:to_vec4()
 			end,
 			to_vec4 = function(self)
-				return ffi.new('Vector4', self.r, self.g, self.b, self.a)
+				return ffi.new('dn_vector4_t', self.r, self.g, self.b, self.a)
 			end,
 			to_vec3 = function(self)
 				return Vector3:new(self.r, self.g, self.b)
@@ -56,21 +56,21 @@ function tdengine.color(r, g, b, a)
 				return ffi.new('float [4]', self.r, self.g, self.b, self.a)
 			end,
 			to_255 = function(self)
-				return tdengine.color255(self)
+				return doublenickel.color255(self)
 			end,
 			to_u32 = function(self)
-				return tdengine.color32(math.floor(self.r * 255), math.floor(self.g * 255), math.floor(self.b * 255),
+				return doublenickel.color32(math.floor(self.r * 255), math.floor(self.g * 255), math.floor(self.b * 255),
 					math.floor(self.a * 255))
 			end,
 			premultiply = function(self)
-				return tdengine.color(self.r * self.a, self.g * self.a, self.b * self.a, 1.0)
+				return doublenickel.color(self.r * self.a, self.g * self.a, self.b * self.a, 1.0)
 			end,
 			alpha = function(self, alpha)
-				return tdengine.color(self.r, self.g, self.b, alpha)
+				return doublenickel.color(self.r, self.g, self.b, alpha)
 			end,
 			readable_color = function(self)
 				local sum = self.r + self.g + self.b
-				return sum > .75 and tdengine.enums.ReadableTextColor.Dark or tdengine.enums.ReadableTextColor.Light
+				return sum > .75 and doublenickel.enums.ReadableTextColor.Dark or doublenickel.enums.ReadableTextColor.Light
 			end,
 		}
 	}
@@ -78,7 +78,7 @@ function tdengine.color(r, g, b, a)
 	return color
 end
 
-function tdengine.color255(r, g, b, a)
+function doublenickel.color255(r, g, b, a)
 	if type(r) == 'table' then
 		local source = r
 		r = source.r
@@ -87,10 +87,10 @@ function tdengine.color255(r, g, b, a)
 		a = source.a
 	end
 
-	return tdengine.color(r / 255.0, g / 255.0, b / 255.0, a / 255.0)
+	return doublenickel.color(r / 255.0, g / 255.0, b / 255.0, a / 255.0)
 end
 
-function tdengine.color32(r, g, b, a)
+function doublenickel.color32(r, g, b, a)
 	if type(r) == 'table' then
 		local color = r
 		r = color.r
@@ -105,26 +105,26 @@ function tdengine.color32(r, g, b, a)
 	return r + g + b + a
 end
 
-function tdengine.color_to_vec4(color)
-	return ffi.new('Vector4', color.r, color.g, color.b, color.a)
+function doublenickel.color_to_vec4(color)
+	return ffi.new('dn_vector4_t', color.r, color.g, color.b, color.a)
 end
 
-function tdengine.coherent_random_color()
+function doublenickel.coherent_random_color()
 	local random = math.random
-	local index = random(1, #tdengine.color_pallet)
-	return tdengine.color_pallet[index]
+	local index = random(1, #doublenickel.color_pallet)
+	return doublenickel.color_pallet[index]
 end
 
-function tdengine.random_color()
+function doublenickel.random_color()
 	local random = math.random
-	return tdengine.color(
+	return doublenickel.color(
 		random(0, 256),
 		random(0, 256),
 		random(0, 256),
 		255)
 end
 
-function tdengine.is_color_like(t)
+function doublenickel.is_color_like(t)
 	if type(t) ~= 'table' then return false end
 
 	local is_color_like = true
@@ -134,74 +134,74 @@ function tdengine.is_color_like(t)
 	return is_color_like
 end
 
-tdengine.colors                    = {}
-tdengine.colors.almost_black       = tdengine.color(0.00, 0.00, 0.10, 1.00)
-tdengine.colors.baby_blue          = tdengine.color(0.49, 0.55, 0.77, 1.00)
-tdengine.colors.blue               = tdengine.color(0.00, 0.00, 1.00, 1.00)
-tdengine.colors.blue_light_trans   = tdengine.color(0.00, 0.00, 1.00, 0.20)
-tdengine.colors.black              = tdengine.color(0.00, 0.00, 0.00, 1.00)
-tdengine.colors.clear              = tdengine.color(0.00, 0.00, 0.00, 0.00)
-tdengine.colors.gray_dark          = tdengine.color(0.10, 0.10, 0.10, 1.00)
-tdengine.colors.gray_medium        = tdengine.color(0.50, 0.50, 0.50, 1.00)
-tdengine.colors.gray_light         = tdengine.color(0.75, 0.75, 0.75, 1.00)
-tdengine.colors.gray_light_trans   = tdengine.color(0.75, 0.75, 0.75, 0.20)
-tdengine.colors.green              = tdengine.color(0.00, 1.00, 0.00, 1.00)
-tdengine.colors.green_dark         = tdengine.color(0.04, 0.40, 0.08, 1.00)
-tdengine.colors.green_medium_trans = tdengine.color(0.00, 1.00, 0.00, 0.50)
-tdengine.colors.green_light_trans  = tdengine.color(0.00, 1.00, 0.00, 0.25)
-tdengine.colors.grid_bg            = tdengine.color(0.25, 0.25, 0.30, 0.80)
-tdengine.colors.hovered_button     = tdengine.color(0.57, 0.57, 0.57, 1.00)
-tdengine.colors.idk                = tdengine.color(0.00, 0.75, 1.00, 1.00)
-tdengine.colors.idle_button        = tdengine.color(0.75, 0.75, 0.75, 1.00)
-tdengine.colors.maroon             = tdengine.color(0.50, 0.08, 0.16, 1.00)
-tdengine.colors.maroon_dark        = tdengine.color(0.40, 0.04, 0.08, 1.00)
-tdengine.colors.muted_purple       = tdengine.color(0.35, 0.25, 0.34, 1.00)
-tdengine.colors.pale_red           = tdengine.color(1.00, 0.10, 0.00, 0.10)
-tdengine.colors.pale_red2          = tdengine.color(1.00, 0.10, 0.00, 0.50)
-tdengine.colors.pale_green         = tdengine.color(0.10, 1.00, 0.00, 0.10)
-tdengine.colors.red                = tdengine.color(1.00, 0.00, 0.00, 1.00)
-tdengine.colors.red_medium_trans   = tdengine.color(1.00, 0.00, 0.00, 0.50)
-tdengine.colors.red_light_trans    = tdengine.color(1.00, 0.00, 0.00, 0.25)
-tdengine.colors.red_xlight_trans   = tdengine.color(1.00, 0.00, 0.00, 0.12)
-tdengine.colors.text               = tdengine.color(1.00, 1.00, 1.00, 1.00)
-tdengine.colors.text_hl            = tdengine.color(0.89, 0.91, 0.56, 1.00)
-tdengine.colors.ui_background      = tdengine.color(0.00, 0.00, 0.00, 1.00)
-tdengine.colors.violet             = tdengine.color(0.48, 0.43, 0.66, 1.00)
-tdengine.colors.white              = tdengine.color(1.00, 1.00, 1.00, 1.00)
-tdengine.colors.white_trans        = tdengine.color(1.00, 1.00, 1.00, 0.20)
+doublenickel.colors                    = {}
+doublenickel.colors.almost_black       = doublenickel.color(0.00, 0.00, 0.10, 1.00)
+doublenickel.colors.baby_blue          = doublenickel.color(0.49, 0.55, 0.77, 1.00)
+doublenickel.colors.blue               = doublenickel.color(0.00, 0.00, 1.00, 1.00)
+doublenickel.colors.blue_light_trans   = doublenickel.color(0.00, 0.00, 1.00, 0.20)
+doublenickel.colors.black              = doublenickel.color(0.00, 0.00, 0.00, 1.00)
+doublenickel.colors.clear              = doublenickel.color(0.00, 0.00, 0.00, 0.00)
+doublenickel.colors.gray_dark          = doublenickel.color(0.10, 0.10, 0.10, 1.00)
+doublenickel.colors.gray_medium        = doublenickel.color(0.50, 0.50, 0.50, 1.00)
+doublenickel.colors.gray_light         = doublenickel.color(0.75, 0.75, 0.75, 1.00)
+doublenickel.colors.gray_light_trans   = doublenickel.color(0.75, 0.75, 0.75, 0.20)
+doublenickel.colors.green              = doublenickel.color(0.00, 1.00, 0.00, 1.00)
+doublenickel.colors.green_dark         = doublenickel.color(0.04, 0.40, 0.08, 1.00)
+doublenickel.colors.green_medium_trans = doublenickel.color(0.00, 1.00, 0.00, 0.50)
+doublenickel.colors.green_light_trans  = doublenickel.color(0.00, 1.00, 0.00, 0.25)
+doublenickel.colors.grid_bg            = doublenickel.color(0.25, 0.25, 0.30, 0.80)
+doublenickel.colors.hovered_button     = doublenickel.color(0.57, 0.57, 0.57, 1.00)
+doublenickel.colors.idk                = doublenickel.color(0.00, 0.75, 1.00, 1.00)
+doublenickel.colors.idle_button        = doublenickel.color(0.75, 0.75, 0.75, 1.00)
+doublenickel.colors.maroon             = doublenickel.color(0.50, 0.08, 0.16, 1.00)
+doublenickel.colors.maroon_dark        = doublenickel.color(0.40, 0.04, 0.08, 1.00)
+doublenickel.colors.muted_purple       = doublenickel.color(0.35, 0.25, 0.34, 1.00)
+doublenickel.colors.pale_red           = doublenickel.color(1.00, 0.10, 0.00, 0.10)
+doublenickel.colors.pale_red2          = doublenickel.color(1.00, 0.10, 0.00, 0.50)
+doublenickel.colors.pale_green         = doublenickel.color(0.10, 1.00, 0.00, 0.10)
+doublenickel.colors.red                = doublenickel.color(1.00, 0.00, 0.00, 1.00)
+doublenickel.colors.red_medium_trans   = doublenickel.color(1.00, 0.00, 0.00, 0.50)
+doublenickel.colors.red_light_trans    = doublenickel.color(1.00, 0.00, 0.00, 0.25)
+doublenickel.colors.red_xlight_trans   = doublenickel.color(1.00, 0.00, 0.00, 0.12)
+doublenickel.colors.text               = doublenickel.color(1.00, 1.00, 1.00, 1.00)
+doublenickel.colors.text_hl            = doublenickel.color(0.89, 0.91, 0.56, 1.00)
+doublenickel.colors.ui_background      = doublenickel.color(0.00, 0.00, 0.00, 1.00)
+doublenickel.colors.violet             = doublenickel.color(0.48, 0.43, 0.66, 1.00)
+doublenickel.colors.white              = doublenickel.color(1.00, 1.00, 1.00, 1.00)
+doublenickel.colors.white_trans        = doublenickel.color(1.00, 1.00, 1.00, 0.20)
 
 -- A real pallette
-tdengine.colors.gunmetal           = tdengine.color255(43, 61, 65, 255)
-tdengine.colors.paynes_gray        = tdengine.color255(76, 95, 107, 255)
-tdengine.colors.cadet_gray         = tdengine.color255(131, 160, 160, 255)
-tdengine.colors.charcoal           = tdengine.color255(64, 67, 78, 255)
-tdengine.colors.cool_gray          = tdengine.color255(140, 148, 173, 255)
+doublenickel.colors.gunmetal           = doublenickel.color255(43, 61, 65, 255)
+doublenickel.colors.paynes_gray        = doublenickel.color255(76, 95, 107, 255)
+doublenickel.colors.cadet_gray         = doublenickel.color255(131, 160, 160, 255)
+doublenickel.colors.charcoal           = doublenickel.color255(64, 67, 78, 255)
+doublenickel.colors.cool_gray          = doublenickel.color255(140, 148, 173, 255)
 
-tdengine.colors.celadon            = tdengine.color255(183, 227, 204, 255)
-tdengine.colors.spring_green       = tdengine.color255(89, 255, 160, 255)
-tdengine.colors.mindaro            = tdengine.color255(188, 231, 132, 255)
-tdengine.colors.light_green        = tdengine.color255(161, 239, 139, 255)
-tdengine.colors.zomp               = tdengine.color255(99, 160, 136, 255)
+doublenickel.colors.celadon            = doublenickel.color255(183, 227, 204, 255)
+doublenickel.colors.spring_green       = doublenickel.color255(89, 255, 160, 255)
+doublenickel.colors.mindaro            = doublenickel.color255(188, 231, 132, 255)
+doublenickel.colors.light_green        = doublenickel.color255(161, 239, 139, 255)
+doublenickel.colors.zomp               = doublenickel.color255(99, 160, 136, 255)
 
-tdengine.colors.indian_red         = tdengine.color255(180, 101, 111, 255)
-tdengine.colors.tyrian_purple      = tdengine.color255(95, 26, 55, 255)
-tdengine.colors.cardinal           = tdengine.color255(194, 37, 50, 255)
+doublenickel.colors.indian_red         = doublenickel.color255(180, 101, 111, 255)
+doublenickel.colors.tyrian_purple      = doublenickel.color255(95, 26, 55, 255)
+doublenickel.colors.cardinal           = doublenickel.color255(194, 37, 50, 255)
 
-tdengine.colors.prussian_blue      = tdengine.color255(16, 43, 63, 255)
-tdengine.colors.midnight_green     = tdengine.color255(25, 83, 95, 255)
+doublenickel.colors.prussian_blue      = doublenickel.color255(16, 43, 63, 255)
+doublenickel.colors.midnight_green     = doublenickel.color255(25, 83, 95, 255)
 
-tdengine.colors.orange             = tdengine.color255(249, 166, 32, 255)
-tdengine.colors.sunglow            = tdengine.color255(255, 209, 102, 255)
-tdengine.colors.selective_yellow   = tdengine.color255(250, 188, 42, 255)
+doublenickel.colors.orange             = doublenickel.color255(249, 166, 32, 255)
+doublenickel.colors.sunglow            = doublenickel.color255(255, 209, 102, 255)
+doublenickel.colors.selective_yellow   = doublenickel.color255(250, 188, 42, 255)
 
-tdengine.colors.cream              = tdengine.color255(245, 255, 198, 255)
-tdengine.colors.misty_rose         = tdengine.color255(255, 227, 227, 255)
+doublenickel.colors.cream              = doublenickel.color255(245, 255, 198, 255)
+doublenickel.colors.misty_rose         = doublenickel.color255(255, 227, 227, 255)
 
-tdengine.colors.taupe              = tdengine.color255(68, 53, 39, 255)
-tdengine.colors.dark_green         = tdengine.color255(4, 27, 21, 255)
-tdengine.colors.rich_black         = tdengine.color255(4, 10, 15, 255)
+doublenickel.colors.taupe              = doublenickel.color255(68, 53, 39, 255)
+doublenickel.colors.dark_green         = doublenickel.color255(4, 27, 21, 255)
+doublenickel.colors.rich_black         = doublenickel.color255(4, 10, 15, 255)
 
-tdengine.colors.pallette = {
+doublenickel.colors.pallette = {
 	gray = {
 		'charcoal',
 		'cool_gray',
@@ -243,16 +243,16 @@ tdengine.colors.pallette = {
 }
 
 
-tdengine.colors32                 = {}
-tdengine.colors32.button_red      = tdengine.color32(150, 0, 0, 255)
-tdengine.colors32.button_red_dark = tdengine.color32(75, 0, 0, 255)
-tdengine.colors32.button_gray     = tdengine.color32(100, 100, 100, 255)
-tdengine.colors32.button_green    = tdengine.color32(0, 150, 25, 255)
-tdengine.colors32.gunmetal        = tdengine.color32(43, 61, 65, 255)
-tdengine.colors32.paynes_gray     = tdengine.color32(76, 95, 107, 255)
-tdengine.colors32.cadet_gray      = tdengine.color32(131, 160, 160, 255)
+doublenickel.colors32                 = {}
+doublenickel.colors32.button_red      = doublenickel.color32(150, 0, 0, 255)
+doublenickel.colors32.button_red_dark = doublenickel.color32(75, 0, 0, 255)
+doublenickel.colors32.button_gray     = doublenickel.color32(100, 100, 100, 255)
+doublenickel.colors32.button_green    = doublenickel.color32(0, 150, 25, 255)
+doublenickel.colors32.gunmetal        = doublenickel.color32(43, 61, 65, 255)
+doublenickel.colors32.paynes_gray     = doublenickel.color32(76, 95, 107, 255)
+doublenickel.colors32.cadet_gray      = doublenickel.color32(131, 160, 160, 255)
 
-tdengine.color_pallet             = {
-	tdengine.color(0.35, 0.25, 0.34, 1.00), -- English Violet
-	tdengine.color(0.48, 0.43, 0.66, 1.00), -- Dark Blue Gray
+doublenickel.color_pallet             = {
+	doublenickel.color(0.35, 0.25, 0.34, 1.00), -- English Violet
+	doublenickel.color(0.48, 0.43, 0.66, 1.00), -- Dark Blue Gray
 }

@@ -30,32 +30,32 @@ typedef double f64;
 typedef struct {
   float x;
   float y;
-} Vector2;
+} dn_vector2_t;
 
 typedef struct {
   float x;
   float y;
   float z;
-} Vector3;
+} dn_vector3_t;
 
 typedef struct {
   float x;
   float y;
   float z;
   float w;
-} Vector4;
+} dn_vector4_t;
 
 typedef struct {
   float data [2] [2];
-} Matrix2;
+} dn_matrix2_t;
 
 typedef struct {
   float data [3] [3];
-} Matrix3;
+} dn_matrix3_t;
 
 typedef struct {
   float data [4] [4];
-} Matrix4;
+} dn_matrix4_t;
 
 // These are just in Lua, so I can add a metatype to returned strings for a nice interning API.
 // dn_tstring_t is a temporary string; i.e., one allocated with temporary storage. There's nothing different
@@ -344,39 +344,39 @@ typedef enum {
 } dn_coord_t;
 
 typedef struct {
-  Vector2 camera;
-  Vector2 framebuffer_position;
-  Vector2 framebuffer_size;
+  dn_vector2_t camera;
+  dn_vector2_t framebuffer_position;
+  dn_vector2_t framebuffer_size;
 } dn_coord_data_t;
 
 dn_coord_data_t dn_coord_get();
 void            dn_coord_set_camera(float x, float y);
 void            dn_coord_set_framebuffer_position(float x, float y);
 void            dn_coord_set_framebuffer_size(float x, float y);
-Vector2         dn_coord_screen_to_window(float x, float y);
-Vector2         dn_coord_screen_to_game(float x, float y);
-Vector2         dn_coord_screen_to_world(float x, float y);
-Vector2         dn_coord_window_to_screen(float x, float y);
-Vector2         dn_coord_window_to_game(float x, float y);
-Vector2         dn_coord_window_to_world(float x, float y);
-Vector2         dn_coord_game_to_screen(float x, float y);
-Vector2         dn_coord_game_to_window(float x, float y);
-Vector2         dn_coord_game_to_world(float x, float y);
-Vector2         dn_coord_world_to_screen(float x, float y);
-Vector2         dn_coord_world_to_window(float x, float y);
-Vector2         dn_coord_world_to_game(float x, float y);
-Vector2         dn_coord_screen_to_window_mag(float x, float y);
-Vector2         dn_coord_screen_to_game_mag(float x, float y);
-Vector2         dn_coord_screen_to_world_mag(float x, float y);
-Vector2         dn_coord_window_to_screen_mag(float x, float y);
-Vector2         dn_coord_window_to_game_mag(float x, float y);
-Vector2         dn_coord_window_to_world_mag(float x, float y);
-Vector2         dn_coord_game_to_screen_mag(float x, float y);
-Vector2         dn_coord_game_to_window_mag(float x, float y);
-Vector2         dn_coord_game_to_world_mag(float x, float y);
-Vector2         dn_coord_world_to_screen_mag(float x, float y);
-Vector2         dn_coord_world_to_window_mag(float x, float y);
-Vector2         dn_coord_world_to_game_mag(float x, float y);
+dn_vector2_t         dn_coord_screen_to_window(float x, float y);
+dn_vector2_t         dn_coord_screen_to_game(float x, float y);
+dn_vector2_t         dn_coord_screen_to_world(float x, float y);
+dn_vector2_t         dn_coord_window_to_screen(float x, float y);
+dn_vector2_t         dn_coord_window_to_game(float x, float y);
+dn_vector2_t         dn_coord_window_to_world(float x, float y);
+dn_vector2_t         dn_coord_game_to_screen(float x, float y);
+dn_vector2_t         dn_coord_game_to_window(float x, float y);
+dn_vector2_t         dn_coord_game_to_world(float x, float y);
+dn_vector2_t         dn_coord_world_to_screen(float x, float y);
+dn_vector2_t         dn_coord_world_to_window(float x, float y);
+dn_vector2_t         dn_coord_world_to_game(float x, float y);
+dn_vector2_t         dn_coord_screen_to_window_mag(float x, float y);
+dn_vector2_t         dn_coord_screen_to_game_mag(float x, float y);
+dn_vector2_t         dn_coord_screen_to_world_mag(float x, float y);
+dn_vector2_t         dn_coord_window_to_screen_mag(float x, float y);
+dn_vector2_t         dn_coord_window_to_game_mag(float x, float y);
+dn_vector2_t         dn_coord_window_to_world_mag(float x, float y);
+dn_vector2_t         dn_coord_game_to_screen_mag(float x, float y);
+dn_vector2_t         dn_coord_game_to_window_mag(float x, float y);
+dn_vector2_t         dn_coord_game_to_world_mag(float x, float y);
+dn_vector2_t         dn_coord_world_to_screen_mag(float x, float y);
+dn_vector2_t         dn_coord_world_to_window_mag(float x, float y);
+dn_vector2_t         dn_coord_world_to_game_mag(float x, float y);
 
 typedef enum {
   DN_INPUT_DEVICE_MOUSE_AND_KEYBOARD = 0,
@@ -388,9 +388,9 @@ bool              dn_input_released(int key);
 bool              dn_input_down(int key);
 bool              dn_input_mod_down(int mod);
 bool              dn_input_chord_pressed(int mod, int key);
-Vector2           dn_input_scroll();
-Vector2           dn_input_mouse(dn_coord_t unit);
-Vector2           dn_input_mouse_delta(dn_coord_t unit);
+dn_vector2_t           dn_input_scroll();
+dn_vector2_t           dn_input_mouse(dn_coord_t unit);
+dn_vector2_t           dn_input_mouse_delta(dn_coord_t unit);
 u32               dn_input_shift_key(u32 key);
 dn_input_device_t dn_input_get_device();
 
@@ -406,9 +406,9 @@ dn_input_device_t dn_input_get_device();
 
 typedef struct {
   char text [1024];
-  Vector2 position;
-  Vector2 padding;
-  Vector4 color;
+  dn_vector2_t position;
+  dn_vector2_t padding;
+  dn_vector4_t color;
   void* font;
   float wrap;
   float offset;
@@ -425,7 +425,7 @@ typedef struct {
 
 dn_prepared_text_t* dn_prepare_text(const char* text, f32 px, f32 py, const char* font);
 dn_prepared_text_t* dn_prepare_text_wrap(const char* text, f32 px, f32 py, const char* font, f32 wrap);
-dn_prepared_text_t* dn_prepare_text_ex(const char* text, f32 px, f32 py, const char* font, f32 wrap, Vector4 color, bool precise);
+dn_prepared_text_t* dn_prepare_text_ex(const char* text, f32 px, f32 py, const char* font, f32 wrap, dn_vector4_t color, bool precise);
 
 typedef enum {
   DN_FONT_FLAG_NONE = 0,
@@ -493,15 +493,15 @@ typedef struct {
   const char* title;
   const char* icon;
   dn_display_mode_t display_mode;
-  Vector2 native_resolution;
+  dn_vector2_t native_resolution;
   dn_window_flags_t flags;
 } dn_window_config_t;
 
 dn_window_config_t dn_window_config_default();
 void               dn_window_init(dn_window_config_t descriptor);
 void               dn_window_set_native_resolution(float width, float height);
-Vector2            dn_window_get_content_area();
-Vector2            dn_window_get_native_resolution();
+dn_vector2_t            dn_window_get_content_area();
+dn_vector2_t            dn_window_get_native_resolution();
 void               dn_window_set_icon(const char* path);
 void               dn_window_set_display_mode(dn_display_mode_t mode);
 dn_display_mode_t  dn_window_get_display_mode();
@@ -519,106 +519,106 @@ void               dn_window_set_cursor_visible(bool visible);
 ////////////////////////////////
 
 typedef enum {
-  GPU_COMMAND_OP_BIND_BUFFERS = 10,
-  GPU_COMMAND_OP_BEGIN_RENDER_PASS = 20,
-  GPU_COMMAND_OP_END_RENDER_PASS = 21,
-  GPU_COMMAND_OP_BIND_PIPELINE = 30,
-  GPU_COMMAND_OP_SET_CAMERA = 40,
-  GPU_COMMAND_OP_SET_LAYER = 41,
-  GPU_COMMAND_OP_SET_WORLD_SPACE = 42,
-  GPU_COMMAND_OP_SET_SCISSOR = 43,
-  GPU_COMMAND_OP_DRAW = 70,
+  DN_GPU_COMMAND_OP_BIND_BUFFERS = 10,
+  DN_GPU_COMMAND_OP_BEGIN_RENDER_PASS = 20,
+  DN_GPU_COMMAND_OP_END_RENDER_PASS = 21,
+  DN_GPU_COMMAND_OP_BIND_PIPELINE = 30,
+  DN_GPU_COMMAND_OP_SET_CAMERA = 40,
+  DN_GPU_COMMAND_OP_SET_LAYER = 41,
+  DN_GPU_COMMAND_OP_SET_WORLD_SPACE = 42,
+  DN_GPU_COMMAND_OP_SET_SCISSOR = 43,
+  DN_GPU_COMMAND_OP_DRAW = 70,
 } dn_gpu_command_op_t;
 
 typedef enum {
-  GPU_PRIMITIVE_TRIANGLES = 0
+  DN_GPU_PRIMITIVE_TRIANGLES = 0
 } dn_gpu_draw_primitive_t;
 
 typedef enum {
-  GPU_DRAW_MODE_ARRAYS = 0,
-  GPU_DRAW_MODE_INSTANCE = 1,
+  DN_GPU_DRAW_MODE_ARRAYS = 0,
+  DN_GPU_DRAW_MODE_INSTANCE = 1,
 } dn_gpu_draw_mode_t;
 
 typedef enum {
-  GPU_VERTEX_ATTRIBUTE_FLOAT = 0,
-  GPU_VERTEX_ATTRIBUTE_U32 = 1,
+  DN_GPU_VERTEX_ATTRIBUTE_FLOAT = 0,
+  DN_GPU_VERTEX_ATTRIBUTE_U32 = 1,
 } dn_gpu_vertex_attribute_kind_t;
 
 typedef enum {
-  GPU_UNIFORM_NONE = 0,
-  GPU_UNIFORM_MATRIX4 = 1,
-  GPU_UNIFORM_MATRIX3 = 2,
-  GPU_UNIFORM_MATRIX2 = 3,
-  GPU_UNIFORM_VECTOR4 = 4,
-  GPU_UNIFORM_VECTOR3 = 5,
-  GPU_UNIFORM_VECTOR2 = 6,
-  GPU_UNIFORM_I32 = 7,
-  GPU_UNIFORM_F32 = 8,
-  GPU_UNIFORM_TEXTURE = 9,
-  GPU_UNIFORM_ENUM = 10,
+  DN_GPU_UNIFORM_NONE = 0,
+  DN_GPU_UNIFORM_MATRIX4 = 1,
+  DN_GPU_UNIFORM_MATRIX3 = 2,
+  DN_GPU_UNIFORM_MATRIX2 = 3,
+  DN_GPU_UNIFORM_VECTOR4 = 4,
+  DN_GPU_UNIFORM_VECTOR3 = 5,
+  DN_GPU_UNIFORM_VECTOR2 = 6,
+  DN_GPU_UNIFORM_I32 = 7,
+  DN_GPU_UNIFORM_F32 = 8,
+  DN_GPU_UNIFORM_TEXTURE = 9,
+  DN_GPU_UNIFORM_ENUM = 10,
 } dn_gpu_uniform_kind_t;
 
 typedef enum {
-  GPU_BUFFER_KIND_STORAGE = 0,
-  GPU_BUFFER_KIND_ARRAY = 1,
+  DN_GPU_BUFFER_KIND_STORAGE = 0,
+  DN_GPU_BUFFER_KIND_ARRAY = 1,
 } dn_gpu_buffer_kind_t;
 
 typedef enum {
-  GPU_BUFFER_USAGE_STATIC = 0,
-  GPU_BUFFER_USAGE_DYNAMIC = 1,
-  GPU_BUFFER_USAGE_STREAM = 2,
+  DN_GPU_BUFFER_USAGE_STATIC = 0,
+  DN_GPU_BUFFER_USAGE_DYNAMIC = 1,
+  DN_GPU_BUFFER_USAGE_STREAM = 2,
 } dn_gpu_buffer_usage_t;
 
 typedef enum {
-  GPU_BLEND_FUNC_NONE,
-  GPU_BLEND_FUNC_ADD,
-  GPU_BLEND_FUNC_SUBTRACT,
-  GPU_BLEND_FUNC_REVERSE_SUBTRACT,
-  GPU_BLEND_FUNC_MIN,
-  GPU_BLEND_FUNC_MAX
+  DN_GPU_BLEND_FUNC_NONE,
+  DN_GPU_BLEND_FUNC_ADD,
+  DN_GPU_BLEND_FUNC_SUBTRACT,
+  DN_GPU_BLEND_FUNC_REVERSE_SUBTRACT,
+  DN_GPU_BLEND_FUNC_MIN,
+  DN_GPU_BLEND_FUNC_MAX
 } dn_gpu_blend_func_t;
 
 typedef enum {
-  GPU_BLEND_MODE_ZERO,
-  GPU_BLEND_MODE_ONE,
-  GPU_BLEND_MODE_SRC_COLOR,
-  GPU_BLEND_MODE_ONE_MINUS_SRC_COLOR,
-  GPU_BLEND_MODE_DST_COLOR,
-  GPU_BLEND_MODE_ONE_MINUS_DST_COLOR,
-  GPU_BLEND_MODE_SRC_ALPHA,
-  GPU_BLEND_MODE_ONE_MINUS_SRC_ALPHA,
-  GPU_BLEND_MODE_DST_ALPHA,
-  GPU_BLEND_MODE_ONE_MINUS_DST_ALPHA,
-  GPU_BLEND_MODE_CONSTANT_COLOR,
-  GPU_BLEND_MODE_ONE_MINUS_CONSTANT_COLOR,
-  GPU_BLEND_MODE_CONSTANT_ALPHA,
-  GPU_BLEND_MODE_ONE_MINUS_CONSTANT_ALPHA,
-  GPU_BLEND_MODE_SRC_ALPHA_SATURATE,
-  GPU_BLEND_MODE_SRC1_COLOR,
-  GPU_BLEND_MODE_ONE_MINUS_SRC1_COLOR,
-  GPU_BLEND_MODE_SRC1_ALPHA,
-  GPU_BLEND_MODE_ONE_MINUS_SRC1_ALPHA
+  DN_GPU_BLEND_MODE_ZERO,
+  DN_GPU_BLEND_MODE_ONE,
+  DN_GPU_BLEND_MODE_SRC_COLOR,
+  DN_GPU_BLEND_MODE_ONE_MINUS_SRC_COLOR,
+  DN_GPU_BLEND_MODE_DST_COLOR,
+  DN_GPU_BLEND_MODE_ONE_MINUS_DST_COLOR,
+  DN_GPU_BLEND_MODE_SRC_ALPHA,
+  DN_GPU_BLEND_MODE_ONE_MINUS_SRC_ALPHA,
+  DN_GPU_BLEND_MODE_DST_ALPHA,
+  DN_GPU_BLEND_MODE_ONE_MINUS_DST_ALPHA,
+  DN_GPU_BLEND_MODE_CONSTANT_COLOR,
+  DN_GPU_BLEND_MODE_ONE_MINUS_CONSTANT_COLOR,
+  DN_GPU_BLEND_MODE_CONSTANT_ALPHA,
+  DN_GPU_BLEND_MODE_ONE_MINUS_CONSTANT_ALPHA,
+  DN_GPU_BLEND_MODE_SRC_ALPHA_SATURATE,
+  DN_GPU_BLEND_MODE_SRC1_COLOR,
+  DN_GPU_BLEND_MODE_ONE_MINUS_SRC1_COLOR,
+  DN_GPU_BLEND_MODE_SRC1_ALPHA,
+  DN_GPU_BLEND_MODE_ONE_MINUS_SRC1_ALPHA
 } dn_gpu_blend_mode_t;
 
 typedef enum {
-  GPU_LOAD_OP_NONE = 0,
-  GPU_LOAD_OP_CLEAR = 1
+  DN_GPU_LOAD_OP_NONE = 0,
+  DN_GPU_LOAD_OP_CLEAR = 1
 } dn_gpu_load_op_t;
 
 typedef enum {
-  GPU_RESOURCE_FRAMEBUFFER = 0,
-  GPU_RESOURCE_SHADER = 1,
-  GPU_RESOURCE_PROGRAM = 2,
+  DN_GPU_RESOURCE_FRAMEBUFFER = 0,
+  DN_GPU_RESOURCE_SHADER = 1,
+  DN_GPU_RESOURCE_PROGRAM = 2,
 } dn_gpu_resource_id_t;
 
 typedef enum {
-  GPU_MEMORY_BARRIER_STORAGE = 0,
-  GPU_MEMORY_BARRIER_BUFFER_UPDATE = 1,
+  DN_GPU_MEMORY_BARRIER_STORAGE = 0,
+  DN_GPU_MEMORY_BARRIER_BUFFER_UPDATE = 1,
 } dn_gpu_memory_barrier_t;
 
 typedef enum {
-  GPU_SHADER_GRAPHICS = 0,
-  GPU_SHADER_COMPUTE = 1,
+  DN_GPU_SHADER_GRAPHICS = 0,
+  DN_GPU_SHADER_COMPUTE = 1,
 } dn_gpu_shader_kind_t;
 
 /////////////
@@ -640,12 +640,12 @@ typedef struct dn_gpu_shader_t dn_gpu_shader_t;
 // UNIFORMS //
 //////////////
 typedef union {
-  Matrix4 mat4;
-  Matrix3 mat3;
-  Matrix2 mat2;
-  Vector4 vec4;
-  Vector3 vec3;
-  Vector2 vec2;
+  dn_matrix4_t mat4;
+  dn_matrix3_t mat3;
+  dn_matrix2_t mat2;
+  dn_vector4_t vec4;
+  dn_vector3_t vec3;
+  dn_vector2_t vec2;
   float f32;
   i32 texture;
   i32 i32;
@@ -692,14 +692,14 @@ typedef struct {
 ///////////////////////
 typedef struct {
   dn_asset_name_t name;
-  Vector2 size;
+  dn_vector2_t size;
 } dn_gpu_render_target_descriptor_t;
 
 typedef struct {
   dn_asset_name_t name;
   u32 handle;
   u32 color_buffer;
-  Vector2 size;
+  dn_vector2_t size;
 } dn_gpu_render_target_t;
 
 
@@ -775,16 +775,16 @@ typedef struct {
 } dn_gpu_raster_state_t;
 
 typedef struct {
-  Vector2 position;
-  Vector2 size;
+  dn_vector2_t position;
+  dn_vector2_t size;
   bool enabled;
 } dn_gpu_scissor_state_t;
 
 typedef struct {
   u32 layer;
   bool world_space;
-  Vector2 camera;
-  Matrix4 projection;
+  dn_vector2_t camera;
+  dn_matrix4_t projection;
 } dn_gpu_renderer_state_t;
 
 typedef struct {
@@ -853,7 +853,7 @@ void                     dn_gpu_apply_bindings(dn_gpu_command_buffer_t* command_
 void                     dn_gpu_bind_render_state(dn_gpu_command_buffer_t* command_buffer, dn_gpu_renderer_state_t render);
 void                     dn_gpu_set_layer(dn_gpu_command_buffer_t* command_buffer, u32 layer);
 void                     dn_gpu_set_world_space(dn_gpu_command_buffer_t* command_buffer, bool world_space);
-void                     dn_gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, Vector2 camera);
+void                     dn_gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, dn_vector2_t camera);
 dn_gpu_pipeline_t*       dn_gpu_pipeline_create(dn_gpu_pipeline_descriptor_t descriptor);
 dn_gpu_uniform_t*        dn_gpu_uniform_create(dn_gpu_uniform_descriptor_t descriptor);
 dn_gpu_buffer_t*         dn_gpu_buffer_create(dn_gpu_buffer_descriptor_t descriptor);
@@ -896,27 +896,27 @@ void                     dn_gpu_set_resource_name(dn_gpu_resource_id_t id, u32 h
 //////////////////////////////
 
 typedef enum {
-  SDF_SHAPE_CIRCLE = 0,
-  SDF_SHAPE_RING = 1,
-  SDF_SHAPE_BOX = 2,
-  SDF_SHAPE_ORIENTED_BOX = 3,
-  SDF_SHAPE_COMBINE = 100,
+  DN_SDF_SHAPE_CIRCLE = 0,
+  DN_SDF_SHAPE_RING = 1,
+  DN_SDF_SHAPE_BOX = 2,
+  DN_SDF_SHAPE_ORIENTED_BOX = 3,
+  DN_SDF_SHAPE_COMBINE = 100,
 } dn_sdf_shape_t;
 
 typedef enum {
-  SDF_COMBINE_OP_UNION = 0,
-  SDF_COMBINE_OP_INTERSECTION = 1,
-  SDF_COMBINE_OP_SUBTRACTION = 2,
+  DN_SDF_COMBINE_OP_UNION = 0,
+  DN_SDF_COMBINE_OP_INTERSECTION = 1,
+  DN_SDF_COMBINE_OP_SUBTRACTION = 2,
 } dn_sdf_combine_op_t;
 
 typedef enum {
-  SDF_SMOOTH_KERNEL_NONE = 0,
-  SDF_SMOOTH_KERNEL_POLYNOMIAL_QUADRATIC = 1,
+  DN_SDF_SMOOTH_KERNEL_NONE = 0,
+  DN_SDF_SMOOTH_KERNEL_POLYNOMIAL_QUADRATIC = 1,
 } dn_sdf_smoothing_kernel_t;
  
 typedef enum {
-  SDF_RENDERER_STATE_NONE,
-  SDF_RENDERER_STATE_COMBINATION,
+  DN_SDF_RENDERER_STATE_NONE,
+  DN_SDF_RENDERER_STATE_COMBINATION,
 } dn_sdf_renderer_state_t;
 
 
@@ -924,8 +924,8 @@ typedef enum {
 // SDF BUFFER DATA //
 /////////////////////
 typedef struct {
-  Vector2 position;
-  Vector2 uv;
+  dn_vector2_t position;
+  dn_vector2_t uv;
 } dn_sdf_vertex_t;
 
 typedef struct {
@@ -949,8 +949,8 @@ typedef struct {
 // SDF SHAPE DATA //
 ////////////////////
 typedef struct {
-  Vector3 color;
-  Vector2 position;
+  dn_vector3_t color;
+  dn_vector2_t position;
   float rotation;
   float edge_thickness;
   dn_sdf_shape_t shape;
@@ -969,7 +969,7 @@ typedef struct {
 
 typedef struct {
   dn_sdf_header_t header;
-  Vector2 size;
+  dn_vector2_t size;
 } dn_sdf_oriented_box_t;
 
 typedef struct {
@@ -1006,11 +1006,11 @@ void                     dn_sdf_grid(dn_sdf_renderer_t* renderer, u32 grid_width
 /////////////////////////////////////////
                                    
 typedef struct {
-  Vector4 light;
-  Vector4 medium_light;
-  Vector4 low_light;
-  Vector4 neutral;
-  Vector4 medium_dark;
+  dn_vector4_t light;
+  dn_vector4_t medium_light;
+  dn_vector4_t low_light;
+  dn_vector4_t neutral;
+  dn_vector4_t medium_dark;
 } dn_imgui_colors_t;
 
 void    dn_imgui_push_font(const char* font_name, u32 size);
@@ -1245,23 +1245,23 @@ void write_screenshot_to_png(const char* file_name);
 //
 
 typedef struct {
-  Vector3 position;
-  Vector4 color;
-  Vector2 uv;
+  dn_vector3_t position;
+  dn_vector4_t color;
+  dn_vector2_t uv;
 } Vertex;
 
 
-void draw_quad(Vector2 position, Vector2 size, Vector4 color);
-void draw_line(Vector2 start, Vector2 end, f32 thickness, Vector4 color);
-void draw_circle(f32 px, f32 py, f32 radius, Vector4 color);
-void draw_circle_sdf(f32 px, f32 py, f32 radius, Vector4 color, f32 edge_thickness);
-void draw_ring_sdf(f32 px, f32 py, f32 inner_radius, f32 radius, Vector4 color, f32 edge_thickness);
+void draw_quad(dn_vector2_t position, dn_vector2_t size, dn_vector4_t color);
+void draw_line(dn_vector2_t start, dn_vector2_t end, f32 thickness, dn_vector4_t color);
+void draw_circle(f32 px, f32 py, f32 radius, dn_vector4_t color);
+void draw_circle_sdf(f32 px, f32 py, f32 radius, dn_vector4_t color, f32 edge_thickness);
+void draw_ring_sdf(f32 px, f32 py, f32 inner_radius, f32 radius, dn_vector4_t color, f32 edge_thickness);
 void draw_image(const char* name, f32 px, f32 py);
 void draw_image_size(const char* name, f32 px, f32 py, f32 dx, f32 dy);
 void draw_image_ex(const char* name, float px, float py, float dx, float dy, float opacity);
-void draw_image_pro(u32 texture, f32 px, f32 py, f32 dx, f32 dy, Vector2* uv, f32 opacity);
+void draw_image_pro(u32 texture, f32 px, f32 py, f32 dx, f32 dy, dn_vector2_t* uv, f32 opacity);
 void draw_text(const char* text, f32 px, f32 py);
-void draw_text_ex(const char* text, f32 px, f32 py, Vector4 color, const char* font, f32 wrap);
+void draw_text_ex(const char* text, f32 px, f32 py, dn_vector4_t color, const char* font, f32 wrap);
 void draw_prepared_text(dn_prepared_text_t* text);
 
 u32 find_texture_handle(const char* name);
@@ -1367,7 +1367,7 @@ typedef enum {
 ffi = require('ffi')
 bit = require('bit')
 
--- function tdengine.handle_error(message)
+-- function doublenickel.handle_error(message)
 --   -- Strip the message's filename the script filename to make it more readable
 --   local parts = split(message, ' ')
 --   local path = parts[1]
@@ -1385,7 +1385,7 @@ bit = require('bit')
 
 --   -- The stack trace contains absolute paths, which are just hard to read. Also, if the path is long, it is
 --   -- shortened with "...". Remove the absolute part of the path, including the "..."
---   local install_dir = tdengine.ffi.dn_paths_resolve('install'):to_interned()
+--   local install_dir = dn.paths_resolve('install'):to_interned()
 --   local escaped_install = install_dir:gsub('%.', '%%.')
 --   local last_path_element = install_dir:match("([^/]+)$")
 --   local pattern = '%.%.%.(.*)/' .. last_path_element
@@ -1401,26 +1401,26 @@ bit = require('bit')
 --   local error_message = string.format('lua runtime error:\n\t%s', message)
 --   local trace_message = string.format('stack trace:\n%s', stack_trace)
 
---   tdengine.debug.last_error = error_message
---   tdengine.debug.last_trace = trace_message
+--   doublenickel.debug.last_error = error_message
+--   doublenickel.debug.last_trace = trace_message
 
---   tdengine.dn_log(error_message)
---   tdengine.dn_log(trace_message)
+--   doublenickel.dn_log(error_message)
+--   doublenickel.dn_log(trace_message)
 
---   tdengine.debug.open_debugger(1)
---   --tdengine.analytics.submit_crash(error_message, trace_message)
+--   doublenickel.debug.open_debugger(1)
+--   --doublenickel.analytics.submit_crash(error_message, trace_message)
 
 --   return
 -- end
 
-function tdengine.handle_error()
+function doublenickel.handle_error()
   local stack_trace = debug.traceback()
   stack_trace = stack_trace:gsub('stack traceback:\n', '')
   stack_trace = stack_trace:gsub('\t', '  ')
 
   -- The stack trace contains absolute paths, which are just hard to read. Also, if the path is long, it is
   -- shortened with "...". Remove the absolute part of the path, including the "..."
-  local install_dir = tdengine.ffi.dn_paths_resolve('install'):to_interned()
+  local install_dir = dn.paths_resolve('install'):to_interned()
   local escaped_install = install_dir:gsub('%.', '%%.')
   local last_path_element = install_dir:match("([^/]+)$")
   local pattern = '%.%.%.(.*)/' .. last_path_element
@@ -1433,151 +1433,152 @@ function tdengine.handle_error()
   stack_trace = stack_trace:gsub(pattern, '')
 
   local trace_message = string.format('stack trace:\n%s', stack_trace)
-  tdengine.dn_log(trace_message)
+  doublenickel.dn_log(trace_message)
 
-  tdengine.debug.open_debugger(1)
+  doublenickel.debug.open_debugger(1)
 end
 
-function tdengine.init_phase_0()
-  tdengine.types = {}
-  tdengine.class = {}
-  tdengine.lifecycle = {}
+function doublenickel.init_phase_0()
+  doublenickel.types = {}
+  doublenickel.class = {}
+  doublenickel.lifecycle = {}
 
-  tdengine.entity = {}
-  tdengine.entity.entities = {}
-  tdengine.entity.created_entities = {}
-  tdengine.entity.destroyed_entities = {}
-  tdengine.entity.persistent_entities = {}
-  tdengine.entity.types = {}
-  tdengine.entity.next_id = 1
-  tdengine.persistent = {}
+  doublenickel.entity = {}
+  doublenickel.entity.entities = {}
+  doublenickel.entity.created_entities = {}
+  doublenickel.entity.destroyed_entities = {}
+  doublenickel.entity.persistent_entities = {}
+  doublenickel.entity.types = {}
+  doublenickel.entity.next_id = 1
+  doublenickel.persistent = {}
 
-  tdengine.component = {}
-  tdengine.component.types = {}
+  doublenickel.component = {}
+  doublenickel.component.types = {}
 
-  tdengine.internal = {}
-  tdengine.internal.enum_metatable = {}
+  doublenickel.internal = {}
+  doublenickel.internal.enum_metatable = {}
 
-  tdengine.debug = {}
+  doublenickel.debug = {}
 
-  tdengine.constants = {}
-  tdengine.enum = {}
-  tdengine.enums = {}
-  tdengine.enum_data = {}
+  doublenickel.constants = {}
+  doublenickel.enum = {}
+  doublenickel.enums = {}
+  doublenickel.enum_data = {}
 
-  tdengine.editor = {}
-  tdengine.editor.types = {}
-  tdengine.editor.sentinel = '__editor'
+  doublenickel.editor = {}
+  doublenickel.editor.types = {}
+  doublenickel.editor.sentinel = '__editor'
 
-  tdengine.save = {}
+  doublenickel.save = {}
 
-  tdengine.state = {}
-  tdengine.state.data = {}
+  doublenickel.state = {}
+  doublenickel.state.data = {}
 
-  tdengine.path_constants = {}
+  doublenickel.path_constants = {}
 
-  tdengine.quests = {}
+  doublenickel.quests = {}
 
-  tdengine.scene = {}
-  tdengine.scene.save_data = {}
-  tdengine.current_scene = nil
-  tdengine.queued_scene = nil
+  doublenickel.scene = {}
+  doublenickel.scene.save_data = {}
+  doublenickel.current_scene = nil
+  doublenickel.queued_scene = nil
 
-  tdengine.callback = {}
-  tdengine.callback.data = {}
+  doublenickel.callback = {}
+  doublenickel.callback.data = {}
 
-  tdengine.data_types = {}
+  doublenickel.data_types = {}
 
-  tdengine.dialogue = {}
-  tdengine.dialogue.node_type = {}
-  tdengine.dialogue.node_kind = {}
-  tdengine.dialogue.sorted_node_kinds = {}
-  tdengine.dialogue.metrics = {
+  doublenickel.dialogue = {}
+  doublenickel.dialogue.node_type = {}
+  doublenickel.dialogue.node_kind = {}
+  doublenickel.dialogue.sorted_node_kinds = {}
+  doublenickel.dialogue.metrics = {
     words = 0,
     nodes = 0,
     dialogues = {}
   }
-  tdengine.dialogue.cache = {}
-  tdengine.dialogue.characters = {}
+  doublenickel.dialogue.cache = {}
+  doublenickel.dialogue.characters = {}
 
-  tdengine.audio = {}
+  doublenickel.audio = {}
 
-  tdengine.animation = {}
-  tdengine.animation.data = {}
+  doublenickel.animation = {}
+  doublenickel.animation.data = {}
 
-  tdengine.texture = {}
-  tdengine.texture.data = {}
+  doublenickel.texture = {}
+  doublenickel.texture.data = {}
 
-  tdengine.background = {}
-  tdengine.background.data = {}
+  doublenickel.background = {}
+  doublenickel.background.data = {}
 
-  tdengine.input = {}
-  tdengine.input.data = {}
+  doublenickel.input = {}
+  doublenickel.input.data = {}
 
-  tdengine.physics = {}
-  tdengine.physics.requests = {}
-  tdengine.physics.debug = false
+  doublenickel.physics = {}
+  doublenickel.physics.requests = {}
+  doublenickel.physics.debug = false
 
-  tdengine.interaction = {}
-  tdengine.interaction.callbacks = {}
-  tdengine.interaction.check_flag = false
+  doublenickel.interaction = {}
+  doublenickel.interaction.callbacks = {}
+  doublenickel.interaction.check_flag = false
 
-  tdengine.interpolation = {}
+  doublenickel.interpolation = {}
 
-  tdengine.gui = {}
-  tdengine.gui.animation = {}
-  tdengine.gui.scroll = {}
-  tdengine.gui.drag = {}
-  tdengine.gui.menu = {}
+  doublenickel.gui = {}
+  doublenickel.gui.animation = {}
+  doublenickel.gui.scroll = {}
+  doublenickel.gui.drag = {}
+  doublenickel.gui.menu = {}
 
-  tdengine.window = {}
+  doublenickel.window = {}
 
-  tdengine.action = {}
-  tdengine.action.event_kind = {}
+  doublenickel.action = {}
+  doublenickel.action.event_kind = {}
 
-  tdengine.analytics = {}
+  doublenickel.analytics = {}
 
-  tdengine.fonts = {}
+  doublenickel.fonts = {}
 
-  tdengine.module = {}
+  doublenickel.module = {}
 
-  tdengine.paths = {}
+  doublenickel.paths = {}
 
-  tdengine.shaders = {}
+  doublenickel.shaders = {}
 
-  tdengine.gpu = {}
+  doublenickel.gpu = {}
 
-  tdengine.app = {}
+  doublenickel.app = {}
 
-  tdengine.iterator = {}
+  doublenickel.iterator = {}
 
-  tdengine.time_metric = {}
+  doublenickel.time_metric = {}
 
-  tdengine.subsystem = {}
-  tdengine.subsystem.types = {}
+  doublenickel.subsystem = {}
+  doublenickel.subsystem.types = {}
 
-  tdengine.math = {}
+  doublenickel.math = {}
 
-  tdengine.filesystem = {}
+  doublenickel.filesystem = {}
 
-  tdengine.asset = {}
+  doublenickel.asset = {}
 
-  tdengine.draw = {}
-  tdengine.draw.internal = {}
+  doublenickel.draw = {}
+  doublenickel.draw.internal = {}
 
-  tdengine.dt = 0
-  tdengine.elapsed_time = 0
-  tdengine.frame = 0
+  doublenickel.dt = 0
+  doublenickel.elapsed_time = 0
+  doublenickel.frame = 0
 
-  tdengine.tick = tdengine.is_packaged_build
-  tdengine.next_tick = tdengine.tick
+  doublenickel.tick = doublenickel.is_packaged_build
+  doublenickel.next_tick = doublenickel.tick
 
   imgui = {}
   imgui.extensions = {}
   imgui.internal = {}
 
   -- Bootstrap the FFI, so that we can resolve paths
-  tdengine.ffi = {}
+  doublenickel.ffi = {}
+  dn = {}
   ffi.cdef(ffi_header)
   
   -- Run a sanity check on the compiled size of all types and what the parser inside LuaJIT generates.
@@ -1677,41 +1678,41 @@ function tdengine.init_phase_0()
 
 end
 
-function tdengine.init_phase_1()
-  tdengine.enum.init()
-  tdengine.ffi.init()
-  tdengine.paths.init()
-  tdengine.math.init()
-  tdengine.time_metric.init()
-  tdengine.input.init()
-  tdengine.gpu.init()
-  tdengine.state.init()
-  tdengine.animation.load()
-  tdengine.texture.load()
-  tdengine.background.load()
-  tdengine.dialogue.init()
-  tdengine.audio.init()
-  tdengine.gui.init()
-  tdengine.scene.init()
-  tdengine.asset.init()
+function doublenickel.init_phase_1()
+  doublenickel.enum.init()
+  doublenickel.ffi.init()
+  doublenickel.paths.init()
+  doublenickel.math.init()
+  doublenickel.time_metric.init()
+  doublenickel.input.init()
+  doublenickel.gpu.init()
+  doublenickel.state.init()
+  doublenickel.animation.load()
+  doublenickel.texture.load()
+  doublenickel.background.load()
+  doublenickel.dialogue.init()
+  doublenickel.audio.init()
+  doublenickel.gui.init()
+  doublenickel.scene.init()
+  doublenickel.asset.init()
 end
 
-function tdengine.init_phase_2()
-  tdengine.subsystem.init()
-  tdengine.app = tdengine.subsystem.find('App')
+function doublenickel.init_phase_2()
+  doublenickel.subsystem.init()
+  doublenickel.app = doublenickel.subsystem.find('App')
 
-  tdengine.dn_log('App:on_init_game')
-  tdengine.app:on_init_game()
+  doublenickel.dn_log('App:on_init_game')
+  doublenickel.app:on_init_game()
 
-  tdengine.window.init()
-  tdengine.save.init()
-  tdengine.editor.init()
-  tdengine.persistent.init()
+  doublenickel.window.init()
+  doublenickel.save.init()
+  doublenickel.editor.init()
+  doublenickel.persistent.init()
 
-  tdengine.dn_log('lifecycle.on_start_game')
-  tdengine.lifecycle.run_callback(tdengine.lifecycle.callbacks.on_start_game)
+  doublenickel.dn_log('lifecycle.on_start_game')
+  doublenickel.lifecycle.run_callback(doublenickel.lifecycle.callbacks.on_start_game)
 end
 
-function tdengine.dn_log(...)
+function doublenickel.dn_log(...)
   print(string.format(...))
 end

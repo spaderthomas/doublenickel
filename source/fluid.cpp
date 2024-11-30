@@ -137,8 +137,8 @@ void lf_set_volume(dn_gen_arena_handle_t handle, float ax, float ay, float bx, f
 	if (!system) return;
 
 	auto& gpu_system = system->gpu;
-	gpu_system.pa = Vector2(ax, ay);
-	gpu_system.pb = Vector2(bx, by);
+	gpu_system.pa = dn_vector2_t(ax, ay);
+	gpu_system.pb = dn_vector2_t(bx, by);
 	gpu_system.radius = radius;
 }
 
@@ -147,7 +147,7 @@ void lf_set_velocity(dn_gen_arena_handle_t handle, float x, float y) {
 	if (!system) return;
 
 	auto& gpu_system = system->gpu;
-	gpu_system.velocity = Vector2(x, y);
+	gpu_system.velocity = dn_vector2_t(x, y);
 }
 
 void lf_set_smoothing_radius(dn_gen_arena_handle_t handle, float radius) {

@@ -148,7 +148,7 @@ end
 function validate_no_choice_children(node, context, errors)
   for index, uuid in pairs(node.children) do
     local child = context.graph[uuid]
-    if child.kind == tdengine.dialogue.node_kind.Choice then
+    if child.kind == doublenickel.dialogue.node_kind.Choice then
       table.insert(errors, error_message(invalid_graph_error.invalid_choice, node))
     end
   end
@@ -221,7 +221,7 @@ function validate_function(node, context, errors)
 end
 
 function validate_choice_list(node, context, errors)
-  validate_all_children_match(node, context, errors, tdengine.dialogue.node_kind.Choice,
+  validate_all_children_match(node, context, errors, doublenickel.dialogue.node_kind.Choice,
     invalid_graph_error.choice_list_wrong_child)
 end
 
@@ -294,7 +294,7 @@ function validate_notes_password_input(node, context, errors)
 
   for index, child_uuid in pairs(node.children) do
     local child = context.graph[child_uuid]
-    if child.kind ~= tdengine.dialogue.node_kind.NotePassword then
+    if child.kind ~= doublenickel.dialogue.node_kind.NotePassword then
       if found_default then
         -- Already have a default
         found_error = true
@@ -331,7 +331,7 @@ end
 
 function validate_tithonus(node, context, errors)
   validate_one_child(node, context, errors)
-  validate_all_children_match(node, context, errors, tdengine.dialogue.node_kind.ChoiceList, invalid_graph_error
+  validate_all_children_match(node, context, errors, doublenickel.dialogue.node_kind.ChoiceList, invalid_graph_error
     .laziness)
 end
 
@@ -357,7 +357,7 @@ function validate_node_fields(node, context, errors)
   }
 
   local validate_single_field = function(field)
-    local exist = index_string(tdengine.state.data, field)
+    local exist = index_string(doublenickel.state.data, field)
     if exist == nil then
       table.insert(err.fields, field)
     end
@@ -384,7 +384,7 @@ function validate_target_exists(node, context, errors)
 end
 
 function validate_target(node, context, errors)
-  if node.target == tdengine.dialogue.node_type.Jump.default_target then
+  if node.target == doublenickel.dialogue.node_type.Jump.default_target then
     local err = error_message(invalid_graph_error.default_label, node)
     table.insert(errors, err)
   end
@@ -396,7 +396,7 @@ function validate_target(node, context, errors)
 end
 
 function validate_dialogue_exists(node, context, errors)
-  if tdengine.dialogue.cache:find(node.target) then return end
+  if doublenickel.dialogue.cache:find(node.target) then return end
 
   local err = error_message(invalid_graph_error.invalid_next_dialogue, node)
   err.target = node.target
@@ -435,7 +435,7 @@ function build_validation_context(graph)
     if node.label then context.symbols[node.label] = true end
   end
 
-  for name, data in tdengine.dialogue.cache:iterate() do
+  for name, data in doublenickel.dialogue.cache:iterate() do
     local nodes = data.nodes
     for uuid, node in pairs(nodes) do
       if node.label and node.export then

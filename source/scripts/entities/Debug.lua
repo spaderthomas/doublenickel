@@ -1,4 +1,4 @@
-Debug = tdengine.entity.define('Debug')
+Debug = doublenickel.entity.define('Debug')
 
 Debug.components = {
   'Render'

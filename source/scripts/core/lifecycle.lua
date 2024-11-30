@@ -1,4 +1,4 @@
-tdengine.lifecycle.callbacks = tdengine.enum.define(
+doublenickel.lifecycle.callbacks = doublenickel.enum.define(
   'LifecycleCallback',
   {
     on_begin_frame = 0,
@@ -15,7 +15,7 @@ tdengine.lifecycle.callbacks = tdengine.enum.define(
   }
 )
 
-tdengine.lifecycle.update_callbacks = tdengine.enum.define(
+doublenickel.lifecycle.update_callbacks = doublenickel.enum.define(
   'UpdateCallback',
   {
     update = 0,
@@ -29,7 +29,7 @@ tdengine.lifecycle.update_callbacks = tdengine.enum.define(
 )
 
 
-function tdengine.lifecycle.run_callback(callback_id)
+function doublenickel.lifecycle.run_callback(callback_id)
   local function run_callback(objects)
     for _, object in pairs(objects) do
       local fn = object[callback_id:to_string()]
@@ -37,6 +37,6 @@ function tdengine.lifecycle.run_callback(callback_id)
     end
   end
 
-  run_callback(tdengine.editor.entities)
-  run_callback(tdengine.subsystem.subsystems)
+  run_callback(doublenickel.editor.entities)
+  run_callback(doublenickel.subsystem.subsystems)
 end

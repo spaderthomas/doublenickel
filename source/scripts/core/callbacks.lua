@@ -1,13 +1,13 @@
-function tdengine.callback.register(name, fn)
-  tdengine.callback.data[name] = fn
+function doublenickel.callback.register(name, fn)
+  doublenickel.callback.data[name] = fn
 end
 
-function tdengine.callback.find(name)
-  return tdengine.callback.data[name]
+function doublenickel.callback.find(name)
+  return doublenickel.callback.data[name]
 end
 
-function tdengine.callback.run(name, ...)
-  local fn = tdengine.callback.data[name]
+function doublenickel.callback.run(name, ...)
+  local fn = doublenickel.callback.data[name]
   if fn then
     local value = fn(...)
     return value

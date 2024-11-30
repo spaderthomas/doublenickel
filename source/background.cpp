@@ -5,7 +5,7 @@ void init_backgrounds() {
 
 	dn_array_init(&backgrounds, 64);
 			
-	lua_getglobal(l, "tdengine");
+	lua_getglobal(l, "doublenickel");
 	DEFER_POP(l);
 	lua_pushstring(l, "background");
 	lua_gettable(l, -2);
@@ -26,7 +26,7 @@ void init_backgrounds() {
 		//lua.parse_bool("high_priority", &background->high_priority);
 
 		// Figure out whether the source has been modified since we tiled it
-		//lua.parse_float64("mod_time", &background->mod_time);
+		//lua.parse_f64("mod_time", &background->mod_time);
 		background->filesystem_mod_time = dn_os_file_mod_time(background->source_image_full_path);
 
 		if (background->is_dirty()) {
@@ -159,8 +159,8 @@ bool Background::add_tile() {
 		dn_array_push(&tile_positions);
 	} else {
 		// Otherwise, advance the previous tile one column, and move to the next row if needed.
-		Vector2I last_tile_position = *dn_array_back(&tile_positions);
-		Vector2I tile_position = { 0, 0 };
+		dn_vector2i_t last_tile_position = *dn_array_back(&tile_positions);
+		dn_vector2i_t tile_position = { 0, 0 };
 		tile_position.x = last_tile_position.x + Background::TILE_SIZE;
 		tile_position.y = last_tile_position.y;
 		if (tile_position.x >= width) {
@@ -230,7 +230,7 @@ void Background::build_from_source() {
 void Background::update_config() {
 	lua_State* l = dn_lua.state;
 
-	lua_getglobal(l, "tdengine");
+	lua_getglobal(l, "doublenickel");
 	DEFER_POP(l);
 	lua_pushstring(l, "background");
 	lua_gettable(l, -2);
@@ -278,14 +278,14 @@ void Background::update_config() {
 	lua_settable(l, -3);
 	
 	// Write the file to disk
-	lua_getglobal(l, "tdengine");
+	lua_getglobal(l, "doublenickel");
 	lua_pushstring(l, "write_file_to_return_table");
 	lua_gettable(l, -2);
 
 	auto background_info = dn_paths_resolve("background_info");
 	lua_pushstring(l, background_info);
 
-	lua_getglobal(l, "tdengine");
+	lua_getglobal(l, "doublenickel");
 	DEFER_POP(l);
 	lua_pushstring(l, "background");
 	lua_gettable(l, -2);
@@ -333,7 +333,7 @@ void Background::load_tiles() {
 		sprite->size = { texture->width, texture->height };
 
 		// Each tile spans the entire image, so use trivial UVs
-		Vector2 uv [6] = dn_quad_literal(0, 1, 0, 1);
+		dn_vector2_t uv [6] = dn_quad_literal(0, 1, 0, 1);
 		for (u32 i = 0; i < 6; i++) sprite->uv[i] = uv[i];
 
 		// Mark the data to be loaded to the GPU
@@ -393,7 +393,7 @@ void TileProcessor::process(Background* background) {
 		u32 tile = current_tile++;
 		mutex.unlock();
 
-		Vector2I source_position = *background->tile_positions[tile];
+		dn_vector2i_t source_position = *background->tile_positions[tile];
 		char*    tile_path       = *background->tile_full_paths[tile];
 		memset(tile_data, 0, Background::TILE_SIZE * Background::TILE_SIZE * sizeof(u32));
 			

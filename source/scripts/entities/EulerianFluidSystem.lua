@@ -1,4 +1,4 @@
-EulerianFluidSystem = tdengine.entity.define('EulerianFluidSystem')
+EulerianFluidSystem = doublenickel.entity.define('EulerianFluidSystem')
 
 EulerianFluidSystem.editor_fields = {
   'grid_size',
@@ -27,34 +27,34 @@ function EulerianFluidSystem:stop(params)
 end
 
 function EulerianFluidSystem:enable()
-  self.handle = tdengine.ffi.ef_create(self.grid_size)
-  tdengine.ffi.ef_init(self.handle)
-  tdengine.ffi.ef_set_render_size(self.handle, self.render_size)
+  self.handle = doublenickel.ffi.ef_create(self.grid_size)
+  doublenickel.ffi.ef_init(self.handle)
+  doublenickel.ffi.ef_set_render_size(self.handle, self.render_size)
 
   for i = 0, self.grid_size - 1, 1 do
     for j = 0, self.grid_size - 1, 1 do
-      tdengine.ffi.ef_set_velocity(self.handle, i, j, 1.0, 1.0)
+      doublenickel.ffi.ef_set_velocity(self.handle, i, j, 1.0, 1.0)
     end
   end
 end
 
 function EulerianFluidSystem:disable()
   if not self.handle then return end
-  tdengine.ffi.ef_destroy(self.handle)
+  doublenickel.ffi.ef_destroy(self.handle)
   self.handle = nil
 end
 
 function EulerianFluidSystem:update()
   if not self.handle then return end
 
-  tdengine.ffi.set_active_shader('fluid_eulerian')
-  tdengine.ffi.set_draw_mode(tdengine.enums.DrawMode.Triangles)
-  tdengine.ffi.set_world_space(true)
-  tdengine.ffi.set_layer(10000)
-  tdengine.ffi.ef_bind(self.handle)
-  tdengine.ffi.push_quad(0, self.render_size, self.render_size, self.render_size, nil, 1.0)
+  doublenickel.ffi.set_active_shader('fluid_eulerian')
+  doublenickel.ffi.set_draw_mode(doublenickel.enums.DrawMode.Triangles)
+  doublenickel.ffi.set_world_space(true)
+  doublenickel.ffi.set_layer(10000)
+  doublenickel.ffi.ef_bind(self.handle)
+  doublenickel.ffi.push_quad(0, self.render_size, self.render_size, self.render_size, nil, 1.0)
 
-  tdengine.ffi.ef_set_density_source(self.handle, 1, 1, 100.0)
-  --tdengine.ffi.ef_set_density_source(self.handle, 10, 10, 100.0)
-  --tdengine.ffi.ef_set_density_source(self.handle, 50, 50, 1000.0)
+  doublenickel.ffi.ef_set_density_source(self.handle, 1, 1, 100.0)
+  --doublenickel.ffi.ef_set_density_source(self.handle, 10, 10, 100.0)
+  --doublenickel.ffi.ef_set_density_source(self.handle, 50, 50, 1000.0)
 end

@@ -1,27 +1,27 @@
-local module = tdengine.subsystem
+local module = doublenickel.subsystem
 
-function tdengine.subsystem.init()
-  tdengine.dn_log('tdengine.subsystem.init')
+function doublenickel.subsystem.init()
+  doublenickel.dn_log('doublenickel.subsystem.init')
   module.subsystems = {}
-  for name, class in pairs(tdengine.subsystem.types) do
+  for name, class in pairs(doublenickel.subsystem.types) do
     module.subsystems[name] = class:new()
   end
 end
 
-function tdengine.subsystem.define(name)
-  local class = tdengine.class.define(name)
+function doublenickel.subsystem.define(name)
+  local class = doublenickel.class.define(name)
   class:include_lifecycle()
   class:include_update()
 
-  tdengine.subsystem.types[name] = class
+  doublenickel.subsystem.types[name] = class
   return class
 end
 
-function tdengine.subsystem.find(name)
+function doublenickel.subsystem.find(name)
   return module.subsystems[name]
 end
 
-function tdengine.subsystem.update()
+function doublenickel.subsystem.update()
   for _, subsystem in pairs(module.subsystems) do
     subsystem:update()
   end

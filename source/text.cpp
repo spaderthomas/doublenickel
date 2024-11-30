@@ -20,20 +20,20 @@ void dn_prepared_text_t::set_text(const char* text) {
 		//strncpy(this->text, text, MAX_TEXT_LEN - 1);
 }
 
-void dn_prepared_text_t::set_wrap(float32 wrap) {
+void dn_prepared_text_t::set_wrap(f32 wrap) {
 	this->wrap = wrap;
 }
 
-void dn_prepared_text_t::set_position(float32 x, float32 y) {
+void dn_prepared_text_t::set_position(f32 x, f32 y) {
 	this->position.x = x;
 	this->position.y = y;
 }
 
-void dn_prepared_text_t::set_offset(float32 offset) {
+void dn_prepared_text_t::set_offset(f32 offset) {
 	this->offset = offset;
 }
 
-void dn_prepared_text_t::set_color(Vector4 color) {
+void dn_prepared_text_t::set_color(dn_vector4_t color) {
 	this->color = color;
 }
 
@@ -45,12 +45,12 @@ bool dn_prepared_text_t::is_empty() {
 	return !this->text[0];
 }
 
-int32 dn_prepared_text_t::count_lines() {
+i32 dn_prepared_text_t::count_lines() {
 	return count_breaks() - 1;
 }
 
-int32 dn_prepared_text_t::count_breaks() {
-	for (int32 i = 1; i < MAX_LINE_BREAKS; i++) {
+i32 dn_prepared_text_t::count_breaks() {
+	for (i32 i = 1; i < MAX_LINE_BREAKS; i++) {
 		if (breaks[i]) continue;
 		return i;
 	}
@@ -58,16 +58,16 @@ int32 dn_prepared_text_t::count_breaks() {
 	return MAX_LINE_BREAKS;
 }
 
-int32 dn_prepared_text_t::get_break(int32 index) {
+i32 dn_prepared_text_t::get_break(i32 index) {
 	return breaks[index];
 }
 
-void dn_prepared_text_t::add_break(int32 index) {
+void dn_prepared_text_t::add_break(i32 index) {
 	auto i = count_breaks();
 	breaks[i] = index;
 }
 
-dn_array_view_t<char> dn_prepared_text_t::get_line(int32 index) {
+dn_array_view_t<char> dn_prepared_text_t::get_line(i32 index) {
 	auto begin = get_break(index);
 	auto end   = get_break(index + 1);
 	auto count = end - begin;
@@ -78,15 +78,15 @@ dn_array_view_t<char> dn_prepared_text_t::get_line(int32 index) {
 	);
 }
 
-dn_prepared_text_t* dn_prepare_text(const char* text, float32 px, float32 py, dn_baked_font_t* font) {
+dn_prepared_text_t* dn_prepare_text(const char* text, f32 px, f32 py, dn_baked_font_t* font) {
 	return dn_prepare_text_ex(text, px, py, font, 0, dn_colors::white, true);
 }
 
-dn_prepared_text_t* dn_prepare_text_wrap(const char* text, float32 px, float32 py, dn_baked_font_t* font, float32 wrap) {
+dn_prepared_text_t* dn_prepare_text_wrap(const char* text, f32 px, f32 py, dn_baked_font_t* font, f32 wrap) {
 	return dn_prepare_text_ex(text, px, py, font, wrap, dn_colors::white, true);
 }
 
-dn_prepared_text_t* dn_prepare_text_ex(const char* text, float32 px, float32 py, dn_baked_font_t* font, float32 wrap, Vector4 color, bool precise) {
+dn_prepared_text_t* dn_prepare_text_ex(const char* text, f32 px, f32 py, dn_baked_font_t* font, f32 wrap, dn_vector4_t color, bool precise) {
 	if (!text) return nullptr;
 	
 	auto prepared_text = dn::allocator::alloc<dn_prepared_text_t>(&dn_allocators.bump, 1);
@@ -104,7 +104,7 @@ dn_prepared_text_t* dn_prepare_text_ex(const char* text, float32 px, float32 py,
 	context.calculate();
 
 	// Calculate width. Just find the longest line.
-	float32 this_line_width = 0;
+	f32 this_line_width = 0;
 	for (int i = 0; i < prepared_text->count_breaks(); i++) {
 		auto line = prepared_text->get_line(i);
 		dn_array_for(line, c) {
@@ -119,8 +119,8 @@ dn_prepared_text_t* dn_prepare_text_ex(const char* text, float32 px, float32 py,
 
 	// Calculate the metrics we need to properly align text specified by a top-left position
 	auto first_line = prepared_text->get_line(0);
-	float32 first_line_height = 0;
-	float32 first_line_descender = 0;
+	f32 first_line_height = 0;
+	f32 first_line_descender = 0;
 	dn_array_for(first_line, c) {
 		if (*c == 0) break;
 		dn_baked_glyph_t& glyph = prepared_text->font->glyphs[*c];
@@ -175,8 +175,8 @@ void LineBreakContext::calculate() {
 	// Text that never wraps never changes lines, because we don't support newline.
 	if (this->info->wrap == 0) return;
 
-	float32 word_size = 0;
-	int32 word_begin  = 0;
+	f32 word_size = 0;
+	i32 word_begin  = 0;
 	dn_baked_glyph_t* glyph  = nullptr;
 	auto text = dn_array_view(info->text, MAX_TEXT_LEN);
 

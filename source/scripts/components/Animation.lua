@@ -1,4 +1,4 @@
-Animation = tdengine.component.define('Animation')
+Animation = doublenickel.component.define('Animation')
 
 Animation.editor_fields = {
   'default',
@@ -22,18 +22,18 @@ function Animation:init(params)
   params = params or {}
   self.default = params.default or 'default'
   self.animation = self.default
-  self.layer = params.layer or tdengine.layers.foreground
+  self.layer = params.layer or doublenickel.layers.foreground
   self.scale = params.scale or 1
   self.opacity = params.opacity or 1
-  self.enabled = tdengine.math.ternary(params.enabled, true, false)
-  self.offset = tdengine.vec2(params.offset)
-  self.center = tdengine.math.ternary(params.center, true, false)
-  self.size = tdengine.vec2(params.size) 
+  self.enabled = doublenickel.math.ternary(params.enabled, true, false)
+  self.offset = doublenickel.vec2(params.offset)
+  self.center = doublenickel.math.ternary(params.center, true, false)
+  self.size = doublenickel.vec2(params.size) 
   self.static_image = params.static_image or nil
   self.color = params.color or nil
 
   self.loop = true
-  self.queued_animations = tdengine.data_types.queue:new()
+  self.queued_animations = doublenickel.data_types.queue:new()
 
   -- In the editor, when we're editing animations, we don't want to lookup the animation from the
   -- canonical list. We want to use the copy we're editing and watch it change live.
@@ -51,9 +51,9 @@ function Animation:update()
   self.changed_frame = false
 
   -- Otherwise, find the animation data and see if we're done with the current frame
-  self.accumulated = self.accumulated + tdengine.dt
+  self.accumulated = self.accumulated + doublenickel.dt
 
-  local data = self.data or tdengine.animation.find(self.animation)
+  local data = self.data or doublenickel.animation.find(self.animation)
 
   local current = data.frames[self.current]
   if not current then return end
@@ -93,13 +93,13 @@ function Animation:draw()
   local position = self:get_position()
   local size = self.size:copy()
   if size.x == 0 or size.y == 0 then
-    size.x, size.y = tdengine.sprite_size(image)
+    size.x, size.y = doublenickel.sprite_size(image)
   end
 
-  tdengine.ffi.set_layer(self.layer)
-  tdengine.ffi.set_world_space(true)
+  doublenickel.ffi.set_layer(self.layer)
+  doublenickel.ffi.set_world_space(true)
 
-  tdengine.ffi.draw_image_ex(image, position.x, position.y, size.x, size.y, self.opacity)
+  doublenickel.ffi.draw_image_ex(image, position.x, position.y, size.x, size.y, self.opacity)
 end
 
 --
@@ -147,7 +147,7 @@ function Animation:get_image()
   end
 
   -- Otherwise, look up the current frame of the current animation
-  local data = self.data or tdengine.animation.find(self.animation)
+  local data = self.data or doublenickel.animation.find(self.animation)
   local frame = data.frames[self.current]
   frame = frame or { image = 'debug.png', time = .25 }
   return frame.image
@@ -155,9 +155,9 @@ end
 
 function Animation:get_size()
   local image = self:get_image()
-  if not image then return tdengine.vec2() end
+  if not image then return doublenickel.vec2() end
 
-  return tdengine.vec2(tdengine.sprite_size(image)):scale(self.scale)
+  return doublenickel.vec2(doublenickel.sprite_size(image)):scale(self.scale)
 end
 
 function Animation:disable()
@@ -173,6 +173,6 @@ function Animation:is_playing(name)
 end
 
 function Animation:is_done()
-  local data = self.data or tdengine.animation.find(self.animation)
+  local data = self.data or doublenickel.animation.find(self.animation)
   return self.current == #data.frames and not self.loop
 end

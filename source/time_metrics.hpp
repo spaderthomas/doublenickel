@@ -57,10 +57,10 @@ void dn_time_metric_t::end() {
 	dn_ring_buffer_push_overwrite(&this->queue, delta);
 }
 
-float64 dn_time_metric_t::get_average() {
+f64 dn_time_metric_t::get_average() {
 	if (!queue.size) return 0;
 	
-	float64 total = 0;
+	f64 total = 0;
 	dn_ring_buffer_for(queue, entry) {
 		total += **entry;
 	}
@@ -68,7 +68,7 @@ float64 dn_time_metric_t::get_average() {
 	return total / queue.size;
 }
 
-float64 dn_time_metric_t::get_last() {
+f64 dn_time_metric_t::get_last() {
 	if (queue.size) return *dn_ring_buffer_back(&queue);
 	return 0;
 }
@@ -92,9 +92,9 @@ double dn_time_metric_t::get_smallest() {
 }
 
 
-void dn_time_metric_t::sleep_wait(float64 target) {
+void dn_time_metric_t::sleep_wait(f64 target) {
 	while (true) {
-		float64 delta = glfwGetTime() - this->time_begin;
+		f64 delta = glfwGetTime() - this->time_begin;
 		if (delta >= target) break;
 
 		double remaining_time = target - delta;
@@ -104,7 +104,7 @@ void dn_time_metric_t::sleep_wait(float64 target) {
 	}
 }
 
-void dn_time_metric_t::busy_wait(float64 target) {
+void dn_time_metric_t::busy_wait(f64 target) {
 	while (true) {
 		auto delta = glfwGetTime() - this->time_begin;
 		if (delta >= target) break;

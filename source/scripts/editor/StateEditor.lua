@@ -1,6 +1,6 @@
-local StateEditor = tdengine.editor.define('StateEditor')
+local StateEditor = doublenickel.editor.define('StateEditor')
 function StateEditor:init(params)
-  self.state_editor = imgui.extensions.TableEditor(tdengine.state.data)
+  self.state_editor = imgui.extensions.TableEditor(doublenickel.state.data)
   self.dirty = false
   self.timer = Timer:new(1)
 
@@ -12,23 +12,23 @@ function StateEditor:init(params)
 end
 
 function StateEditor:update(dt)
-  if tdengine.editor.find('DialogueEditor').hidden then return end
+  if doublenickel.editor.find('DialogueEditor').hidden then return end
   
   -- This flag only applies to whether we're dirty this frame
   self.dirty = false
 
-  tdengine.editor.begin_window('Dialogue State')
+  doublenickel.editor.begin_window('Dialogue State')
 
   imgui.InputText(self.ids.add, self, 'new_category')
   imgui.SameLine()
   if imgui.Button('Add') then
-    tdengine.state.data[self.new_category] = {}
+    doublenickel.state.data[self.new_category] = {}
     self.new_category = ''
   end
 
   -- If the underlying table changes, we're holding a stale reference
-  if self.state_editor.editing ~= tdengine.state.data then
-    self.state_editor = imgui.extensions.TableEditor(tdengine.state.data)
+  if self.state_editor.editing ~= doublenickel.state.data then
+    self.state_editor = imgui.extensions.TableEditor(doublenickel.state.data)
   end
 
   self.timer:update()
@@ -36,13 +36,13 @@ function StateEditor:update(dt)
     self.timer:reset()
 
     -- Reconcile any added / removed state fields to the default state
-    local default_state = tdengine.state.read_file('default')
-    if make_keys_match(tdengine.state.data, default_state) then
+    local default_state = doublenickel.state.read_file('default')
+    if make_keys_match(doublenickel.state.data, default_state) then
       self.dirty = true
-      tdengine.state.write('default', default_state)
+      doublenickel.state.write('default', default_state)
     end
   end
 
   self.state_editor:draw()
-  tdengine.editor.end_window()
+  doublenickel.editor.end_window()
 end

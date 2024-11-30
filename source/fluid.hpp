@@ -23,11 +23,11 @@ namespace LagrangianFluidSim {
 	};
 	
 	struct Particle {
-		 Vector4 color;
-		 Vector2 position;
-		 Vector2 predicted_position;
-		 Vector2 velocity;
-		 Vector2 local_velocity;
+		 dn_vector4_t color;
+		 dn_vector2_t position;
+		 dn_vector2_t predicted_position;
+		 dn_vector2_t velocity;
+		 dn_vector2_t local_velocity;
 	};
 
 	struct FluidProperties {
@@ -38,9 +38,9 @@ namespace LagrangianFluidSim {
 	};
 	
 	struct GpuSystem {
-		Vector2 pa;
-		Vector2 pb;
-		Vector2 velocity;
+		dn_vector2_t pa;
+		dn_vector2_t pb;
+		dn_vector2_t velocity;
 		float radius;
 
 		float smoothing_radius_px = 4.0;
@@ -109,14 +109,14 @@ namespace EulerianFluidSim {
 	using ssbo = u32;
 	
 	struct Fluid {
-		Vector2 velocity;
+		dn_vector2_t velocity;
 		float density;
 		float buffered_density;
 		float padding [4];
 	};
 
 	struct Source {
-		Vector2 velocity;
+		dn_vector2_t velocity;
 		float density;
 		float padding [1];
 	};

@@ -13,7 +13,7 @@ struct FileChange {
 	char* file_path;
 	char* file_name;
 	dn_file_change_event_t events;
-	float32 time;
+	f32 time;
 };
 
 struct FileMonitor;
@@ -25,20 +25,20 @@ struct FileMonitor {
 		OVERLAPPED overlapped;
 		HANDLE handle;
 		void* notify_information;
-		int32 bytes_returned;
+		i32 bytes_returned;
 	};
 
 	struct CacheEntry {
 		dn_hash_t hash;
-		float64 last_event_time = 0;
+		f64 last_event_time = 0;
 	};
 
-	static constexpr int32 BUFFER_SIZE = 4092;
+	static constexpr i32 BUFFER_SIZE = 4092;
 	
 	FileChangeCallback callback;
 	dn_file_change_event_t events_to_watch;
 	void* userdata;
-	float64 debounce_time = .1;
+	f64 debounce_time = .1;
 	dn_array_t<DirectoryInfo, 128> directory_infos;
 	dn_array_t<FileChange, 16> changes;
 	dn_array_t<CacheEntry, 512> cache;
@@ -50,7 +50,7 @@ struct FileMonitor {
 	void issue_one_read(DirectoryInfo* info);
 	void emit_changes();
 	void add_change(char* file_path, dn_string_t file_name, dn_file_change_event_t events);
-	bool check_cache(char* file_path, float64 time);
+	bool check_cache(char* file_path, f64 time);
 	CacheEntry* find_cache_entry(char* file_path);
 };
 
@@ -147,7 +147,7 @@ bool FileMonitor::add_file(const char* file_path) {
 void FileMonitor::issue_one_read(DirectoryInfo* info) {
 	DN_ASSERT(info->handle != INVALID_HANDLE_VALUE);
 
-	int32 notify_filter = 0;
+	i32 notify_filter = 0;
 	if (this->events_to_watch & (DN_FILE_CHANGE_EVENT_ADDED | DN_FILE_CHANGE_EVENT_REMOVED)) {
 		notify_filter |= FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_CREATION;
 	}
@@ -167,7 +167,7 @@ void FileMonitor::process_changes() {
 
 		if (!HasOverlappedIoCompleted(&info->overlapped)) continue;
 
-		int32 bytes_written = 0;
+		i32 bytes_written = 0;
 		bool success = GetOverlappedResult(info->handle, &info->overlapped, (LPDWORD) & bytes_written, false);
 		if (!success || bytes_written == 0) break;
 
@@ -196,7 +196,7 @@ void FileMonitor::process_changes() {
 
 			// Construct the full path
 			char* full_path = dn::allocator::alloc<char>(&dn_allocators.bump, DN_MAX_PATH_LEN);
-			char* partial_path = dn_string_16_to_8((uint16*)&notify->FileName[0], notify->FileNameLength / 2);
+			char* partial_path = dn_string_16_to_8((u16*)&notify->FileName[0], notify->FileNameLength / 2);
 			snprintf(full_path, DN_MAX_PATH_LEN, "%s/%s", info->path, partial_path);
 			dn_path_normalize_cstr(full_path);
 			dn_string_t file_name = dn_path_extract_file_name(full_path);
@@ -276,7 +276,7 @@ FileMonitor::CacheEntry* FileMonitor::find_cache_entry(char* file_path) {
 	return found;
 }
 
-bool FileMonitor::check_cache(char* file_path, float64 time) {
+bool FileMonitor::check_cache(char* file_path, f64 time) {
 	auto entry = this->find_cache_entry(file_path);
 	auto delta = time - entry->last_event_time;
 	entry->last_event_time = time;

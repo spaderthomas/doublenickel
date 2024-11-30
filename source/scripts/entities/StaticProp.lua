@@ -1,4 +1,4 @@
-StaticProp = tdengine.entity.define('StaticProp')
+StaticProp = doublenickel.entity.define('StaticProp')
 
 StaticProp.components = {
   'Animation',

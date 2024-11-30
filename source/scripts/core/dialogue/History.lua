@@ -1,4 +1,4 @@
-History = tdengine.class.define('History')
+History = doublenickel.class.define('History')
 
 function History:init()
   self.unread_items = {}

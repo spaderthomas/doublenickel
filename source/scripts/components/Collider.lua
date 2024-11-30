@@ -1,6 +1,6 @@
-Collider = tdengine.component.define('Collider')
+Collider = doublenickel.component.define('Collider')
 
-tdengine.enum.define(
+doublenickel.enum.define(
 	'ColliderShape',
 	{
 		Box = 0,
@@ -9,7 +9,7 @@ tdengine.enum.define(
 	}
 )
 
-Collider.kinds = tdengine.enum.define(
+Collider.kinds = doublenickel.enum.define(
 	'ColliderKind',
 	{
 		Static = 0,
@@ -27,12 +27,12 @@ Collider.editor_fields = {
 }
 
 function Collider:init(params)
-	local shape = tdengine.enum.load(params.shape) or tdengine.enums.ColliderShape.Box
+	local shape = doublenickel.enum.load(params.shape) or doublenickel.enums.ColliderShape.Box
 	self:set_shape(shape, params.impl)
 
-	self.kind = tdengine.enum.load(params.kind) or tdengine.enums.ColliderKind.Static
+	self.kind = doublenickel.enum.load(params.kind) or doublenickel.enums.ColliderKind.Static
 	self.attached = params.attached or ''
-	self.attach_offset = params.attach_offset or tdengine.vec2()
+	self.attach_offset = params.attach_offset or doublenickel.vec2()
 
 	if params.world_space ~= nil then
 		self.world_space = params.world_space
@@ -43,7 +43,7 @@ function Collider:init(params)
 	local editor_callbacks = {
     on_change_field = function(field) self:on_change_field(field) end,
   }
-  tdengine.editor.set_editor_callbacks(self, editor_callbacks)
+  doublenickel.editor.set_editor_callbacks(self, editor_callbacks)
 end
 
 function Collider:on_change_field(field)
@@ -56,19 +56,19 @@ function Collider:is_attached() return #self.attached > 0 end
 
 function Collider:attach(entity_uuid, attach_offset)
 	self.attached = entity_uuid
-	self.attach_offset = attach_offset or tdengine.vec2()
+	self.attach_offset = attach_offset or doublenickel.vec2()
 	self:update()
 end
 
 function Collider:unattach()
 	self.attached = nil
-	self.attach_offset = tdengine.vec2()
+	self.attach_offset = doublenickel.vec2()
 	self:update()
 end
 
 function Collider:update()
 	if self.attached and #self.attached > 0 then
-		local entity = tdengine.find_entity_by_uuid(self.attached)
+		local entity = doublenickel.find_entity_by_uuid(self.attached)
 		if not entity then return end
 
 		local collider = entity:find_component('Collider')
@@ -88,9 +88,9 @@ function Collider:is_world_space() return self.world_space end
 
 function Collider:set_draw_space()
 	if self:is_world_space() then
-		tdengine.ffi.set_world_space(true)()
+		doublenickel.ffi.set_world_space(true)()
 	else
-		tdengine.ffi.end_world_space(true)()
+		doublenickel.ffi.end_world_space(true)()
 	end
 end
 
@@ -101,11 +101,11 @@ function Collider:set_shape(shape, params)
 	params.position = params.position or self.impl and self.impl.position
 
 	self.shape = shape
-	if self.shape == tdengine.enums.ColliderShape.Box then
+	if self.shape == doublenickel.enums.ColliderShape.Box then
 		self.impl = ColliderBox:new(params)
-	elseif self.shape == tdengine.enums.ColliderShape.Circle then
+	elseif self.shape == doublenickel.enums.ColliderShape.Circle then
 		self.impl = ColliderCircle:new(params)
-	elseif self.shape == tdengine.enums.ColliderShape.Capsule then
+	elseif self.shape == doublenickel.enums.ColliderShape.Capsule then
 		self.impl = ColliderCapsule:new(params)
 	end
 
@@ -127,9 +127,9 @@ end
 function Collider:make(data)
 	local collider = add_component(
 		nil, 'Collider', data or {
-			shape = tdengine.enums.ColliderShape.Circle,
+			shape = doublenickel.enums.ColliderShape.Circle,
 			world_space = false,
-			impl = { position = tdengine.vec2(100, 100), radius = 100 }
+			impl = { position = doublenickel.vec2(100, 100), radius = 100 }
 		})
 	return collider
 end
@@ -156,7 +156,7 @@ function Collider:get_height() return self.impl:get_height() end
 function Collider:get_width() return self.impl:get_width() end
 
 function Collider:get_dimension()
-	return tdengine.vec2(self.impl:get_width(), self.impl:get_height())
+	return doublenickel.vec2(self.impl:get_width(), self.impl:get_height())
 end
 
 function Collider:get_center() return self.impl:get_center() end
@@ -197,8 +197,8 @@ function Collider:is_point_inside(point) return self.impl:is_point_inside(point)
 
 function Collider:is_cursor_inside()
 	local coord = ternary(
-		self:is_world_space(), tdengine.coordinate.world,
-		tdengine.coordinate.game)
-	local mouse = tdengine.vec2(tdengine.cursor(coord))
+		self:is_world_space(), doublenickel.coordinate.world,
+		doublenickel.coordinate.game)
+	local mouse = doublenickel.vec2(doublenickel.cursor(coord))
 	return self.impl:is_point_inside(mouse)
 end

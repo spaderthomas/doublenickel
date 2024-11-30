@@ -20,7 +20,7 @@
 
 -- IMGUI_LAYER_1
 function imgui.internal.init_c_api()
-	local header = tdengine.module.read_from_named_path('cimgui_header')
+	local header = doublenickel.module.read_from_named_path('cimgui_header')
 	ffi.cdef(header)
 end
 
@@ -173,13 +173,13 @@ function imgui.internal.init_lua_api_overwrites()
 		local value = t[k]
 		local len = #value
 
-		local allocator = tdengine.ffi.dn_allocator_find('bump')
+		local allocator = dn.allocator_find('bump')
 		local buffer_len = len + max_chars_per_frame
 		local buffer = allocator:alloc(buffer_len)
-		tdengine.ffi.dn_string_copy_n(value, len, buffer, buffer_len)
+		dn.string_copy_n(value, len, buffer, buffer_len)
 	
 		flags = flags or 0
-		flags = bitwise(tdengine.op_or, flags, ffi.C.ImGuiInputTextFlags_CallbackResize)
+		flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiInputTextFlags_CallbackResize)
 		local callback = empty_resize_callback
 		local userdata = nil
 		local changed = ffi.C.igInputText(label, buffer, buffer_len, flags, callback, userdata)
@@ -209,7 +209,7 @@ function imgui.internal.init_lua_api_overwrites()
 		local ref_col = nil
 		local changed = ffi.C.igColorPicker4(label, value, flags, ref_col)
 	
-		t[k] = tdengine.color(value)
+		t[k] = doublenickel.color(value)
 	
 		return changed
 	end

@@ -14,15 +14,15 @@ vec4 sdf_primitive(vec2 world, inout SdfDecodeContext context) {
 	context.header = pull_header(context.index.buffer_index);
 
 	context.sdf_distance = 0.0;	
-	if (context.index.shape == SDF_CIRCLE) {
+	if (context.index.shape == DN_SDF_CIRCLE) {
 		dn_sdf_circle_t circle = pull_circle(context.index.buffer_index);
 		context.sdf_distance = sdf_circle(world, context.header.position, circle.radius);
 	}
-	else if (context.index.shape == SDF_RING) {
+	else if (context.index.shape == DN_SDF_RING) {
 		dn_sdf_ring_t ring = pull_ring(context.index.buffer_index);
 		context.sdf_distance = sdf_ring(world, context.header.position, ring.inner_radius, ring.outer_radius);
 	}
-	else if (context.index.shape == SDF_ORIENTED_BOX) {
+	else if (context.index.shape == DN_SDF_ORIENTED_BOX) {
 		dn_sdf_oriented_box_t box = pull_oriented_box(context.index.buffer_index);
 
 		vec2 axis = vec2(cos(context.header.rotation), sin(context.header.rotation));
@@ -46,16 +46,16 @@ vec4 sdf_combination(vec2 world, inout SdfDecodeContext context) {
 	for (uint i = 1; i < num_sdfs; i++) {
 		dn_sdf_combine_entry_t entry = pull_sdf_combine_entry(combine_index);
 		context.index = entry.index;
-	// FN_DBG_SCALAR_EQ(context.index.shape, SDF_CIRCLE);
+	// FN_DBG_SCALAR_EQ(context.index.shape, DN_SDF_CIRCLE);
 		sdf_primitive(world, context);
 
-		if (entry.combine_op == SDF_COMBINE_OP_UNION) {
+		if (entry.combine_op == DN_SDF_COMBINE_OP_UNION) {
 			sdf_distance = sdf_op_union(sdf_distance, context.sdf_distance, entry.kernel);
 		}
-		else if (entry.combine_op == SDF_COMBINE_OP_SUBTRACTION) {
+		else if (entry.combine_op == DN_SDF_COMBINE_OP_SUBTRACTION) {
 			sdf_distance = sdf_op_subtraction(sdf_distance, context.sdf_distance, entry.kernel);
 		}
-		else if (entry.combine_op == SDF_COMBINE_OP_INTERSECTION) {
+		else if (entry.combine_op == DN_SDF_COMBINE_OP_INTERSECTION) {
 			sdf_distance = sdf_op_intersection(sdf_distance, context.sdf_distance, entry.kernel);
 		}
 
@@ -68,7 +68,7 @@ void main() {
 	vec2 world = gl_FragCoord.xy + camera;
 	SdfDecodeContext context = sdf_decode_context(f_index);
 
-	if (context.index.shape == SDF_COMBINE) {
+	if (context.index.shape == DN_SDF_COMBINE) {
 		color = sdf_combination(world, context);
 	}
 	else {

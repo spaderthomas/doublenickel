@@ -1,4 +1,4 @@
-local Label = tdengine.node('Label')
+local Label = doublenickel.node('Label')
 
 Label.editor_fields = {
   'label',

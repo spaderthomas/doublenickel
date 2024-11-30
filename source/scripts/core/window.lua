@@ -1,6 +1,6 @@
-local self = tdengine.window
+local self = doublenickel.window
 
-tdengine.window.states = tdengine.enum.define(
+doublenickel.window.states = doublenickel.enum.define(
   'WindowAnimationState',
   {
     Idle = 0,
@@ -8,36 +8,36 @@ tdengine.window.states = tdengine.enum.define(
   }
 )
 
-function tdengine.window.init()
-  tdengine.dn_log('tdengine.window.init')
+function doublenickel.window.init()
+  doublenickel.dn_log('doublenickel.window.init')
   self.state = self.states.Idle
 
-  self.display_mode = tdengine.ffi.dn_window_get_display_mode()
+  self.display_mode = dn.window_get_display_mode()
   self.interpolation = {
-    window_size = tdengine.interpolation.EaseInOut2:new({ time = 1, exponent = 3 })
+    window_size = doublenickel.interpolation.EaseInOut2:new({ time = 1, exponent = 3 })
   }
 end
 
-function tdengine.window.update()
+function doublenickel.window.update()
   if self.state == self.states.Idle then
 
   elseif self.state == self.states.Interpolate then
     local window_size = self.interpolation.window_size:get_value()
-    tdengine.ffi.set_window_size(window_size.x, window_size.y)
+    doublenickel.ffi.set_window_size(window_size.x, window_size.y)
 
     self.interpolation.window_size:update()
     if self.interpolation.window_size:is_done() then
-      tdengine.ffi.dn_window_set_display_mode(self.display_mode)
+      dn.window_set_display_mode(self.display_mode)
       self.state = self.states.Idle
     end
   end
 end
 
-function tdengine.window.animate_display_mode(display_mode)
-  local was_full_screen = self.display_mode == tdengine.enums.DisplayMode.Fullscreen
-  local is_full_screen = display_mode == tdengine.enums.DisplayMode.Fullscreen
-  if was_full_screen or is_full_screen or tdengine.ffi.dn_steam_is_deck() then
-    tdengine.ffi.dn_window_set_display_mode(display_mode)
+function doublenickel.window.animate_display_mode(display_mode)
+  local was_full_screen = self.display_mode == doublenickel.enums.DisplayMode.Fullscreen
+  local is_full_screen = display_mode == doublenickel.enums.DisplayMode.Fullscreen
+  if was_full_screen or is_full_screen or dn.steam_is_deck() then
+    dn.window_set_display_mode(display_mode)
     self.display_mode = display_mode
     self.state = self.states.Idle
     return
@@ -46,26 +46,26 @@ function tdengine.window.animate_display_mode(display_mode)
   self.display_mode = display_mode
 
 
-  local current_size = tdengine.ffi.dn_window_get_content_area()
-  current_size = tdengine.vec2(current_size.x, current_size.y)
-  local target_size = tdengine.vec2()
+  local current_size = dn.window_get_content_area()
+  current_size = doublenickel.vec2(current_size.x, current_size.y)
+  local target_size = doublenickel.vec2()
 
-  if self.display_mode == tdengine.enums.DisplayMode.p480 then
+  if self.display_mode == doublenickel.enums.DisplayMode.p480 then
     target_size.x = 854
     target_size.y = 480
-  elseif self.display_mode == tdengine.enums.DisplayMode.p720 then
+  elseif self.display_mode == doublenickel.enums.DisplayMode.p720 then
     target_size.x = 1280
     target_size.y = 720
-  elseif self.display_mode == tdengine.enums.DisplayMode.p1280_800 then
+  elseif self.display_mode == doublenickel.enums.DisplayMode.p1280_800 then
     target_size.x = 1280
     target_size.y = 800
-  elseif self.display_mode == tdengine.enums.DisplayMode.p1080 then
+  elseif self.display_mode == doublenickel.enums.DisplayMode.p1080 then
     target_size.x = 1920
     target_size.y = 1080
-  elseif self.display_mode == tdengine.enums.DisplayMode.p1440 then
+  elseif self.display_mode == doublenickel.enums.DisplayMode.p1440 then
     target_size.x = 2560
     target_size.y = 1440
-  elseif self.display_mode == tdengine.enums.DisplayMode.p2160 then
+  elseif self.display_mode == doublenickel.enums.DisplayMode.p2160 then
     target_size.x = 3840
     target_size.y = 2160
   end
@@ -77,19 +77,19 @@ function tdengine.window.animate_display_mode(display_mode)
 end
 
 
-function tdengine.window.get_game_area_size()
-  local data = tdengine.ffi.dn_coord_get()
-  return tdengine.vec2(data.framebuffer_size.x, data.framebuffer_size.y)
+function doublenickel.window.get_game_area_size()
+  local data = dn.coord_get()
+  return doublenickel.vec2(data.framebuffer_size.x, data.framebuffer_size.y)
 end
 
-function tdengine.window.set_game_area_size(size)
-  tdengine.ffi.dn_coord_set_framebuffer_size(size.x, size.y)
+function doublenickel.window.set_game_area_size(size)
+  dn.coord_set_framebuffer_size(size.x, size.y)
 end
 
-function tdengine.window.set_game_area_position(position)
-  tdengine.ffi.dn_coord_set_framebuffer_position(position.x, position.y)
+function doublenickel.window.set_game_area_position(position)
+  dn.coord_set_framebuffer_position(position.x, position.y)
 end
 
-function tdengine.window.dn_window_get_native_resolution()
-	return tdengine.vec2(tdengine.ffi.dn_window_get_native_resolution())
+function doublenickel.window.dn_window_get_native_resolution()
+	return doublenickel.vec2(dn.window_get_native_resolution())
 end

@@ -56,7 +56,7 @@ void dn_log_flags(dn_log_flags_t flags, const char* fmt, ...) {
 }
 
 void dn_log_v(dn_log_flags_t flags, const char* fmt, va_list fmt_args) {
-	uint64 ms_since_epoch = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	u64 ms_since_epoch = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	auto sec_since_epoch = std::time_t(ms_since_epoch / 1000);
 	auto time_info = std::localtime(&sec_since_epoch);
 

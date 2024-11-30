@@ -1,18 +1,18 @@
-Character = tdengine.class.define('Character')
+Character = doublenickel.class.define('Character')
 
 function Character:init(params)
   params = params or {}
 
   self.name = params.name                           or 'jerry_garcia'
   self.display_name = params.display_name           or 'Jerry Garcia'
-  self.color = tdengine.color(params.color)         or tdengine.colors.red:copy()
-  self.body_color = tdengine.color(params.color)    or tdengine.colors.white:copy()
+  self.color = doublenickel.color(params.color)         or doublenickel.colors.red:copy()
+  self.body_color = doublenickel.color(params.color)    or doublenickel.colors.white:copy()
   self.font = params.font                           or 'game'
   self.portrait = params.portrait                   or ''
   self.omit_display_name = params.omit_display_name or false
 end
 
-CharacterEditor = tdengine.editor.define('CharacterEditor')
+CharacterEditor = doublenickel.editor.define('CharacterEditor')
 
 CharacterEditor.popup_kind = {
   edit = 'Edit Character##character_editor'
@@ -27,7 +27,7 @@ function CharacterEditor:init()
   }
   self.popups = Popups:new(popups)
 
-  self.portrait_size = tdengine.vec2(160, 160)
+  self.portrait_size = doublenickel.vec2(160, 160)
   self.character = {}
   self.table_editor = {}
   self:setup_create_character()
@@ -46,7 +46,7 @@ function CharacterEditor:setup_create_character()
 end
 
 function CharacterEditor:edit_character(name)
-  local character_data = tdengine.dialogue.characters[name]
+  local character_data = doublenickel.dialogue.characters[name]
   self.character = Character:new(character_data)
   self.table_editor = imgui.extensions.TableEditor(self.character)
   self.popups:open_popup(self.popup_kind.edit)
@@ -56,13 +56,13 @@ end
 -- POPUPS --
 ------------
 function CharacterEditor:edit_character_popup()
-  local popup_size = tdengine.vec2(600, 800)
-	tdengine.editor.center_next_window(popup_size)
+  local popup_size = doublenickel.vec2(600, 800)
+	doublenickel.editor.center_next_window(popup_size)
 
   local flags = 0
-  flags = bitwise(tdengine.op_or, flags, ffi.C.ImGuiWindowFlags_NoMove)
-  flags = bitwise(tdengine.op_or, flags, ffi.C.ImGuiWindowFlags_NoResize)
-  flags = bitwise(tdengine.op_or, flags, ffi.C.ImGuiWindowFlags_NoCollapse)
+  flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiWindowFlags_NoMove)
+  flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiWindowFlags_NoResize)
+  flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiWindowFlags_NoCollapse)
 
 
   if imgui.BeginPopupModal(self.popup_kind.edit, nil, flags) then
@@ -84,14 +84,14 @@ end
 function CharacterEditor:invalid_popup()
   local sx = 500
   local sy = 150
-  local wx = tdengine.ffi.dn_window_get_content_area().x
+  local wx = dn.window_get_content_area().x
   imgui.SetCursorPosX((wx / 2) - (sx / 2))
   imgui.SetNextWindowSize(sx, sy)
 
   local flags = 0
-  flags = bitwise(tdengine.op_or, flags, ffi.C.ImGuiWindowFlags_NoMove)
-  flags = bitwise(tdengine.op_or, flags, ffi.C.ImGuiWindowFlags_NoResize)
-  flags = bitwise(tdengine.op_or, flags, ffi.C.ImGuiWindowFlags_NoCollapse)
+  flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiWindowFlags_NoMove)
+  flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiWindowFlags_NoResize)
+  flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiWindowFlags_NoCollapse)
 
   if imgui.BeginPopupModal('Invalid Character!', nil, flags) then
     if self.character.name == '' then
@@ -160,8 +160,8 @@ function CharacterEditor:draw_buttons()
       done = true
 
       -- Pull any data out of editor and into table and add it to the list.
-      tdengine.dialogue.characters[self.character.name] = deep_copy_any(self.character)
-      tdengine.module.write_to_named_path('character_info', tdengine.dialogue.characters, tdengine.module.WriteOptions.Pretty)
+      doublenickel.dialogue.characters[self.character.name] = deep_copy_any(self.character)
+      doublenickel.module.write_to_named_path('character_info', doublenickel.dialogue.characters, doublenickel.module.WriteOptions.Pretty)
     end
   end
 

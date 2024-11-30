@@ -1,4 +1,4 @@
-function tdengine.enum.init()
+function doublenickel.enum.init()
 end
 
 local enum_ignore = {
@@ -6,7 +6,7 @@ local enum_ignore = {
 	__metatable = true,
 }
 
-tdengine.internal.enum_value_metatable = {
+doublenickel.internal.enum_value_metatable = {
 	__eq = function(a, b)
 		local type_of_a = type(a)
 		local type_of_b = type(b)
@@ -26,9 +26,9 @@ tdengine.internal.enum_value_metatable = {
 	end,
 }
 
-tdengine.internal.enum_proxy_metatable = {
+doublenickel.internal.enum_proxy_metatable = {
 	__index = function(self, key)
-		local value = rawget(tdengine.enum_data[self.name], key)
+		local value = rawget(doublenickel.enum_data[self.name], key)
 		if not value then return nil end
 
 		return table.deep_copy(value)
@@ -42,17 +42,17 @@ tdengine.internal.enum_proxy_metatable = {
 	end
 }
 
-function tdengine.enum.define(enum_name, values)
+function doublenickel.enum.define(enum_name, values)
 	-- This is what we fill with KVPs for the actual enum values
-	tdengine.enum_data[enum_name] = {}
+	doublenickel.enum_data[enum_name] = {}
 
 	-- This is just a proxy which forwards to the actual data table. We can declare static methods for the enum
 	-- class here; everything else goes to __index
-	tdengine.enums[enum_name] = {
+	doublenickel.enums[enum_name] = {
 		name = enum_name,
 		iterate = function(self)
 			local function iterator()
-				for str, enum in pairs(tdengine.enum_data[enum_name]) do
+				for str, enum in pairs(doublenickel.enum_data[enum_name]) do
 					coroutine.yield(enum, enum:to_string(), enum:to_number())
 				end
 			end
@@ -60,11 +60,11 @@ function tdengine.enum.define(enum_name, values)
 			return coroutine.wrap(iterator)
 		end,
 		match = function(_, other)
-			if not tdengine.enum.is_enum(other) then 
+			if not doublenickel.enum.is_enum(other) then 
 				return false 
 			end
 
-			return tdengine.enums[other.__enum].name == enum_name
+			return doublenickel.enums[other.__enum].name == enum_name
 		end,
 		new = function(self, value)
 			for enum in self:iterate() do
@@ -72,11 +72,11 @@ function tdengine.enum.define(enum_name, values)
 			end
 		end
 	}
-	setmetatable(tdengine.enums[enum_name], tdengine.internal.enum_proxy_metatable)
+	setmetatable(doublenickel.enums[enum_name], doublenickel.internal.enum_proxy_metatable)
 
 	-- These are the entries for each enum value
 	for string_id, value in pairs(values) do
-		tdengine.enum_data[enum_name][string_id] = {
+		doublenickel.enum_data[enum_name][string_id] = {
 			to_string = function()
 				return string_id
 			end,
@@ -95,14 +95,14 @@ function tdengine.enum.define(enum_name, values)
 			__enum = enum_name
 		}
 
-		setmetatable(tdengine.enum_data[enum_name][string_id], tdengine.internal.enum_value_metatable)
+		setmetatable(doublenickel.enum_data[enum_name][string_id], doublenickel.internal.enum_value_metatable)
 	end
 
-	return tdengine.enums[enum_name]
+	return doublenickel.enums[enum_name]
 end
 
-function tdengine.enum.define_from_ctype(ctype)
-	local type_info = tdengine.ffi.typeof(ctype)
+function doublenickel.enum.define_from_ctype(ctype)
+	local type_info = doublenickel.ffi.typeof(ctype)
 
 	local prefix = string.format('%s_', ctype)
 	local values = {}
@@ -111,43 +111,43 @@ function tdengine.enum.define_from_ctype(ctype)
 		values[cleaned_name] = value.value
 	end
 
-	return tdengine.enum.define(ctype, values)
+	return doublenickel.enum.define(ctype, values)
 end
 
-function tdengine.enum.is_enum(v)
+function doublenickel.enum.is_enum(v)
 	if type(v) ~= 'table' then return false end
 	if not v.__enum then return false end
 	return true
 end
 
-function tdengine.enum.load(serialized_enum)
+function doublenickel.enum.load(serialized_enum)
 	if not serialized_enum then return nil end
 
-	local enum_class = tdengine.enum_data[serialized_enum.__enum]
+	local enum_class = doublenickel.enum_data[serialized_enum.__enum]
 	if not enum_class then return nil end
 
 	return enum_class[serialized_enum.value or serialized_enum:to_string()] -- @hack
 end
 
-function tdengine.enum.bitwise_and(...)
+function doublenickel.enum.bitwise_and(...)
 	local args = table.pack(...)
 
 	local result = 0
 	for i = 1, args.n do
 		local enum_value = args[i]
-		result = bitwise(tdengine.op_and, result, enum_value:to_number())
+		result = bitwise(doublenickel.op_and, result, enum_value:to_number())
 	end
 
 	return result
 end
 
-function tdengine.enum.bitwise_or(...)
+function doublenickel.enum.bitwise_or(...)
 	local args = table.pack(...)
 
 	local result = 0
 	for i = 1, args.n do
 		local enum_value = args[i]
-		result = bitwise(tdengine.op_or, result, enum_value:to_number())
+		result = bitwise(doublenickel.op_or, result, enum_value:to_number())
 	end
 
 	return result

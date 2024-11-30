@@ -1,15 +1,15 @@
-#define SDF_CIRCLE 0
-#define SDF_RING 1
-#define SDF_BOX 2   
-#define SDF_ORIENTED_BOX 3
-#define SDF_COMBINE 100
+#define DN_SDF_CIRCLE 0
+#define DN_SDF_RING 1
+#define DN_SDF_BOX 2   
+#define DN_SDF_ORIENTED_BOX 3
+#define DN_SDF_COMBINE 100
 
-#define SDF_COMBINE_OP_UNION 0
-#define SDF_COMBINE_OP_INTERSECTION 1
-#define SDF_COMBINE_OP_SUBTRACTION 2
+#define DN_SDF_COMBINE_OP_UNION 0
+#define DN_SDF_COMBINE_OP_INTERSECTION 1
+#define DN_SDF_COMBINE_OP_SUBTRACTION 2
 
-#define SDF_SMOOTH_KERNEL_NONE 0
-#define SDF_SMOOTH_KERNEL_POLYNOMIAL_QUADRATIC 1
+#define DN_SDF_SMOOTH_KERNEL_NONE 0
+#define DN_SDF_SMOOTH_KERNEL_POLYNOMIAL_QUADRATIC 1
 
 layout (std430, binding = 0) readonly buffer SdfBuffer {
     float sdf_data [];
@@ -157,10 +157,10 @@ dn_sdf_combine_entry_t pull_sdf_combine_entry(inout uint index) {
 // SDF OPERATIONS //
 ////////////////////
 float sdf_op_union(float a, float b, uint kernel) {
-    if (kernel == SDF_SMOOTH_KERNEL_NONE) {
+    if (kernel == DN_SDF_SMOOTH_KERNEL_NONE) {
         return min(a, b);
     }
-    else if (kernel == SDF_SMOOTH_KERNEL_POLYNOMIAL_QUADRATIC) {
+    else if (kernel == DN_SDF_SMOOTH_KERNEL_POLYNOMIAL_QUADRATIC) {
         float k = 8.0;
         float h = clamp( 0.5 + 0.5*(b-a)/k, 0.0, 1.0 );
         return mix( b, a, h ) - k*h*(1.0-h);
@@ -169,10 +169,10 @@ float sdf_op_union(float a, float b, uint kernel) {
 }
 
 float sdf_op_subtraction(float a, float b, uint kernel) {
-    if (kernel == SDF_SMOOTH_KERNEL_NONE) {
+    if (kernel == DN_SDF_SMOOTH_KERNEL_NONE) {
         return max(-a, b);
     }
-    else if (kernel == SDF_SMOOTH_KERNEL_POLYNOMIAL_QUADRATIC) {
+    else if (kernel == DN_SDF_SMOOTH_KERNEL_POLYNOMIAL_QUADRATIC) {
         float k = 4.0;
         float h = clamp( 0.5 - 0.5*(b + a)/k, 0.0, 1.0 );
         return mix( b, -a, h ) + k*h*(1.0-h);
@@ -181,10 +181,10 @@ float sdf_op_subtraction(float a, float b, uint kernel) {
 }
 
 float sdf_op_intersection(float a, float b, uint kernel) {
-    if (kernel == SDF_SMOOTH_KERNEL_NONE) {
+    if (kernel == DN_SDF_SMOOTH_KERNEL_NONE) {
         return max(a, b);
     }
-    else if (kernel == SDF_SMOOTH_KERNEL_POLYNOMIAL_QUADRATIC) {
+    else if (kernel == DN_SDF_SMOOTH_KERNEL_POLYNOMIAL_QUADRATIC) {
         float k = 4.0;
         float h = clamp( 0.5 - 0.5*(b - 1)/k, 0.0, 1.0 );
         return mix( b, a, h ) + k*h*(1.0-h);

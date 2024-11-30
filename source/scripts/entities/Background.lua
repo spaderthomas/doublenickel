@@ -1,9 +1,9 @@
 -- POINT
 -- A small utility for moving to the correct location when advancing by a tile
-local BackgroundPoint = tdengine.class.define('BackgroundPoint')
+local BackgroundPoint = doublenickel.class.define('BackgroundPoint')
 function BackgroundPoint:init()
-  self.base_position = tdengine.vec2()
-  self.position = tdengine.vec2()
+  self.base_position = doublenickel.vec2()
+  self.position = doublenickel.vec2()
   self.width = 0
   self.zoom = 1
 end
@@ -27,7 +27,7 @@ function BackgroundPoint:advance()
 end
 
 -- BACKGROUND
-Background = tdengine.entity.define('Background')
+Background = doublenickel.entity.define('Background')
 Background.components = {}
 Background.editor_fields = {
   'background',
@@ -39,14 +39,14 @@ function Background:init(params)
   self.background = params.background or 'computer'
   self.point = BackgroundPoint:new()
   self.zoom = params.zoom or 1
-  self.base_position = tdengine.vec2()
+  self.base_position = doublenickel.vec2()
   self.__enabled = ternary(params.__enabled, true, false)
 end
 
 function Background:draw(dt)
   if not self.__enabled then return end
 
-  local data = tdengine.background.find(self.background)
+  local data = doublenickel.background.find(self.background)
   if not data then return end
 
   -- Reset the point. This is really just an editor thing, because if we change what image this
@@ -56,15 +56,15 @@ function Background:draw(dt)
   self.point.zoom = self.zoom
 
   local options = {
-    --size = tdengine.vec2(1024 * self.zoom, 1024 * self.zoom)
-    size = tdengine.vec2(2048 * self.zoom, 2048 * self.zoom),
+    --size = doublenickel.vec2(1024 * self.zoom, 1024 * self.zoom)
+    size = doublenickel.vec2(2048 * self.zoom, 2048 * self.zoom),
     opacity = self.opacity or 1
   }
 
-  tdengine.ffi.set_world_space(true)
-  tdengine.ffi.set_layer(self.layer or tdengine.layers.background)
+  doublenickel.ffi.set_world_space(true)
+  doublenickel.ffi.set_layer(self.layer or doublenickel.layers.background)
   for index, tile in pairs(data.tiles) do
-    tdengine.ffi.draw_image_l(tile, self.point.position, options)
+    doublenickel.ffi.draw_image_l(tile, self.point.position, options)
     self.point:advance()
   end
 end

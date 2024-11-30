@@ -5,15 +5,15 @@ local do_once = {
   target = 0
 }
 
-function tdengine.debug.assert(expression)
+function doublenickel.debug.assert(expression)
   if not expression then dbg() end
 end
 
-function tdengine.debug.do_once(f, ...)
-  tdengine.debug.do_n_times(f, 1, ...)
+function doublenickel.debug.do_once(f, ...)
+  doublenickel.debug.do_n_times(f, 1, ...)
 end
 
-function tdengine.debug.do_n_times(f, n, ...)
+function doublenickel.debug.do_n_times(f, n, ...)
   local info = debug.getinfo(f)
 
   -- Is this the first time we called this specific function with these
@@ -44,11 +44,11 @@ function tdengine.debug.do_n_times(f, n, ...)
 end
 
 function d()
-  local controller = tdengine.dialogue.controller
+  local controller = doublenickel.dialogue.controller
   controller.state = 'idle'
 end
 
-function tdengine.debug.open_debugger(stack_depth)
+function doublenickel.debug.open_debugger(stack_depth)
   stack_depth = stack_depth or 0
   dbg(false, stack_depth + 1) -- @refactor
 end

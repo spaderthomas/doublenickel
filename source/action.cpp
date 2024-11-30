@@ -82,7 +82,7 @@ void SteamInputManager::register_actions() {
 	steam->RunFrame();
 
 	auto l = dn_lua.state;
-	lua_getglobal(l, "tdengine");
+	lua_getglobal(l, "doublenickel");
 	lua_pushstring(l, "action");
 	lua_gettable(l, -2);
 	lua_pushstring(l, "init");
@@ -263,7 +263,7 @@ void activate_action_set(const char* name) {
 	steam_input.action_set_cooldown = SteamInputManager::action_set_cooldown_max;
 }
 
-int32 get_action_set_cooldown() {
+i32 get_action_set_cooldown() {
 	return steam_input.action_set_cooldown;
 }
 
