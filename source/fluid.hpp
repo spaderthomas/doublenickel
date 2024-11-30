@@ -23,7 +23,7 @@ namespace LagrangianFluidSim {
 	};
 	
 	struct Particle {
-		 Vector4 color;
+		 dn_vector4_t color;
 		 dn_vector2_t position;
 		 dn_vector2_t predicted_position;
 		 dn_vector2_t velocity;

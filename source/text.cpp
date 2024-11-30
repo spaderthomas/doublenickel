@@ -33,7 +33,7 @@ void dn_prepared_text_t::set_offset(float32 offset) {
 	this->offset = offset;
 }
 
-void dn_prepared_text_t::set_color(Vector4 color) {
+void dn_prepared_text_t::set_color(dn_vector4_t color) {
 	this->color = color;
 }
 
@@ -86,7 +86,7 @@ dn_prepared_text_t* dn_prepare_text_wrap(const char* text, float32 px, float32 p
 	return dn_prepare_text_ex(text, px, py, font, wrap, dn_colors::white, true);
 }
 
-dn_prepared_text_t* dn_prepare_text_ex(const char* text, float32 px, float32 py, dn_baked_font_t* font, float32 wrap, Vector4 color, bool precise) {
+dn_prepared_text_t* dn_prepare_text_ex(const char* text, float32 px, float32 py, dn_baked_font_t* font, float32 wrap, dn_vector4_t color, bool precise) {
 	if (!text) return nullptr;
 	
 	auto prepared_text = dn::allocator::alloc<dn_prepared_text_t>(&dn_allocators.bump, 1);

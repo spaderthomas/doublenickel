@@ -2,11 +2,11 @@
 #define DN_IMGUI_H
 
 typedef struct {
-  Vector4 light;
-  Vector4 medium_light;
-  Vector4 low_light;
-  Vector4 neutral;
-  Vector4 medium_dark;
+  dn_vector4_t light;
+  dn_vector4_t medium_light;
+  dn_vector4_t low_light;
+  dn_vector4_t neutral;
+  dn_vector4_t medium_dark;
 } dn_imgui_colors_t;
 
 typedef struct {

@@ -44,7 +44,7 @@ function doublenickel.color(r, g, b, a)
 				return self:to_vec4()
 			end,
 			to_vec4 = function(self)
-				return ffi.new('Vector4', self.r, self.g, self.b, self.a)
+				return ffi.new('dn_vector4_t', self.r, self.g, self.b, self.a)
 			end,
 			to_vec3 = function(self)
 				return Vector3:new(self.r, self.g, self.b)
@@ -106,7 +106,7 @@ function doublenickel.color32(r, g, b, a)
 end
 
 function doublenickel.color_to_vec4(color)
-	return ffi.new('Vector4', color.r, color.g, color.b, color.a)
+	return ffi.new('dn_vector4_t', color.r, color.g, color.b, color.a)
 end
 
 function doublenickel.coherent_random_color()

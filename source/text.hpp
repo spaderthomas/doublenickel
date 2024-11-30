@@ -6,7 +6,7 @@ struct dn_prepared_text_t {
 	char text [MAX_TEXT_LEN] = { 0 };
 	dn_vector2_t position;
 	dn_vector2_t padding;
-	Vector4 color;
+	dn_vector4_t color;
 	dn_baked_font_t* font;
 	float wrap;
 	float offset;
@@ -36,7 +36,7 @@ struct dn_prepared_text_t {
 	void set_wrap(float wrap);
 	void set_position(float x, float y);
 	void set_offset(float offset);
-	void set_color(Vector4 color);
+	void set_color(dn_vector4_t color);
 	void set_precision(bool precision);
 	bool is_empty();
 	i32 count_breaks();
@@ -48,7 +48,7 @@ struct dn_prepared_text_t {
 
 DN_API dn_prepared_text_t* dn_prepare_text(const char* text, float px, float py, dn_baked_font_t* font);
 DN_API dn_prepared_text_t* dn_prepare_text_wrap(const char* text, float px, float py, dn_baked_font_t* font, float wrap);
-DN_API dn_prepared_text_t* dn_prepare_text_ex(const char* text, float px, float py, dn_baked_font_t* font, float wrap, Vector4 color, bool precise);
+DN_API dn_prepared_text_t* dn_prepare_text_ex(const char* text, float px, float py, dn_baked_font_t* font, float wrap, dn_vector4_t color, bool precise);
 
 struct LineBreakContext {
 	// Input

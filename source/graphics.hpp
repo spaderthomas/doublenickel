@@ -149,8 +149,8 @@ typedef union {
   Matrix4 mat4;
   Matrix3 mat3;
   Matrix2 mat2;
-  Vector4 vec4;
-  Vector3 vec3;
+  dn_vector4_t vec4;
+  dn_vector3_t vec3;
   dn_vector2_t vec2;
   float f32;
   i32 texture;

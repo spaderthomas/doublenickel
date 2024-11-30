@@ -610,7 +610,7 @@ function Vector2:scale(scalar)
   return Vector2:new(self.x * scalar, self.y * scalar)
 end
 
-Vector3 = doublenickel.class.metatype('Vector3')
+Vector3 = doublenickel.class.metatype('dn_vector3_t')
 function  Vector3:init(x, y, z)
   self.x = x or self.x
   self.y = y or self.y
@@ -618,7 +618,7 @@ function  Vector3:init(x, y, z)
 end
 
 
-Vector4 = doublenickel.class.metatype('Vector4')
+Vector4 = doublenickel.class.metatype('dn_vector4_t')
 function Vector4:init(x, y, z, w)
   self.x = x or self.x
   self.y = y or self.y

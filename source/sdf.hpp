@@ -58,7 +58,7 @@ typedef struct {
 // SDF SHAPE DATA //
 ////////////////////
 typedef struct {
-  Vector3 color;
+  dn_vector3_t color;
   dn_vector2_t position;
   float rotation;
   float edge_thickness;

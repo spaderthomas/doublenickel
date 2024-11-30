@@ -189,7 +189,7 @@ void set_particle_color(ParticleSystemHandle handle, float r, float g, float b, 
 	auto particle_system = find_particle_system(handle);
 	if (!particle_system) return;
 
-	particle_system->color = Vector4{r, g, b, a};
+	particle_system->color = dn_vector4_t{r, g, b, a};
 }
 
 void set_particle_layer(ParticleSystemHandle handle, int32 layer) {

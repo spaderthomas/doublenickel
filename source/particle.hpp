@@ -33,8 +33,8 @@ struct Particle {
 
 	ParticleKind kind;
 	ParticleData data;
-	Vector4 base_color;
-	Vector4 color;
+	dn_vector4_t base_color;
+	dn_vector4_t color;
 
 	bool occupied = false;
 	Particle* next = nullptr;
@@ -70,7 +70,7 @@ struct ParticleSystem {
 	ParticleQuad quad;
 	ParticleCircle circle;
 	ParticleImage image;
-	Vector4 color;
+	dn_vector4_t color;
 	ParticlePositionMode position_mode;
 	dn_vector2_t position;
 	dn_vector2_t area;

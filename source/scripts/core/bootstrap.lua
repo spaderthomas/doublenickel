@@ -36,14 +36,14 @@ typedef struct {
   float x;
   float y;
   float z;
-} Vector3;
+} dn_vector3_t;
 
 typedef struct {
   float x;
   float y;
   float z;
   float w;
-} Vector4;
+} dn_vector4_t;
 
 typedef struct {
   float data [2] [2];
@@ -408,7 +408,7 @@ typedef struct {
   char text [1024];
   dn_vector2_t position;
   dn_vector2_t padding;
-  Vector4 color;
+  dn_vector4_t color;
   void* font;
   float wrap;
   float offset;
@@ -425,7 +425,7 @@ typedef struct {
 
 dn_prepared_text_t* dn_prepare_text(const char* text, f32 px, f32 py, const char* font);
 dn_prepared_text_t* dn_prepare_text_wrap(const char* text, f32 px, f32 py, const char* font, f32 wrap);
-dn_prepared_text_t* dn_prepare_text_ex(const char* text, f32 px, f32 py, const char* font, f32 wrap, Vector4 color, bool precise);
+dn_prepared_text_t* dn_prepare_text_ex(const char* text, f32 px, f32 py, const char* font, f32 wrap, dn_vector4_t color, bool precise);
 
 typedef enum {
   DN_FONT_FLAG_NONE = 0,
@@ -643,8 +643,8 @@ typedef union {
   Matrix4 mat4;
   Matrix3 mat3;
   Matrix2 mat2;
-  Vector4 vec4;
-  Vector3 vec3;
+  dn_vector4_t vec4;
+  dn_vector3_t vec3;
   dn_vector2_t vec2;
   float f32;
   i32 texture;
@@ -949,7 +949,7 @@ typedef struct {
 // SDF SHAPE DATA //
 ////////////////////
 typedef struct {
-  Vector3 color;
+  dn_vector3_t color;
   dn_vector2_t position;
   float rotation;
   float edge_thickness;
@@ -1006,11 +1006,11 @@ void                     dn_sdf_grid(dn_sdf_renderer_t* renderer, u32 grid_width
 /////////////////////////////////////////
                                    
 typedef struct {
-  Vector4 light;
-  Vector4 medium_light;
-  Vector4 low_light;
-  Vector4 neutral;
-  Vector4 medium_dark;
+  dn_vector4_t light;
+  dn_vector4_t medium_light;
+  dn_vector4_t low_light;
+  dn_vector4_t neutral;
+  dn_vector4_t medium_dark;
 } dn_imgui_colors_t;
 
 void    dn_imgui_push_font(const char* font_name, u32 size);
@@ -1245,23 +1245,23 @@ void write_screenshot_to_png(const char* file_name);
 //
 
 typedef struct {
-  Vector3 position;
-  Vector4 color;
+  dn_vector3_t position;
+  dn_vector4_t color;
   dn_vector2_t uv;
 } Vertex;
 
 
-void draw_quad(dn_vector2_t position, dn_vector2_t size, Vector4 color);
-void draw_line(dn_vector2_t start, dn_vector2_t end, f32 thickness, Vector4 color);
-void draw_circle(f32 px, f32 py, f32 radius, Vector4 color);
-void draw_circle_sdf(f32 px, f32 py, f32 radius, Vector4 color, f32 edge_thickness);
-void draw_ring_sdf(f32 px, f32 py, f32 inner_radius, f32 radius, Vector4 color, f32 edge_thickness);
+void draw_quad(dn_vector2_t position, dn_vector2_t size, dn_vector4_t color);
+void draw_line(dn_vector2_t start, dn_vector2_t end, f32 thickness, dn_vector4_t color);
+void draw_circle(f32 px, f32 py, f32 radius, dn_vector4_t color);
+void draw_circle_sdf(f32 px, f32 py, f32 radius, dn_vector4_t color, f32 edge_thickness);
+void draw_ring_sdf(f32 px, f32 py, f32 inner_radius, f32 radius, dn_vector4_t color, f32 edge_thickness);
 void draw_image(const char* name, f32 px, f32 py);
 void draw_image_size(const char* name, f32 px, f32 py, f32 dx, f32 dy);
 void draw_image_ex(const char* name, float px, float py, float dx, float dy, float opacity);
 void draw_image_pro(u32 texture, f32 px, f32 py, f32 dx, f32 dy, dn_vector2_t* uv, f32 opacity);
 void draw_text(const char* text, f32 px, f32 py);
-void draw_text_ex(const char* text, f32 px, f32 py, Vector4 color, const char* font, f32 wrap);
+void draw_text_ex(const char* text, f32 px, f32 py, dn_vector4_t color, const char* font, f32 wrap);
 void draw_prepared_text(dn_prepared_text_t* text);
 
 u32 find_texture_handle(const char* name);
