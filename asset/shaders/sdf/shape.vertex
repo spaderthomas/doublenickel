@@ -1,0 +1,57 @@
+#include "common.glsl"
+#include "sdf.glsl"
+
+layout (location = 0) in vec2 vertex_position;
+layout (location = 1) in vec2 vertex_uv;
+layout (location = 2) in uvec2 index;
+
+
+out vec2 f_uv;
+out uvec2 f_index;
+
+void main() {
+	SdfIndex sdf_index;
+	sdf_index.shape = index.x;
+	sdf_index.buffer_index = index.y;
+
+	dn_sdf_header_t header = pull_header(sdf_index.buffer_index);
+	if (sdf_index.shape == SDF_CIRCLE) {
+		dn_sdf_circle_t circle = pull_circle(sdf_index.buffer_index);
+
+		mat3 transform_matrix = transformation_matrix(header.position, header.rotation, vec2(circle.radius * 2));
+		vec3 transformed_position = transform_matrix * vec3(vertex_position, 1.0);
+		gl_Position = projection * view * vec4(transformed_position.xy, 1.0, 1.0);
+	}
+	else if (sdf_index.shape == SDF_RING) {
+		dn_sdf_ring_t ring = pull_ring(sdf_index.buffer_index);
+
+		mat3 transform_matrix = transformation_matrix(header.position, header.rotation, vec2(ring.outer_radius * 2));
+		vec3 transformed_position = transform_matrix * vec3(vertex_position, 1.0);
+		gl_Position = projection * view * vec4(transformed_position.xy, 1.0, 1.0);
+	}
+	else if (sdf_index.shape == SDF_ORIENTED_BOX) {
+		dn_sdf_oriented_box_t box = pull_oriented_box(sdf_index.buffer_index);
+
+		mat3 transform_matrix = transformation_matrix(header.position, header.rotation, box.size);
+		vec3 transformed_position = transform_matrix * vec3(vertex_position, 1.0);
+		gl_Position = projection * view * vec4(transformed_position.xy, 1.0, 1.0);
+	}
+	else if (sdf_index.shape == SDF_COMBINE) {
+		vec2 transformed_position = vertex_position * 5000;
+		gl_Position = projection * view * vec4(transformed_position, 1.0, 1.0);
+	}
+
+	else {
+		vec2 transformed_position = vertex_position * 5;
+		gl_Position = projection * view * vec4(transformed_position, 1.0, 1.0);
+	}
+
+
+
+	// f_color = color;
+	f_uv = vertex_uv;
+	f_index = index;
+	// vec2 transformed_position = vertex_position * sdf_index.buffer_index;
+	// gl_Position = projection * view * vec4(transformed_position, 1.0, 1.0);
+
+}

@@ -15,3 +15,4 @@ build/windows/DeepCopy
 build/windows/tdengine.vcxproj.user
 build/linux/firmament
 build/steam
+src/build_info.hpp
