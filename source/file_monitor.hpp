@@ -219,7 +219,7 @@ void FileMonitor::add_change(char* file_path, dn_string_t file_name, dn_file_cha
 
 	// We don't care about directory updates. They're annoying and hard to understand
 	// on Windows, and file updates give us everything we need.
-	if (dn_os_is_directory(file_path)) return;
+	if (dn_os_is_directory(dn_string_literal(file_path))) return;
 
 	// Exclude some annoying files
 	if (file_name.data) {
@@ -243,7 +243,7 @@ void FileMonitor::add_change(char* file_path, dn_string_t file_name, dn_file_cha
 
 	auto change = dn_array_push(&this->changes);
 	change->file_path = file_path;
-	change->file_name = dn_string_to_cstr(file_name, &dn_allocators.bump);
+	change->file_name = dn_string_to_cstr_ex(file_name, &dn_allocators.bump);
 	change->events = events;
 	change->time = time;
 }

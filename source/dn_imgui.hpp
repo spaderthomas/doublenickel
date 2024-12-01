@@ -187,6 +187,6 @@ dn_tstring_t dn_imgui_file_browser_get_selected_file() {
   std::string selected = dn_imgui_file_browser.GetSelected().string();
   dn_imgui_file_browser.ClearSelected();
 
-  return dn_string_copy(selected, &dn_allocators.bump);
+  return dn_cstr_copy(selected, &dn_allocators.bump);
 }
 #endif

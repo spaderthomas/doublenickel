@@ -1030,6 +1030,10 @@ function dn.os_scan_directory_recursive(path)
   return ffi.C.dn_os_scan_directory_recursive(dn.String:new(path))
 end
 
+function dn.os_does_path_exist(path)
+  return ffi.C.dn_os_does_path_exist(dn.String:new(path))
+end
+
 function doublenickel.ffi.set_camera()
 end
 

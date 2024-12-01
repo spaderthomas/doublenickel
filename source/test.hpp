@@ -188,7 +188,9 @@ void dn_dynamic_array_test() {
 }
 
 void dn_bump_allocator_test() {
+  dn_bump_allocator_clear(&dn_allocators.bump);
   dn_allocator_t* allocator = &dn_allocators.bump;
+
 
   auto memory_block = (u32*)dn_allocator_alloc(allocator, sizeof(u32) * 8);
   memory_block[0] = 69;
@@ -209,10 +211,119 @@ void dn_path_test() {
   ));
 }
 
+void dn_string_test() {
+  typedef struct {
+    dn_string_t jerry;
+    dn_string_t garcia;
+    const char* jerry_cstr;
+    std::string jerry_std;
+  } dn_strings_t;
+
+  dn_strings_t data = {
+    .jerry  = dn_string_literal("jerry garcia"),
+    .garcia = dn_string_literal("jerry garcia"),
+    .jerry_cstr = "jerry garcia",
+    .jerry_std = std::string("jerry garcia"),
+  };
+
+  DN_ASSERT(data.jerry.len == strlen(data.jerry_cstr));
+
+  // u32                dn_cstr_len(const char* str);
+  DN_ASSERT(dn_cstr_len(data.jerry_cstr) == 12);
+
+  // bool               dn_cstr_equal(const char* a, const char* b);
+  DN_ASSERT(dn_cstr_equal(data.jerry_cstr, data.jerry_cstr));
+
+  // DN_API bool        dn_string_equal(dn_string_t a, dn_string_t b);
+  DN_ASSERT(dn_string_equal(data.jerry, data.garcia));
+
+  // DN_API bool        dn_string_equal_cstr(dn_string_t a, const char* b);
+  DN_ASSERT(dn_string_equal_cstr(data.jerry, data.jerry_cstr));
+
+  // DN_API dn_string_t dn_string_copy(dn_string_t str, dn_allocator_t* allocator);
+  dn_string_t jerry_from_dn = dn_string_copy(data.jerry,  &dn_allocators.bump);
+  DN_ASSERT(dn_string_equal(data.jerry, jerry_from_dn));
+
+  // DN_API dn_string_t dn_string_copy_cstr(const char* str, dn_allocator_t* allocator);
+  dn_string_t jerry_from_cstr = dn_string_copy_cstr(data.jerry_cstr,  &dn_allocators.bump);
+  DN_ASSERT(dn_string_equal(data.jerry, jerry_from_cstr));
+
+  // DN_API dn_string_t dn_string_copy_std(const std::string& str, dn_allocator_t* allocator);
+  dn_string_t jerry_from_std = dn_string_copy_std(data.jerry_std,  &dn_allocators.bump);
+  DN_ASSERT(dn_string_equal(data.jerry, jerry_from_std));
+
+  // DN_API char*       dn_string_to_cstr_ex(dn_string_t str, dn_allocator_t* allocator);
+  char* jerry_cstr = dn_string_to_cstr_ex(data.jerry, &dn_allocators.bump);
+  DN_ASSERT(dn_cstr_len(jerry_cstr) == dn_cstr_len(data.jerry_cstr));
+  DN_ASSERT(dn_cstr_equal(jerry_cstr, data.jerry_cstr));
+
+  // DN_IMP char*       dn_cstr_copy(const char* str, u32 length, dn_allocator_t* allocator = nullptr);
+  // DN_IMP char*       dn_cstr_copy(const char* str, dn_allocator_t* allocator = nullptr);
+  // DN_IMP char*       dn_cstr_copy(const std::string& str, dn_allocator_t* allocator = nullptr);
+  // DN_IMP char*       dn_cstr_copy_u8(const u8* str, u32 length, dn_allocator_t* allocator = nullptr);
+  // DN_API void        dn_cstr_copy(const char* str, char* buffer, u32 buffer_length);
+  // DN_API void        dn_cstr_copy_n(const char* str, u32 length, char* buffer, u32 buffer_length);
+}
+
+void dn_string_builder_test() {
+  // DN_API void        dn_string_builder_grow(dn_string_builder_t* builder);
+  dn_test_scope(dn_string_builder_grow, {
+    dn_string_builder_t builder = { .buffer = dn_zero_initialize(), .allocator = &dn_allocators.bump };
+    dn_string_builder_grow(&builder, 32);
+    DN_ASSERT(builder.buffer.capacity >= 32);
+    dn_string_builder_grow(&builder, 8);
+    DN_ASSERT(builder.buffer.capacity >= 32);
+    dn_string_builder_grow(&builder, 64);
+    DN_ASSERT(builder.buffer.capacity >= 64);
+  });
+
+
+  // DN_API void        dn_string_builder_append(dn_string_builder_t* builder, dn_string_t str);
+  // DN_API void        dn_string_builder_append_cstr(dn_string_builder_t* builder, const char* str);
+  // DN_API dn_string_t dn_string_builder_write(dn_string_builder_t* builder);
+  dn_test_scope(dn_string_builder_append, {
+    dn_string_builder_t builder = { .buffer = dn_zero_initialize(), .allocator = &dn_allocators.bump };
+    dn_string_builder_append(&builder, dn_string_literal("jerry"));
+    dn_string_builder_append_cstr(&builder, "/");
+    dn_string_builder_append(&builder, dn_string_literal("garcia"));
+    DN_ASSERT(dn_string_equal(dn_string_builder_write(&builder), dn_string_literal("jerry/garcia")));
+  });
+
+  // DN_API char*       dn_string_builder_write_cstr(dn_string_builder_t* builder);
+  dn_test_scope(dn_string_builder_write_cstr, {
+    dn_string_builder_t builder = { .buffer = dn_zero_initialize(), .allocator = &dn_allocators.bump };
+    dn_string_builder_append(&builder, dn_string_literal("jerry"));
+    DN_ASSERT(dn_cstr_equal(dn_string_builder_write_cstr(&builder), "jerry"));
+  });
+
+  // DN_API void        dn_string_builder_append_fmt(dn_string_builder_t* builder, dn_string_t fmt, ...);
+  dn_test_scope(dn_string_builder_write_fmt, {
+    dn_string_builder_t builder = { .buffer = dn_zero_initialize(), .allocator = &dn_allocators.bump };
+    dn_string_builder_append_fmt(&builder, dn_string_literal("%d:%.2f:%s"), 69, 420.69, "blazeit");
+    DN_ASSERT(dn_string_equal(dn_string_builder_write(&builder), dn_string_literal("69:420.69:blazeit")));
+  });
+}
+
+
+void dn_os_scan_directory_test() {
+  dn_os_create_directory(dn_string_literal("tmp"));
+  dn_os_create_file(dn_string_literal("tmp/jerry"));
+  dn_os_create_file(dn_string_literal("tmp/pigpen"));
+  dn_os_create_file(dn_string_literal("tmp/bobby"));
+  dn_os_create_file(dn_string_literal("tmp/phil"));
+  dn_os_create_file(dn_string_literal("tmp/bill"));
+  dn_os_create_file(dn_string_literal("tmp/keith"));
+  auto entries = dn_os_scan_directory(dn_string_literal("tmp"));
+  DN_ASSERT(entries.count == 6);
+}
+
 void dn_test_init() {
+  dn_string_test();
+  dn_string_builder_test();
   dn_dynamic_array_test();
-  dn_bump_allocator_test();
   dn_gen_arena_test();
+  dn_bump_allocator_test();
+  dn_os_scan_directory_test();
   // test_convert_point();
   dn_path_test();
 }

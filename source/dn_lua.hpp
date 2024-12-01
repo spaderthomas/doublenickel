@@ -272,12 +272,11 @@ void dn_lua_script_dir(const char* path) {
     auto entry = dn_array_push(&directory_entries);
     entry->occupied = true;
 
-    auto dir_path = it->path().string();
-    entry->path = dn_string_copy(dir_path, &dn_allocators.bump);
+    auto path = dn_string_copy_std(it->path().string(), &dn_allocators.bump);
+    entry->is_regular_file = dn_os_is_regular_file(path);
+    entry->is_directory = dn_os_is_directory(path);
+    entry->path = dn_string_to_cstr_ex(path, &dn_allocators.bump);
     dn_path_normalize_cstr(entry->path);
-
-    entry->is_regular_file = dn_os_is_regular_file(entry->path);
-    entry->is_directory = dn_os_is_directory(entry->path);
   }
 
   auto compare_subpaths = [](const void* va, const void* vb) {
@@ -353,7 +352,7 @@ void dn_lua_dump_stack () {
 }
 
 void dn_lua_add_dir(const char* directory) {
-  auto copy = dn_string_copy(directory, &dn_allocators.standard);
+  auto copy = dn_cstr_copy(directory, &dn_allocators.standard);
   dn_array_push(&dn_lua.script_dirs, copy);
 }
 #endif

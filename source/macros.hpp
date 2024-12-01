@@ -22,12 +22,16 @@
 #define dn_align(n) __declspec(align(n))
 #define DN_ASSERT(condition) assert(condition)
 #define DN_UNTESTED() DN_ASSERT(false)
+#define DN_UNREACHABLE() DN_ASSERT(false)
+#define DN_BROKEN() DN_ASSERT(false)
 
 #define dn_zero_initialize() { 0 }
 
 #define dn_type_name(t) (#t)
 
 #define dn_enum_flags(t) DEFINE_ENUM_FLAG_OPERATORS(t)
+
+#define dn_test_scope(name, ...) do { __VA_ARGS__ } while(false);
 
 // Defer works by using (abusing...?) RAII; define a struct which holds a function and calls
 // that function in its destructor. Then, use __LINE__ to make an instance of that struct with

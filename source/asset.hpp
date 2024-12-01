@@ -227,7 +227,7 @@ dn_asset_data_t dn_assets_find(const char* name) {
 }
 
 void dn_asset_copy_name(const char* source, dn_asset_name_t dest) {
-  dn_string_copy(source, dest, DN_ASSET_NAME_LEN);
+  dn_cstr_copy(source, dest, DN_ASSET_NAME_LEN);
 }
 
 

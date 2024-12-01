@@ -993,7 +993,7 @@ dn_gpu_shader_t* dn_gpu_shader_find(const char* name) {
 // SHADER LOADING //
 ////////////////////
 dn_tstring_t build_shader_source(const char* file_path) {
-  auto shader_file = dn_string_copy(file_path, &dn_allocators.bump);
+  auto shader_file = dn_cstr_copy(file_path, &dn_allocators.bump);
   auto error = dn::allocator::alloc<char>(&dn_allocators.bump, 256);
   
   dn_preprocessor_context_t context = {
@@ -1007,10 +1007,10 @@ dn_tstring_t build_shader_source(const char* file_path) {
 
   if (!context.result) {
     dn_log("shader preprocessor error; shader = %s, err = %s", shader_file, context.error);
-    return dn_string_copy("YOUR_SHADER_FAILED_TO_COMPILE", &dn_allocators.bump);
+    return dn_cstr_copy("YOUR_SHADER_FAILED_TO_COMPILE", &dn_allocators.bump);
   }
   
-  auto source = dn_string_copy(context.result, &dn_allocators.bump);
+  auto source = dn_cstr_copy(context.result, &dn_allocators.bump);
   
   return source;
 }
@@ -1050,8 +1050,8 @@ void dn_gpu_shader_init(dn_gpu_shader_t* shader, dn_gpu_shader_descriptor_t desc
   switch (descriptor.kind) {
     case DN_GPU_SHADER_COMPUTE: {
       shader->kind = DN_GPU_SHADER_COMPUTE;
-      dn_string_copy(descriptor.name, shader->name, DN_ASSET_NAME_LEN);
-      shader->compute.path = dn_string_copy(descriptor.compute_shader);
+      dn_cstr_copy(descriptor.name, shader->name, DN_ASSET_NAME_LEN);
+      shader->compute.path = dn_cstr_copy(descriptor.compute_shader);
       auto source = build_shader_source(shader->compute.path);
 
       u32 num_shaders = 1;
@@ -1068,9 +1068,9 @@ void dn_gpu_shader_init(dn_gpu_shader_t* shader, dn_gpu_shader_descriptor_t desc
     } break;
     case DN_GPU_SHADER_GRAPHICS: {
       shader->kind = DN_GPU_SHADER_GRAPHICS;
-      dn_string_copy(descriptor.name, shader->name, DN_ASSET_NAME_LEN);
-      shader->graphics.vertex_path = dn_string_copy(descriptor.vertex_shader);
-      shader->graphics.fragment_path = dn_string_copy(descriptor.fragment_shader);
+      dn_cstr_copy(descriptor.name, shader->name, DN_ASSET_NAME_LEN);
+      shader->graphics.vertex_path = dn_cstr_copy(descriptor.vertex_shader);
+      shader->graphics.fragment_path = dn_cstr_copy(descriptor.fragment_shader);
       
 
       const char* paths[] = {
@@ -1387,16 +1387,16 @@ void dn_gpu_error_clear() {
 dn_tstring_t dn_gpu_error_read() {
   auto error = glGetError();
   if (error == GL_INVALID_ENUM) {
-    return dn_string_copy("GL_INVALID_ENUM", &dn_allocators.bump);
+    return dn_cstr_copy("GL_INVALID_ENUM", &dn_allocators.bump);
   }
   else if (error == GL_INVALID_OPERATION) {
-    return dn_string_copy("GL_INVALID_OPERATION", &dn_allocators.bump);
+    return dn_cstr_copy("GL_INVALID_OPERATION", &dn_allocators.bump);
   }
   else if (error == GL_OUT_OF_MEMORY) {
-    return dn_string_copy("GL_OUT_OF_MEMORY", &dn_allocators.bump);
+    return dn_cstr_copy("GL_OUT_OF_MEMORY", &dn_allocators.bump);
   }
   else if (error == GL_NO_ERROR) {
-    return dn_string_copy("GL_NO_ERROR", &dn_allocators.bump);
+    return dn_cstr_copy("GL_NO_ERROR", &dn_allocators.bump);
   }
 
   return nullptr;

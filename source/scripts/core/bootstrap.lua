@@ -165,7 +165,7 @@ typedef struct {
   u32 count;
 } dn_os_directory_entry_list_t;
 
-bool                         dn_os_does_path_exist(const char* path);
+bool                         dn_os_does_path_exist(dn_string_t path);
 bool                         dn_os_is_regular_file(const char* path);
 bool                         dn_os_is_directory(dn_string_t path);
 void                         dn_os_remove_directory(const char* path);
@@ -232,8 +232,8 @@ typedef struct {
   i32 generation;
 } dn_gen_arena_handle_t;
 
-void dn_string_copy(const char* str, char* buffer, u32 buffer_length);
-void dn_string_copy_n(const char* str, u32 length, char* buffer, u32 buffer_length);
+void dn_cstr_copy(const char* str, char* buffer, u32 buffer_length);
+void dn_cstr_copy_n(const char* str, u32 length, char* buffer, u32 buffer_length);
 
 
 ///////////////////////////////////////////

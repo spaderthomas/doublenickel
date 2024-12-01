@@ -90,7 +90,7 @@ u8* dn_dynamic_array_push(dn_dynamic_array_t* buffer, void* data, u32 count) {
   if (data) dn_os_memory_copy(data, reserved, buffer->element_size * count);
   return reserved;
 }
-obs
+
 u8* dn_dynamic_array_reserve(dn_dynamic_array_t* buffer, u32 count) {
   DN_ASSERT(buffer);
 

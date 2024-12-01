@@ -7,7 +7,6 @@ typedef char dn_path_t [DN_MAX_PATH_LEN];
 DN_API void        dn_path_normalize_cstr(char* str);
 DN_IMP void        dn_path_normalize_std(std::string& str);
 DN_API void        dn_path_from_cstr(dn_path_t path, const char* a);
-DN_API void        dn_path_join(dn_path_t path, const char* a, const char* b);
 DN_API dn_string_t dn_path_strip_extension(const char* file_name);
 DN_API dn_string_t dn_path_extract_file_name(const char* full_path);
 DN_API char*       dn_string_16_to_8(u16* str, u32 length);
@@ -25,15 +24,11 @@ void dn_path_from_cstr(dn_path_t path, const char* a) {
 	snprintf(path, DN_MAX_PATH_LEN, "%s", a);
 }
 
-void dn_path_join(dn_path_t path, const char* a, const char* b) {
-	snprintf(path, DN_MAX_PATH_LEN, "%s/%s", a, b);
-}
-
 bool dn_path_is_extension(std::string_view str, dn_string_t extension) {
 	if (str.size() < extension.len) return false;
 
 	std::string_view extension_view = str.substr(str.size() - extension.len, extension.len);
-	return !extension_view.compare(dn_string_to_cstr(extension, &dn_allocators.bump));
+	return !extension_view.compare(dn_string_to_cstr_ex(extension, &dn_allocators.bump));
 }
 
 
@@ -74,7 +69,7 @@ dn_string_t dn_path_extract_file_name(const char* full_path) {
 	}
 	
 	return {
-		.data = (u8*)dn_string_copy(full_path + index, &dn_allocators.bump),
+		.data = (u8*)dn_cstr_copy(full_path + index, &dn_allocators.bump),
 		.len = (u32)(size - index)
 	};
 }
@@ -87,7 +82,7 @@ char* dn_string_16_to_8(u16* str, u32 length) {
 
 
 dn_string_t dn_path_strip_extension(const char* file_name) {
-	auto stripped = dn_string_copy(file_name, &dn_allocators.bump);
+	auto stripped = dn_cstr_copy(file_name, &dn_allocators.bump);
 	
 	auto length = strlen(stripped);
 	auto period = length;
