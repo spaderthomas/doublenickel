@@ -33,6 +33,7 @@ DN_API bool                         dn_os_is_directory(const char* path);
 DN_API void                         dn_os_remove_directory(const char* path);
 DN_API void                         dn_os_create_directory(const char* path);
 DN_API dn_os_directory_entry_list_t dn_os_scan_directory(const char* path);
+DN_API dn_os_directory_entry_list_t dn_os_scan_directory_recursive(const char* path);
 DN_API dn_os_date_time_t            dn_os_get_date_time();
 DN_API f64                          dn_os_file_mod_time(const char* path);
 DN_API void                         dn_os_memory_copy(const void* source, void* dest, u32 num_bytes);
@@ -114,6 +115,7 @@ dn_os_directory_entry_list_t dn_os_scan_directory(const char* path) {
   };
 }
 
+
 dn_os_date_time_t dn_os_get_date_time() {
   dn_os_date_time_t date_time;
 
@@ -143,12 +145,12 @@ dn_os_date_time_t dn_os_get_date_time() {
 }
 
 f64 dn_os_file_mod_time(const char* file_path) {
-	std::error_code error;
-	auto file_mod_time = std::filesystem::last_write_time(file_path, error);
-	auto file_mod_time_s = std::chrono::time_point_cast<std::chrono::seconds>(file_mod_time);
-	double file_mod_time_epoch = file_mod_time_s.time_since_epoch().count();
-	
-	return file_mod_time_epoch;
+  std::error_code error;
+  auto file_mod_time = std::filesystem::last_write_time(file_path, error);
+  auto file_mod_time_s = std::chrono::time_point_cast<std::chrono::seconds>(file_mod_time);
+  double file_mod_time_epoch = file_mod_time_s.time_since_epoch().count();
+  
+  return file_mod_time_epoch;
 }
 
 dn_os_file_attr_t dn_os_winapi_attr_to_dn_attr(u32 attr) {

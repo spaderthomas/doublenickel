@@ -163,7 +163,7 @@ void dn_imgui_image(const char* image, float sx, float sy) {
   float ymin = sprite->uv[0].y;
   float ymax = sprite->uv[1].y;
 
-  auto texture = find_texture(sprite->texture);
+  auto texture = dn_images_find_texture_by_hash(sprite->texture);
   ImGui::Image((ImTextureID)texture->handle, ImVec2(sx, sy), ImVec2(xmin, ymin), ImVec2(xmax, ymax));
 }
 

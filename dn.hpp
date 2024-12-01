@@ -11,6 +11,7 @@
 #include "source/os.hpp"
 #include "source/array.hpp"
 #include "source/fixed_array.hpp"
+#include "source/dynamic_array.hpp"
 #include "source/ring_buffer.hpp"
 #include "source/arena.hpp"
 #include "source/colors.hpp"
@@ -60,6 +61,8 @@
 #include "source/audio.hpp"
 #define DN_COORDINATE_IMPLEMENTATION
 #include "source/coordinate.hpp"
+#define DN_DYNAMIC_ARRAY_IMPLEMENTATION
+#include "source/dynamic_array.hpp"
 #define DN_ENGINE_IMPLEMENTATION
 #include "source/engine.hpp"
 #define DN_FILE_MONITOR_IMPLEMENTATION
@@ -72,6 +75,10 @@
 #include "source/input.hpp"
 #define DN_GRAPHICS_IMPLEMENTATION
 #include "source/graphics.hpp"
+#define DN_HASH_IMPLEMENTATION
+#include "source/hash.hpp"
+#define DN_IMAGE_IMPLEMENTATION
+#include "source/image.hpp"
 #define DN_IMGUI_IMPLEMENTATION
 #include "source/dn_imgui.hpp"
 #define DN_LOG_IMPLEMENTATION
@@ -108,7 +115,6 @@
 
 #include "source/text.cpp"
 #include "source/background.cpp" // INVERT (I need something to load large images though, in general)
-#include "source/image.cpp" // HALF (Screenshots should be reworked, probably? I'm referencing a named path when I initialize)
 #include "source/fluid.cpp" // GAME
 #include "source/action.cpp" // HALF
 
