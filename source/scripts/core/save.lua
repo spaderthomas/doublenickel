@@ -40,6 +40,7 @@ end
 
 function doublenickel.save.count()
   local save_dir = dn.paths_resolve('saves'):to_interned()
+  -- local entries = dn.os_scan_directory(save_dir)
   local entries = dn.os_scan_directory(save_dir)
   return entries.count
 end

@@ -90,7 +90,7 @@ u8* dn_dynamic_array_push(dn_dynamic_array_t* buffer, void* data, u32 count) {
   if (data) dn_os_memory_copy(data, reserved, buffer->element_size * count);
   return reserved;
 }
-
+obs
 u8* dn_dynamic_array_reserve(dn_dynamic_array_t* buffer, u32 count) {
   DN_ASSERT(buffer);
 
@@ -117,6 +117,7 @@ void dn_dynamic_array_grow(dn_dynamic_array_t* buffer, u32 capacity) {
   DN_ASSERT(buffer);
 
   if (buffer->capacity >= capacity) return;
-  buffer->data = (u8*)dn_allocator_realloc(buffer->allocator, buffer->data, capacity);
+  buffer->capacity = dn_max(buffer->capacity * 2, capacity);
+  buffer->data = (u8*)dn_allocator_realloc(buffer->allocator, buffer->data, buffer->capacity);
 }
 #endif

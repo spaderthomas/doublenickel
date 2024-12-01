@@ -180,7 +180,7 @@ void dn_assets_init(dn_asset_config_t user_config) {
     {
       .importers = {
         .data = default_importers,
-        .count = DN_ARR_LEN(default_importers)
+        .count = dn_arr_len(default_importers)
       }
     },
     user_config

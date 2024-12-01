@@ -167,7 +167,7 @@ typedef struct {
 
 bool                         dn_os_does_path_exist(const char* path);
 bool                         dn_os_is_regular_file(const char* path);
-bool                         dn_os_is_directory(const char* path);
+bool                         dn_os_is_directory(dn_string_t path);
 void                         dn_os_remove_directory(const char* path);
 void                         dn_os_create_directory(const char* path);
 dn_os_directory_entry_list_t dn_os_scan_directory(const char* path);

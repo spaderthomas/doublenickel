@@ -166,10 +166,25 @@ void dn_gen_arena_test() {
 void dn_dynamic_array_test() {
   dn_dynamic_array<u32> array;
   dn::dynamic_array::init(&array, &dn_allocators.bump);
-  DN_ASSERT(array.capacity == 2);
+  DN_ASSERT(array.size == 0);
 
   dn::dynamic_array::push(&array, 32u);
   dn::dynamic_array::push(&array, 420u);
+  DN_ASSERT(*dn::dynamic_array::at(&array, 0) == 32u);
+  DN_ASSERT(*dn::dynamic_array::at(&array, 1) == 420u);
+  DN_ASSERT(array.size == 2);
+  DN_ASSERT(array.capacity >= 2);
+
+  dn::dynamic_array::push(&array, 69u);
+  dn::dynamic_array::push(&array, 69420u);
+  dn::dynamic_array::push(&array, 42069u);
+  dn::dynamic_array::push(&array, 690u);
+  DN_ASSERT(array.size == 6);
+  DN_ASSERT(array.capacity >= 6);
+  DN_ASSERT(*dn::dynamic_array::at(&array, 2) == 69u);
+  DN_ASSERT(*dn::dynamic_array::at(&array, 3) == 69420u);
+  DN_ASSERT(*dn::dynamic_array::at(&array, 4) == 42069u);
+  DN_ASSERT(*dn::dynamic_array::at(&array, 5) == 690u);
 }
 
 void dn_bump_allocator_test() {
@@ -195,6 +210,7 @@ void dn_path_test() {
 }
 
 void dn_test_init() {
+  dn_dynamic_array_test();
   dn_bump_allocator_test();
   dn_gen_arena_test();
   // test_convert_point();

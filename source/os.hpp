@@ -29,11 +29,11 @@ typedef struct {
 
 DN_API bool                         dn_os_does_path_exist(const char* path);
 DN_API bool                         dn_os_is_regular_file(const char* path);
-DN_API bool                         dn_os_is_directory(const char* path);
+DN_API bool                         dn_os_is_directory(dn_string_t path);
 DN_API void                         dn_os_remove_directory(const char* path);
 DN_API void                         dn_os_create_directory(const char* path);
-DN_API dn_os_directory_entry_list_t dn_os_scan_directory(const char* path);
-DN_API dn_os_directory_entry_list_t dn_os_scan_directory_recursive(const char* path);
+DN_API dn_os_directory_entry_list_t dn_os_scan_directory(dn_string_t path);
+DN_API dn_os_directory_entry_list_t dn_os_scan_directory_recursive(dn_string_t path);
 DN_API dn_os_date_time_t            dn_os_get_date_time();
 DN_API f64                          dn_os_file_mod_time(const char* path);
 DN_API void                         dn_os_memory_copy(const void* source, void* dest, u32 num_bytes);
@@ -58,8 +58,8 @@ bool dn_os_is_regular_file(const char* path) {
   return !(attribute & FILE_ATTRIBUTE_DIRECTORY);
 }
 
-bool dn_os_is_directory(const char* path) {
-  auto attribute = GetFileAttributesA(path);
+bool dn_os_is_directory(dn_string_t path) {
+  auto attribute = GetFileAttributesA(dn_string_to_cstr(path));
   if (attribute == INVALID_FILE_ATTRIBUTES) return false;
   return attribute & FILE_ATTRIBUTE_DIRECTORY;
 }
@@ -76,13 +76,13 @@ void dn_os_create_directory(const char* path) {
   }
 }
 
-dn_os_directory_entry_list_t dn_os_scan_directory(const char* path) {
+dn_os_directory_entry_list_t dn_os_scan_directory(dn_string_t path) {
   if (!dn_os_is_directory(path) || !dn_os_does_path_exist(path)) {
     return dn_zero_initialize();
   }
 
-  dn_fixed_array<dn_os_directory_entry_t, 256> entries;
-  dn::fixed_array::init(&entries, &dn_allocators.bump);
+  dn_dynamic_array<dn_os_directory_entry_t> entries;
+  dn::dynamic_array::init(&entries, &dn_allocators.bump);
 
   dn_path_t glob = dn_zero_initialize();
   snprintf(glob, DN_MAX_PATH_LEN, "%s/*", path);
@@ -99,12 +99,11 @@ dn_os_directory_entry_list_t dn_os_scan_directory(const char* path) {
     
     dn_path_t file_path;
     dn_path_join(file_path, path, find_data.cFileName);
-    dn_os_directory_entry_t entry = {
+    dn::dynamic_array::push(&entries, {
       .file_path = dn_string_copy(file_path, &dn_allocators.bump),
       .file_name = dn_string_copy(find_data.cFileName, &dn_allocators.bump),
       .attributes = dn_os_winapi_attr_to_dn_attr(GetFileAttributesA(file_path)),
-    };
-    dn::fixed_array::push(&entries, &entry, 1);
+    });
   } while (FindNextFile(handle, &find_data));
 
   FindClose(handle);
@@ -115,6 +114,32 @@ dn_os_directory_entry_list_t dn_os_scan_directory(const char* path) {
   };
 }
 
+dn_os_directory_entry_list_t dn_os_scan_directory_recursive(const char* path) {
+  if (!dn_os_is_directory(path) || !dn_os_does_path_exist(path)) {
+    return dn_zero_initialize();
+  }
+
+  // A queue of directories and child directories to scan
+  dn_dynamic_array<dn_os_directory_entry_t> directory_queue;
+  dn::dynamic_array::init(&directory_queue, &dn_allocators.bump);
+  dn::dynamic_array::push(&directory_queue, {
+    .file_path = dn_string_copy(dn_string_literal(path)),
+    .file_name = dn_zero_initialize(),
+    .attributes = DN_OS_FILE_ATTR_DIRECTORY
+  });
+
+  // The final list of all files
+  dn_dynamic_array<dn_os_directory_entry_t> entries;
+  dn::dynamic_array::init(&entries, &dn_allocators.bump);
+
+  u32 process_index = 0;
+  do {
+    auto directory = dn::dynamic_array::at(&directory_queue, process_index);
+    auto directory_entries = dn_os_scan_directory()
+  } while (directory_queue.size > ++process_index);
+
+  dn_os_directory_entry_list_t entries = dn_os_scan_directory(path);
+}
 
 dn_os_date_time_t dn_os_get_date_time() {
   dn_os_date_time_t date_time;

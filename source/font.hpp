@@ -110,7 +110,7 @@ void dn_font_init(dn_font_config_t config) {
       .flags = DN_FONT_FLAG_IMGUI
     }
   };
-  dn_font_bake_n(engine_fonts, DN_ARR_LEN(engine_fonts));
+  dn_font_bake_n(engine_fonts, dn_arr_len(engine_fonts));
   dn_font_bake_n(config.fonts, config.num_fonts);
 }
 

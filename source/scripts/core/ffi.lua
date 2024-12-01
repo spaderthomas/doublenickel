@@ -503,6 +503,16 @@ end
 -- METATYPES -- 
 ---------------
 
+------------
+-- STRING --
+------------
+
+dn.String = doublenickel.class.metatype('dn_string_t')
+function dn.String:init(path)
+  self.data = ffi.cast('u8*', path)
+  self.len = #path
+end
+
 ----------------------
 -- MEMORY ALLOCATOR --
 ----------------------
@@ -1010,6 +1020,14 @@ end
 ------------------
 function dn.window_get_display_mode()
   return doublenickel.enums.DisplayMode(ffi.C.dn_window_get_display_mode())
+end
+
+function dn.os_scan_directory(path)
+  return ffi.C.dn_os_scan_directory(dn.String:new(path))
+end
+
+function dn.os_scan_directory_recursive(path)
+  return ffi.C.dn_os_scan_directory_recursive(dn.String:new(path))
 end
 
 function doublenickel.ffi.set_camera()

@@ -1,7 +1,7 @@
-#define DN_MAX(a, b) (a) > (b) ? (a) : (b)
-#define DN_MIN(a, b) (a) > (b) ? (b) : (a)
+#define dn_max(a, b) (a) > (b) ? (a) : (b)
+#define dn_min(a, b) (a) > (b) ? (b) : (a)
 
-#define DN_ARR_LEN(carray) (sizeof((carray)) / sizeof((carray)[0]))
+#define dn_arr_len(carray) (sizeof((carray)) / sizeof((carray)[0]))
 
 #define dn_macro_str(x) #x
 #define _dn_macro_cat(x, y) x##y
@@ -9,10 +9,10 @@
 #define dn_unique_name() dn_macro_cat(__dn_unique_name__, __LINE__)
 
 #define dn_for(it, n) for (u32 it = 0; it < (n); it++)
-#define dn_for_arr(arr, it) for (u32 it = 0; it < DN_ARR_LEN(arr); it++)
+#define dn_for_arr(arr, it) for (u32 it = 0; it < dn_arr_len(arr); it++)
 #define dn_for_each_n(arr, it, n) for (auto it = (arr); it < (arr) + n; it++)
-#define dn_for_each(arr, it) dn_for_each_n(arr, it, DN_ARR_LEN(arr))
-#define dn_for_anon(arr) for (u32 dn_unique_name() = 0; dn_unique_name() < DN_ARR_LEN(arr); dn_unique_name()++) 
+#define dn_for_each(arr, it) dn_for_each_n(arr, it, dn_arr_len(arr))
+#define dn_for_anon(arr) for (u32 dn_unique_name() = 0; dn_unique_name() < dn_arr_len(arr); dn_unique_name()++) 
 
 #define dn_typedef_fn(return_type, name, ...) typedef return_type(*name)(__VA_ARGS__)
 

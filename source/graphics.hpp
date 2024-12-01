@@ -533,7 +533,7 @@ void dn_gpu_init(dn_gpu_config_t config) {
     dn_paths_resolve("dn_shaders"),
     dn_paths_resolve("dn_shader_includes"),
   };
-  for (u32 i = 0; i < DN_ARR_LEN(default_include_paths); i++) {
+  for (u32 i = 0; i < dn_arr_len(default_include_paths); i++) {
     dn_path_t* path = dn::fixed_array::reserve(&dn_gpu.search_paths, 1);
     dn_path_from_cstr(*path, default_include_paths[i]);
   }
@@ -565,7 +565,7 @@ void dn_gpu_init(dn_gpu_config_t config) {
         .kind = DN_GPU_SHADER_GRAPHICS,
     },
   };
-  for (u32 i = 0; i < DN_ARR_LEN(default_shaders); i++) {
+  for (u32 i = 0; i < dn_arr_len(default_shaders); i++) {
     dn_gpu_shader_create(default_shaders[i]);
   }
 
