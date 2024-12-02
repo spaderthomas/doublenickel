@@ -366,7 +366,7 @@ void dn_string_test() {
   dn_test_end();
 
   // u32                dn_cstr_len(const char* str);
-	dn_test_begin(dn_string_literal("dn_cstr_len"));
+  dn_test_begin(dn_string_literal("dn_cstr_len"));
   dn_test_assert(dn_cstr_len(data.jerry_cstr) == 12);
   dn_test_assert(dn_cstr_len("") == 0);
   dn_test_end();
@@ -443,7 +443,7 @@ void dn_string_builder_test() {
   // DN_API void        dn_string_builder_append(dn_string_builder_t* builder, dn_string_t str);
   // DN_API void        dn_string_builder_append_cstr(dn_string_builder_t* builder, const char* str);
   // DN_API dn_string_t dn_string_builder_write(dn_string_builder_t* builder);
-	dn_test_begin(dn_string_literal("dn_string_builder_append"));
+  dn_test_begin(dn_string_literal("dn_string_builder_append"));
   {
     dn_string_builder_t builder = { .buffer = dn_zero_initialize(), .allocator = &dn_allocators.bump };
     dn_string_builder_append(&builder, dn_string_literal("jerry"));
@@ -502,7 +502,7 @@ void dn_os_scan_directory_test() {
   {
     dn_os_create_directory(dn_string_literal("tmp"));
     dn_os_create_file(dn_string_literal("tmp/jerry"));
-    dn_os_create_file(dn_string_literal("tmp/drummers"));
+    dn_os_create_directory(dn_string_literal("tmp/drummers"));
     dn_os_create_file(dn_string_literal("tmp/drummers/bill"));
     dn_os_create_file(dn_string_literal("tmp/drummers/mickey"));
     auto entries = dn_os_scan_directory_recursive(dn_string_literal("tmp"));

@@ -17,6 +17,7 @@ dn_hash_t dn_hash_bytes_ex(const void *p, size_t len, size_t seed);
 dn_hash_t dn_combine_hashes(dn_hash_t a, dn_hash_t b);
 dn_hash_t dn_hash_cstr_dumb(const char* str);
 dn_hash_t dn_hash_str_dumb(dn_string_t str);
+dn_hash_t dn_hash_string(dn_string_t str);
 void      dn_hash_encode_hex(char* destination, const char* data, size_t len);
 void      dn_hash_encode_base64(char* destination, const char* source, size_t len);
 
@@ -113,6 +114,10 @@ dn_hash_t dn_hash_str_dumb(dn_string_t str) {
         result = str.data[i] + (result * prime);
     }
     return result;
+}
+
+dn_hash_t dn_hash_string(dn_string_t str) {
+  return dn_hash_bytes(str.data, str.len);
 }
 
 void dn_hash_encode_hex(char* destination, const char* data, size_t len) {

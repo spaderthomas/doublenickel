@@ -1009,6 +1009,11 @@ function SteamConfig:init(params)
   self.app_id = params.app_id
 end
 
+ImageConfig = doublenickel.class.metatype('dn_image_config_t')
+function ImageConfig:init(params)
+  self.app_id = params.app_id
+end
+
 AppConfig = doublenickel.class.metatype('dn_app_config_t')
 function AppConfig:init(params)
   self.window = params.window or dn.window_config_default()

@@ -1152,6 +1152,12 @@ void dn_asset_copy_name(const char* source, dn_asset_name_t dest);
 
 
 
+typedef struct {
+  dn_string_t* dirs;
+  u32 num_dirs;
+} dn_image_config_t;
+
+
 
 typedef enum {
   DN_STEAM_INIT_NONE = 0,
@@ -1204,6 +1210,7 @@ typedef struct {
   dn_gpu_config_t gpu;
   dn_asset_config_t asset;
   dn_steam_config_t steam;
+  dn_image_config_t image;
   u32 target_fps;
 } dn_app_config_t;
 

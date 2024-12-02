@@ -9,12 +9,6 @@ struct dn_texture_t {
   u32 channels;
 };
 
-void dn_atlas_build(dn_path_t path) {
-
-  // Collect all files in the directory, and assign each file a bucket based on a hash of its name
-  // 
-}
-
 
 struct Texture {
   dn_hash_t hash;
@@ -120,20 +114,63 @@ std::mutex image_mutex;
 std::mutex image_config_mutex;
 
 typedef struct {
+  dn_dynamic_array<dn_string_t> files;
+} dn_atlas_bucket_t;
+
+typedef struct {
+  dn_string_t* dirs;
+  u32 num_dirs;
+} dn_image_config_t;
+
+typedef struct {
   dn_array_t<dn_vector2_t, 65536> uv_data;
   dn_array_t<Texture, 256> textures;
   dn_array_t<Sprite, 1024> sprites;
   dn_array_t<TextureAtlas, 64> atlases;
+
+  dn_fixed_array<dn_atlas_bucket_t, 16> buckets;
 } dn_images_t;
 dn_images_t dn_images;
 
 DN_IMP void dn_images_init();
+DN_IMP void dn_atlas_bucket_init(dn_atlas_bucket_t* bucket);
+DN_IMP u32  dn_atlas_calc_bucket(dn_string_t path);
 
 DN_API void take_screenshot();
 DN_API void write_screenshot_to_png(const char* file_name);
 #endif
 
 #ifdef DN_IMAGE_IMPLEMENTATION
+void dn_atlas_bucket_init(dn_atlas_bucket_t* bucket) {
+  dn::fixed_array::init(bucket->files);
+}
+
+u32 dn_atlas_calc_bucket(dn_string_t path) {
+  dn_hash_t hash = dn_hash_string(path);
+  return hash % dn_images.buckets.capacity;
+}
+
+void dn_images_init(dn_image_config_t config) {
+  dn::fixed_array::init(&dn_images.buckets);
+  dn_for(i, dn_images.buckets.capacity) {
+    dn_atlas_bucket_t* bucket = dn::fixed_array::reserve(&dn_images.buckets, 1);
+    dn_atlas_bucket_init(bucket);
+  }
+
+  dn_for(path_index, config.num_dirs) {
+    dn_string_t path = config.dirs[path_index];
+    auto files = dn_os_scan_directory_recursive(path);
+    dn_for(file_index, files.count) {
+      dn_os_directory_entry_t file = files.data[file_index];
+      dn_log("loading image; file = %s, bucket = %d", dn_string_to_cstr(file.file_path), dn_atlas_calc_bucket(file.file_path));
+    }
+  }
+}
+
+void dn_atlas_build(dn_path_t path) {
+  dn_os_directory_entry_list_t entries = dn_os_scan_directory_recursive(path);
+}
+
 ///////////////////
 // TEXTURE ATLAS //
 ///////////////////
