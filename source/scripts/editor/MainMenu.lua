@@ -242,7 +242,7 @@ function MainMenu:Window()
 			if imgui.BeginMenu('Open') then
 				local layout_dir = dn.paths_resolve('layouts'):to_interned()
 				for entry in doublenickel.filesystem.iterate_directory(layout_dir) do
-					local layout = entry.file_path:to_interned()
+					local layout = ffi.string(dn.string_to_cstr(entry.file_path))
 					if imgui.MenuItem(doublenickel.strip_extension(layout)) then
 						local file_name = doublenickel.strip_extension(layout)
 						dn.imgui_load_layout(file_name)
@@ -251,7 +251,7 @@ function MainMenu:Window()
 
 				imgui.EndMenu()
 			end
-
+   
 			if imgui.MenuItem('Save As') then
 				self.open_save_layout_modal = true
 			end

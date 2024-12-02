@@ -186,7 +186,8 @@ end
 
 function doublenickel.editor.ignore_field(t, field)
   ensure_editor_metadata(t, doublenickel.editor.MetadataKind.Ignore)
-  t[doublenickel.editor.sentinel].ignore[field] = true
+  local metadata = find_metadata(t, doublenickel.editor.MetadataKind.Ignore)
+  metadata[field] = true
 end
 
 function doublenickel.editor.is_ignoring_field(t, field)

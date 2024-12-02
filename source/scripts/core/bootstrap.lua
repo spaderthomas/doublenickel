@@ -1747,7 +1747,7 @@ function doublenickel.init_phase_2()
   doublenickel.app:on_init_game()
 
   doublenickel.window.init()
-  doublenickel.save.init()
+  -- doublenickel.save.init()
   doublenickel.editor.init()
   doublenickel.persistent.init()
 

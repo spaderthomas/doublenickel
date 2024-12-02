@@ -70,11 +70,11 @@ void dn_app_configure(dn_app_config_t config) {
   dn_gpu_init(config.gpu);
   dn_images_init(config.image);
   dn_noise_init();
-  init_texture_atlas(); // Invert control
-  init_backgrounds(); // Invert control
-  init_screenshots(); // Use the asset loader
-  init_particles();
-  init_fluid();
+  // init_texture_atlas(); // Invert control
+  // init_backgrounds(); // Invert control
+  // init_screenshots(); // Use the asset loader
+  // init_particles();
+  // init_fluid();
   dn_steam_init(config.steam);
 }
 
