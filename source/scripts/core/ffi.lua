@@ -1011,7 +1011,13 @@ end
 
 ImageConfig = doublenickel.class.metatype('dn_image_config_t')
 function ImageConfig:init(params)
-  self.app_id = params.app_id
+  local allocator = dn.allocator_find('bump')
+
+  self.num_dirs = #params.dirs
+  self.dirs = allocator:alloc_array('dn_string_t', #params.dirs)
+  for i = 0, #params.dirs - 1 do
+    self.dirs[i] = dn.String:new(params.dirs[i + 1])
+  end
 end
 
 AppConfig = doublenickel.class.metatype('dn_app_config_t')
@@ -1022,6 +1028,7 @@ function AppConfig:init(params)
   self.gpu = params.gpu or ffi.new('dn_gpu_config_t')
   self.asset = params.asset or ffi.new('dn_asset_config_t')
   self.steam = params.steam or ffi.new('dn_steam_config_t')
+  self.image = params.image or ffi.new('dn_image_config_t')
   self.target_fps = params.target_fps or 60
 end
 

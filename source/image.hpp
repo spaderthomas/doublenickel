@@ -132,7 +132,7 @@ typedef struct {
 } dn_images_t;
 dn_images_t dn_images;
 
-DN_IMP void dn_images_init();
+DN_IMP void dn_images_init(dn_image_config_t config);
 DN_IMP void dn_atlas_bucket_init(dn_atlas_bucket_t* bucket);
 DN_IMP u32  dn_atlas_calc_bucket(dn_string_t path);
 
@@ -142,7 +142,7 @@ DN_API void write_screenshot_to_png(const char* file_name);
 
 #ifdef DN_IMAGE_IMPLEMENTATION
 void dn_atlas_bucket_init(dn_atlas_bucket_t* bucket) {
-  dn::fixed_array::init(bucket->files);
+  dn::dynamic_array::init(&bucket->files, &dn_allocators.bump);
 }
 
 u32 dn_atlas_calc_bucket(dn_string_t path) {
@@ -151,7 +151,7 @@ u32 dn_atlas_calc_bucket(dn_string_t path) {
 }
 
 void dn_images_init(dn_image_config_t config) {
-  dn::fixed_array::init(&dn_images.buckets);
+  dn::fixed_array::init(&dn_images.buckets, &dn_allocators.bump);
   dn_for(i, dn_images.buckets.capacity) {
     dn_atlas_bucket_t* bucket = dn::fixed_array::reserve(&dn_images.buckets, 1);
     dn_atlas_bucket_init(bucket);
@@ -167,7 +167,7 @@ void dn_images_init(dn_image_config_t config) {
   }
 }
 
-void dn_atlas_build(dn_path_t path) {
+void dn_atlas_build(dn_string_t path) {
   dn_os_directory_entry_list_t entries = dn_os_scan_directory_recursive(path);
 }
 
