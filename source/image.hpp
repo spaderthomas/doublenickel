@@ -151,7 +151,11 @@ u32 dn_atlas_calc_bucket(dn_string_t path) {
 }
 
 void dn_images_init(dn_image_config_t config) {
-  dn::fixed_array::init(&dn_images.buckets, &dn_allocators.bump);
+  dn_array_init(&dn_images.uv_data);
+  dn_array_init(&dn_images.textures);
+  dn_array_init(&dn_images.sprites);
+  
+  dn_array_init(&dn_images.atlases);dn::fixed_array::init(&dn_images.buckets, &dn_allocators.bump);
   dn_for(i, dn_images.buckets.capacity) {
     dn_atlas_bucket_t* bucket = dn::fixed_array::reserve(&dn_images.buckets, 1);
     dn_atlas_bucket_init(bucket);
@@ -906,13 +910,6 @@ Sprite* alloc_sprite() {
   auto sprite = dn_array_push(&dn_images.sprites);
   sprite->uv = alloc_uvs_no_lock();
   return sprite;
-}
-
-DN_IMP void dn_images_init() {
-  dn_array_init(&dn_images.uv_data);
-  dn_array_init(&dn_images.textures);
-  dn_array_init(&dn_images.sprites);
-  dn_array_init(&dn_images.atlases);
 }
 
 #endif
