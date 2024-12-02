@@ -110,7 +110,7 @@ void dn_font_init(dn_font_config_t config) {
       .flags = DN_FONT_FLAG_IMGUI
     }
   };
-  dn_font_bake_n(engine_fonts, DN_ARR_LEN(engine_fonts));
+  dn_font_bake_n(engine_fonts, dn_arr_len(engine_fonts));
   dn_font_bake_n(config.fonts, config.num_fonts);
 }
 
@@ -148,8 +148,8 @@ void dn_font_bake(dn_font_descriptor_t desc) {
 
     dn_baked_font_t* font = dn::fixed_array::reserve(&dn_fonts.baked_fonts, 1);
     font->hash = dn_font_hash(desc.id, size);
-    dn_string_copy(desc.id, font->name, DN_ASSET_NAME_LEN);
-    dn_string_copy(desc.file_path, font->path, DN_MAX_PATH_LEN);
+    dn_cstr_copy(desc.id, font->name, DN_ASSET_NAME_LEN);
+    dn_cstr_copy(desc.file_path, font->path, DN_MAX_PATH_LEN);
     font->size = size;
     font->flags = desc.flags;
     

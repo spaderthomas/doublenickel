@@ -33,6 +33,7 @@ typedef struct {
   dn_gpu_config_t gpu;
   dn_asset_config_t asset;
   dn_steam_config_t steam;
+  dn_image_config_t image;
   u32 target_fps;
 } dn_app_config_t;
 
@@ -67,7 +68,7 @@ void dn_app_configure(dn_app_config_t config) {
   dn_audio_init(config.audio);
   dn_font_init(config.font);
   dn_gpu_init(config.gpu);
-  dn_images_init();
+  dn_images_init(config.image);
   dn_noise_init();
   init_texture_atlas(); // Invert control
   init_backgrounds(); // Invert control

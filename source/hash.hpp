@@ -1,9 +1,30 @@
+#ifndef DN_HASH_H
+#define DN_HASH_H
+
+// Thank you to John Jackson's framework Gunslinger, from which I took much inspiration but also
+// ripped this piece of hashing code off wholesale.
 #define GS_SIZE_T_BITS  ((sizeof(size_t)) * 8)
 #define GS_SIPHASH_C_ROUNDS 1
 #define GS_SIPHASH_D_ROUNDS 1
 #define gs_rotate_left(__V, __N)   (((__V) << (__N)) | ((__V) >> (GS_SIZE_T_BITS - (__N))))
 #define gs_rotate_right(__V, __N)  (((__V) >> (__N)) | ((__V) << (GS_SIZE_T_BITS - (__N))))
 
+#define DN_HASH_SEED 0x9de341c9
+
+dn_hash_t dn_hash_siphash_bytes(const void *p, size_t len, size_t seed);
+dn_hash_t dn_hash_bytes(const void *p, size_t len);
+dn_hash_t dn_hash_bytes_ex(const void *p, size_t len, size_t seed);
+dn_hash_t dn_combine_hashes(dn_hash_t a, dn_hash_t b);
+dn_hash_t dn_hash_cstr_dumb(const char* str);
+dn_hash_t dn_hash_str_dumb(dn_string_t str);
+dn_hash_t dn_hash_string(dn_string_t str);
+void      dn_hash_encode_hex(char* destination, const char* data, size_t len);
+void      dn_hash_encode_base64(char* destination, const char* source, size_t len);
+
+#define dn_hash_type(t) dn_hash_string_dumb((const char*)(#t))
+#endif
+
+#ifdef DN_HASH_IMPLEMENTATION
 size_t hash_siphash_bytes(const void *p, size_t len, size_t seed) {
   unsigned char *d = (unsigned char *) p;
   size_t i,j;
@@ -82,14 +103,21 @@ dn_hash_t dn_combine_hashes(dn_hash_t a, dn_hash_t b) {
 }
 
 dn_hash_t dn_hash_cstr_dumb(const char* str) {
+  return dn_hash_str_dumb(dn_string_literal(str));
+}
+
+dn_hash_t dn_hash_str_dumb(dn_string_t str) {
   constexpr size_t prime = 31;
   
   size_t result = 0;
-  size_t len = strlen(str);
-  for (int i = 0; i < len; i++) {
-        result = str[i] + (result * prime);
+  for (int i = 0; i < str.len; i++) {
+        result = str.data[i] + (result * prime);
     }
     return result;
+}
+
+dn_hash_t dn_hash_string(dn_string_t str) {
+  return dn_hash_bytes(str.data, str.len);
 }
 
 void dn_hash_encode_hex(char* destination, const char* data, size_t len) {
@@ -127,3 +155,4 @@ void dn_hash_encode_base64(char* destination, const char* source, size_t len) {
 
 
 #define dn_hash_type(t) dn_hash_string_dumb((const char*)(#t))
+#endif

@@ -113,7 +113,7 @@ dn_prepared_text_t* dn_prepare_text_ex(const char* text, f32 px, f32 py, dn_bake
 			this_line_width += glyph.advance.x;
 		}
 
-		prepared_text->width = DN_MAX(prepared_text->width, this_line_width);
+		prepared_text->width = dn_max(prepared_text->width, this_line_width);
 		this_line_width = 0;
 	}
 

@@ -72,7 +72,7 @@ dn_tstring_t dn_paths_strip(const char* name, const char* absolute_path) {
   auto named_path_len = strlen(named_path);
   auto absolute_path_len = strlen(absolute_path);
   
-  auto stripped_path = dn_string_copy(absolute_path, absolute_path_len, &dn_allocators.bump);
+  auto stripped_path = dn_cstr_copy(absolute_path, absolute_path_len, &dn_allocators.bump);
   
   u32 num_strip_chars = std::min(named_path_len, absolute_path_len);
   u32 num_stripped = 0;
@@ -97,7 +97,7 @@ char* dn_paths_resolve_ex(const char* name, dn_allocator_t* allocator) {
   }
 
   auto& path = dn_paths.entries[name];
-  return dn_string_copy(path.c_str(), path.length(), allocator);   
+  return dn_cstr_copy(path.c_str(), path.length(), allocator);   
 }
 
 dn_tstring_t dn_paths_resolve_format(const char* name, const char* file_name) {
@@ -126,8 +126,8 @@ dn_named_path_result_t dn_paths_find_all() {
 
   for (auto& [name, path] : dn_paths.entries) {
     auto collected_path = dn_array_push(&collected_paths);
-    collected_path->name = dn_string_copy(name, &dn_allocators.bump);
-    collected_path->path = dn_string_copy(path, &dn_allocators.bump);
+    collected_path->name = dn_cstr_copy(name, &dn_allocators.bump);
+    collected_path->path = dn_cstr_copy(path, &dn_allocators.bump);
   }
 
   return {
@@ -146,7 +146,7 @@ dn_tstring_t _dn_paths_build_root_path(const char* relative_path) {
   auto canonical_path = std::filesystem::canonical(executable_dir, error);
   auto canonical_dir = canonical_path.string();
 
-  auto normalized_dir = dn_string_copy(canonical_dir, &dn_allocators.bump);
+  auto normalized_dir = dn_cstr_copy(canonical_dir, &dn_allocators.bump);
   for (u32 i = 0; i < canonical_dir.size(); i++) {
     if (normalized_dir[i] == '\\') {
       normalized_dir[i] = '/';
@@ -157,6 +157,7 @@ dn_tstring_t _dn_paths_build_root_path(const char* relative_path) {
 }
 
 void _dn_paths_set_install_roots() {
+  dn_paths_add_ex("dn_executable", _dn_paths_build_root_path(""));
   dn_paths_add_ex("install", _dn_paths_build_root_path(dn_app.install_path));
   dn_paths_add_ex("engine", _dn_paths_build_root_path(dn_app.engine_path));
   dn_paths_add_ex("app", _dn_paths_build_root_path(dn_app.app_path));

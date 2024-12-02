@@ -7,7 +7,6 @@ function doublenickel.ffi.namespaced_metatype(namespace, struct_name)
 end
 
 function doublenickel.ffi.namespace(prefix)
-  local namespace = {}
   setmetatable(namespace, {
     __index = function(__namespace, fn_name)
       return ffi.C[prefix .. '_' .. fn_name]
@@ -31,7 +30,14 @@ function doublenickel.ffi.init()
     }
   )
 
-  dn = doublenickel.ffi.namespace('dn')
+  setmetatable(
+    dn,
+    {
+      __index = function(self, fn_name)
+        return ffi.C['dn_' .. fn_name]
+      end
+    }
+  )
 
   local string_metatable = {
     __index = {
@@ -502,6 +508,16 @@ end
 ---------------
 -- METATYPES -- 
 ---------------
+
+------------
+-- STRING --
+------------
+
+dn.String = doublenickel.class.metatype('dn_string_t')
+function dn.String:init(path)
+  self.data = ffi.cast('u8*', path)
+  self.len = #path
+end
 
 ----------------------
 -- MEMORY ALLOCATOR --
@@ -993,6 +1009,17 @@ function SteamConfig:init(params)
   self.app_id = params.app_id
 end
 
+ImageConfig = doublenickel.class.metatype('dn_image_config_t')
+function ImageConfig:init(params)
+  local allocator = dn.allocator_find('bump')
+
+  self.num_dirs = #params.dirs
+  self.dirs = allocator:alloc_array('dn_string_t', #params.dirs)
+  for i = 0, #params.dirs - 1 do
+    self.dirs[i] = dn.String:new(params.dirs[i + 1])
+  end
+end
+
 AppConfig = doublenickel.class.metatype('dn_app_config_t')
 function AppConfig:init(params)
   self.window = params.window or dn.window_config_default()
@@ -1001,6 +1028,7 @@ function AppConfig:init(params)
   self.gpu = params.gpu or ffi.new('dn_gpu_config_t')
   self.asset = params.asset or ffi.new('dn_asset_config_t')
   self.steam = params.steam or ffi.new('dn_steam_config_t')
+  self.image = params.image or ffi.new('dn_image_config_t')
   self.target_fps = params.target_fps or 60
 end
 
@@ -1010,6 +1038,50 @@ end
 ------------------
 function dn.window_get_display_mode()
   return doublenickel.enums.DisplayMode(ffi.C.dn_window_get_display_mode())
+end
+
+function dn.os_scan_directory(path)
+  return ffi.C.dn_os_scan_directory(dn.String:new(path))
+end
+
+function dn.os_scan_directory_recursive(path)
+  return ffi.C.dn_os_scan_directory_recursive(dn.String:new(path))
+end
+
+function dn.os_does_path_exist(path)
+  return ffi.C.dn_os_does_path_exist(dn.String:new(path))
+end
+
+function dn.os_is_regular_file(path)
+  return ffi.C.dn_os_is_regular_file(dn.String:new(path))
+end
+
+function dn.os_is_directory(path)
+  return ffi.C.dn_os_is_directory(dn.String:new(path))
+end
+
+function dn.os_create_directory(path)
+  return ffi.C.dn_os_create_directory(dn.String:new(path))
+end
+
+function dn.os_remove_directory(path)
+  return ffi.C.dn_os_remove_directory(dn.String:new(path))
+end
+
+function dn.os_create_file(path)
+  return ffi.C.dn_os_create_file(dn.String:new(path))
+end
+
+function dn.os_remove_file(path)
+  return ffi.C.dn_os_remove_file(dn.String:new(path))
+end
+
+function dn.os_file_mod_time(path)
+  return ffi.C.dn_os_file_mod_time(dn.String:new(path))
+end
+
+function dn.stuff()
+  return 69
 end
 
 function doublenickel.ffi.set_camera()

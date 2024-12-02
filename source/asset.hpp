@@ -180,7 +180,7 @@ void dn_assets_init(dn_asset_config_t user_config) {
     {
       .importers = {
         .data = default_importers,
-        .count = DN_ARR_LEN(default_importers)
+        .count = dn_arr_len(default_importers)
       }
     },
     user_config
@@ -227,7 +227,7 @@ dn_asset_data_t dn_assets_find(const char* name) {
 }
 
 void dn_asset_copy_name(const char* source, dn_asset_name_t dest) {
-  dn_string_copy(source, dest, DN_ASSET_NAME_LEN);
+  dn_cstr_copy(source, dest, DN_ASSET_NAME_LEN);
 }
 
 

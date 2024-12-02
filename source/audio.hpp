@@ -434,15 +434,17 @@ dn_audio_info_t* alloc_sound(const char* file_name) {
 }
 
 void dn_audio_load_dir(const char* path) {
-  dn_os_directory_entry_list_t entries = dn_os_scan_directory(path);
+  dn_os_directory_entry_list_t entries = dn_os_scan_directory(dn_string_literal(path));
   for (u32 i = 0; i < entries.count; i++) {
     dn_os_directory_entry_t entry = entries.data[i];
     if (entry.attributes & DN_OS_FILE_ATTR_DIRECTORY) {
-      dn_audio.file_monitor->add_directory(entry.file_path);
-      dn_audio_load_dir(entry.file_path);
+      // @string
+      dn_audio.file_monitor->add_directory(dn_string_to_cstr_ex(entry.file_path, &dn_allocators.bump));
+      dn_audio_load_dir(dn_string_to_cstr_ex(entry.file_path, &dn_allocators.bump));
     }
     else {
-      dn_audio_load(entry.file_path, entry.file_name);
+      // @string
+      dn_audio_load(dn_string_to_cstr_ex(entry.file_path, &dn_allocators.bump), dn_string_to_cstr_ex(entry.file_name, &dn_allocators.bump));
     }
   }
 }

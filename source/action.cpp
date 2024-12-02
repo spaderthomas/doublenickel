@@ -246,7 +246,7 @@ dn_tstring_t SteamInputManager::get_controller_name(Steam::Controller controller
 		name = "A Seriously Unknown Controller";
 	}
 
-	return dn_string_copy(name, &dn_allocators.bump);
+	return dn_cstr_copy(name, &dn_allocators.bump);
 }
 
 bool SteamInputManager::update_cooldown_hack() {

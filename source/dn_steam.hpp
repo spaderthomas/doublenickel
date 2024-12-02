@@ -128,7 +128,7 @@ void dn_steam_callbacks_t::on_dismiss_text_input(GamepadTextInputDismissed_t* ca
   DN_UNTESTED();
 
   if (dn_steam_initialized()) {
-    SteamFriends()->ActivateGameOverlayToWebPage(dn_string_to_cstr(url, &dn_allocators.bump));
+    SteamFriends()->ActivateGameOverlayToWebPage(dn_string_to_cstr_ex(url, &dn_allocators.bump));
   }
   else {
     dn_string_builder_t builder = {

@@ -73,6 +73,115 @@ typedef char dn_path_t [256]; // [DN_MAX_PATH_LEN];
 
 
 
+
+///////////////////////
+//  ██████╗ ███████╗ //
+// ██╔═══██╗██╔════╝ //
+// ██║   ██║███████╗ //
+// ██║   ██║╚════██║ //
+// ╚██████╔╝███████║ //
+//  ╚═════╝ ╚══════╝ //
+///////////////////////
+
+///////////////
+// ALLOCATOR //
+///////////////
+typedef struct dn_allocator_t dn_allocator_t;
+
+void             dn_allocator_add(const char* name, dn_allocator_t* allocator);
+dn_allocator_t*  dn_allocator_find(const char* name);
+void*            dn_allocator_alloc(dn_allocator_t* allocator, u32 size);
+void*            dn_allocator_realloc(dn_allocator_t* allocator, void* memory, u32 size);
+void             dn_allocator_free(dn_allocator_t* allocator, void* buffer);
+
+typedef struct {
+  u8* data;
+  u32 len;
+} dn_string_t;
+
+
+////////////
+// STRING //
+////////////
+typedef struct {
+  struct {
+    u8* data;
+    u32 count;
+    u32 capacity;
+  } buffer;
+
+  dn_allocator_t* allocator;
+} dn_string_builder_t;
+
+void        dn_string_builder_grow(dn_string_builder_t* builder);
+void        dn_string_builder_append(dn_string_builder_t* builder, dn_string_t str);
+void        dn_string_builder_append_cstr(dn_string_builder_t* builder, const char* str);
+void        dn_string_builder_append_fmt(dn_string_builder_t* builder, dn_string_t fmt, ...);
+dn_string_t dn_string_builder_write(dn_string_builder_t* builder);
+char*       dn_string_builder_write_cstr(dn_string_builder_t* builder);
+void        dn_cstr_copy(const char* str, char* buffer, u32 buffer_length);
+void        dn_cstr_copy_n(const char* str, u32 length, char* buffer, u32 buffer_length);
+char*       dn_string_to_cstr(dn_string_t str);
+char*       dn_string_to_cstr_ex(dn_string_t str, dn_allocator_t* allocator);
+bool        dn_string_equal(dn_string_t a, dn_string_t b);
+bool        dn_string_equal_cstr(dn_string_t a, const char* b);
+bool        dn_cstr_equal(const char* a, const char* b);
+u32         dn_cstr_len(const char* str);
+dn_string_t dn_string_copy_cstr(const char* str, dn_allocator_t* allocator);
+dn_string_t dn_string_copy(dn_string_t str, dn_allocator_t* allocator);
+
+
+////////////////
+// FILESYSTEM //
+////////////////
+
+typedef enum {
+  DN_OS_FILE_ATTR_NONE = 0,
+  DN_OS_FILE_ATTR_REGULAR_FILE = 1,
+  DN_OS_FILE_ATTR_DIRECTORY = 2,
+} dn_os_file_attr_t;
+
+typedef struct dn_os_date_time_t {
+  int year;
+  int month;
+  int day;
+  int hour;
+  int minute;
+  int second;
+  int millisecond;
+} dn_os_date_time_t;
+
+typedef struct {
+  dn_string_t file_path;
+  dn_string_t file_name;
+  dn_os_file_attr_t attributes;
+} dn_os_directory_entry_t;
+
+typedef struct {
+  dn_os_directory_entry_t* data;
+  u32 count;
+} dn_os_directory_entry_list_t;
+
+bool                         dn_os_does_path_exist(dn_string_t path);
+bool                         dn_os_is_regular_file(dn_string_t path);
+bool                         dn_os_is_directory(dn_string_t path);
+void                         dn_os_create_directory(dn_string_t path);
+void                         dn_os_remove_directory(dn_string_t path);
+void                         dn_os_create_file(dn_string_t path);
+void                         dn_os_remove_file(dn_string_t path);
+dn_os_directory_entry_list_t dn_os_scan_directory(dn_string_t path);
+dn_os_directory_entry_list_t dn_os_scan_directory_recursive(dn_string_t path);
+dn_os_date_time_t            dn_os_get_date_time();
+f64                          dn_os_file_mod_time(dn_string_t path);
+void                         dn_os_memory_copy(const void* source, void* dest, u32 num_bytes);
+bool                         dn_os_is_memory_equal(const void* a, const void* b, size_t len);
+void                         dn_os_fill_memory(void* buffer, u32 buffer_size, void* fill, u32 fill_size);
+void                         dn_os_fill_memory_u8(void* buffer, u32 buffer_size, u8 fill);
+void                         dn_os_zero_memory(void* buffer, u32 buffer_size);
+
+
+
+
 //////////////////////////////////////////////////////
 // ███████╗███╗   ██╗ ██████╗ ██╗███╗   ██╗███████╗ //
 // ██╔════╝████╗  ██║██╔════╝ ██║████╗  ██║██╔════╝ //
@@ -124,83 +233,9 @@ void                   dn_paths_add_install_subpath(const char* name, const char
 void                   dn_paths_add_engine_subpath(const char* name, const char* relative_path);
 void                   dn_paths_add_write_subpath(const char* name, const char* relative_path);
 void                   dn_paths_add_subpath(const char* name, const char* parent_name, const char* relative_path);
-dn_tstring_t                dn_paths_resolve(const char* name);
-dn_tstring_t                dn_paths_resolve_format(const char* name, const char* file_name);
+dn_tstring_t           dn_paths_resolve(const char* name);
+dn_tstring_t           dn_paths_resolve_format(const char* name, const char* file_name);
 
-
-///////////////////////
-//  ██████╗ ███████╗ //
-// ██╔═══██╗██╔════╝ //
-// ██║   ██║███████╗ //
-// ██║   ██║╚════██║ //
-// ╚██████╔╝███████║ //
-//  ╚═════╝ ╚══════╝ //
-///////////////////////
- 
-typedef enum {
-  DN_OS_FILE_ATTR_NONE = 0,
-  DN_OS_FILE_ATTR_REGULAR_FILE = 1,
-  DN_OS_FILE_ATTR_DIRECTORY = 2,
-} dn_os_file_attr_t;
-
-typedef struct dn_os_date_time_t {
-  int year;
-  int month;
-  int day;
-  int hour;
-  int minute;
-  int second;
-  int millisecond;
-} dn_os_date_time_t;
-
-typedef struct {
-  dn_tstring_t file_path;
-  dn_tstring_t file_name;
-  dn_os_file_attr_t attributes;
-} dn_os_directory_entry_t;
-
-
-typedef struct {
-  dn_os_directory_entry_t* data;
-  u32 count;
-} dn_os_directory_entry_list_t;
-
-bool                         dn_os_does_path_exist(const char* path);
-bool                         dn_os_is_regular_file(const char* path);
-bool                         dn_os_is_directory(const char* path);
-void                         dn_os_remove_directory(const char* path);
-void                         dn_os_create_directory(const char* path);
-dn_os_directory_entry_list_t dn_os_scan_directory(const char* path);
-dn_os_date_time_t            dn_os_get_date_time();
-f64                          dn_os_file_mod_time(const char* path);
-void                         dn_os_memory_copy(const void* source, void* dest, u32 num_bytes);
-bool                         dn_os_is_memory_equal(void* a, void* b, size_t len);
-void                         dn_os_fill_memory(void* buffer, u32 buffer_size, void* fill, u32 fill_size);
-void                         dn_os_fill_memory_u8(void* buffer, u32 buffer_size, u8 fill);
-void                         dn_os_zero_memory(void* buffer, u32 buffer_size);
-
-typedef struct dn_allocator_t dn_allocator_t;
-
-void             dn_allocator_add(const char* name, dn_allocator_t* allocator);
-dn_allocator_t*  dn_allocator_find(const char* name);
-void*            dn_allocator_alloc(dn_allocator_t* allocator, u32 size);
-void*            dn_allocator_realloc(dn_allocator_t* allocator, void* memory, u32 size);
-void             dn_allocator_free(dn_allocator_t* allocator, void* buffer);
-
-typedef struct {
-  u8* data;
-  u32 len;
-} dn_string_t;
-
-typedef struct {
-  struct {
-    u8* data;
-    u32 count;
-    u32 capacity;
-  } buffer;
-
-  dn_allocator_t* allocator;
-} dn_string_builder_t;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -232,8 +267,8 @@ typedef struct {
   i32 generation;
 } dn_gen_arena_handle_t;
 
-void dn_string_copy(const char* str, char* buffer, u32 buffer_length);
-void dn_string_copy_n(const char* str, u32 length, char* buffer, u32 buffer_length);
+void dn_cstr_copy(const char* str, char* buffer, u32 buffer_length);
+void dn_cstr_copy_n(const char* str, u32 length, char* buffer, u32 buffer_length);
 
 
 ///////////////////////////////////////////
@@ -1117,6 +1152,12 @@ void dn_asset_copy_name(const char* source, dn_asset_name_t dest);
 
 
 
+typedef struct {
+  dn_string_t* dirs;
+  u32 num_dirs;
+} dn_image_config_t;
+
+
 
 typedef enum {
   DN_STEAM_INIT_NONE = 0,
@@ -1169,6 +1210,7 @@ typedef struct {
   dn_gpu_config_t gpu;
   dn_asset_config_t asset;
   dn_steam_config_t steam;
+  dn_image_config_t image;
   u32 target_fps;
 } dn_app_config_t;
 
@@ -1603,7 +1645,7 @@ function doublenickel.init_phase_0()
     end
   end
   if type_mismatch then 
-    ffi.C.dn_engine_set_exit_game(true) -- Technically useless, since the game will explode without bootstrapping
+    ffi.C.dn_engine_set_exit_game() -- Technically useless, since the game will explode without bootstrapping
     return 
   end
 

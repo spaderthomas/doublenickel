@@ -115,7 +115,7 @@ dn_type_info_list_t dn_engine_query_types() {
 
   return {
     .data = types,
-    .count = DN_ARR_LEN(types)
+    .count = dn_arr_len(types)
   };
 }
 void dn_engine_set_target_fps(f64 fps) {

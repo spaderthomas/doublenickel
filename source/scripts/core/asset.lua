@@ -11,7 +11,7 @@ end
 function doublenickel.asset.find(id)
   local ctype = 'dn_asset_data_t'
   if doublenickel.enum.is_enum(id) then
-    ctype = self.casts[id.__enum] or cast
+    ctype = self.casts[id.__enum] or ctype
     id = id:to_qualified_string()
   end
 
