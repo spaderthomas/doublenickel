@@ -10,6 +10,13 @@ function doublenickel.ffi.namespace(prefix)
   local namespace = {}
   setmetatable(namespace, {
     __index = function(__namespace, fn_name)
+      if fn_name == 'os_does_path_exist' then
+        for key in doublenickel.iterator.keys(dn) do
+          print(key)
+        end
+      end
+      print(rawget(dn, fn_name))
+      print(fn_name)
       return ffi.C[prefix .. '_' .. fn_name]
     end
   })
@@ -1031,8 +1038,38 @@ function dn.os_scan_directory_recursive(path)
 end
 
 function dn.os_does_path_exist(path)
+  dbg()
   return ffi.C.dn_os_does_path_exist(dn.String:new(path))
 end
+
+function dn.os_is_regular_file(path)
+  return ffi.C.dn_os_is_regular_file(dn.String:new(path))
+end
+
+function dn.os_is_directory(path)
+  return ffi.C.dn_os_is_directory(dn.String:new(path))
+end
+
+function dn.os_create_directory(path)
+  return ffi.C.dn_os_create_directory(dn.String:new(path))
+end
+
+function dn.os_remove_directory(path)
+  return ffi.C.dn_os_remove_directory(dn.String:new(path))
+end
+
+function dn.os_create_file(path)
+  return ffi.C.dn_os_create_file(dn.String:new(path))
+end
+
+function dn.os_remove_file(path)
+  return ffi.C.dn_os_remove_file(dn.String:new(path))
+end
+
+function dn.os_file_mod_time(path)
+  return ffi.C.dn_os_file_mod_time(dn.String:new(path))
+end
+
 
 function doublenickel.ffi.set_camera()
 end

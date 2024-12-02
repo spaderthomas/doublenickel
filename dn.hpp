@@ -43,7 +43,7 @@
 #include "source/graphics.hpp"
 #include "source/sdf.hpp"
 #include "source/app.hpp"
-#include "source/test.hpp"
+#include "source/dn_tests.hpp"
 #endif
 
 #ifdef DN_IMPLEMENTATION
@@ -106,7 +106,7 @@
 #define DN_STRING_IMPLEMENTATION
 #include "source/string.hpp"
 #define DN_TEST_IMPLEMENTATION
-#include "source/test.hpp"
+#include "source/dn_tests.hpp"
 #define DN_TIME_METRICS_IMPLEMENTATION
 #include "source/time_metrics.hpp"
 #define DN_WINDOW_IMPLEMENTATION

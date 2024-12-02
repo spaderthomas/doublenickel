@@ -31,6 +31,9 @@ namespace dn::dynamic_array {
   T* push(dn_dynamic_array<T>* dynamic_array, T data);
 
   template<typename T>
+  T* push(dn_dynamic_array<T>* dynamic_array);
+
+  template<typename T>
   T* reserve(dn_dynamic_array<T>* dynamic_array, u32 count);
 
   template<typename T>
@@ -54,6 +57,12 @@ namespace dn::dynamic_array {
 
   template<typename T>
   T* push(dn_dynamic_array<T>* dynamic_array, T data) {
+    return (T*)dn_dynamic_array_push(dynamic_array, &data, 1);
+  }
+
+  template<typename T>
+  T* push(dn_dynamic_array<T>* dynamic_array) {
+    T data = dn_zero_initialize();
     return (T*)dn_dynamic_array_push(dynamic_array, &data, 1);
   }
 
@@ -118,6 +127,6 @@ void dn_dynamic_array_grow(dn_dynamic_array_t* buffer, u32 capacity) {
 
   if (buffer->capacity >= capacity) return;
   buffer->capacity = dn_max(buffer->capacity * 2, capacity);
-  buffer->data = (u8*)dn_allocator_realloc(buffer->allocator, buffer->data, buffer->capacity);
+  buffer->data = (u8*)dn_allocator_realloc(buffer->allocator, buffer->data, buffer->capacity * buffer->element_size);
 }
 #endif

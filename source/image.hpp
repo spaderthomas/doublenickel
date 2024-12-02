@@ -229,7 +229,8 @@ void TextureAtlas::calc_hash_and_mod_time() {
         files_hash = files_hash ^ file_name_hash;
 
         // 2: We check modtime for files that exist
-        auto this_file_mod_time = dn_os_file_mod_time(file_path.c_str());
+        // auto this_file_mod_time = dn_os_file_mod_time(file_path.c_str());
+        auto this_file_mod_time = 0;
         if (this_file_mod_time > mod_time) {
           mod_time = this_file_mod_time;
         }

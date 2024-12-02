@@ -31,8 +31,6 @@
 
 #define dn_enum_flags(t) DEFINE_ENUM_FLAG_OPERATORS(t)
 
-#define dn_test_scope(name, ...) do { __VA_ARGS__ } while(false);
-
 // Defer works by using (abusing...?) RAII; define a struct which holds a function and calls
 // that function in its destructor. Then, use __LINE__ to make an instance of that struct with
 // a unique name and use operator overloading with a lambda to get nice syntax.
