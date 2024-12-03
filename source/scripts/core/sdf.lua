@@ -4,6 +4,18 @@ function SdfRenderer:init(params)
 	self = doublenickel.ffi.sdf_renderer_create(params.buffer_size)
 end
 
+function SdfRenderer:oriented_box(params)
+	dn.sdf_oriented_box_ex(
+		self,
+		params.position.x, params.position.y,
+		params.color.r, params.color.g, params.color.b, 
+		params.rotation,
+		params.edge_thickness,
+		params.length,
+		params.thickness
+	)
+end
+
 SdfInstance = doublenickel.class.metatype('dn_sdf_instance_t')
 function SdfInstance:init(params)
 	self.buffer_index = params.buffer_index or 0
@@ -63,3 +75,4 @@ function SdfOrientedBox:init(params)
 	self.header = SdfHeader:new(params)
   self.size = Vector2:new(params.size.x or 20, params.size.y or 2)
 end
+

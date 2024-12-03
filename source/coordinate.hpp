@@ -181,14 +181,14 @@ dn_vector2_t dn_coord_window_to_screen_mag(float x, float y) {
 
 dn_vector2_t dn_coord_window_to_game_mag(float x, float y) {
 	return {
-		.x = x * window.native_resolution.x,
-		.y = y * window.native_resolution.y,
+		.x = x * dn_coord_data.framebuffer_size.x,
+		.y = y * dn_coord_data.framebuffer_size.y,
 	};
 }
 dn_vector2_t dn_coord_window_to_world_mag(float x, float y) {
 	return {
-		.x = x * window.native_resolution.x,
-		.y = y * window.native_resolution.y,
+		.x = x * dn_coord_data.framebuffer_size.x,
+		.y = y * dn_coord_data.framebuffer_size.y,
 	};
 }
 
@@ -199,8 +199,8 @@ dn_vector2_t dn_coord_game_to_screen_mag(float x, float y) {
 
 dn_vector2_t dn_coord_game_to_window_mag(float x, float y) {
 	return {
-		.x = x / window.native_resolution.x,
-		.y = y / window.native_resolution.y,
+		.x = x / dn_coord_data.framebuffer_size.x,
+		.y = y / dn_coord_data.framebuffer_size.y,
 	};
 }
 

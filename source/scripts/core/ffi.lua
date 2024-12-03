@@ -627,6 +627,10 @@ function Vector2:scale(scalar)
   return Vector2:new(self.x * scalar, self.y * scalar)
 end
 
+function Vector2:copy()
+  return Vector2:new(self.x, self.y)
+end
+
 Vector3 = doublenickel.class.metatype('dn_vector3_t')
 function  Vector3:init(x, y, z)
   self.x = x or self.x
@@ -854,8 +858,8 @@ function GpuRenderPass:init(params)
 
     doublenickel.debug.assert(not doublenickel.ffi.is_nil(self.color.attachment))
   end
-
 end
+
 
 GpuUniformBinding = doublenickel.class.metatype('dn_gpu_uniform_binding_t')
 function GpuUniformBinding:init(params)

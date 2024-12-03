@@ -50,8 +50,8 @@ function subtract(x, y)
   return x - y
 end
 
-
 function doublenickel.math.init()
+  pi = 3.14159265359
   doublenickel.math.pi = 3.14159265359
   doublenickel.really_large_number = 2000000000
   doublenickel.really_small_number = -2000000000

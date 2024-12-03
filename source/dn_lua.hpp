@@ -29,7 +29,7 @@ DN_API void        dn_lua_add_dir(const char* directory);
 
 #ifdef DN_LUA_IMPLEMENTATION
 void dn_lua_init() {
-    // This is the best way I figured out to check whether LuaJIT was compiled with GC64; this function is 
+  // This is the best way I figured out to check whether LuaJIT was compiled with GC64; this function is 
   // only stubbed out on GC32. On GC64, it'll actually try to use the first parameter (an allocator) and
   // crash since it's a nullptr
   //dn_lua.state = lua_newstate(nullptr, nullptr);
