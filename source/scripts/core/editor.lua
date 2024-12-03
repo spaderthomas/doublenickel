@@ -90,9 +90,9 @@ function doublenickel.editor.update()
   end
 
   dn.gpu_set_world_space(self.config.command_buffer, true)
-  dn.gpu_set_camera(self.config.command_buffer, self.find('EditorCamera').offset:to_ctype())
-  -- dn.gpu_set_camera(self.config.command_buffer, Vector2:new(10, 10))
-  dn.sdf_circle_ex(self.sdf, 0, 0, 1.0, 0.0, 0.0, 0.0, 1.5, 10);
+  local camera = self.find('EditorCamera').offset:to_ctype()
+  dn.gpu_set_camera(self.config.command_buffer, camera)
+  dn.coord_set_camera(camera.x, camera.y)
   dn.sdf_renderer_draw(self.sdf, self.config.command_buffer)
   dn.gpu_end_render_pass(self.config.command_buffer)
   dn.gpu_command_buffer_submit(self.config.command_buffer)

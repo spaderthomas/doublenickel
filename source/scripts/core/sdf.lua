@@ -16,6 +16,17 @@ function SdfRenderer:oriented_box(params)
 	)
 end
 
+function SdfRenderer:circle(params)
+	dn.sdf_circle_ex(
+		self,
+		params.position.x, params.position.y,
+		params.color.r, params.color.g, params.color.b, 
+		params.rotation,
+		params.edge_thickness,
+		params.radius
+	)
+end
+
 SdfInstance = doublenickel.class.metatype('dn_sdf_instance_t')
 function SdfInstance:init(params)
 	self.buffer_index = params.buffer_index or 0

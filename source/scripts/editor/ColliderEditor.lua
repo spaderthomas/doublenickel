@@ -539,13 +539,10 @@ end
 
 
 function ColliderEditor:draw()
-	-- doublenickel.ffi.set_world_space(true)
-	-- doublenickel.ffi.set_layer(doublenickel.editor.layers.colliders)
-
-	-- for collider in doublenickel.component.iterate('Collider') do
-		-- local color = self:on_color(collider)
-		-- collider:show(color)
-	-- end
+	for collider in doublenickel.component.iterate('Collider') do
+		local color = self:on_color(collider)
+		collider:show(color)
+	end
 end
 
 function ColliderEditor:update_shape_editors() 

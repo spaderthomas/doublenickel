@@ -102,6 +102,7 @@ function EditorUtility:draw_grid()
     local game_camera = doublenickel.entity.find('Camera')
     camera = game_camera or camera
   end
+  
   local slop = 300
 
   local min = doublenickel.vec2(
@@ -165,11 +166,6 @@ function EditorUtility:draw_grid()
       length = render_target.size.y,
       thickness = line_thickness
     })
-
-    -- doublenickel.ffi.draw_line(1, min.y, 1, max.y, line_thickness,
-      -- self.colors.axis.x:to_vec4())
-    -- doublenickel.ffi.draw_line(min.x, 0, max.x, 0, line_thickness,
-      -- self.colors.axis.y:to_vec4())
   end
 end
 
