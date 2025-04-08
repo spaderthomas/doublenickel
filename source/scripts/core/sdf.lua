@@ -16,6 +16,9 @@ function SdfRenderer:oriented_box(params)
 	)
 end
 
+function SdfRenderer:foo(params)
+end
+
 function SdfRenderer:circle(params)
 	dn.sdf_circle_ex(
 		self,

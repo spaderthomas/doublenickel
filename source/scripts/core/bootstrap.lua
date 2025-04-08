@@ -57,17 +57,6 @@ typedef struct {
   float data [4] [4];
 } dn_matrix4_t;
 
-// These are just in Lua, so I can add a metatype to returned strings for a nice interning API.
-// dn_tstring_t is a temporary string; i.e., one allocated with temporary storage. There's nothing different
-// about the underlying data, it's just a hint to the programmer to not hold onto this pointer.
-typedef struct {
-  char* data;
-} dn_tstring_t;
-
-typedef struct {
-  char* data;
-} string;
-
 typedef char dn_asset_name_t [64]; // [DN_ASSET_NAME_LEN];
 typedef char dn_path_t [256]; // [DN_MAX_PATH_LEN];
 
@@ -95,8 +84,8 @@ void*            dn_allocator_realloc(dn_allocator_t* allocator, void* memory, u
 void             dn_allocator_free(dn_allocator_t* allocator, void* buffer);
 
 typedef struct {
-  u8* data;
   u32 len;
+  u8* data;
 } dn_string_t;
 
 
@@ -201,13 +190,13 @@ typedef struct {
   u32 count;
 } dn_type_info_list_t;
 
-void                dn_engine_set_exit_game();
-const char*         dn_engine_get_game_hash();
-void                dn_engine_set_target_fps(double fps);
-double              dn_engine_get_target_fps();
-bool                dn_engine_exceeded_frame_time();
-bool                dn_engine_should_exit();
-dn_type_info_list_t dn_engine_query_types();
+void                dn_app_set_exit_game();
+const char*         dn_app_get_game_hash();
+void                dn_app_set_target_fps(double fps);
+double              dn_app_get_target_fps();
+bool                dn_app_exceeded_frame_time();
+bool                dn_app_should_exit();
+dn_type_info_list_t dn_app_query_types();
 
 
 void   dn_time_metric_add(const char* name);
@@ -219,8 +208,8 @@ double dn_time_metric_largest(const char* name);
 double dn_time_metric_smallest(const char* name);
 
 typedef struct {
-  const char* name;
-  const char* path;
+  dn_string_t name;
+  dn_string_t path;
 } dn_named_path_t;
 
 typedef struct {
@@ -229,13 +218,19 @@ typedef struct {
 } dn_named_path_result_t;
 
 dn_named_path_result_t dn_paths_find_all();
-void                   dn_paths_add_install_subpath(const char* name, const char* relative_path);
-void                   dn_paths_add_engine_subpath(const char* name, const char* relative_path);
-void                   dn_paths_add_write_subpath(const char* name, const char* relative_path);
-void                   dn_paths_add_subpath(const char* name, const char* parent_name, const char* relative_path);
-dn_tstring_t           dn_paths_resolve(const char* name);
-dn_tstring_t           dn_paths_resolve_format(const char* name, const char* file_name);
-
+void                   dn_paths_add_install_subpath(dn_string_t name, dn_string_t relative_path);
+void                   dn_paths_add_write_subpath(dn_string_t name, dn_string_t relative_path);
+void                   dn_paths_add_engine_subpath(dn_string_t name, dn_string_t relative_path);
+void                   dn_paths_add_app_subpath(dn_string_t name, dn_string_t relative_path);
+void                   dn_paths_add_subpath(dn_string_t name, dn_string_t parent_name, dn_string_t relative_path);
+dn_string_t            dn_paths_resolve(dn_string_t name);
+dn_string_t            dn_paths_resolve_cstr(const char* name);
+dn_string_t            dn_paths_resolve_format(dn_string_t name, dn_string_t file_name);
+dn_string_t            dn_paths_resolve_format_cstr(const char* name, const char* file_name);
+dn_string_t            dn_paths_resolve_ex(dn_string_t name, dn_allocator_t* allocator);
+dn_string_t            dn_paths_resolve_format_ex(dn_string_t name, dn_string_t file_name, dn_allocator_t* allocator);
+dn_string_t            dn_paths_strip(dn_string_t name, dn_string_t absolute_path);
+void                   dn_paths_add_ex(dn_string_t name, dn_string_t absolute_path);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -525,8 +520,8 @@ typedef enum {
 } dn_display_mode_t;
 
 typedef struct {
-  const char* title;
-  const char* icon;
+  dn_string_t title;
+  dn_string_t icon;
   dn_display_mode_t display_mode;
   dn_vector2_t native_resolution;
   dn_window_flags_t flags;
@@ -914,7 +909,7 @@ void                     dn_gpu_memory_barrier(dn_gpu_memory_barrier_t barrier);
 void                     dn_gpu_dispatch_compute(dn_gpu_buffer_t* buffer, u32 size);
 void                     dn_gpu_swap_buffers();
 void                     dn_gpu_error_clear();
-dn_tstring_t                  dn_gpu_error_read();
+dn_string_t              dn_gpu_error_read();
 void                     dn_gpu_error_log_one();
 void                     dn_gpu_error_log_all();
 void                     dn_gpu_set_resource_name(dn_gpu_resource_id_t id, u32 handle, u32 name_len, const char* name);
@@ -1048,16 +1043,16 @@ typedef struct {
   dn_vector4_t medium_dark;
 } dn_imgui_colors_t;
 
-void    dn_imgui_push_font(const char* font_name, u32 size);
-void    dn_imgui_image(const char* image, float sx, float sy);
-void    dn_imgui_file_browser_open();
-void    dn_imgui_file_browser_close();
-void    dn_imgui_file_browser_set_work_dir(const char* directory);
-bool    dn_imgui_file_browser_is_file_selected();
-dn_tstring_t dn_imgui_file_browser_get_selected_file();
-void    dn_imgui_load_layout(const char* file_name);
-void    dn_imgui_save_layout(const char* file_name);
-void    dn_imgui_load_colors(dn_imgui_colors_t colors);
+void        dn_imgui_push_font(const char* font_name, u32 size);
+void        dn_imgui_image(const char* image, float sx, float sy);
+void        dn_imgui_file_browser_open();
+void        dn_imgui_file_browser_close();
+void        dn_imgui_file_browser_set_work_dir(const char* directory);
+bool        dn_imgui_file_browser_is_file_selected();
+dn_string_t dn_imgui_file_browser_get_selected_file();
+void        dn_imgui_load_layout(const char* file_name);
+void        dn_imgui_save_layout(const char* file_name);
+void        dn_imgui_load_colors(dn_imgui_colors_t colors);
 
 
 
@@ -1205,12 +1200,12 @@ typedef struct {
 
 typedef struct {
   dn_window_config_t window;
-  dn_audio_config_t audio;
-  dn_font_config_t font;
-  dn_gpu_config_t gpu;
-  dn_asset_config_t asset;
-  dn_steam_config_t steam;
-  dn_image_config_t image;
+  // dn_audio_config_t audio;
+  // dn_font_config_t font;
+  // dn_gpu_config_t gpu;
+  // dn_asset_config_t asset;
+  // dn_steam_config_t steam;
+  // dn_image_config_t image;
   u32 target_fps;
 } dn_app_config_t;
 
@@ -1409,52 +1404,6 @@ typedef enum {
 ffi = require('ffi')
 bit = require('bit')
 
--- function doublenickel.handle_error(message)
---   -- Strip the message's filename the script filename to make it more readable
---   local parts = split(message, ' ')
---   local path = parts[1]
---   local path_elements = split(path, '/')
---   local filename = path_elements[#path_elements]
-
---   local message = filename
---   for index = 2, #parts do
---     message = message .. ' ' .. parts[index]
---   end
-
---   local stack_trace = debug.traceback()
---   stack_trace = stack_trace:gsub('stack traceback:\n', '')
---   stack_trace = stack_trace:gsub('\t', ' ')
-
---   -- The stack trace contains absolute paths, which are just hard to read. Also, if the path is long, it is
---   -- shortened with "...". Remove the absolute part of the path, including the "..."
---   local install_dir = dn.paths_resolve('install'):to_interned()
---   local escaped_install = install_dir:gsub('%.', '%%.')
---   local last_path_element = install_dir:match("([^/]+)$")
---   local pattern = '%.%.%.(.*)/' .. last_path_element
-
---   -- Replace the full path first
---   stack_trace = stack_trace:gsub(escaped_install, '')
-
---   -- Then replace any possible shortened versions with ...
---   local shortened_path_pattern = '[^%.]+%.[^%.]+%.[^%.]+%.[^%.]+%.[^%.]+'
---   stack_trace = stack_trace:gsub(pattern, '')
-
---   -- Print
---   local error_message = string.format('lua runtime error:\n\t%s', message)
---   local trace_message = string.format('stack trace:\n%s', stack_trace)
-
---   doublenickel.debug.last_error = error_message
---   doublenickel.debug.last_trace = trace_message
-
---   doublenickel.dn_log(error_message)
---   doublenickel.dn_log(trace_message)
-
---   doublenickel.debug.open_debugger(1)
---   --doublenickel.analytics.submit_crash(error_message, trace_message)
-
---   return
--- end
-
 function doublenickel.handle_error()
   local stack_trace = debug.traceback()
   stack_trace = stack_trace:gsub('stack traceback:\n', '')
@@ -1630,7 +1579,7 @@ function doublenickel.init_phase_0()
   -- The only reason this is here is because I *have* seen MSVC generate a different size than what 
   -- the FFI reports. See the types in the header which are force aligned to 16 bytes.
   local type_mismatch = false
-  local type_infos = ffi.C.dn_engine_query_types()
+  local type_infos = ffi.C.dn_app_query_types()
   for i = 0, type_infos.count - 1 do
     local type_info = type_infos.data[i]
     local ffi_size = ffi.sizeof(ffi.string(type_info.name))
@@ -1645,7 +1594,7 @@ function doublenickel.init_phase_0()
     end
   end
   if type_mismatch then 
-    ffi.C.dn_engine_set_exit_game() -- Technically useless, since the game will explode without bootstrapping
+    ffi.C.dn_app_set_exit_game() -- Technically useless, since the game will explode without bootstrapping
     return 
   end
 
@@ -1681,23 +1630,32 @@ function doublenickel.init_phase_0()
   
     return collected_paths
   end
-  
-  local file_path = ffi.string(ffi.C.dn_paths_resolve('dn_install').data)
+  local file_path = ffi.C.dn_paths_resolve_cstr('dn_paths')
+  local file_path = ffi.string(file_path.data, file_path.len)
   local path_info = dofile(file_path)
 
   local dn_install_paths = collect_paths(path_info.dn_install)
   for index, path in pairs(dn_install_paths) do
-    ffi.C.dn_paths_add_engine_subpath(path.name, path.path)
+    ffi.C.dn_paths_add_engine_subpath(
+      ffi.new('dn_string_t', #path.name, ffi.cast('u8*', path.name)),
+      ffi.new('dn_string_t', #path.path, ffi.cast('u8*', path.path))
+    )
   end
 
   local app_paths = collect_paths(path_info.app_paths)
   for index, path in pairs(app_paths) do
-    ffi.C.dn_paths_add_subpath(path.name, 'app', path.path)
+    ffi.C.dn_paths_add_app_subpath(
+      ffi.new('dn_string_t', #path.name, ffi.cast('u8*', path.name)),
+      ffi.new('dn_string_t', #path.path, ffi.cast('u8*', path.path))
+    )
   end
 
   local write_paths = collect_paths(path_info.write_paths)
   for index, path in pairs(write_paths) do
-    ffi.C.dn_paths_add_write_subpath(path.name, path.path)
+    ffi.C.dn_paths_add_write_subpath(
+      ffi.new('dn_string_t', #path.name, ffi.cast('u8*', path.name)),
+      ffi.new('dn_string_t', #path.path, ffi.cast('u8*', path.path))
+    )
   end
 
   -- We need a couple of files to even be able to load other files (since they
@@ -1713,8 +1671,8 @@ function doublenickel.init_phase_0()
   }
 
   for _, file_name in pairs(loader) do
-    local file_path = ffi.string(ffi.C.dn_paths_resolve_format('engine_script', file_name).data)
-    dofile(file_path)
+    local file_path = ffi.C.dn_paths_resolve_format_cstr('engine_script', file_name)
+    dofile(ffi.string(file_path.data, file_path.len))
   end
 
 

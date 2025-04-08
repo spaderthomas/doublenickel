@@ -155,11 +155,13 @@ function doublenickel.class.metatype(ctype, namespace)
   if not doublenickel.types[ctype] then
     local metatype_indirection = {
       __index = function(t, k)
+        local from_class = getmetatable(doublenickel.types[ctype]).__index(t, k)
+        if from_class then return from_class end
         if namespace then
-          local namespaced_fn = doublenickel.ffi[namespace .. '_' .. k]
+          local namespaced_fn = ffi.C[namespace .. '_' .. k]
           if namespaced_fn then return namespaced_fn end
         end
-        return getmetatable(doublenickel.types[ctype]).__index(t, k)
+        return 
       end
     }
 

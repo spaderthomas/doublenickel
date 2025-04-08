@@ -18,7 +18,7 @@ function EditorConfig:init(params)
   else
     dn.gpu_render_target_create(GpuRenderTargetDescriptor:new({
       name = DnRenderTargets.Editor,
-      size = Vector2:new(320, 180)
+      size = Vector2:new(1024, 576)
     }))
     self.render_pass = GpuRenderPass:new({
       color = {

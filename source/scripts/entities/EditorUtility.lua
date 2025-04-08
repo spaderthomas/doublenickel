@@ -91,7 +91,7 @@ function EditorUtility:draw_grid()
   if not self.enabled.grid then return end
 
   local grid_size = self.style.grid.size
-  local line_thickness = 2
+  local line_thickness = 8
   local edge_thickness = 0
 
   local sdf = doublenickel.editor.sdf
@@ -102,7 +102,7 @@ function EditorUtility:draw_grid()
     local game_camera = doublenickel.entity.find('Camera')
     camera = game_camera or camera
   end
-  
+
   local slop = 300
 
   local min = doublenickel.vec2(
@@ -123,8 +123,17 @@ function EditorUtility:draw_grid()
   )
   if self.style.grid.draw_body then
     -- Draw vertical lines
-    for x = min.x, max.x, grid_size do  
-      sdf:oriented_box({ 
+    for x = min.x, max.x, grid_size do
+      -- ffi.C.dn_sdf_oriented_box_ex(
+      --   sdf,
+      --   x, center.y,
+      --   self.colors.grid.r, self.colors.grid.g, self.colors.grid.b,
+      --   pi / 2,
+      --   edge_thickness,
+      --   render_target.size.y,
+      --   line_thickness
+      -- )
+      sdf:oriented_box({
         position = Vector2:new(x, center.y),
         color = self.colors.grid,
         rotation = doublenickel.math.pi / 2,

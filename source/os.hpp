@@ -38,6 +38,7 @@ DN_API dn_os_directory_entry_list_t dn_os_scan_directory(dn_string_t path);
 DN_API dn_os_directory_entry_list_t dn_os_scan_directory_recursive(dn_string_t path);
 DN_API dn_os_date_time_t            dn_os_get_date_time();
 DN_API f64                          dn_os_file_mod_time(dn_string_t path);
+DN_API dn_string_t                 dn_os_canonize_path(dn_string_t path);
 DN_API void                         dn_os_memory_copy(const void* source, void* dest, u32 num_bytes);
 DN_API bool                         dn_os_is_memory_equal(const void* a, const void* b, size_t len);
 DN_API void                         dn_os_fill_memory(void* buffer, u32 buffer_size, void* fill, u32 fill_size);
@@ -208,6 +209,16 @@ f64 dn_os_file_mod_time(dn_string_t file_path) {
   double file_mod_time_epoch = file_mod_time_s.time_since_epoch().count();
   
   return file_mod_time_epoch;
+}
+
+dn_string_t dn_os_canonize_path(dn_string_t path) {
+  dn_string_t canonical_path = {
+    .data = dn::allocator::alloc<u8>(&dn_allocators.bump, DN_MAX_PATH_LEN),
+    .len = 0
+  };
+
+  canonical_path.len = GetFullPathNameA((LPCSTR)path.data, MAX_PATH, (LPSTR)canonical_path.data, NULL);
+  return canonical_path;
 }
 
 dn_os_file_attr_t dn_os_winapi_attr_to_dn_attr(u32 attr) {
