@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <inttypes.h>
+#include <float.h>
 
 #ifdef DN_APP
 #define DN_LUA
@@ -75,6 +76,8 @@ typedef uint64_t u64;
 typedef float f32;
 typedef double f64;
 #endif
+
+#define DN_F64_MAX DBL_MAX
 
 typedef u64 dn_hash_t;
 
@@ -467,6 +470,8 @@ DN_API bool                         dn_os_is_memory_equal(const void* a, const v
 DN_API void                         dn_os_fill_memory(void* buffer, u32 buffer_size, void* fill, u32 fill_size);
 DN_API void                         dn_os_fill_memory_u8(void* buffer, u32 buffer_size, u8 fill);
 DN_API void                         dn_os_zero_memory(void* buffer, u32 buffer_size);
+DN_API void                         dn_os_sleep_ms(f64 ms);
+DN_API u64                          dn_os_time_since_epoch();
 DN_IMP dn_os_file_attr_t            dn_os_winapi_attr_to_dn_attr(u32 attr);
 
 #define dn_os_arr_copy(source, dest) { static_assert(sizeof(source) == sizeof(dest), "dn_os_arr_copy expects two C arrays of the same size"); dn_os_memory_copy(source, dest, sizeof(dest)); }
@@ -604,27 +609,60 @@ typedef struct {
 	dn_ring_buffer_t* buffer;
 } dn_ring_buffer_iterator_t;
 
-void* dn_ring_buffer_at(dn_ring_buffer_t* buffer, u32 index);
-void  dn_ring_buffer_init(dn_ring_buffer_t* buffer, u32 capacity, u32 element_size);
-void* dn_ring_buffer_back(dn_ring_buffer_t* buffer);
-void* dn_ring_buffer_push(dn_ring_buffer_t* buffer, void* data);
-void* dn_ring_buffer_push_zero(dn_ring_buffer_t* buffer);
-void* dn_ring_buffer_push_overwrite(dn_ring_buffer_t* buffer, void* data);
-void* dn_ring_buffer_push_overwrite_zero(dn_ring_buffer_t* buffer);
-void* dn_ring_buffer_pop(dn_ring_buffer_t* buffer);
-u32   dn_ring_buffer_bytes(dn_ring_buffer_t* buffer);
-void  dn_ring_buffer_clear(dn_ring_buffer_t* buffer);
-bool  dn_ring_buffer_is_full(dn_ring_buffer_t* buffer);
-bool  dn_ring_buffer_is_empty(dn_ring_buffer_t* buffer);
-void* dn_ring_buffer_iter_deref(dn_ring_buffer_iterator_t* it);
-void  dn_ring_buffer_iter_next(dn_ring_buffer_iterator_t* it);
-void  dn_ring_buffer_iter_prev(dn_ring_buffer_iterator_t* it);
-bool  dn_ring_buffer_iter_done(dn_ring_buffer_iterator_t* it);
-dn_ring_buffer_iterator_t dn_ring_buffer_iter(dn_ring_buffer_t* buffer);
-dn_ring_buffer_iterator_t dn_ring_buffer_riter(dn_ring_buffer_t* buffer);
+DN_API void*                     dn_ring_buffer_at(dn_ring_buffer_t* buffer, u32 index);
+DN_API void                      dn_ring_buffer_init(dn_ring_buffer_t* buffer, u32 capacity, u32 element_size);
+DN_API void*                     dn_ring_buffer_back(dn_ring_buffer_t* buffer);
+DN_API void*                     dn_ring_buffer_push(dn_ring_buffer_t* buffer, void* data);
+DN_API void*                     dn_ring_buffer_push_zero(dn_ring_buffer_t* buffer);
+DN_API void*                     dn_ring_buffer_push_overwrite(dn_ring_buffer_t* buffer, void* data);
+DN_API void*                     dn_ring_buffer_push_overwrite_zero(dn_ring_buffer_t* buffer);
+DN_API void*                     dn_ring_buffer_pop(dn_ring_buffer_t* buffer);
+DN_API u32                       dn_ring_buffer_bytes(dn_ring_buffer_t* buffer);
+DN_API void                      dn_ring_buffer_clear(dn_ring_buffer_t* buffer);
+DN_API bool                      dn_ring_buffer_is_full(dn_ring_buffer_t* buffer);
+DN_API bool                      dn_ring_buffer_is_empty(dn_ring_buffer_t* buffer);
+DN_API void*                     dn_ring_buffer_iter_deref(dn_ring_buffer_iterator_t* it);
+DN_API void                      dn_ring_buffer_iter_next(dn_ring_buffer_iterator_t* it);
+DN_API void                      dn_ring_buffer_iter_prev(dn_ring_buffer_iterator_t* it);
+DN_API bool                      dn_ring_buffer_iter_done(dn_ring_buffer_iterator_t* it);
+DN_API dn_ring_buffer_iterator_t dn_ring_buffer_iter(dn_ring_buffer_t* buffer);
+DN_API dn_ring_buffer_iterator_t dn_ring_buffer_riter(dn_ring_buffer_t* buffer);
 
-#define dn_ring_buffer_for(rb, it)  for (dn_ring_buffer_iterator_t (it) = dn_ring_buffer_iter((&rb));  !dn_ring_buffer_iter_done(&(it)); !dn_ring_buffer_iter_next(&(it)))
-#define dn_ring_buffer_rfor(rb, it) for (dn_ring_buffer_iterator_t (it) = dn_ring_buffer_riter((&rb)); !dn_ring_buffer_iter_done(&(it)); !dn_ring_buffer_iter_prev(&(it)))
+#define dn_ring_buffer_for(rb, it)  for (dn_ring_buffer_iterator_t (it) = dn_ring_buffer_iter((&(rb)));  !dn_ring_buffer_iter_done(&(it)); dn_ring_buffer_iter_next(&(it)))
+#define dn_ring_buffer_rfor(rb, it) for (dn_ring_buffer_iterator_t (it) = dn_ring_buffer_riter((&(rb))); !dn_ring_buffer_iter_done(&(it)); dn_ring_buffer_iter_prev(&(it)))
+#define dn_rb_it(it, t) (t*)dn_ring_buffer_iter_deref(&(it))
+
+// ████████╗██╗███╗   ███╗███████╗██████╗ ███████╗
+// ╚══██╔══╝██║████╗ ████║██╔════╝██╔══██╗██╔════╝
+//    ██║   ██║██╔████╔██║█████╗  ██████╔╝███████╗
+//    ██║   ██║██║╚██╔╝██║██╔══╝  ██╔══██╗╚════██║
+//    ██║   ██║██║ ╚═╝ ██║███████╗██║  ██║███████║
+//    ╚═╝   ╚═╝╚═╝     ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝
+typedef struct {
+	dn_ring_buffer(f64) queue;
+	f64 time_begin;
+} dn_time_metric_t;
+
+typedef struct {
+  gs_hash_table(dn_hash_t, dn_time_metric_t) metrics;
+} dn_time_metrics_t;
+dn_time_metrics_t dn_time_metrics;
+
+DN_API void              dn_time_metric_init(dn_time_metric_t* metric);
+DN_API void              dn_time_metric_begin_ex(dn_time_metric_t* metric);
+DN_API void              dn_time_metric_end_ex(dn_time_metric_t* metric);
+DN_API f64               dn_time_metric_average(dn_time_metric_t* metric);
+DN_API f64               dn_time_metric_last(dn_time_metric_t* metric);
+DN_API f64               dn_time_metric_largest(dn_time_metric_t* metric);
+DN_API f64               dn_time_metric_smallest(dn_time_metric_t* metric);
+DN_API void              dn_time_metric_busy_wait(dn_time_metric_t* metric, f64 target);
+DN_API void              dn_time_metric_sleep_wait(dn_time_metric_t* metric, f64 target);
+DN_API void              dn_time_metric_begin(dn_string_t name);
+DN_API void              dn_time_metric_end(dn_string_t name);
+DN_API dn_time_metric_t* dn_time_metrics_find(dn_string_t name);
+DN_API void              dn_time_metrics_add(dn_string_t name);
+DN_IMP void              dn_time_metrics_init();
+DN_IMP void              dn_time_metrics_update();
 
 
 //  ██╗      ██████╗  ██████╗
@@ -649,11 +687,12 @@ dn_log_t dn_logger;
 
 DN_API void dn_log(const char* fmt, ...);
 DN_API void dn_log_flags(dn_log_flags_t flags, const char* fmt, ...);
+DN_API void dn_log_builder(dn_string_builder_t builder);
+DN_API void dn_log_str(dn_string_t message);
 DN_IMP void dn_log_v(dn_log_flags_t flags, const char* fmt, va_list fmt_args);
 DN_IMP void dn_log_format_str(dn_string_t fmt, ...);
-DN_IMP void dn_log_str(dn_string_t message);
-DN_API void dn_log_builder(dn_string_builder_t builder);
 DN_IMP void dn_log_flush(dn_log_flags_t flags);
+DN_IMP void dn_log_build_preamble();
 DN_IMP void dn_log_zero();
 DN_IMP void dn_log_init();
 #define DN_LOG(fmt, ...) dn_log("%s: " fmt, __func__, __VA_ARGS__)
@@ -1062,6 +1101,116 @@ dn_vector4_t dn_math_clamp4(dn_vector4_t v, float minVal, float maxVal) {
     return result;
 }
 
+
+//////////////////
+// TIME METRICS //
+//////////////////
+void dn_time_metrics_init() {
+	dn_time_metrics_add(dn_string_literal("frame"));
+}
+
+void dn_time_metrics_update() {
+  dn_time_metric_t* frame = dn_time_metrics_find(dn_string_literal("frame"));
+  dn_time_metric_end_ex(frame);
+  dn_time_metric_busy_wait(frame, dn_app.dt);
+}
+
+void dn_time_metric_init(dn_time_metric_t* metric) {
+	dn_ring_buffer_init(&metric->queue, 64, sizeof(dn_time_metric_t));
+}
+
+void dn_time_metric_begin_ex(dn_time_metric_t* metric) {
+	metric->time_begin = glfwGetTime();
+}
+
+void dn_time_metric_end_ex(dn_time_metric_t* metric) {
+	f64 time_end = glfwGetTime();
+	f64 delta = time_end - metric->time_begin;
+	dn_ring_buffer_push_overwrite(&metric->queue, &delta);
+}
+
+f64 dn_time_metric_get_average(dn_time_metric_t* metric) {
+  if (dn_ring_buffer_is_empty(&metric->queue)) return 0;
+	
+	f64 total = 0;
+	dn_ring_buffer_for(metric->queue, entry) {
+		total += *dn_rb_it(entry, f64);
+	}
+
+	return total / metric->queue.size;
+}
+
+f64 dn_time_metric_get_last(dn_time_metric_t* metric) {
+  if (dn_ring_buffer_is_empty(&metric->queue)) return 0;
+  return *(f64*)dn_ring_buffer_back(&metric->queue);
+}
+
+f64 dn_time_metric_get_largest(dn_time_metric_t* metric) {
+	f64 max_entry = 0;
+	dn_ring_buffer_for(metric->queue, entry) {
+		max_entry = dn_max(max_entry, *dn_rb_it(entry, f64));
+	}
+
+	return max_entry;
+}
+
+f64 dn_time_metric_get_smallest(dn_time_metric_t* metric) {
+	f64 min_entry = DN_F64_MAX;
+	dn_ring_buffer_for(metric->queue, entry) {
+		min_entry = dn_min(min_entry, *dn_rb_it(entry, f64));
+	}
+
+	return min_entry;
+}
+
+void dn_time_metric_sleep_wait(dn_time_metric_t* metric, f64 target) {
+	while (true) {
+		f64 delta = glfwGetTime() - metric->time_begin;
+		if (delta >= target) break;
+
+		f64 remaining_time = target - delta;
+		if (remaining_time > 0) {
+      dn_os_sleep_ms(remaining_time * 1e3);
+		}
+	}
+}
+
+void dn_time_metric_busy_wait(dn_time_metric_t* metric, f64 target) {
+	while (true) {
+		auto delta = glfwGetTime() - metric->time_begin;
+		if (delta >= target) break;
+	}
+}
+
+dn_time_metric_t* dn_time_metrics_find(dn_string_t name) {
+  dn_hash_t hash = dn_hash_string(name);
+  if (!gs_hash_table_exists(dn_time_metrics.metrics, hash)) {
+    dn_log("Tried to find time metric, but it was not registered; name = %.*s", __func__, name.len, name.data);
+  }
+
+  return gs_hash_table_getp(dn_time_metrics.metrics, hash);
+}
+
+void dn_time_metrics_add(dn_string_t name) {
+	dn_time_metric_t time_metric;
+  dn_time_metric_init(&time_metric);
+	gs_hash_table_insert(dn_time_metrics.metrics, dn_hash_string(name), time_metric);
+}
+
+void dn_time_metric_begin(dn_string_t name) {
+  dn_time_metric_t* metric = dn_time_metrics_find(name);
+  if (!metric) return;
+  
+  dn_time_metric_begin_ex(metric);
+}
+
+void dn_time_metric_end(dn_string_t name) {
+  dn_time_metric_t* metric = dn_time_metrics_find(name);
+  if (!metric) return;
+
+  dn_time_metric_end_ex(metric);
+}
+
 /////////
 // LOG //
 /////////
@@ -1091,30 +1240,29 @@ void dn_log_flags(dn_log_flags_t flags, const char* fmt, ...) {
 }
 
 void dn_log_v(dn_log_flags_t flags, const char* fmt, va_list fmt_args) {
-  // @fix
-  // struct timeval tv;
-  // gettimeofday(&tv, NULL);
-  // uint64_t ms_since_epoch = (uint64_t)(tv.tv_sec) * 1000 + (tv.tv_usec / 1000);
-  uint64_t ms_since_epoch = 69;
-  time_t sec_since_epoch = (time_t)(ms_since_epoch / 1000);
-  struct tm* time_info = localtime(&sec_since_epoch);
-
-	snprintf(dn_logger.preamble_buffer, DN_LOGGER_PREAMBLE_BUFFER_SIZE, "[%04d-%02d-%02d %02d:%02d:%02d.%03" DN_FMT_U64 "]",
-			 1900 + time_info->tm_year, 1 + time_info->tm_mon, time_info->tm_mday,
-			 time_info->tm_hour, time_info->tm_min, time_info->tm_sec, ms_since_epoch % 1000);
-
+  dn_log_build_preamble();
 	vsnprintf(&dn_logger.message_buffer[0], DN_LOGGER_MESSAGE_BUFFER_SIZE, fmt, fmt_args);
-
 	dn_log_flush(flags);
 }
 
 void dn_log_str(dn_string_t message) {
+  dn_log_build_preamble();
 	snprintf(dn_logger.message_buffer, DN_LOGGER_MESSAGE_BUFFER_SIZE, "%.*s", message.len, message.data);
 	dn_log_flush(DN_LOG_FLAG_CONSOLE);
 }
 
 void dn_log_builder(dn_string_builder_t builder) {
 	dn_log_str(dn_string_builder_write(&builder));
+}
+
+void dn_log_build_preamble() {
+  uint64_t ms_since_epoch = dn_os_time_since_epoch();
+  time_t sec_since_epoch = (time_t)(ms_since_epoch / 1000);
+  struct tm* time_info = localtime(&sec_since_epoch);
+
+	snprintf(dn_logger.preamble_buffer, DN_LOGGER_PREAMBLE_BUFFER_SIZE, "[%04d-%02d-%02d %02d:%02d:%02d.%03" DN_FMT_U64 "]",
+			 1900 + time_info->tm_year, 1 + time_info->tm_mon, time_info->tm_mday,
+			 time_info->tm_hour, time_info->tm_min, time_info->tm_sec, ms_since_epoch % 1000);
 }
 
 void dn_log_flush(dn_log_flags_t flags) {
@@ -1927,6 +2075,25 @@ void dn_os_fill_memory_u8(void* buffer, u32 buffer_size, u8 fill) {
 
 void dn_os_zero_memory(void* buffer, u32 buffer_size) {
   dn_os_fill_memory_u8(buffer, buffer_size, 0);
+}
+
+void dn_os_sleep_ms(f64 ms) {
+  Sleep(ms);
+}
+
+u64 dn_os_time_since_epoch() {
+  FILETIME file_time;
+  ULARGE_INTEGER time;
+
+  GetSystemTimeAsFileTime(&file_time);
+
+  time.LowPart  = file_time.dwLowDateTime;
+  time.HighPart = file_time.dwHighDateTime;
+
+  u64 epoch_delta = 11644473600ULL * 10000000ULL;
+  u64 time_100ns = time.QuadPart - epoch_delta;
+
+  return time_100ns / 10000ULL;
 }
 
 ////////////////////

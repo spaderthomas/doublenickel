@@ -523,7 +523,7 @@ function dn.String:init(path)
 end
 
 function dn.String:to_interned()
-  return ffi.string(self.len, self.data)
+  return ffi.string(self.data, self.len)
 end
 
 
@@ -1059,8 +1059,24 @@ end
 -- ██╔══╝  ██╔══╝  ██║    ██║███╗██║██╔══██╗██╔══██║██╔═══╝ ██╔═══╝ ██╔══╝  ██╔══██╗╚════██║
 -- ██║     ██║     ██║    ╚███╔███╔╝██║  ██║██║  ██║██║     ██║     ███████╗██║  ██║███████║
 -- ╚═╝     ╚═╝     ╚═╝     ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝     ╚══════╝╚═╝  ╚═╝╚══════╝
+function dn.log(fmt, ...)
+  return ffi.C.dn_log_str(dn.String:new(string.format(fmt, ...)))
+end
+
+function dn.time_metrics_add(name)
+    return ffi.C.dn_time_metrics_add(dn.String:new(name))
+end
+
 function dn.paths_resolve(name)
   return ffi.C.dn_paths_resolve(dn.String:new(name)):to_interned()
+end
+
+function dn.paths_resolve_format(name, file_name)
+  return ffi.C.dn_paths_resolve_format(dn.String:new(name), dn.String:new(file_name)):to_interned()
+end
+
+function dn.paths_add_subpath(name, parent_name, relative_path)
+  return ffi.C.dn_paths_add_subpath(dn.String:new(name), dn.String:new(parent_name), dn.String:new(relative_path))
 end
 
 function dn.os_scan_directory(path)

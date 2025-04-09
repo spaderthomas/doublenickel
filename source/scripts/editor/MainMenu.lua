@@ -191,7 +191,7 @@ function MainMenu:Dialogue()
 		-- The hotkey entity in the editor takes care of the hotkey part
 		local dialogue_editor = doublenickel.find_entity_editor('DialogueEditor')
 		if imgui.MenuItem('Open', 'Ctrl+O') then
-			local directory = dn.paths_resolve('dialogues'):to_interned()
+			local directory = dn.paths_resolve('dialogues')
 			imgui.file_browser_set_work_dir(directory)
 			imgui.file_browser_open()
 			self.state = state.choosing_dialogue
@@ -240,7 +240,7 @@ function MainMenu:Window()
 	if imgui.BeginMenu('Window') then
 		if imgui.BeginMenu('Layout') then
 			if imgui.BeginMenu('Open') then
-				local layout_dir = dn.paths_resolve('layouts'):to_interned()
+				local layout_dir = dn.paths_resolve('layouts')
 				for entry in doublenickel.filesystem.iterate_directory(layout_dir) do
 					local layout = ffi.string(dn.string_to_cstr(entry.file_path))
 					if imgui.MenuItem(doublenickel.strip_extension(layout)) then

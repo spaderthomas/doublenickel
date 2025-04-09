@@ -151,7 +151,7 @@ function AnimationEditor:popup()
 		end
 
 		imgui.InputText(self.ids.import, self, 'import_dir')
-		local import_path = dn.paths_resolve_format('dn_image', self.import_dir):to_interned()
+		local import_path = dn.paths_resolve_format('dn_image', self.import_dir)
 		local import_valid = dn.os_does_path_exist(import_path) and #self.import_dir > 0
 		imgui.SameLine()
 
@@ -166,7 +166,7 @@ function AnimationEditor:popup()
 			
 			local files = {}
 			for entry in doublenickel.filesystem.iterate_directory(import_path) do
-				table.insert(files, entry.file_path:to_interned())
+				table.insert(files, entry.file_path)
 			end
 			table.sort(files)
 

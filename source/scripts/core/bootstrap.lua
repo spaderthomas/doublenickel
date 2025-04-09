@@ -20,10 +20,16 @@ local ffi_header = [[
 ////////////////////////////////////////////////
    
 
-typedef uint8_t u8;
+typedef int8_t   s8;
+typedef int16_t  s16;
+typedef int32_t  s32;
+typedef int64_t  s64;
+
+typedef uint8_t  u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
-typedef int32_t  i32;
+typedef uint64_t u64;
+
 typedef float f32;
 typedef double f64;
 
@@ -167,8 +173,7 @@ bool                         dn_os_is_memory_equal(const void* a, const void* b,
 void                         dn_os_fill_memory(void* buffer, u32 buffer_size, void* fill, u32 fill_size);
 void                         dn_os_fill_memory_u8(void* buffer, u32 buffer_size, u8 fill);
 void                         dn_os_zero_memory(void* buffer, u32 buffer_size);
-
-
+u64                          dn_os_time_since_epoch();
 
 
 //////////////////////////////////////////////////////
@@ -199,14 +204,12 @@ bool                dn_app_should_exit();
 dn_type_info_list_t dn_app_query_types();
 
 
-void   dn_time_metric_add(const char* name);
-void   dn_time_metric_begin(const char* name);
-void   dn_time_metric_end(const char* name);
-double dn_time_metric_average(const char* name);
-double dn_time_metric_last(const char* name);
-double dn_time_metric_largest(const char* name);
-double dn_time_metric_smallest(const char* name);
-
+//  ██████╗  █████╗ ████████╗██╗  ██╗███████╗
+//  ██╔══██╗██╔══██╗╚══██╔══╝██║  ██║██╔════╝
+//  ██████╔╝███████║   ██║   ███████║███████╗
+//  ██╔═══╝ ██╔══██║   ██║   ██╔══██║╚════██║
+//  ██║     ██║  ██║   ██║   ██║  ██║███████║
+//  ╚═╝     ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚══════╝
 typedef struct {
   dn_string_t name;
   dn_string_t path;
@@ -258,12 +261,75 @@ u32  dn_fixed_array_byte_size(dn_fixed_array_t* vertex_buffer);
 u8*  dn_fixed_array_at(dn_fixed_array_t* vertex_buffer, u32 index);
 
 typedef struct {
-  i32 index;
-  i32 generation;
+  s32 index;
+  s32 generation;
 } dn_gen_arena_handle_t;
 
 void dn_cstr_copy(const char* str, char* buffer, u32 buffer_length);
 void dn_cstr_copy_n(const char* str, u32 length, char* buffer, u32 buffer_length);
+
+
+/////////////////
+// RING BUFFER //
+/////////////////
+typedef struct {
+	u8* data;
+  u32 element_size;
+	u32 head;
+	u32 size;
+	u32 capacity;
+} dn_ring_buffer_t;
+
+typedef struct {
+	u32 index;
+	bool reverse;
+	dn_ring_buffer_t* buffer;
+} dn_ring_buffer_iterator_t;
+
+void*                     dn_ring_buffer_at(dn_ring_buffer_t* buffer, u32 index);
+void                      dn_ring_buffer_init(dn_ring_buffer_t* buffer, u32 capacity, u32 element_size);
+void*                     dn_ring_buffer_back(dn_ring_buffer_t* buffer);
+void*                     dn_ring_buffer_push(dn_ring_buffer_t* buffer, void* data);
+void*                     dn_ring_buffer_push_zero(dn_ring_buffer_t* buffer);
+void*                     dn_ring_buffer_push_overwrite(dn_ring_buffer_t* buffer, void* data);
+void*                     dn_ring_buffer_push_overwrite_zero(dn_ring_buffer_t* buffer);
+void*                     dn_ring_buffer_pop(dn_ring_buffer_t* buffer);
+u32                       dn_ring_buffer_bytes(dn_ring_buffer_t* buffer);
+void                      dn_ring_buffer_clear(dn_ring_buffer_t* buffer);
+bool                      dn_ring_buffer_is_full(dn_ring_buffer_t* buffer);
+bool                      dn_ring_buffer_is_empty(dn_ring_buffer_t* buffer);
+void*                     dn_ring_buffer_iter_deref(dn_ring_buffer_iterator_t* it);
+void                      dn_ring_buffer_iter_next(dn_ring_buffer_iterator_t* it);
+void                      dn_ring_buffer_iter_prev(dn_ring_buffer_iterator_t* it);
+bool                      dn_ring_buffer_iter_done(dn_ring_buffer_iterator_t* it);
+dn_ring_buffer_iterator_t dn_ring_buffer_iter(dn_ring_buffer_t* buffer);
+dn_ring_buffer_iterator_t dn_ring_buffer_riter(dn_ring_buffer_t* buffer);
+
+
+// ████████╗██╗███╗   ███╗███████╗██████╗ ███████╗
+// ╚══██╔══╝██║████╗ ████║██╔════╝██╔══██╗██╔════╝
+//    ██║   ██║██╔████╔██║█████╗  ██████╔╝███████╗
+//    ██║   ██║██║╚██╔╝██║██╔══╝  ██╔══██╗╚════██║
+//    ██║   ██║██║ ╚═╝ ██║███████╗██║  ██║███████║
+//    ╚═╝   ╚═╝╚═╝     ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝
+typedef struct {
+	dn_ring_buffer_t queue;
+	f64 time_begin;
+} dn_time_metric_t;
+
+void              dn_time_metric_init(dn_time_metric_t* metric);
+void              dn_time_metric_begin_ex(dn_time_metric_t* metric);
+void              dn_time_metric_end_ex(dn_time_metric_t* metric);
+f64               dn_time_metric_average(dn_time_metric_t* metric);
+f64               dn_time_metric_last(dn_time_metric_t* metric);
+f64               dn_time_metric_largest(dn_time_metric_t* metric);
+f64               dn_time_metric_smallest(dn_time_metric_t* metric);
+void              dn_time_metric_busy_wait(dn_time_metric_t* metric, f64 target);
+void              dn_time_metric_sleep_wait(dn_time_metric_t* metric, f64 target);
+void              dn_time_metric_begin(dn_string_t name);
+void              dn_time_metric_end(dn_string_t name);
+dn_time_metric_t* dn_time_metrics_find(dn_string_t name);
+void              dn_time_metrics_add(dn_string_t name);
 
 
 ///////////////////////////////////////////
@@ -677,8 +743,8 @@ typedef union {
   dn_vector3_t vec3;
   dn_vector2_t vec2;
   float f32;
-  i32 texture;
-  i32 i32;
+  s32 texture;
+  s32 s32;
 } dn_gpu_uniform_data_t;
 
 typedef struct {
@@ -1076,7 +1142,7 @@ void activate_action_set(const char* name);
 bool is_digital_active(const char* name);
 bool was_digital_active(const char* name);
 bool was_digital_pressed(const char* name);
-i32 get_action_set_cooldown();
+s32 get_action_set_cooldown();
 const char* get_active_action_set();
 
 
@@ -1327,8 +1393,8 @@ typedef enum {
 } ParticlePositionMode;
 
 typedef struct {
-  i32 index;
-  i32 generation;
+  s32 index;
+  s32 generation;
 } ParticleSystemHandle;
 
 typedef struct {
@@ -1371,7 +1437,7 @@ void set_particle_opacity_jitter(ParticleSystemHandle handle, float jitter);
 void set_particle_jitter_opacity(ParticleSystemHandle handle, bool jitter);
 void set_particle_opacity_interpolation(ParticleSystemHandle handle, bool active, float start_time, float interpolate_to);
 void set_particle_warm(ParticleSystemHandle system, bool warm);
-void set_particle_warmup(ParticleSystemHandle system, i32 warmup);
+void set_particle_warmup(ParticleSystemHandle system, s32 warmup);
 void set_particle_gravity_source(ParticleSystemHandle handle, float x, float y);
 void set_particle_gravity_intensity(ParticleSystemHandle handle, float intensity);
 void set_particle_gravity_enabled(ParticleSystemHandle handle, bool enabled);
@@ -1396,8 +1462,10 @@ typedef enum {
   DN_LOG_FLAG_DEFAULT = 3,
 } dn_log_flags_t;
 
-//void dn_log(const char* fmt, ...);
-//void dn_log_flags(dn_log_flags_t flags, const char* fmt, ...);
+void dn_log(const char* fmt, ...);
+void dn_log_flags(dn_log_flags_t flags, const char* fmt, ...);
+void dn_log_builder(dn_string_builder_t builder);
+void dn_log_str(dn_string_t message);
 
 ]]
 
@@ -1411,7 +1479,7 @@ function doublenickel.handle_error()
 
   -- The stack trace contains absolute paths, which are just hard to read. Also, if the path is long, it is
   -- shortened with "...". Remove the absolute part of the path, including the "..."
-  local install_dir = dn.paths_resolve('install'):to_interned()
+  local install_dir = dn.paths_resolve('dn_install')
   local escaped_install = install_dir:gsub('%.', '%%.')
   local last_path_element = install_dir:match("([^/]+)$")
   local pattern = '%.%.%.(.*)/' .. last_path_element
@@ -1424,7 +1492,7 @@ function doublenickel.handle_error()
   stack_trace = stack_trace:gsub(pattern, '')
 
   local trace_message = string.format('stack trace:\n%s', stack_trace)
-  doublenickel.dn_log(trace_message)
+  dn.log(trace_message)
 
   doublenickel.debug.open_debugger(1)
 end
