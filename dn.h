@@ -213,8 +213,8 @@ typedef union {
 #endif
 
 typedef struct {
-	s32 x;
-	s32 y;
+  s32 x;
+  s32 y;
 } dn_vector2i_t;
 
 f32          dn_math_step(f32 edge, f32 x);
@@ -237,56 +237,56 @@ typedef dn_vector4_t dn_color_t;
 
 typedef struct {
   dn_color_t indian_red;
-	dn_color_t tyrian_purple;
-	dn_color_t cardinal;
+  dn_color_t tyrian_purple;
+  dn_color_t cardinal;
   dn_color_t celadon;
-	dn_color_t spring_green;
-	dn_color_t mindaro;
-	dn_color_t light_green;
+  dn_color_t spring_green;
+  dn_color_t mindaro;
+  dn_color_t light_green;
   dn_color_t zomp;
-	dn_color_t midnight_green;
-	dn_color_t prussian_blue;
-	dn_color_t orange;
-	dn_color_t sunglow;
-	dn_color_t selective_yellow;
+  dn_color_t midnight_green;
+  dn_color_t prussian_blue;
+  dn_color_t orange;
+  dn_color_t sunglow;
+  dn_color_t selective_yellow;
   dn_color_t gunmetal;
-	dn_color_t paynes_gray;
-	dn_color_t cadet_gray;
-	dn_color_t charcoal;
-	dn_color_t cool_gray;
-	dn_color_t cream;
-	dn_color_t misty_rose;
-	dn_color_t taupe;
-	dn_color_t dark_green;
-	dn_color_t rich_black;
-	dn_color_t white;
+  dn_color_t paynes_gray;
+  dn_color_t cadet_gray;
+  dn_color_t charcoal;
+  dn_color_t cool_gray;
+  dn_color_t cream;
+  dn_color_t misty_rose;
+  dn_color_t taupe;
+  dn_color_t dark_green;
+  dn_color_t rich_black;
+  dn_color_t white;
 } dn_colors_t;
 
 dn_colors_t dn_colors = {
   .indian_red       = dn_rgb_255(180, 101, 111), // RED
-	.tyrian_purple    = dn_rgb_255(95,  26,  55),
-	.cardinal         = dn_rgb_255(194, 37,  50),
+  .tyrian_purple    = dn_rgb_255(95,  26,  55),
+  .cardinal         = dn_rgb_255(194, 37,  50),
   .celadon          = dn_rgb_255(183, 227, 204), // GREEN
-	.spring_green     = dn_rgb_255(89,  255, 160),
-	.mindaro          = dn_rgb_255(188, 231, 132),
-	.light_green      = dn_rgb_255(161, 239, 139),
+  .spring_green     = dn_rgb_255(89,  255, 160),
+  .mindaro          = dn_rgb_255(188, 231, 132),
+  .light_green      = dn_rgb_255(161, 239, 139),
   .zomp             = dn_rgb_255(99,  160, 136),
-	.midnight_green   = dn_rgb_255(25,  83,  95),
-	.prussian_blue    = dn_rgb_255(16,  43,  63),  // BLUE
-	.orange           = dn_rgb_255(249, 166, 32),  // ORANGE
-	.sunglow          = dn_rgb_255(255, 209, 102),
+  .midnight_green   = dn_rgb_255(25,  83,  95),
+  .prussian_blue    = dn_rgb_255(16,  43,  63),  // BLUE
+  .orange           = dn_rgb_255(249, 166, 32),  // ORANGE
+  .sunglow          = dn_rgb_255(255, 209, 102),
   .selective_yellow = dn_rgb_255(250, 188, 42),
   .gunmetal         = dn_rgb_255(43,  61,  65),  // GRAY
-	.paynes_gray      = dn_rgb_255(76,  95,  107),
-	.cadet_gray       = dn_rgb_255(131, 160, 160),
-	.charcoal         = dn_rgb_255(64,  67,  78),
-	.cool_gray        = dn_rgb_255(140, 148, 173),
-	.cream            = dn_rgb_255(245, 255, 198),  // OFF WHITE
-	.misty_rose       = dn_rgb_255(255, 227, 227),
-	.taupe            = dn_rgb_255(68,  53,  39),   // BROWN
-	.dark_green       = dn_rgb_255(4,   27,  21),   // BLACK
-	.rich_black       = dn_rgb_255(4,   10,  15),
-	.white            = dn_rgb_255(255, 255, 255),
+  .paynes_gray      = dn_rgb_255(76,  95,  107),
+  .cadet_gray       = dn_rgb_255(131, 160, 160),
+  .charcoal         = dn_rgb_255(64,  67,  78),
+  .cool_gray        = dn_rgb_255(140, 148, 173),
+  .cream            = dn_rgb_255(245, 255, 198),  // OFF WHITE
+  .misty_rose       = dn_rgb_255(255, 227, 227),
+  .taupe            = dn_rgb_255(68,  53,  39),   // BROWN
+  .dark_green       = dn_rgb_255(4,   27,  21),   // BLACK
+  .rich_black       = dn_rgb_255(4,   10,  15),
+  .white            = dn_rgb_255(255, 255, 255),
 };
 
 dn_color_t dn_color_rgb_to_hsv(dn_color_t color);
@@ -300,28 +300,28 @@ dn_color_t dn_color_hsv_to_rgb(dn_color_t color);
 //  ██║ ╚═╝ ██║███████╗██║ ╚═╝ ██║╚██████╔╝██║  ██║   ██║
 //  ╚═╝     ╚═╝╚══════╝╚═╝     ╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝
 typedef enum {
-	DN_ALLOCATOR_MODE_ALLOC,
-	DN_ALLOCATOR_MODE_FREE,
-	DN_ALLOCATOR_MODE_RESIZE,
+  DN_ALLOCATOR_MODE_ALLOC,
+  DN_ALLOCATOR_MODE_FREE,
+  DN_ALLOCATOR_MODE_RESIZE,
 } dn_allocator_mode_t;
 
 struct dn_allocator_t;
 
 dn_typedef_fn(
-	void*,
-	dn_alloc_fn_t,
-	struct dn_allocator_t* allocator, dn_allocator_mode_t mode, u32 size, void* previous_allocation
+  void*,
+  dn_alloc_fn_t,
+  struct dn_allocator_t* allocator, dn_allocator_mode_t mode, u32 size, void* previous_allocation
 );
 
 typedef struct dn_allocator_t {
-	dn_alloc_fn_t on_alloc;
+  dn_alloc_fn_t on_alloc;
 } dn_allocator_t;
 
 typedef struct {
   dn_allocator_t allocator;
-	u8* buffer;
-	u32 capacity;
-	u32 bytes_used;
+  u8* buffer;
+  u32 capacity;
+  u32 bytes_used;
   gs_hash_table(u32, u32) allocations;
 } dn_bump_allocator_t;
 
@@ -330,8 +330,8 @@ typedef struct {
 } dn_standard_allocator_t;
 
 typedef struct {
-	dn_standard_allocator_t standard;
-	dn_bump_allocator_t bump;
+  dn_standard_allocator_t standard;
+  dn_bump_allocator_t bump;
   gs_hash_table(dn_hash_t, dn_allocator_t*) allocators;
 } dn_allocators_t;
 dn_allocators_t dn_allocators;
@@ -477,6 +477,28 @@ DN_IMP dn_os_file_attr_t            dn_os_winapi_attr_to_dn_attr(u32 attr);
 #define dn_os_arr_copy(source, dest) { static_assert(sizeof(source) == sizeof(dest), "dn_os_arr_copy expects two C arrays of the same size"); dn_os_memory_copy(source, dest, sizeof(dest)); }
 
 
+// ████████╗██╗  ██╗██████╗ ███████╗ █████╗ ██████╗ ██╗███╗   ██╗ ██████╗ 
+// ╚══██╔══╝██║  ██║██╔══██╗██╔════╝██╔══██╗██╔══██╗██║████╗  ██║██╔════╝ 
+//    ██║   ███████║██████╔╝█████╗  ███████║██║  ██║██║██╔██╗ ██║██║  ███╗
+//    ██║   ██╔══██║██╔══██╗██╔══╝  ██╔══██║██║  ██║██║██║╚██╗██║██║   ██║
+//    ██║   ██║  ██║██║  ██║███████╗██║  ██║██████╔╝██║██║ ╚████║╚██████╔╝
+//    ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═════╝ ╚═╝╚═╝  ╚═══╝ ╚═════╝ 
+typedef enum {
+  DN_MUTEX_ATTR_NONE = 0,
+  DN_MUTEX_ATTR_RECURSIVE = 1
+} dn_mutex_attr_t;
+
+typedef struct {
+  dn_mutex_attr_t attrs;
+  bool initialized;
+  CRITICAL_SECTION handle;
+} dn_mutex_t;
+
+void dn_mutex_init(dn_mutex_t* mutex);
+void dn_mutex_lock(dn_mutex_t* mutex);
+void dn_mutex_unlock(dn_mutex_t* mutex);
+
+
 //  ██╗  ██╗ █████╗ ███████╗██╗  ██╗██╗███╗   ██╗ ██████╗
 //  ██║  ██║██╔══██╗██╔════╝██║  ██║██║████╗  ██║██╔════╝
 //  ███████║███████║███████╗███████║██║██╔██╗ ██║██║  ███╗
@@ -524,6 +546,7 @@ typedef struct {
 } dn_fixed_array_t;
 
 #define dn_fixed_array(t, n) dn_fixed_array_t
+#define dn_fixed_array_for(arr, it, t) for (t* it = (t*)arr.data; (it - (t*)arr.data) < arr.size; it++)
 #define DN_FIXED_ARRAY_RUNTIME_SIZE
 
 DN_API void dn_fixed_array_init(dn_fixed_array_t* fixed_array, u32 capacity, u32 element_size, dn_allocator_t* allocator);
@@ -558,9 +581,11 @@ DN_API void dn_dynamic_array_grow(dn_dynamic_array_t* dynamic_array, u32 capacit
 //////////
 // POOL //
 //////////
+#define DN_POOL_NO_FREE_SLOT -1
+
 typedef struct {
-	u32 index;
-	u32 generation;
+  u32 index;
+  u32 generation;
 } dn_pool_handle_t;
 
 typedef struct {
@@ -577,37 +602,70 @@ typedef struct {
   s32 free_list;
 } dn_pool_t;
 
+typedef struct {
+  u32 index;
+  dn_pool_t* pool;
+} dn_pool_iterator_t;
+
 #define dn_pool(t) dn_pool_t
 
-void             dn_pool_init(dn_pool_t* pool, u32 capacity, u32 element_size);
-dn_pool_handle_t dn_pool_insert(dn_pool_t* pool, void* value);
-dn_pool_handle_t dn_pool_reserve(dn_pool_t* pool);
-void             dn_pool_remove(dn_pool_t* pool, dn_pool_handle_t handle);
-bool             dn_pool_contains(dn_pool_t* pool, dn_pool_handle_t handle);
-void             dn_pool_clear(dn_pool_t* pool);
-dn_pool_handle_t dn_pool_invalid_handle();
-bool             dn_pool_is_handle_valid(dn_pool_handle_t handle);
-bool             dn_pool_slot_has_next_free(dn_pool_slot_t* slot);
-bool             dn_pool_slot_is_match(dn_pool_slot_t* slot, dn_pool_handle_t handle);
-#define dn_pool_at(T, POOL, HANDLE) ((T*)((POOL)->data + ((HANDLE).index * (POOL)->element_size)))
+void               dn_pool_init(dn_pool_t* pool, u32 capacity, u32 element_size);
+dn_pool_handle_t   dn_pool_insert(dn_pool_t* pool, void* value);
+dn_pool_handle_t   dn_pool_reserve(dn_pool_t* pool);
+void               dn_pool_remove(dn_pool_t* pool, dn_pool_handle_t handle);
+bool               dn_pool_contains(dn_pool_t* pool, dn_pool_handle_t handle);
+void               dn_pool_clear(dn_pool_t* pool);
+dn_pool_handle_t   dn_pool_invalid_handle();
+bool               dn_pool_is_handle_valid(dn_pool_handle_t handle);
+bool               dn_pool_slot_has_next_free(dn_pool_slot_t* slot);
+bool               dn_pool_slot_is_match(dn_pool_slot_t* slot, dn_pool_handle_t handle);
+#define            dn_pool_at(POOL, HANDLE, T) ((T*)((POOL)->data + ((HANDLE).index * (POOL)->element_size)))
+#define            dn_pool_at_i(POOL, INDEX, T) ((T*)((POOL)->data + ((INDEX) * (POOL)->element_size)))
+dn_pool_iterator_t dn_pool_iterator_init(dn_pool_t* pool);
+void               dn_pool_iterator_next(dn_pool_iterator_t* it);
+bool               dn_pool_iterator_done(dn_pool_iterator_t* it);
+#define            dn_pool_for(POOL, IT) for (dn_pool_iterator_t IT = dn_pool_iterator_init((POOL)); !dn_pool_iterator_done(&(IT)); dn_pool_iterator_next(&(IT)))
+#define            dn_pool_it(POOL, IT, T) dn_pool_at_i(POOL, (IT).index, T)
+
+dn_pool_iterator_t dn_pool_iterator_init(dn_pool_t* pool) {
+  return (dn_pool_iterator_t) {
+    .index = 0,
+    .pool = pool
+  };
+}
+
+void dn_pool_iterator_next(dn_pool_iterator_t* it) {
+  while (true) {
+    it->index++;
+    if (it->index >= it->pool->capacity) break;
+
+    dn_pool_slot_t* slot = &it->pool->slots[it->index];
+    if (slot->occupied) break;
+  } 
+}
+
+bool dn_pool_iterator_done(dn_pool_iterator_t* it) {
+  if (it->index >= it->pool->capacity) return true;
+  return false;
+}
 
 /////////////////
 // RING BUFFER //
 /////////////////
 typedef struct {
-	u8* data;
+  u8* data;
   u32 element_size;
-	u32 head;
-	u32 size;
-	u32 capacity;
+  u32 head;
+  u32 size;
+  u32 capacity;
 } dn_ring_buffer_t;
 
 #define dn_ring_buffer(t) dn_ring_buffer_t
 
 typedef struct {
-	u32 index;
-	bool reverse;
-	dn_ring_buffer_t* buffer;
+  u32 index;
+  bool reverse;
+  dn_ring_buffer_t* buffer;
 } dn_ring_buffer_iterator_t;
 
 DN_API void*                     dn_ring_buffer_at(dn_ring_buffer_t* buffer, u32 index);
@@ -642,8 +700,8 @@ DN_API dn_ring_buffer_iterator_t dn_ring_buffer_riter(dn_ring_buffer_t* buffer);
 //    ██║   ██║██║ ╚═╝ ██║███████╗██║  ██║███████║
 //    ╚═╝   ╚═╝╚═╝     ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝
 typedef struct {
-	dn_ring_buffer(f64) queue;
-	f64 time_begin;
+  dn_ring_buffer(f64) queue;
+  f64 time_begin;
 } dn_time_metric_t;
 
 typedef struct {
@@ -675,16 +733,16 @@ DN_IMP void              dn_time_metrics_update();
 //  ███████╗╚██████╔╝╚██████╔╝
 //  ╚══════╝ ╚═════╝  ╚═════╝
 typedef enum {
-	DN_LOG_FLAG_CONSOLE = 1,
-	DN_LOG_FLAG_FILE = 2,
-	DN_LOG_FLAG_DEFAULT = 3,
+  DN_LOG_FLAG_CONSOLE = 1,
+  DN_LOG_FLAG_FILE = 2,
+  DN_LOG_FLAG_DEFAULT = 3,
 } dn_log_flags_t;
 
 #define DN_LOGGER_MESSAGE_BUFFER_SIZE 4096
 #define DN_LOGGER_PREAMBLE_BUFFER_SIZE 512
 typedef struct {
-	char message_buffer [DN_LOGGER_MESSAGE_BUFFER_SIZE];
-	char preamble_buffer [DN_LOGGER_PREAMBLE_BUFFER_SIZE];
+  char message_buffer [DN_LOGGER_MESSAGE_BUFFER_SIZE];
+  char preamble_buffer [DN_LOGGER_PREAMBLE_BUFFER_SIZE];
 } dn_log_t;
 dn_log_t dn_logger;
 
@@ -762,18 +820,18 @@ typedef enum {
 typedef struct {
   dn_audio_filter_mode_t mode;
   bool enabled;
-  float cutoff_frequency;
-  float cutoff_alpha;
-  float a0, a1, a2, b1, b2;
-  float input_history [2];
-  float output_history [2];
+  f32 cutoff_frequency;
+  f32 cutoff_alpha;
+  f32 a0, a1, a2, b1, b2;
+  f32 input_history [2];
+  f32 output_history [2];
 } dn_low_pass_filter_t;
 
 typedef struct {
-  float threshold;
-  float ratio;
-  float attack_time;
-  float release_time;
+  f32 threshold;
+  f32 ratio;
+  f32 attack_time;
+  f32 release_time;
   bool enabled;
 } dn_compressor_t;
 
@@ -785,7 +843,7 @@ typedef struct {
   u32 sample_rate;
   u64 num_frames;
   u32 num_samples;
-  float* samples;
+  f32* samples;
   u32 generation;
   double file_mod_time;
 } dn_audio_info_t;
@@ -796,7 +854,7 @@ typedef struct {
   dn_audio_instance_handle_t next;
   u32 next_sample;
   bool loop;
-  float volume;
+  f32 volume;
   dn_low_pass_filter_t filter;
   bool paused;
   s32 sample_buffer_offset;
@@ -811,46 +869,46 @@ typedef struct {
   u32 num_dirs;
   dn_compressor_t compressor;
   dn_low_pass_filter_t filter;
-  float sample_frequency;
-  float master_volume;
-  float master_volume_mod;
+  f32 sample_frequency;
+  f32 master_volume;
+  f32 master_volume_mod;
 } dn_audio_config_t;
 
 #define DN_AUDIO_MAX_SOUNDS 1024
 #define DN_AUDIO_MAX_INSTANCES 128
 typedef struct {
+  dn_mutex_t mutex;
   dn_compressor_t compressor;
   dn_low_pass_filter_t filter;
-  float sample_frequency;
-  float master_volume;
-  float master_volume_mod;
+  f32 sample_frequency;
+  f32 master_volume;
+  f32 master_volume_mod;
   // FileMonitor* file_monitor;
-  dn_fixed_array(float, DN_FIXED_ARRAY_RUNTIME_SIZE) sample_buffer;
-  dn_fixed_array(dn_audio_info_t, DN_AUDIO_MAX_SOUNDS) sounds;
-  dn_fixed_array(dn_audio_instance_t, DN_AUDIO_MAX_INSTANCES) instances;
+  dn_fixed_array(f32, DN_FIXED_ARRAY_RUNTIME_SIZE) sample_buffer;
+  dn_pool(dn_audio_info_t) sounds;
+  dn_pool(dn_audio_instance_t) instances;
 } dn_audio_t;
 dn_audio_t dn_audio;
-std::recursive_mutex dn_audio_mutex;
 
-DN_API void                       dn_audio_set_compressor_threshold(float t);
-DN_API void                       dn_audio_set_compressor_ratio(float v);
-DN_API void                       dn_audio_set_compressor_attack(float v);
-DN_API void                       dn_audio_set_compressor_release(float v);
-DN_API void                       dn_audio_set_sample_rate(float v);
-DN_API float                      dn_audio_get_master_volume();
-DN_API void                       dn_audio_set_master_volume(float v);
-DN_API float                      dn_audio_get_master_volume_mod();
-DN_API void                       dn_audio_set_master_volume_mod(float v);
-DN_API float                      dn_audio_get_master_filter_cutoff();
-DN_API void                       dn_audio_set_master_filter_cutoff(float v);
+DN_API void                       dn_audio_set_compressor_threshold(f32 t);
+DN_API void                       dn_audio_set_compressor_ratio(f32 v);
+DN_API void                       dn_audio_set_compressor_attack(f32 v);
+DN_API void                       dn_audio_set_compressor_release(f32 v);
+DN_API void                       dn_audio_set_sample_rate(f32 v);
+DN_API f32                        dn_audio_get_master_volume();
+DN_API void                       dn_audio_set_master_volume(f32 v);
+DN_API f32                        dn_audio_get_master_volume_mod();
+DN_API void                       dn_audio_set_master_volume_mod(f32 v);
+DN_API f32                        dn_audio_get_master_filter_cutoff();
+DN_API void                       dn_audio_set_master_filter_cutoff(f32 v);
 DN_API void                       dn_audio_set_master_filter_cutoff_enabled(bool enabled);
 DN_API void                       dn_audio_set_master_filter_mode(dn_audio_filter_mode_t mode);
-DN_API void                       dn_audio_set_volume(dn_audio_instance_handle_t handle, float volume);
-DN_API void                       dn_audio_set_filter_cutoff(dn_audio_instance_handle_t handle, float cutoff);
-DN_API void                       dn_audio_set_filter_mode(dn_audio_instance_handle_t handle, float cutoff);
+DN_API void                       dn_audio_set_volume(dn_audio_instance_handle_t handle, f32 volume);
+DN_API void                       dn_audio_set_filter_cutoff(dn_audio_instance_handle_t handle, f32 cutoff);
+DN_API void                       dn_audio_set_filter_mode(dn_audio_instance_handle_t handle, f32 cutoff);
 DN_API void                       dn_audio_set_filter_enabled(dn_audio_instance_handle_t handle, bool enabled);
-DN_API dn_audio_instance_handle_t dn_audio_play_sound(const char* name);
-DN_API dn_audio_instance_handle_t dn_audio_play_looped(const char* name);
+DN_API dn_audio_instance_handle_t dn_audio_play_sound(dn_string_t name);
+DN_API dn_audio_instance_handle_t dn_audio_play_looped(dn_string_t name);
 DN_API void                       dn_audio_queue(dn_audio_instance_handle_t current, dn_audio_instance_handle_t next);
 DN_API void                       dn_audio_stop(dn_audio_instance_handle_t handle);
 DN_API void                       dn_audio_stop_all();
@@ -858,593 +916,23 @@ DN_API void                       dn_audio_pause(dn_audio_instance_handle_t hand
 DN_API void                       dn_audio_resume(dn_audio_instance_handle_t handle);
 DN_API bool                       dn_audio_is_playing(dn_audio_instance_handle_t handle);
 DN_API bool                       dn_audio_is_any_playing();
-DN_API void                       dn_audio_load(const char* file_path, const char* file_name);
-DN_API void                       dn_audio_load_dir(const char* path);
+DN_API void                       dn_audio_load(dn_string_t file_path, dn_string_t file_name);
+DN_API void                       dn_audio_load_dir(dn_string_t path);
 DN_API void                       dn_low_pass_filter_set_mode(dn_low_pass_filter_t* filter, dn_audio_filter_mode_t mode);
-DN_API void                       dn_low_pass_filter_set_cutoff(dn_low_pass_filter_t* filter, float cutoff);
-DN_API float                      dn_low_pass_filter_apply(dn_low_pass_filter_t* filter, float input);
+DN_API void                       dn_low_pass_filter_set_cutoff(dn_low_pass_filter_t* filter, f32 cutoff);
+DN_API f32                        dn_low_pass_filter_apply(dn_low_pass_filter_t* filter, f32 input);
 DN_API dn_audio_config_t          dn_audio_config_default();
 DN_API void                       dn_audio_init(dn_audio_config_t config);
-DN_IMP void                       dn_audio_update(float* buffer, int frames_requested, int num_channels);
+DN_IMP void                       dn_audio_update(f32* buffer, int frames_requested, int num_channels);
 DN_IMP void                       dn_audio_shutdown();
-DN_IMP dn_audio_info_t*           dn_audio_find(const char* name);
-DN_IMP dn_audio_info_t*           dn_audio_find_no_default(const char* name);
-DN_IMP dn_audio_instance_t*       dn_audio_resolve(dn_audio_instance_handle_t handle);
+DN_IMP dn_audio_info_t*           dn_audio_find(dn_string_t name);
+DN_IMP dn_audio_info_t*           dn_audio_find_no_default(dn_string_t name);
+DN_IMP dn_audio_info_t*           dn_audio_resolve(dn_audio_info_handle_t handle);
+DN_IMP dn_audio_instance_t*       dn_audio_resolve_instance(dn_audio_instance_handle_t handle);
 DN_IMP dn_audio_instance_handle_t dn_audio_reserve();
 DN_IMP dn_audio_instance_handle_t dn_audio_play_sound_ex(dn_audio_info_t* sound, bool loop);
 DN_IMP void                       dn_audio_stop_ex(dn_audio_instance_t* active_sound);
 
-
-
-#ifdef DN_AUDIO_IMPLEMENTATION
-using sound_iterator = std::function<void(const char*)>;
-
-dn_audio_config_t dn_audio_config_default() {
-  return (dn_audio_config_t) {
-    .dirs = NULL,
-    .num_dirs = 0,
-    .compressor = {
-      .threshold = 0.5f,
-      .ratio = 2.0f,
-      .attack_time = 0.95f,
-      .release_time = 1.0f,
-      .enabled = true
-    },
-    .filter = {
-      .mode = DN_AUDIO_FILTER_MODE_BUTTERWORTH,
-      .enabled = false,
-      .cutoff_frequency = 10000,
-      .cutoff_alpha = 0,
-      .a0 = 0.f, .a1 = 0.f, .a2 = 0.f, .b1 = 0.f, .b2 = 0.f,
-      .input_history = { 0 },
-      .output_history = { 0 },
-    },
-    .sample_frequency = 44100,
-    .master_volume = 1.0f,
-    .master_volume_mod = 1.0f,
-  };
-}
-
-void dn_audio_init(dn_audio_config_t config) {
-  dn_log("%s", __func__);
-
-  dn_audio = {
-    .compressor = config.compressor,
-    .filter = config.filter,
-    .sample_frequency = config.sample_frequency,
-    .master_volume = config.master_volume,
-    .master_volume_mod = config.master_volume_mod,
-    .file_monitor = dn_file_monitors_add(),
-    .sample_buffer = {0}
-  };
-
-  dn_fixed_array_init(&dn_audio.sounds, DN_AUDIO_MAX_SOUNDS, sizeof(dn_audio_info_t), &dn_allocator.standard.allocator);
-  dn_fixed_array_init(&dn_audio.sounds, DN_AUDIO_MAX_INSTANCES, sizeof(dn_audio_instance_t), &dn_allocator.standard.allocator);
-
-
-  // @here
-  dn_low_pass_filter_set_cutoff(&dn_audio.filter, 10000);
-
-  auto on_file_event = [](FileMonitor* monitor, FileChange* event, void* userdata) {
-    dn_log("dn_audio_init: Reloading audio file; file = %s", __func__, event->file_path);
-    dn_audio_load(event->file_path, event->file_name);
-  };
-
-  auto events = DN_FILE_CHANGE_EVENT_ADDED | DN_FILE_CHANGE_EVENT_MODIFIED;
-  dn_audio.file_monitor->init(on_file_event, events, nullptr);
-  
-  dn_log("%s: Loading default audio directory; directory = %s", __func__, dn_paths_resolve("dn_audio"));
-  dn_audio_load_dir(dn_paths_resolve("dn_audio"));
-  for (u32 i = 0; i < config.num_dirs; i++) {
-    dn_audio_load_dir(config.dirs[i]);
-  }
-
-  // Initialize the audio backend
-  dn_log("%s: Initializing audio backend", __func__);
-  saudio_desc descriptor = { 0 };
-  descriptor.num_channels = 2;
-  descriptor.buffer_frames = 2048;
-  descriptor.logger.func = slog_func;
-  descriptor.stream_cb = dn_audio_update;
-  saudio_setup(&descriptor);
-
-  auto max_samples_requested = saudio_expect() * saudio_channels() * 2;
-  dn_array_init(&dn_audio.sample_buffer, max_samples_requested);
-  dn_audio.sample_buffer.size = dn_audio.sample_buffer.capacity;
-
-
-  // We use this array like a free list, so it is always full and we determine which elements are current
-  // based on a flag in the element itself.
-  dn_audio.instances.size = dn_audio.instances.capacity;
-  dn_array_for(dn_audio.instances, active_sound) {
-    active_sound->occupied = false;
-  }
-
-
-}
-
-void dn_audio_add_samples(dn_audio_instance_t* active_sound, int samples_requested, int offset) {
-  for (i32 i = 0; i < samples_requested; i++) {
-    auto info = dn_audio.sounds[active_sound->info.index];
-    auto index = active_sound->next_sample++;
-
-    if (index == info->num_samples) {
-      if (active_sound->loop) {
-        active_sound->next_sample = 0;
-        index = 0;
-      }
-      else if (dn_gen_arena_handle_valid(active_sound->next)) {
-        active_sound->sample_buffer_offset = i;
-        active_sound->samples_from_next = samples_requested - i;
-        break;
-      }
-      else {
-        dn_audio_stop_ex(active_sound);
-        break;
-      }
-    }
-
-    // Take the next sample from the sound and add it to the sample buffer
-    auto sample = info->samples[index];
-    sample = sample * active_sound->volume;
-    sample = dn_low_pass_filter_apply(&active_sound->filter, sample);
-
-    *dn_audio.sample_buffer[i + offset] += sample;
-  }
-  
-}
-  
-
-void dn_audio_update(float* buffer, int frames_requested, int num_channels) {
-  if (!frames_requested) return;
-
-  // Cap the number of samples so we don't overwrite the buffer
-  i32 samples_requested = frames_requested * num_channels;
-  if (samples_requested > dn_audio.sample_buffer.capacity) {
-    dn_log("requested too many audio samples: %d", samples_requested);
-    samples_requested = dn_audio.sample_buffer.capacity;
-  }
-
-  // You must write zeros, or else whatever the last requested samples were will linger
-  if (!dn_audio_is_any_playing()) {
-    memset(buffer, 0, samples_requested * sizeof(float));
-    return;
-  }
-
-  std::unique_lock lock(dn_audio_mutex);
-
-  dn_array_for(dn_audio.instances, active_sound) {
-    if (!active_sound->occupied) continue;
-    if (active_sound->paused) continue;
-    if (!dn_gen_arena_handle_valid(active_sound->info)) continue;
-    
-    auto info = dn_audio.sounds[active_sound->info.index];
-    if (active_sound->info.generation != info->generation) {
-      dn_audio_stop_ex(active_sound);
-      continue;
-    }
-
-    
-    dn_audio_add_samples(active_sound, samples_requested, 0);
-  }
-
-  bool chaining_sounds = true;
-  while (chaining_sounds) {
-    chaining_sounds = false;
-    
-    dn_array_for(dn_audio.instances, active_sound) {
-      if (!active_sound->occupied) continue;
-      if (active_sound->paused) continue;
-
-      if (active_sound->samples_from_next) {
-        chaining_sounds = true;
-        
-        auto next_sound = dn_audio_resolve(active_sound->next);
-        if (!next_sound) continue;
-        
-        dn_audio_resume(active_sound->next);
-        dn_audio_add_samples(next_sound, active_sound->samples_from_next, active_sound->sample_buffer_offset);
-        dn_audio_stop_ex(active_sound);
-      }
-    }
-  }
-
-  lock.unlock();
-  
-  float envelope = 0.0f;
-  float gain = 1.0f;
-  for (int i = 0; i < samples_requested; i++) {
-    auto sample = *dn_audio.sample_buffer[i];
-    sample *= dn_audio.master_volume * dn_audio.master_volume_mod;
-
-    auto abs_sample = std::abs(sample);
-    if (dn_audio.compressor.enabled) {
-      envelope = dn_math_lerp(envelope, abs_sample, dn_audio.compressor.attack_time);
-
-      if (envelope > dn_audio.compressor.threshold) {
-        auto decibel = 10 * std::log10(envelope / dn_audio.compressor.threshold);
-        auto target_decibel = decibel / dn_audio.compressor.ratio;
-        auto target_bel = target_decibel / 10;
-        auto target_envelope = std::pow(10, target_bel) * dn_audio.compressor.threshold;
-        gain = target_envelope / envelope;
-      }
-      else {
-        gain = dn_math_lerp(gain, 1.0f, dn_audio.compressor.release_time);
-      }
-    }
-
-    sample *= gain;
-    sample = dn_low_pass_filter_apply(&dn_audio.filter, sample);
-    sample = dn_math_clamp(sample, -1.f, 1.f);
-    
-    *dn_audio.sample_buffer[i] = sample;
-  }
-
-  memcpy(buffer, dn_audio.sample_buffer.data, samples_requested * sizeof(float));
-  dn_array_fill(&dn_audio.sample_buffer, 0.f);
-}
-
-void dn_audio_shutdown() {
-  saudio_shutdown();
-}
-
-bool dn_audio_is_any_playing() {
-  std::unique_lock lock(dn_audio_mutex);
-  
-  dn_array_for(dn_audio.instances, active_sound) {
-    if (active_sound->occupied) return true;
-  }
-
-  return false;
-}
-
-dn_audio_info_t* dn_audio_find_no_default(const char* name) {
-  std::unique_lock lock(dn_audio_mutex);
-
-  auto hash = dn_hash_cstr_dumb(name);
-  dn_array_for(dn_audio.sounds, info) {
-    if (info->hash == hash) return info;
-  }
-
-  return nullptr;
-}
-
-dn_audio_info_t* dn_audio_find(const char* name) {
-  auto sound = dn_audio_find_no_default(name);
-  if (!sound) sound = dn_audio_find_no_default("debug.wav");
-  return sound;
-}
-
-dn_audio_instance_handle_t dn_audio_reserve() {
-  std::unique_lock lock(dn_audio_mutex);
-  
-  for (u32 index = 0; index < dn_audio.instances.size; index++) {
-    auto active_sound = dn_audio.instances[index];
-    if (!active_sound->occupied) {
-      active_sound->occupied = true;
-      return { 
-        .index = index, 
-        .generation = active_sound->generation 
-      };
-    }
-  }
-
-  return dn_gen_arena_invalid_handle();
-}
-
-dn_audio_instance_t* dn_audio_resolve(dn_audio_instance_handle_t handle) {
-  std::unique_lock lock(dn_audio_mutex);
-
-  if (!dn_gen_arena_handle_valid(handle)) return nullptr;
-  
-  auto active_sound = dn_audio.instances[handle.index];
-  if (handle.generation != active_sound->generation) return nullptr;
-
-  return active_sound;
-}
-
-dn_audio_instance_handle_t dn_audio_play_sound_ex(dn_audio_info_t* sound, bool loop) { 
-  std::unique_lock lock(dn_audio_mutex);
-  
-  auto handle = dn_audio_reserve();
-  if (!dn_gen_arena_handle_valid(handle)) return handle;
-
-  auto active_sound = dn_audio_resolve(handle);
-  active_sound->info = { dn_array_indexof(&dn_audio.sounds, sound), sound->generation };
-  active_sound->volume = 1.f;
-  active_sound->next_sample = 0;
-  active_sound->loop = loop;
-  active_sound->paused = false;
-  active_sound->next = dn_gen_arena_invalid_handle();
-  active_sound->samples_from_next = 0;
-  active_sound->sample_buffer_offset = 0;
-  active_sound->filter = {
-    .mode = DN_AUDIO_FILTER_MODE_BUTTERWORTH,
-    .enabled = false,
-    .a0 = 0.f, .a1 = 0.f, .a2 = 0.f, .b1 = 0.f, .b2 = 0.f,
-    .input_history = { 0 },
-    .output_history = { 0 },
-  };
-  dn_low_pass_filter_set_cutoff(&active_sound->filter, dn_audio_get_master_filter_cutoff());
-
-  return handle;
-}
-
-void dn_audio_stop_ex(dn_audio_instance_t* active_sound) {
-  std::unique_lock lock(dn_audio_mutex);  
-
-  if (!active_sound) return;
-  
-  active_sound->occupied = false;
-  active_sound->generation++;
-
-  dn_audio_stop_ex(dn_audio_resolve(active_sound->next));
-}
-
-dn_audio_info_t* alloc_sound(const char* file_name) {
-  auto sound = dn_audio_find_no_default(file_name);
-  if (!sound) sound = dn_array_push(&dn_audio.sounds);
-  sound->generation++;
-
-  return sound;
-}
-
-void dn_audio_load_dir(const char* path) {
-  dn_os_directory_entry_list_t entries = dn_os_scan_directory(dn_string_literal(path));
-  for (u32 i = 0; i < entries.count; i++) {
-    dn_os_directory_entry_t entry = entries.data[i];
-    if (entry.attributes & DN_OS_FILE_ATTR_DIRECTORY) {
-      // @string
-      dn_audio.file_monitor->add_directory(dn_string_to_cstr_ex(entry.file_path, &dn_allocators.bump));
-      dn_audio_load_dir(dn_string_to_cstr_ex(entry.file_path, &dn_allocators.bump));
-    }
-    else {
-      // @string
-      dn_audio_load(dn_string_to_cstr_ex(entry.file_path, &dn_allocators.bump), dn_string_to_cstr_ex(entry.file_name, &dn_allocators.bump));
-    }
-  }
-}
-
-void dn_audio_load(const char* file_path, const char* file_name) {
-  std::unique_lock lock(dn_audio_mutex);
-
-  auto sound = alloc_sound(file_name);
-  strncpy(sound->name, file_name, DN_ASSET_NAME_LEN);
-  sound->hash = dn_hash_cstr_dumb(sound->name);
-  
-  sound->samples = drwav_open_file_and_read_pcm_frames_f32(file_path, &sound->num_channels, &sound->sample_rate, &sound->num_frames, NULL);
-  if (!sound->samples) {
-    dn_log("failed to load sound file sound file: %s", file_path);
-  }
-  sound->num_samples = sound->num_frames * sound->num_channels;
-};
-
-
-//////////////////////
-// LOW PASS FILTER  //
-//////////////////////
-void dn_low_pass_filter_set_mode(dn_low_pass_filter_t* filter, dn_audio_filter_mode_t mode) {
-  filter->mode = mode;
-  dn_low_pass_filter_set_cutoff(filter, filter->cutoff_frequency);
-}
-
-void dn_low_pass_filter_set_cutoff(dn_low_pass_filter_t* filter, float cutoff) {
-  // The low pass filters are unstable at frequencies higher than the Nyquist frequency, so clamp. Add a little wiggle room
-  // to make sure we're not close to it, because it sounds a little bad that high anyway.
-  float nyquist = dn_audio.sample_frequency / 2.1;
-  filter->cutoff_frequency = std::min(cutoff, nyquist);
-
-  // Butterworth filter
-  float omega = 2.0f * 3.14159 * filter->cutoff_frequency / dn_audio.sample_frequency;
-  float cos_omega = cos(omega);
-  float sin_omega = sin(omega);
-  float alpha = sin_omega / sqrt(2.0f); // Butterworth filter (sqrt(2) damping factor)
-
-  filter->a0 = (1.0f - cos_omega) / 2.0f;
-  filter->a1 = 1.0f - cos_omega;
-  filter->a2 = (1.0f - cos_omega) / 2.0f;
-  filter->b1 = -2.0f * cos_omega;
-  filter->b2 = 1.0f - alpha;
-
-  float a0_inv = 1.0f / (1.0f + alpha);
-  filter->a0 *= a0_inv;
-  filter->a1 *= a0_inv;
-  filter->a2 *= a0_inv;
-  filter->b1 *= a0_inv;
-  filter->b2 *= a0_inv;
-
-  // Simple first order low pass filter
-  filter->cutoff_alpha = 2.0f * 3.14159 * filter->cutoff_frequency / (dn_audio.sample_frequency + 2.0f * 3.14159 * filter->cutoff_frequency);
-
-}
-
-float dn_low_pass_filter_apply(dn_low_pass_filter_t* filter, float input) {
-  if (!filter->enabled) return input;
-  
-  switch (filter->mode) {
-    case DN_AUDIO_FILTER_MODE_BUTTERWORTH: {
-      float output = 0;
-      output += (filter->a0 * input) + (filter->a1 * filter->input_history[0]) + (filter->a2 * filter->input_history[1]);
-      output -= (filter->b1 * filter->output_history[0]) + (filter->b2 * filter->output_history[1]);
-
-      filter->input_history[1] = filter->input_history[0];
-      filter->input_history[0] = input;
-
-      filter->output_history[1] = filter->output_history[0];
-      filter->output_history[0] = output;
-
-      return output;
-    } break;
-
-    case DN_AUDIO_FILTER_MODE_FIRST_ORDER: {
-      float output = 0;
-      output += filter->cutoff_alpha * input;
-      output += (1.0f - filter->cutoff_alpha) * filter->output_history[0];
-    
-      filter->output_history[0] = output;
-    
-      return output;
-    } break;
-
-    default: {
-      DN_ASSERT(false);
-      return input;
-    }
-  }
-}
-
-
-/////////////
-// LUA API //
-/////////////
-dn_audio_instance_handle_t dn_audio_play_sound(const char* name) {
-  auto info = dn_audio_find(name);
-  return dn_audio_play_sound_ex(info, false);
-}
-
-dn_audio_instance_handle_t dn_audio_play_looped(const char* name) {
-  auto info = dn_audio_find(name);
-  return dn_audio_play_sound_ex(info, true);
-}
-
-void dn_audio_stop(dn_audio_instance_handle_t handle) {
-  auto active_sound = dn_audio_resolve(handle);
-  dn_audio_stop_ex(active_sound);
-}
-
-void dn_audio_stop_all() {
-  dn_array_for(dn_audio.instances, active_sound) {
-    dn_audio_stop_ex(active_sound);
-  }
-}
-
-void dn_audio_set_volume(dn_audio_instance_handle_t handle, float volume) {
-  auto active_sound = dn_audio_resolve(handle);
-  if (!active_sound) return;
-
-  std::unique_lock lock(dn_audio_mutex);
-
-  active_sound->volume = dn_math_clamp(volume, 0.f, 1.f);
-}
-
-void dn_audio_set_filter_mode(dn_audio_instance_handle_t handle, dn_audio_filter_mode_t mode) {
-  auto active_sound = dn_audio_resolve(handle);
-  if (!active_sound) return;
-
-  std::unique_lock lock(dn_audio_mutex);
-  dn_low_pass_filter_set_mode(&active_sound->filter, mode);
-}
-
-void dn_audio_set_filter_cutoff(dn_audio_instance_handle_t handle, float cutoff) {
-  auto active_sound = dn_audio_resolve(handle);
-  if (!active_sound) return;
-
-  std::unique_lock lock(dn_audio_mutex);
-  dn_low_pass_filter_set_cutoff(&active_sound->filter, cutoff);
-}
-
-void dn_audio_set_filter_enabled(dn_audio_instance_handle_t handle, bool enabled) {
-  auto active_sound = dn_audio_resolve(handle);
-  if (!active_sound) return;
-
-  std::unique_lock lock(dn_audio_mutex);
-  active_sound->filter.enabled = enabled;
-}
-
-void dn_audio_set_compressor_threshold(float threshold) {
-  std::unique_lock lock(dn_audio_mutex);
-  dn_audio.compressor.threshold = threshold;
-}
-
-void dn_audio_set_compressor_ratio(float ratio) {
-  std::unique_lock lock(dn_audio_mutex);
-  dn_audio.compressor.ratio = ratio;
-}
-
-void dn_audio_set_compressor_attack(float attack) {
-  std::unique_lock lock(dn_audio_mutex);
-  dn_audio.compressor.attack_time = attack;
-}
-
-void dn_audio_set_compressor_release(float release) {
-  std::unique_lock lock(dn_audio_mutex);
-  dn_audio.compressor.release_time = release;
-}
-
-void dn_audio_set_sample_rate(float rate) {
-  std::unique_lock lock(dn_audio_mutex);
-  dn_audio.sample_frequency = rate;
-}
-
-void dn_audio_set_master_volume(float volume) {
-  std::unique_lock lock(dn_audio_mutex);
-  dn_audio.master_volume = volume;
-}
-
-void dn_audio_set_master_volume_mod(float volume_mod) {
-  std::unique_lock lock(dn_audio_mutex);
-  dn_audio.master_volume_mod = volume_mod;
-}
-
-void dn_audio_set_master_filter_cutoff(float frequency) {
-  std::unique_lock lock(dn_audio_mutex);
-  dn_low_pass_filter_set_cutoff(&dn_audio.filter, frequency);
-}
-
-void dn_audio_set_master_filter_cutoff_enabled(bool enabled) {
-  std::unique_lock lock(dn_audio_mutex);
-  dn_audio.filter.enabled = enabled;
-}
-
-void dn_audio_set_master_filter_mode(dn_audio_filter_mode_t mode) {
-  std::unique_lock lock(dn_audio_mutex);
-  dn_audio.filter.mode = mode;
-}
-
-float dn_audio_get_master_filter_cutoff() {
-  return dn_audio.filter.cutoff_frequency;
-}
-
-float dn_audio_get_master_volume() {
-  return dn_audio.master_volume;
-}
-
-float dn_audio_get_master_volume_mod() {
-  return dn_audio.master_volume_mod;
-}
-
-bool dn_audio_is_playing(dn_audio_instance_handle_t handle) {
-  return dn_audio_resolve(handle);
-}
-
-void dn_audio_pause(dn_audio_instance_handle_t handle) {
-  auto sound = dn_audio_resolve(handle);
-  if (!sound) return;
-  
-  sound->paused = true;
-}
-
-void dn_audio_resume(dn_audio_instance_handle_t handle) {
-  auto sound = dn_audio_resolve(handle);
-  if (!sound) return;
-  
-  sound->paused = false;
-}
-
-void dn_audio_queue(dn_audio_instance_handle_t current, dn_audio_instance_handle_t next) {
-  auto next_sound = dn_audio_resolve(next);
-  if (!dn_gen_arena_handle_valid(next)) return;
-  
-  auto current_sound = dn_audio_resolve(current);
-  if (!current_sound) {
-    next_sound->paused = false;
-    return;
-  };
-
-  current_sound->next = next;
-  dn_audio_pause(next);
-}
-#endif
 
 //  ████████╗███████╗███████╗████████╗██╗███╗   ██╗ ██████╗
 //  ╚══██╔══╝██╔════╝██╔════╝╚══██╔══╝██║████╗  ██║██╔════╝
@@ -1606,7 +1094,7 @@ nk_style_item dn_color_to_nk_style_item(dn_color_t color);
 //  ╚══════╝ ╚═════╝ ╚═╝  ╚═╝
 #ifdef DN_LUA
 #ifndef LUA_VERSION
-	#error "Please include Lua before including dn.h. If you aren't using Lua, find where DN_LUA is being defined and fix it."
+  #error "Please include Lua before including dn.h. If you aren't using Lua, find where DN_LUA is being defined and fix it."
 #endif
 
 typedef lua_State* dn_lua_interpreter_t;
@@ -1618,7 +1106,7 @@ typedef struct {
 #define DN_LUA_MAX_DIRECTORIES 32
 typedef struct {
   dn_string_t scripts;
-	dn_lua_interpreter_t state;
+  dn_lua_interpreter_t state;
   dn_fixed_array(dn_string_t, DN_LUA_MAX_DIRECTORIES) directories;
 } dn_lua_t;
 dn_lua_t dn_lua;
@@ -1727,6 +1215,26 @@ DN_IMP void                dn_app_update();
 //  ╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
 
 #ifdef DN_IMPLEMENTATION
+///////////
+// MUTEX //
+///////////
+void dn_mutex_init(dn_mutex_t* mutex) {
+  DN_ASSERT(mutex);
+  DN_ASSERT(mutex->initialized);
+  InitializeCriticalSection(&mutex->handle);
+}
+
+void dn_mutex_lock(dn_mutex_t* mutex) {
+  DN_ASSERT(mutex);
+  DN_ASSERT(mutex->initialized);
+  EnterCriticalSection(&mutex->handle);
+}
+
+void dn_mutex_unlock(dn_mutex_t* mutex) {
+  DN_ASSERT(mutex);
+  DN_ASSERT(mutex->initialized);
+  LeaveCriticalSection(&mutex->handle);
+}
 /////////////
 // UTILITY //
 /////////////
@@ -1808,7 +1316,7 @@ dn_vector4_t dn_math_clamp4(dn_vector4_t v, float minVal, float maxVal) {
 // TIME METRICS //
 //////////////////
 void dn_time_metrics_init() {
-	dn_time_metrics_add(dn_string_literal("frame"));
+  dn_time_metrics_add(dn_string_literal("frame"));
 }
 
 void dn_time_metrics_update() {
@@ -1818,28 +1326,28 @@ void dn_time_metrics_update() {
 }
 
 void dn_time_metric_init(dn_time_metric_t* metric) {
-	dn_ring_buffer_init(&metric->queue, 64, sizeof(dn_time_metric_t));
+  dn_ring_buffer_init(&metric->queue, 64, sizeof(dn_time_metric_t));
 }
 
 void dn_time_metric_begin_ex(dn_time_metric_t* metric) {
-	metric->time_begin = glfwGetTime();
+  metric->time_begin = glfwGetTime();
 }
 
 void dn_time_metric_end_ex(dn_time_metric_t* metric) {
-	f64 time_end = glfwGetTime();
-	f64 delta = time_end - metric->time_begin;
-	dn_ring_buffer_push_overwrite(&metric->queue, &delta);
+  f64 time_end = glfwGetTime();
+  f64 delta = time_end - metric->time_begin;
+  dn_ring_buffer_push_overwrite(&metric->queue, &delta);
 }
 
 f64 dn_time_metric_get_average(dn_time_metric_t* metric) {
   if (dn_ring_buffer_is_empty(&metric->queue)) return 0;
-	
-	f64 total = 0;
-	dn_ring_buffer_for(metric->queue, entry) {
-		total += *dn_rb_it(entry, f64);
-	}
+  
+  f64 total = 0;
+  dn_ring_buffer_for(metric->queue, entry) {
+    total += *dn_rb_it(entry, f64);
+  }
 
-	return total / metric->queue.size;
+  return total / metric->queue.size;
 }
 
 f64 dn_time_metric_get_last(dn_time_metric_t* metric) {
@@ -1848,40 +1356,40 @@ f64 dn_time_metric_get_last(dn_time_metric_t* metric) {
 }
 
 f64 dn_time_metric_get_largest(dn_time_metric_t* metric) {
-	f64 max_entry = 0;
-	dn_ring_buffer_for(metric->queue, entry) {
-		max_entry = dn_max(max_entry, *dn_rb_it(entry, f64));
-	}
+  f64 max_entry = 0;
+  dn_ring_buffer_for(metric->queue, entry) {
+    max_entry = dn_max(max_entry, *dn_rb_it(entry, f64));
+  }
 
-	return max_entry;
+  return max_entry;
 }
 
 f64 dn_time_metric_get_smallest(dn_time_metric_t* metric) {
-	f64 min_entry = DN_F64_MAX;
-	dn_ring_buffer_for(metric->queue, entry) {
-		min_entry = dn_min(min_entry, *dn_rb_it(entry, f64));
-	}
+  f64 min_entry = DN_F64_MAX;
+  dn_ring_buffer_for(metric->queue, entry) {
+    min_entry = dn_min(min_entry, *dn_rb_it(entry, f64));
+  }
 
-	return min_entry;
+  return min_entry;
 }
 
 void dn_time_metric_sleep_wait(dn_time_metric_t* metric, f64 target) {
-	while (true) {
-		f64 delta = glfwGetTime() - metric->time_begin;
-		if (delta >= target) break;
+  while (true) {
+    f64 delta = glfwGetTime() - metric->time_begin;
+    if (delta >= target) break;
 
-		f64 remaining_time = target - delta;
-		if (remaining_time > 0) {
+    f64 remaining_time = target - delta;
+    if (remaining_time > 0) {
       dn_os_sleep_ms(remaining_time * 1e3);
-		}
-	}
+    }
+  }
 }
 
 void dn_time_metric_busy_wait(dn_time_metric_t* metric, f64 target) {
-	while (true) {
-		auto delta = glfwGetTime() - metric->time_begin;
-		if (delta >= target) break;
-	}
+  while (true) {
+    auto delta = glfwGetTime() - metric->time_begin;
+    if (delta >= target) break;
+  }
 }
 
 dn_time_metric_t* dn_time_metrics_find(dn_string_t name) {
@@ -1894,9 +1402,9 @@ dn_time_metric_t* dn_time_metrics_find(dn_string_t name) {
 }
 
 void dn_time_metrics_add(dn_string_t name) {
-	dn_time_metric_t time_metric;
+  dn_time_metric_t time_metric;
   dn_time_metric_init(&time_metric);
-	gs_hash_table_insert(dn_time_metrics.metrics, dn_hash_string(name), time_metric);
+  gs_hash_table_insert(dn_time_metrics.metrics, dn_hash_string(name), time_metric);
 }
 
 void dn_time_metric_begin(dn_string_t name) {
@@ -1921,40 +1429,40 @@ void dn_log_init() {
 }
 
 void dn_log(const char* fmt, ...) {
-	va_list fmt_args;
-	va_start(fmt_args, fmt);
-	dn_log_v(DN_LOG_FLAG_DEFAULT, fmt, fmt_args);
-	va_end(fmt_args);
+  va_list fmt_args;
+  va_start(fmt_args, fmt);
+  dn_log_v(DN_LOG_FLAG_DEFAULT, fmt, fmt_args);
+  va_end(fmt_args);
 }
 
 void dn_log_format_str(dn_string_t fmt, ...) {
-	va_list fmt_args;
-	va_start(fmt_args, fmt);
-	dn_log_v(DN_LOG_FLAG_DEFAULT, dn_string_to_cstr(fmt), fmt_args);
-	va_end(fmt_args);
+  va_list fmt_args;
+  va_start(fmt_args, fmt);
+  dn_log_v(DN_LOG_FLAG_DEFAULT, dn_string_to_cstr(fmt), fmt_args);
+  va_end(fmt_args);
 }
 
 void dn_log_flags(dn_log_flags_t flags, const char* fmt, ...) {
-	va_list fmt_args;
-	va_start(fmt_args, fmt);
-	dn_log_v(flags, fmt, fmt_args);
-	va_end(fmt_args);
+  va_list fmt_args;
+  va_start(fmt_args, fmt);
+  dn_log_v(flags, fmt, fmt_args);
+  va_end(fmt_args);
 }
 
 void dn_log_v(dn_log_flags_t flags, const char* fmt, va_list fmt_args) {
   dn_log_build_preamble();
-	vsnprintf(&dn_logger.message_buffer[0], DN_LOGGER_MESSAGE_BUFFER_SIZE, fmt, fmt_args);
-	dn_log_flush(flags);
+  vsnprintf(&dn_logger.message_buffer[0], DN_LOGGER_MESSAGE_BUFFER_SIZE, fmt, fmt_args);
+  dn_log_flush(flags);
 }
 
 void dn_log_str(dn_string_t message) {
   dn_log_build_preamble();
-	snprintf(dn_logger.message_buffer, DN_LOGGER_MESSAGE_BUFFER_SIZE, "%.*s", message.len, message.data);
-	dn_log_flush(DN_LOG_FLAG_CONSOLE);
+  snprintf(dn_logger.message_buffer, DN_LOGGER_MESSAGE_BUFFER_SIZE, "%.*s", message.len, message.data);
+  dn_log_flush(DN_LOG_FLAG_CONSOLE);
 }
 
 void dn_log_builder(dn_string_builder_t builder) {
-	dn_log_str(dn_string_builder_write(&builder));
+  dn_log_str(dn_string_builder_write(&builder));
 }
 
 void dn_log_build_preamble() {
@@ -1962,97 +1470,97 @@ void dn_log_build_preamble() {
   time_t sec_since_epoch = (time_t)(ms_since_epoch / 1000);
   struct tm* time_info = localtime(&sec_since_epoch);
 
-	snprintf(dn_logger.preamble_buffer, DN_LOGGER_PREAMBLE_BUFFER_SIZE, "[%04d-%02d-%02d %02d:%02d:%02d.%03" DN_FMT_U64 "]",
-			 1900 + time_info->tm_year, 1 + time_info->tm_mon, time_info->tm_mday,
-			 time_info->tm_hour, time_info->tm_min, time_info->tm_sec, ms_since_epoch % 1000);
+  snprintf(dn_logger.preamble_buffer, DN_LOGGER_PREAMBLE_BUFFER_SIZE, "[%04d-%02d-%02d %02d:%02d:%02d.%03" DN_FMT_U64 "]",
+       1900 + time_info->tm_year, 1 + time_info->tm_mon, time_info->tm_mday,
+       time_info->tm_hour, time_info->tm_min, time_info->tm_sec, ms_since_epoch % 1000);
 }
 
 void dn_log_flush(dn_log_flags_t flags) {
-	if (flags & DN_LOG_FLAG_CONSOLE) {
-		printf("%s %s\n", dn_logger.preamble_buffer, dn_logger.message_buffer);
-	}
+  if (flags & DN_LOG_FLAG_CONSOLE) {
+    printf("%s %s\n", dn_logger.preamble_buffer, dn_logger.message_buffer);
+  }
 
-	dn_log_zero();
+  dn_log_zero();
 }
 
 void dn_log_zero() {
-	memset(&dn_logger.preamble_buffer[0], 0, DN_LOGGER_PREAMBLE_BUFFER_SIZE);
-	memset(&dn_logger.message_buffer[0], 0, DN_LOGGER_MESSAGE_BUFFER_SIZE);
+  memset(&dn_logger.preamble_buffer[0], 0, DN_LOGGER_PREAMBLE_BUFFER_SIZE);
+  memset(&dn_logger.message_buffer[0], 0, DN_LOGGER_MESSAGE_BUFFER_SIZE);
 }
 
 /////////////////
 // RING BUFFER //
 /////////////////
 void* dn_ring_buffer_at(dn_ring_buffer_t* buffer, u32 index) {
-		return buffer->data + ((buffer->head + buffer->element_size * index) % buffer->capacity);
+    return buffer->data + ((buffer->head + buffer->element_size * index) % buffer->capacity);
 }
 
 void dn_ring_buffer_init(dn_ring_buffer_t* buffer, u32 capacity, u32 element_size) {
-	buffer->size = 0;
-	buffer->head = 0;
-	buffer->capacity = capacity;
-	buffer->element_size = element_size;
-	buffer->data = dn_allocator_alloc(&dn_allocators.standard.allocator, capacity * element_size);
+  buffer->size = 0;
+  buffer->head = 0;
+  buffer->capacity = capacity;
+  buffer->element_size = element_size;
+  buffer->data = dn_allocator_alloc(&dn_allocators.standard.allocator, capacity * element_size);
 }
 
 void* dn_ring_buffer_back(dn_ring_buffer_t* buffer) {
-	DN_ASSERT(buffer->size);
+  DN_ASSERT(buffer->size);
   return dn_ring_buffer_at(buffer, buffer->size - 1);
 }
 
 void* dn_ring_buffer_push(dn_ring_buffer_t* buffer, void* data) {
-	DN_ASSERT(buffer->size < buffer->capacity);
+  DN_ASSERT(buffer->size < buffer->capacity);
 
-	u32 index = (buffer->head + buffer->size) % buffer->capacity;
+  u32 index = (buffer->head + buffer->size) % buffer->capacity;
   dn_os_memory_copy(data, buffer->data + index * buffer->element_size, buffer->element_size);
-	buffer->size += 1;
-	return dn_ring_buffer_back(buffer);
+  buffer->size += 1;
+  return dn_ring_buffer_back(buffer);
 }
 
 void* dn_ring_buffer_push_zero(dn_ring_buffer_t* buffer) {
-	DN_ASSERT(buffer->size < buffer->capacity);
+  DN_ASSERT(buffer->size < buffer->capacity);
 
-	u32 index = (buffer->head + buffer->size) % buffer->capacity;
+  u32 index = (buffer->head + buffer->size) % buffer->capacity;
   dn_os_zero_memory(buffer->data + index, buffer->element_size);
-	buffer->size += 1;
-	return dn_ring_buffer_back(buffer);
+  buffer->size += 1;
+  return dn_ring_buffer_back(buffer);
 }
 
 void* dn_ring_buffer_push_overwrite(dn_ring_buffer_t* buffer, void* data) {
-	if (buffer->size == buffer->capacity) dn_ring_buffer_pop(buffer);
-	return dn_ring_buffer_push(buffer, data);
+  if (buffer->size == buffer->capacity) dn_ring_buffer_pop(buffer);
+  return dn_ring_buffer_push(buffer, data);
 }
 
 void* dn_ring_buffer_push_overwrite_zero(dn_ring_buffer_t* buffer) {
-	if (buffer->size == buffer->capacity) dn_ring_buffer_pop(buffer);
-	return dn_ring_buffer_push_zero(buffer);
+  if (buffer->size == buffer->capacity) dn_ring_buffer_pop(buffer);
+  return dn_ring_buffer_push_zero(buffer);
 }
 
 void* dn_ring_buffer_pop(dn_ring_buffer_t* buffer) {
-	DN_ASSERT(buffer->size);
+  DN_ASSERT(buffer->size);
 
-	void* element = buffer->data + (buffer->head * buffer->element_size);
-	buffer->head = (buffer->head + 1) % buffer->capacity;
-	buffer->size--;
-	return element;
+  void* element = buffer->data + (buffer->head * buffer->element_size);
+  buffer->head = (buffer->head + 1) % buffer->capacity;
+  buffer->size--;
+  return element;
 }
 
 u32 dn_ring_buffer_bytes(dn_ring_buffer_t* buffer) {
-	return buffer->capacity * buffer->element_size;
+  return buffer->capacity * buffer->element_size;
 }
 
 void dn_ring_buffer_clear(dn_ring_buffer_t* buffer) {
-	memset(buffer->data, 0, dn_ring_buffer_bytes(buffer));
-	buffer->size = 0;
-	buffer->head = 0;
+  memset(buffer->data, 0, dn_ring_buffer_bytes(buffer));
+  buffer->size = 0;
+  buffer->head = 0;
 }
 
 bool dn_ring_buffer_is_full(dn_ring_buffer_t* buffer) {
-	return buffer->capacity == buffer->size;
+  return buffer->capacity == buffer->size;
 }
 
 bool dn_ring_buffer_is_empty(dn_ring_buffer_t* buffer) {
-	return buffer->size == 0;
+  return buffer->size == 0;
 }
 
 void* dn_ring_buffer_iter_deref(dn_ring_buffer_iterator_t* it) {
@@ -2075,88 +1583,88 @@ bool dn_ring_buffer_iter_done(dn_ring_buffer_iterator_t* it) {
 }
 
 dn_ring_buffer_iterator_t dn_ring_buffer_iter(dn_ring_buffer_t* buffer) {
-	dn_ring_buffer_iterator_t iterator;
-	iterator.index = 0;
-	iterator.reverse = false;
-	iterator.buffer = buffer;
-	return iterator;
+  dn_ring_buffer_iterator_t iterator;
+  iterator.index = 0;
+  iterator.reverse = false;
+  iterator.buffer = buffer;
+  return iterator;
 }
 
 dn_ring_buffer_iterator_t dn_ring_buffer_riter(dn_ring_buffer_t* buffer) {
-	dn_ring_buffer_iterator_t iterator;
-	iterator.index = buffer->size - 1;
-	iterator.reverse = true;
-	iterator.buffer = buffer;
-	return iterator;
+  dn_ring_buffer_iterator_t iterator;
+  iterator.index = buffer->size - 1;
+  iterator.reverse = true;
+  iterator.buffer = buffer;
+  return iterator;
 }
 
 //////////
 // POOL //
 //////////
 void dn_pool_init(dn_pool_t* pool, u32 capacity, u32 element_size) {
-	pool->capacity = capacity;
-	pool->free_list = 0;
+  pool->capacity = capacity;
+  pool->free_list = 0;
   pool->element_size = element_size;
-	pool->data = (u8*)dn_allocator_alloc(&dn_allocators.standard.allocator, capacity * element_size);
-	pool->slots = (dn_pool_slot_t*)dn_allocator_alloc(&dn_allocators.standard.allocator, capacity * sizeof(dn_pool_slot_t));
+  pool->data = (u8*)dn_allocator_alloc(&dn_allocators.standard.allocator, capacity * element_size);
+  pool->slots = (dn_pool_slot_t*)dn_allocator_alloc(&dn_allocators.standard.allocator, capacity * sizeof(dn_pool_slot_t));
 
   dn_for(i, capacity) {
-		pool->slots[i].next_free = i + 1;
+    pool->slots[i].next_free = i + 1;
   }
-	pool->slots[capacity - 1].next_free = -1;
+  pool->slots[capacity - 1].next_free = DN_POOL_NO_FREE_SLOT;
 }
 
 dn_pool_handle_t dn_pool_insert(dn_pool_t* pool, void* value) {
-	assert(!pool->slots[pool->free_list].occupied);
+  assert(!pool->slots[pool->free_list].occupied);
 
   dn_pool_slot_t* slot = pool->slots + pool->free_list;
-	slot->occupied = true;
-	slot->generation++;
+  slot->occupied = true;
+  slot->generation++;
 
   dn_os_memory_copy(value, pool->data + pool->element_size * pool->free_list, pool->element_size);
 
-	dn_pool_handle_t handle;
-	handle.index = pool->free_list;
-	handle.generation = slot->generation;
+  dn_pool_handle_t handle;
+  handle.index = pool->free_list;
+  handle.generation = slot->generation;
 
-	pool->free_list = slot->next_free;
+  pool->free_list = slot->next_free;
 
-	return handle;
+  return handle;
 }
 
 dn_pool_handle_t dn_pool_reserve(dn_pool_t* pool) {
-	assert(!pool->slots[pool->free_list].occupied);
+  assert(!pool->slots[pool->free_list].occupied);
 
   dn_pool_slot_t* slot = pool->slots + pool->free_list;
-	slot->occupied = true;
-	slot->generation++;
+  slot->occupied = true;
+  slot->generation++;
 
   dn_os_zero_memory(pool->data + pool->element_size * pool->free_list, pool->element_size);
 
-	dn_pool_handle_t handle;
-	handle.index = pool->free_list;
-	handle.generation = slot->generation;
+  dn_pool_handle_t handle;
+  handle.index = pool->free_list;
+  handle.generation = slot->generation;
 
-	pool->free_list = slot->next_free;
+  pool->free_list = slot->next_free;
 
-	return handle;
+  return handle;
 }
 
 void dn_pool_remove(dn_pool_t* pool, dn_pool_handle_t handle) {
-	if (handle.index >= pool->capacity) return;
+  if (handle.index >= pool->capacity) return;
 
   dn_pool_slot_t* slot = pool->slots + handle.index;
   if (!dn_pool_slot_is_match(slot, handle)) return;
   if (!dn_pool_slot_has_next_free(slot)) return;
 
-	slot->occupied = false;
-	slot->generation++;
-	slot->next_free = pool->free_list;
-	pool->free_list = handle.index;
+  slot->occupied = false;
+  slot->generation++;
+  slot->next_free = pool->free_list;
+  pool->free_list = handle.index;
 }
 
 bool dn_pool_contains(dn_pool_t* pool, dn_pool_handle_t handle) {
-	if (handle.index >= pool->capacity) return false;
+  if (handle.index >= pool->capacity) return false;
 
   dn_pool_slot_t* slot = pool->slots + handle.index;
   return dn_pool_slot_is_match(slot, handle);
@@ -2164,25 +1672,25 @@ bool dn_pool_contains(dn_pool_t* pool, dn_pool_handle_t handle) {
 
 void dn_pool_clear(dn_pool_t* pool) {
   dn_for(i, pool->capacity) {
-		pool->slots[i].next_free = i + 1;
-		pool->slots[i].occupied = false;
-		pool->slots[i].generation++;
-	}
+    pool->slots[i].next_free = i + 1;
+    pool->slots[i].occupied = false;
+    pool->slots[i].generation++;
+  }
 
-	pool->slots[pool->capacity - 1].next_free = -1;
+  pool->slots[pool->capacity - 1].next_free = -1;
 
-	pool->free_list = 0;
+  pool->free_list = 0;
 }
 
 dn_pool_handle_t dn_pool_invalid_handle() {
-	return (dn_pool_handle_t){
-		.index = 0,
-		.generation = 0
-	};
+  return (dn_pool_handle_t){
+    .index = 0,
+    .generation = 0
+  };
 }
 
 bool dn_pool_is_handle_valid(dn_pool_handle_t handle) {
-	return handle.generation > 0;
+  return handle.generation > 0;
 }
 
 bool dn_pool_slot_has_next_free(dn_pool_slot_t* slot) {
@@ -2802,18 +2310,18 @@ u64 dn_os_time_since_epoch() {
 // BUMP ALLOCATOR //
 ////////////////////
 void dn_bump_allocator_init(dn_bump_allocator_t* allocator, u32 capacity) {
-	allocator->buffer = (u8*)dn_allocator_alloc(&dn_allocators.standard.allocator, capacity);
-	allocator->capacity = capacity;
-	allocator->allocator.on_alloc = &dn_bump_allocator_on_alloc;
+  allocator->buffer = (u8*)dn_allocator_alloc(&dn_allocators.standard.allocator, capacity);
+  allocator->capacity = capacity;
+  allocator->allocator.on_alloc = &dn_bump_allocator_on_alloc;
 }
 
 void dn_bump_allocator_clear(dn_bump_allocator_t* allocator) {
-	memset(allocator->buffer, 0, allocator->bytes_used);
-	allocator->bytes_used = 0;
+  memset(allocator->buffer, 0, allocator->bytes_used);
+  allocator->bytes_used = 0;
 }
 
 void* dn_bump_allocator_on_alloc(dn_allocator_t* allocator, dn_allocator_mode_t mode, u32 size, void* old_memory) {
-	dn_bump_allocator_t* bump = (dn_bump_allocator_t*)allocator;
+  dn_bump_allocator_t* bump = (dn_bump_allocator_t*)allocator;
   switch (mode) {
     case DN_ALLOCATOR_MODE_ALLOC: {
       if (bump->bytes_used + size > bump->capacity) {
@@ -2828,7 +2336,7 @@ void* dn_bump_allocator_on_alloc(dn_allocator_t* allocator, dn_allocator_mode_t 
       return memory_block;
     }
     case DN_ALLOCATOR_MODE_FREE: {
- 		  return NULL;
+      return NULL;
     }
     case DN_ALLOCATOR_MODE_RESIZE: {
       if (!old_memory) {
@@ -2856,23 +2364,23 @@ void* dn_bump_allocator_on_alloc(dn_allocator_t* allocator, dn_allocator_mode_t 
 // STANDARD ALLOCATOR //
 ////////////////////////
 void dn_standard_allocator_init(dn_standard_allocator_t* allocator) {
-	allocator->allocator.on_alloc = &dn_standard_allocator_on_alloc;
+  allocator->allocator.on_alloc = &dn_standard_allocator_on_alloc;
 }
 
 void* dn_standard_allocator_on_alloc(dn_allocator_t* allocator, dn_allocator_mode_t mode, u32 size, void* old_memory) {
-	if (mode == DN_ALLOCATOR_MODE_ALLOC) {
-		return calloc(size, 1);
-	}
-	else if (mode == DN_ALLOCATOR_MODE_FREE) {
-		free(old_memory);
-		return NULL;
-	}
-	else if (mode == DN_ALLOCATOR_MODE_RESIZE) {
-		return realloc(old_memory, size);
-	}
+  if (mode == DN_ALLOCATOR_MODE_ALLOC) {
+    return calloc(size, 1);
+  }
+  else if (mode == DN_ALLOCATOR_MODE_FREE) {
+    free(old_memory);
+    return NULL;
+  }
+  else if (mode == DN_ALLOCATOR_MODE_RESIZE) {
+    return realloc(old_memory, size);
+  }
 
-	DN_UNREACHABLE();
-	return NULL;
+  DN_UNREACHABLE();
+  return NULL;
 }
 
 ///////////////
@@ -2887,31 +2395,31 @@ dn_allocator_t* dn_allocator_find(const char* name) {
 }
 
 void* dn_allocator_alloc(dn_allocator_t* allocator, u32 size) {
-	DN_ASSERT(allocator);
-	return allocator->on_alloc(allocator, DN_ALLOCATOR_MODE_ALLOC, size, NULL);
+  DN_ASSERT(allocator);
+  return allocator->on_alloc(allocator, DN_ALLOCATOR_MODE_ALLOC, size, NULL);
 }
 
 void* dn_allocator_realloc(dn_allocator_t* allocator, void* memory, u32 size) {
-	DN_ASSERT(allocator);
-	return allocator->on_alloc(allocator, DN_ALLOCATOR_MODE_RESIZE, size, memory);
+  DN_ASSERT(allocator);
+  return allocator->on_alloc(allocator, DN_ALLOCATOR_MODE_RESIZE, size, memory);
 }
 
 void dn_allocator_free(dn_allocator_t* allocator, void* buffer) {
-	DN_ASSERT(allocator);
-	DN_ASSERT(buffer);
-	allocator->on_alloc(allocator, DN_ALLOCATOR_MODE_FREE, 0, buffer);
+  DN_ASSERT(allocator);
+  DN_ASSERT(buffer);
+  allocator->on_alloc(allocator, DN_ALLOCATOR_MODE_FREE, 0, buffer);
 }
 
 void dn_allocators_init() {
-	dn_standard_allocator_init(&dn_allocators.standard);
-	dn_bump_allocator_init(&dn_allocators.bump, 50 * 1024 * 1024);
+  dn_standard_allocator_init(&dn_allocators.standard);
+  dn_bump_allocator_init(&dn_allocators.bump, 50 * 1024 * 1024);
 
-	dn_allocator_add("bump", &dn_allocators.bump.allocator);
-	dn_allocator_add("standard", &dn_allocators.standard.allocator);
+  dn_allocator_add("bump", &dn_allocators.bump.allocator);
+  dn_allocator_add("standard", &dn_allocators.standard.allocator);
 }
 
 void dn_allocators_update() {
-	dn_bump_allocator_clear(&dn_allocators.bump);
+  dn_bump_allocator_clear(&dn_allocators.bump);
 }
 
 ///////////
@@ -3176,30 +2684,60 @@ void dn_test_begin(dn_string_t name) {
 void dn_test_end() {
 }
 
-void dn_gen_arena_test() {
+void dn_pool_test() {
   dn_test_suite_t suite = {
-    .name = dn_string_literal("dn_gen_arena_t"),
+    .name = dn_string_literal("dn_pool_t"),
     .flags = DN_TEST_CONTEXT_FLAG_DEFAULT
   };
   dn_test_begin_suite(&suite);
 
-  dn_test_begin(dn_string_literal("dn_gen_arena"));
+  dn_test_begin(dn_string_literal("dn_pool"));
     dn_pool(u32) arena = dn_zero_initialize();
     dn_pool_init(&arena, 32, sizeof(u32));
     dn_pool_handle_t rza = dn_pool_insert(&arena, dn_ptr_lval(u32, 69));
     dn_pool_handle_t gza = dn_pool_insert(&arena, dn_ptr_lval(u32, 420));
     dn_pool_handle_t bill = dn_pool_insert(&arena, dn_ptr_lval(u32, 7));
 
-    dn_test_assert(*dn_pool_at(u32, &arena, rza) == 69);
-    dn_test_assert(*dn_pool_at(u32, &arena, gza) == 420);
-    dn_test_assert(*dn_pool_at(u32, &arena, bill) == 7);
+    dn_test_assert(*dn_pool_at(&arena, rza, u32) == 69);
+    dn_test_assert(*dn_pool_at(&arena, gza, u32) == 420);
+    dn_test_assert(*dn_pool_at(&arena, bill, u32) == 7);
 
+    // Check that dn_pool_for() works
+    {
+      u32 values [] = { 69, 420, 7 };
+      dn_pool_for(&arena, it) {
+        u32* value = dn_pool_it(&arena, it, u32);
+        dn_test_assert(*value = values[it.index]);
+      }
+    }
+
+    // Remove an element at the end
     dn_pool_remove(&arena, bill);
 
     dn_pool_handle_t murray = dn_pool_insert(&arena, dn_ptr_lval(u32, 9001));
     dn_test_assert(!dn_pool_contains(&arena, bill));
     dn_test_assert(dn_pool_contains(&arena, murray));
-    dn_test_assert(*dn_pool_at(u32, &arena, murray) == 9001);
+    dn_test_assert(*dn_pool_at(&arena, murray, u32) == 9001);
+
+    {
+      u32 values [] = { 69, 420, 9001 };
+      dn_pool_for(&arena, it) {
+        u32* value = dn_pool_it(&arena, it, u32);
+        dn_test_assert(*value = values[it.index]);
+      }
+    }
+
+    // Remove an element in the middle
+    dn_pool_remove(&arena, gza);
+
+    {
+      u32 values [] = { 69, 9001 };
+      dn_pool_for(&arena, it) {
+        u32* value = dn_pool_it(&arena, it, u32);
+        dn_test_assert(*value = values[it.index]);
+      }
+    }
+
   dn_test_end();
 
   dn_test_end_suite();
@@ -3350,8 +2888,9 @@ void dn_color_test() {
 void dn_test_run_internal() {
   dn_string_test();
   dn_string_builder_test();
-  dn_gen_arena_test();
+  dn_pool_test();
   // dn_color_test();
+  exit(0);
 }
 
 ///////////////
@@ -3362,6 +2901,7 @@ void dn_init(dn_config_t config) {
   dn_log_init();
   // dn_random_init();
   // dn_test_init();
+  dn_test_run_internal();
 
   if (config.mode == DN_MODE_APP || config.mode == DN_MODE_CORE_LUA) {
     dn_paths_init(config.path);
@@ -3459,16 +2999,16 @@ void dn_lua_init(dn_lua_config_t config) {
 }
 
 void dn_lua_pcall(dn_string_t fn) {
-	lua_pushstring(dn_lua.state, dn_string_to_cstr(fn));
+  lua_pushstring(dn_lua.state, dn_string_to_cstr(fn));
   lua_gettable(dn_lua.state, -2);
   
   bool result = lua_pcall(dn_lua.state, 0, 0, 0);
   if (result) {
-		dn_string_builder_t builder = dn_tstring_builder();
-		dn_string_builder_append_fmt(&builder, dn_string_literal("%.*s() failed; error = %s"),
-			fn.len, fn.data,
-			lua_tostring(dn_lua.state, -1)
-		);
+    dn_string_builder_t builder = dn_tstring_builder();
+    dn_string_builder_append_fmt(&builder, dn_string_literal("%.*s() failed; error = %s"),
+      fn.len, fn.data,
+      lua_tostring(dn_lua.state, -1)
+    );
 
     dn_log_builder(builder);
     exit(0);
@@ -3479,11 +3019,11 @@ bool dn_lua_script_file(dn_string_t file_path) {
   dn_lua_interpreter_t l = dn_lua.state;
   s32 initial_stack_size = lua_gettop(l);
 
-	dn_log_format_str(dn_string_literal("%s: scripting %.*s"), __func__, file_path.len, file_path.data);
+  dn_log_format_str(dn_string_literal("%s: scripting %.*s"), __func__, file_path.len, file_path.data);
 
   lua_pushcfunction(l, &dn_lua_format_file_load_error_l);
 
-	const char* file_path_cstr = dn_string_to_cstr(file_path);
+  const char* file_path_cstr = dn_string_to_cstr(file_path);
   bool result = luaL_loadfile(l, file_path_cstr);
 
   // In all error cases, do not return early.
@@ -3491,11 +3031,11 @@ bool dn_lua_script_file(dn_string_t file_path) {
     // There's a syntax error in the file. Since loadfile doesn't call the
     // function we put on the stack, format the message manually.
     const char* unformatted_error = lua_tostring(l, -1);
-		dn_log_format_str(dn_string_literal("%s: error loading %.*s\n%s"),
-			__func__,
-			file_path.len, file_path.data,
-			dn_lua_format_file_load_error(unformatted_error)
-		);
+    dn_log_format_str(dn_string_literal("%s: error loading %.*s\n%s"),
+      __func__,
+      file_path.len, file_path.data,
+      dn_lua_format_file_load_error(unformatted_error)
+    );
 
     lua_pop(l, 2);
     goto check_stack;
@@ -3506,12 +3046,12 @@ bool dn_lua_script_file(dn_string_t file_path) {
 
     if (result) {
       // There was a runtime error running the chunk.
-			const char* unformatted_error = lua_tostring(l, -1);
-			dn_log_format_str(dn_string_literal("%s: error running %.*s\n%s"),
-				__func__,
-				file_path.len, file_path.data,
-				dn_lua_format_file_load_error(unformatted_error)
-			);
+      const char* unformatted_error = lua_tostring(l, -1);
+      dn_log_format_str(dn_string_literal("%s: error running %.*s\n%s"),
+        __func__,
+        file_path.len, file_path.data,
+        dn_lua_format_file_load_error(unformatted_error)
+      );
 
       lua_pop(l, 2);
       goto check_stack;
@@ -3959,6 +3499,570 @@ dn_vector2_t dn_window_get_native_resolution() {
 dn_vector2_t dn_window_get_content_area() {
   return dn_app.window.content_area;
 }
+
+// AUDIO
+#ifdef DN_AUDIO
+dn_audio_config_t dn_audio_config_default() {
+  return (dn_audio_config_t) {
+    .dirs = NULL,
+    .num_dirs = 0,
+    .compressor = {
+      .threshold = 0.5f,
+      .ratio = 2.0f,
+      .attack_time = 0.95f,
+      .release_time = 1.0f,
+      .enabled = true
+    },
+    .filter = {
+      .mode = DN_AUDIO_FILTER_MODE_BUTTERWORTH,
+      .enabled = false,
+      .cutoff_frequency = 10000,
+      .cutoff_alpha = 0,
+      .a0 = 0.f, .a1 = 0.f, .a2 = 0.f, .b1 = 0.f, .b2 = 0.f,
+      .input_history = { 0 },
+      .output_history = { 0 },
+    },
+    .sample_frequency = 44100,
+    .master_volume = 1.0f,
+    .master_volume_mod = 1.0f,
+  };
+}
+
+void dn_audio_init(dn_audio_config_t config) {
+  dn_log("%s", __func__);
+
+  dn_audio = {
+    .compressor = config.compressor,
+    .filter = config.filter,
+    .sample_frequency = config.sample_frequency,
+    .master_volume = config.master_volume,
+    .master_volume_mod = config.master_volume_mod,
+    .file_monitor = dn_file_monitors_add(),
+    .sample_buffer = {0}
+  };
+
+  dn_pool_init(&dn_audio.sounds, DN_AUDIO_MAX_SOUNDS, sizeof(dn_audio_info_t));
+  dn_pool_init(&dn_audio.instances, DN_AUDIO_MAX_INSTANCES, sizeof(dn_audio_instance_t));
+
+  dn_low_pass_filter_set_cutoff(&dn_audio.filter, 10000);
+
+  // @fix
+  // auto on_file_event = [](FileMonitor* monitor, FileChange* event, void* userdata) {
+  //   dn_log("dn_audio_init: Reloading audio file; file = %s", __func__, event->file_path);
+  //   dn_audio_load(event->file_path, event->file_name);
+  // };
+
+  // auto events = DN_FILE_CHANGE_EVENT_ADDED | DN_FILE_CHANGE_EVENT_MODIFIED;
+  // dn_audio.file_monitor->init(on_file_event, events, nullptr);
+  
+  dn_string_t audio_dir = dn_paths_resolve(dn_string_literal("dn_audio"));
+  dn_log("%s: Loading default audio directory; directory = %s", __func__, dn_string_to_cstr(audio_dir));
+  dn_audio_load_dir(audio_dir);
+  for (u32 i = 0; i < config.num_dirs; i++) {
+    dn_audio_load_dir(config.dirs[i]);
+  }
+
+  // Initialize the audio backend
+  dn_log("%s: Initializing audio backend", __func__);
+  saudio_desc descriptor = { 0 };
+  descriptor.num_channels = 2;
+  descriptor.buffer_frames = 2048;
+  descriptor.logger.func = slog_func;
+  descriptor.stream_cb = dn_audio_update;
+  saudio_setup(&descriptor);
+
+  auto max_samples_requested = saudio_expect() * saudio_channels() * 2;
+  dn_array_init(&dn_audio.sample_buffer, max_samples_requested);
+  dn_audio.sample_buffer.size = dn_audio.sample_buffer.capacity;
+}
+
+void dn_audio_add_samples(dn_audio_instance_t* instance, int samples_requested, int offset) {
+  for (s32 i = 0; i < samples_requested; i++) {
+    dn_audio_info_t* info = dn_audio_resolve(instance->info);
+    s32 index = instance->next_sample++;
+
+    if (index == info->num_samples) {
+      if (instance->loop) {
+        instance->next_sample = 0;
+        index = 0;
+      }
+      else if (dn_gen_arena_handle_valid(instance->next)) {
+        instance->sample_buffer_offset = i;
+        instance->samples_from_next = samples_requested - i;
+        break;
+      }
+      else {
+        dn_audio_stop_ex(instance);
+        break;
+      }
+    }
+
+    // Take the next sample from the sound and add it to the sample buffer
+    auto sample = info->samples[index];
+    sample = sample * instance->volume;
+    sample = dn_low_pass_filter_apply(&instance->filter, sample);
+
+    *dn_fixed_array_at(&dn_audio.sample_buffer, i + offset) += sample;
+  }
+  
+}
+  
+
+void dn_audio_update(f32* buffer, int frames_requested, int num_channels) {
+  if (!frames_requested) return;
+
+  // Cap the number of samples so we don't overwrite the buffer
+  s32 samples_requested = frames_requested * num_channels;
+  if (samples_requested > dn_audio.sample_buffer.capacity) {
+    dn_log("requested too many audio samples: %d", samples_requested);
+    samples_requested = dn_audio.sample_buffer.capacity;
+  }
+
+  // You must write zeros, or else whatever the last requested samples were will linger
+  if (!dn_audio_is_any_playing()) {
+    memset(buffer, 0, samples_requested * sizeof(float));
+    return;
+  }
+
+  dn_mutex_lock(&dn_audio.mutex);
+
+  for (u32 i = 0; i < dn_audio.instances.capacity; i++) {
+    dn_audio_instance_t* instance = dn_pool_at_i(&dn_audio.instances, i, dn_audio_instance_t);
+    if (!instance->occupied) continue;
+    if (instance->paused) continue;
+
+    if (!dn_pool_contains(&dn_audio.sounds, instance->info)) {
+      dn_audio_stop_ex(instance);
+      continue;
+    }
+    
+    dn_audio_add_samples(instance, samples_requested, 0);
+  }
+
+  bool chaining_sounds = true;
+  while (chaining_sounds) {
+    chaining_sounds = false;
+    
+    for (u32 i = 0; i < dn_audio.instances.capacity; i++) {
+      dn_pool_slot_t* slot = dn_audio.instances.slots + i;
+      if (!slot->occupied) continue;
+
+      dn_audio_instance_t* instance = dn_pool_at_i(&dn_audio.instances, i, dn_audio_instance_t);
+      if (!instance->occupied) continue;
+      if (instance->paused) continue;
+
+      if (instance->samples_from_next) {
+        chaining_sounds = true;
+        
+        dn_audio_instance_t* next_sound = dn_audio_resolve_instance(instance->next);
+        if (!next_sound) continue;
+        
+        dn_audio_resume(instance->next);
+        dn_audio_add_samples(next_sound, instance->samples_from_next, instance->sample_buffer_offset);
+        dn_audio_stop_ex(instance);
+      }
+    }
+  }
+
+  dn_mutex_unlock(&dn_audio.mutex);
+  
+  float envelope = 0.0f;
+  float gain = 1.0f;
+  for (int i = 0; i < samples_requested; i++) {
+    f32* sample = (f32*)dn_fixed_array_at(&dn_audio.sample_buffer, i);
+    *sample *= dn_audio.master_volume * dn_audio.master_volume_mod;
+
+    f32 abs_sample = abs(*sample);
+    if (dn_audio.compressor.enabled) {
+      envelope = dn_math_lerp(envelope, abs_sample, dn_audio.compressor.attack_time);
+
+      if (envelope > dn_audio.compressor.threshold) {
+        auto decibel = 10 * log10(envelope / dn_audio.compressor.threshold);
+        auto target_decibel = decibel / dn_audio.compressor.ratio;
+        auto target_bel = target_decibel / 10;
+        auto target_envelope = pow(10, target_bel) * dn_audio.compressor.threshold;
+        gain = target_envelope / envelope;
+      }
+      else {
+        gain = dn_math_lerp(gain, 1.0f, dn_audio.compressor.release_time);
+      }
+    }
+
+    *sample *= gain;
+    *sample = dn_low_pass_filter_apply(&dn_audio.filter, *sample);
+    *sample = dn_math_clamp(sample, -1.f, 1.f);
+  }
+
+  memcpy(buffer, dn_audio.sample_buffer.data, samples_requested * sizeof(float));
+  dn_fixed_array_clear(&dn_audio.sample_buffer);
+}
+
+void dn_audio_shutdown() {
+  saudio_shutdown();
+}
+
+bool dn_audio_is_any_playing() {
+  dn_mutex_lock(&dn_audio.mutex);
+  
+  dn_pool_for(&dn_audio.instances, it) {
+    dn_audio_instance_t* instance = dn_pool_it(&dn_audio.instances, it, dn_audio_instance_t);
+    if (instance->occupied) return true;
+  }
+
+  return false;
+}
+
+dn_audio_info_t* dn_audio_find_no_default(dn_string_t name) {
+  dn_mutex_lock(&dn_audio.mutex);
+
+  dn_hash_t hash = dn_hash_string(name);
+  dn_pool_for(&dn_audio.sounds, it) {
+    dn_audio_info_t* info = dn_pool_it(&dn_audio.sounds, it, dn_audio_info_t);
+    if (info->hash == hash) return hash;
+  }
+
+  return NULL;
+}
+
+dn_audio_info_t* dn_audio_find(dn_string_t name) {
+  dn_audio_info_t* sound = dn_audio_find_no_default(name);
+  if (!sound) sound = dn_audio_find_no_default(dn_string_literal("debug.wav"));
+  return sound;
+}
+
+dn_audio_instance_handle_t dn_audio_reserve() {
+  dn_mutex_lock(&dn_audio.mutex);
+  
+  for (u32 index = 0; index < dn_audio.instances.size; index++) {
+    auto active_sound = dn_audio.instances[index];
+    if (!active_sound->occupied) {
+      active_sound->occupied = true;
+      return { 
+        .index = index, 
+        .generation = active_sound->generation 
+      };
+    }
+  }
+
+  return dn_gen_arena_invalid_handle();
+}
+
+dn_audio_info_t* dn_audio_resolve(dn_audio_info_handle_t handle) {
+  dn_mutex_lock(&dn_audio.mutex);
+
+  if (!dn_pool_contains(&dn_audio.sounds, handle)) return NULL;
+  return dn_pool_at(&dn_audio.sounds, handle, dn_audio_info_t);
+}
+
+dn_audio_instance_t* dn_audio_resolve_instance(dn_audio_instance_handle_t handle) {
+  dn_mutex_lock(&dn_audio.mutex);
+
+  if (!dn_pool_contains(&dn_audio.instances, handle)) return NULL;
+  return dn_pool_at(&dn_audio.instances, handle, dn_audio_instance_t);
+}
+
+dn_audio_instance_handle_t dn_audio_play_sound_ex(dn_audio_info_t* sound, bool loop) { 
+  dn_mutex_lock(&dn_audio.mutex);
+  
+  auto handle = dn_audio_reserve();
+  if (!dn_gen_arena_handle_valid(handle)) return handle;
+
+  auto active_sound = dn_audio_resolve_instance(handle);
+  active_sound->info = { dn_array_indexof(&dn_audio.sounds, sound), sound->generation };
+  active_sound->volume = 1.f;
+  active_sound->next_sample = 0;
+  active_sound->loop = loop;
+  active_sound->paused = false;
+  active_sound->next = dn_gen_arena_invalid_handle();
+  active_sound->samples_from_next = 0;
+  active_sound->sample_buffer_offset = 0;
+  active_sound->filter = {
+    .mode = DN_AUDIO_FILTER_MODE_BUTTERWORTH,
+    .enabled = false,
+    .a0 = 0.f, .a1 = 0.f, .a2 = 0.f, .b1 = 0.f, .b2 = 0.f,
+    .input_history = { 0 },
+    .output_history = { 0 },
+  };
+  dn_low_pass_filter_set_cutoff(&active_sound->filter, dn_audio_get_master_filter_cutoff());
+
+  return handle;
+}
+
+void dn_audio_stop_ex(dn_audio_instance_t* active_sound) {
+  dn_mutex_lock(&dn_audio.mutex);  
+
+  if (!active_sound) return;
+  
+  active_sound->occupied = false;
+  active_sound->generation++;
+
+  dn_audio_stop_ex(dn_audio_resolve_instance(active_sound->next));
+}
+
+dn_audio_info_t* alloc_sound(const char* file_name) {
+  auto sound = dn_audio_find_no_default(file_name);
+  if (!sound) sound = dn_array_push(&dn_audio.sounds);
+  sound->generation++;
+
+  return sound;
+}
+
+void dn_audio_load_dir(const char* path) {
+  dn_os_directory_entry_list_t entries = dn_os_scan_directory(dn_string_literal(path));
+  for (u32 i = 0; i < entries.count; i++) {
+    dn_os_directory_entry_t entry = entries.data[i];
+    if (entry.attributes & DN_OS_FILE_ATTR_DIRECTORY) {
+      // @string
+      dn_audio.file_monitor->add_directory(dn_string_to_cstr_ex(entry.file_path, &dn_allocators.bump));
+      dn_audio_load_dir(dn_string_to_cstr_ex(entry.file_path, &dn_allocators.bump));
+    }
+    else {
+      // @string
+      dn_audio_load(dn_string_to_cstr_ex(entry.file_path, &dn_allocators.bump), dn_string_to_cstr_ex(entry.file_name, &dn_allocators.bump));
+    }
+  }
+}
+
+void dn_audio_load(const char* file_path, const char* file_name) {
+  dn_mutex_lock(&dn_audio.mutex);
+
+  auto sound = alloc_sound(file_name);
+  strncpy(sound->name, file_name, DN_ASSET_NAME_LEN);
+  sound->hash = dn_hash_cstr_dumb(sound->name);
+  
+  sound->samples = drwav_open_file_and_read_pcm_frames_f32(file_path, &sound->num_channels, &sound->sample_rate, &sound->num_frames, NULL);
+  if (!sound->samples) {
+    dn_log("failed to load sound file sound file: %s", file_path);
+  }
+  sound->num_samples = sound->num_frames * sound->num_channels;
+};
+
+
+//////////////////////
+// LOW PASS FILTER  //
+//////////////////////
+void dn_low_pass_filter_set_mode(dn_low_pass_filter_t* filter, dn_audio_filter_mode_t mode) {
+  filter->mode = mode;
+  dn_low_pass_filter_set_cutoff(filter, filter->cutoff_frequency);
+}
+
+void dn_low_pass_filter_set_cutoff(dn_low_pass_filter_t* filter, float cutoff) {
+  // The low pass filters are unstable at frequencies higher than the Nyquist frequency, so clamp. Add a little wiggle room
+  // to make sure we're not close to it, because it sounds a little bad that high anyway.
+  float nyquist = dn_audio.sample_frequency / 2.1;
+  filter->cutoff_frequency = dn_min(cutoff, nyquist);
+
+  // Butterworth filter
+  float omega = 2.0f * 3.14159 * filter->cutoff_frequency / dn_audio.sample_frequency;
+  float cos_omega = cos(omega);
+  float sin_omega = sin(omega);
+  float alpha = sin_omega / sqrt(2.0f); // Butterworth filter (sqrt(2) damping factor)
+
+  filter->a0 = (1.0f - cos_omega) / 2.0f;
+  filter->a1 = 1.0f - cos_omega;
+  filter->a2 = (1.0f - cos_omega) / 2.0f;
+  filter->b1 = -2.0f * cos_omega;
+  filter->b2 = 1.0f - alpha;
+
+  float a0_inv = 1.0f / (1.0f + alpha);
+  filter->a0 *= a0_inv;
+  filter->a1 *= a0_inv;
+  filter->a2 *= a0_inv;
+  filter->b1 *= a0_inv;
+  filter->b2 *= a0_inv;
+
+  // Simple first order low pass filter
+  filter->cutoff_alpha = 2.0f * 3.14159 * filter->cutoff_frequency / (dn_audio.sample_frequency + 2.0f * 3.14159 * filter->cutoff_frequency);
+}
+
+float dn_low_pass_filter_apply(dn_low_pass_filter_t* filter, float input) {
+  if (!filter->enabled) return input;
+  
+  switch (filter->mode) {
+    case DN_AUDIO_FILTER_MODE_BUTTERWORTH: {
+      float output = 0;
+      output += (filter->a0 * input) + (filter->a1 * filter->input_history[0]) + (filter->a2 * filter->input_history[1]);
+      output -= (filter->b1 * filter->output_history[0]) + (filter->b2 * filter->output_history[1]);
+
+      filter->input_history[1] = filter->input_history[0];
+      filter->input_history[0] = input;
+
+      filter->output_history[1] = filter->output_history[0];
+      filter->output_history[0] = output;
+
+      return output;
+    } break;
+
+    case DN_AUDIO_FILTER_MODE_FIRST_ORDER: {
+      float output = 0;
+      output += filter->cutoff_alpha * input;
+      output += (1.0f - filter->cutoff_alpha) * filter->output_history[0];
+    
+      filter->output_history[0] = output;
+    
+      return output;
+    } break;
+
+    default: {
+      DN_ASSERT(false);
+      return input;
+    }
+  }
+}
+
+
+/////////////
+// LUA API //
+/////////////
+dn_audio_instance_handle_t dn_audio_play_sound(const char* name) {
+  auto info = dn_audio_find(name);
+  return dn_audio_play_sound_ex(info, false);
+}
+
+dn_audio_instance_handle_t dn_audio_play_looped(const char* name) {
+  auto info = dn_audio_find(name);
+  return dn_audio_play_sound_ex(info, true);
+}
+
+void dn_audio_stop(dn_audio_instance_handle_t handle) {
+  auto active_sound = dn_audio_resolve_instance(handle);
+  dn_audio_stop_ex(active_sound);
+}
+
+void dn_audio_stop_all() {
+  dn_array_for(dn_audio.instances, active_sound) {
+    dn_audio_stop_ex(active_sound);
+  }
+}
+
+void dn_audio_set_volume(dn_audio_instance_handle_t handle, float volume) {
+  auto active_sound = dn_audio_resolve_instance(handle);
+  if (!active_sound) return;
+
+  dn_mutex_lock(&dn_audio.mutex);
+
+  active_sound->volume = dn_math_clamp(volume, 0.f, 1.f);
+}
+
+void dn_audio_set_filter_mode(dn_audio_instance_handle_t handle, dn_audio_filter_mode_t mode) {
+  auto active_sound = dn_audio_resolve_instance(handle);
+  if (!active_sound) return;
+
+  dn_mutex_lock(&dn_audio.mutex);
+  dn_low_pass_filter_set_mode(&active_sound->filter, mode);
+}
+
+void dn_audio_set_filter_cutoff(dn_audio_instance_handle_t handle, float cutoff) {
+  auto active_sound = dn_audio_resolve_instance(handle);
+  if (!active_sound) return;
+
+  dn_mutex_lock(&dn_audio.mutex);
+  dn_low_pass_filter_set_cutoff(&active_sound->filter, cutoff);
+}
+
+void dn_audio_set_filter_enabled(dn_audio_instance_handle_t handle, bool enabled) {
+  auto active_sound = dn_audio_resolve_instance(handle);
+  if (!active_sound) return;
+
+  dn_mutex_lock(&dn_audio.mutex);
+  active_sound->filter.enabled = enabled;
+}
+
+void dn_audio_set_compressor_threshold(float threshold) {
+  dn_mutex_lock(&dn_audio.mutex);
+  dn_audio.compressor.threshold = threshold;
+}
+
+void dn_audio_set_compressor_ratio(float ratio) {
+  dn_mutex_lock(&dn_audio.mutex);
+  dn_audio.compressor.ratio = ratio;
+}
+
+void dn_audio_set_compressor_attack(float attack) {
+  dn_mutex_lock(&dn_audio.mutex);
+  dn_audio.compressor.attack_time = attack;
+}
+
+void dn_audio_set_compressor_release(float release) {
+  dn_mutex_lock(&dn_audio.mutex);
+  dn_audio.compressor.release_time = release;
+}
+
+void dn_audio_set_sample_rate(float rate) {
+  dn_mutex_lock(&dn_audio.mutex);
+  dn_audio.sample_frequency = rate;
+}
+
+void dn_audio_set_master_volume(float volume) {
+  dn_mutex_lock(&dn_audio.mutex);
+  dn_audio.master_volume = volume;
+}
+
+void dn_audio_set_master_volume_mod(float volume_mod) {
+  dn_mutex_lock(&dn_audio.mutex);
+  dn_audio.master_volume_mod = volume_mod;
+}
+
+void dn_audio_set_master_filter_cutoff(float frequency) {
+  dn_mutex_lock(&dn_audio.mutex);
+  dn_low_pass_filter_set_cutoff(&dn_audio.filter, frequency);
+}
+
+void dn_audio_set_master_filter_cutoff_enabled(bool enabled) {
+  dn_mutex_lock(&dn_audio.mutex);
+  dn_audio.filter.enabled = enabled;
+}
+
+void dn_audio_set_master_filter_mode(dn_audio_filter_mode_t mode) {
+  dn_mutex_lock(&dn_audio.mutex);
+  dn_audio.filter.mode = mode;
+}
+
+float dn_audio_get_master_filter_cutoff() {
+  return dn_audio.filter.cutoff_frequency;
+}
+
+float dn_audio_get_master_volume() {
+  return dn_audio.master_volume;
+}
+
+float dn_audio_get_master_volume_mod() {
+  return dn_audio.master_volume_mod;
+}
+
+bool dn_audio_is_playing(dn_audio_instance_handle_t handle) {
+  return dn_audio_resolve_instance(handle);
+}
+
+void dn_audio_pause(dn_audio_instance_handle_t handle) {
+  auto sound = dn_audio_resolve_instance(handle);
+  if (!sound) return;
+  
+  sound->paused = true;
+}
+
+void dn_audio_resume(dn_audio_instance_handle_t handle) {
+  auto sound = dn_audio_resolve_instance(handle);
+  if (!sound) return;
+  
+  sound->paused = false;
+}
+
+void dn_audio_queue(dn_audio_instance_handle_t current, dn_audio_instance_handle_t next) {
+  auto next_sound = dn_audio_resolve_instance(next);
+  if (!dn_gen_arena_handle_valid(next)) return;
+  
+  auto current_sound = dn_audio_resolve_instance(current);
+  if (!current_sound) {
+    next_sound->paused = false;
+    return;
+  };
+
+  current_sound->next = next;
+  dn_audio_pause(next);
+}
+#endif
+
 
 /////////
 // APP //
