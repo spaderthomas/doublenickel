@@ -43,7 +43,7 @@ return {
 					path = 'data',
 					children = {
 						editor_scene = 'editor.lua',
-						cimgui_header = 'cimgui.lua',
+						cimgui_header = 'cimgui_header.lua',
 					}
 				},
 				dn_editor = 'editor',

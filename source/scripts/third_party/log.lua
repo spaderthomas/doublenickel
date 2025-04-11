@@ -11,7 +11,7 @@ log = { _version = "0.1.0" }
 
 log.use_color = true
 log.outfile = nil
-log.level = "trace"
+log.level = "info"
 
 log.stack_depth = nil
 log.push_stack_depth = function(value)

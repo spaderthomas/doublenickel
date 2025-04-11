@@ -53,6 +53,9 @@
 #include "sokol/sokol_audio.h"
 #include "sokol/sokol_log.h"
 
+#define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
+#include "cimgui/cimgui.h"
+
 // #include "steam/steam_api.h"
 #endif
 
@@ -744,6 +747,80 @@ DN_IMP void                   _dn_paths_set_install_roots(dn_path_config_t confi
 DN_IMP void                   _dn_paths_set_write_path(dn_path_config_t config);
 
 
+// BACKGROUND
+#define DN_BACKGROUND_TILE_SIZE 2048
+
+typedef struct {
+  dn_texture_t* texture;
+  u32* data;
+} dn_background_loaded_tile_t;
+
+typedef struct {
+	char* name;
+	char* tile_output_folder;
+	char* tile_output_full_path;
+	char* source_image;
+	char* source_image_full_path;
+	// dn_array_t<char*, 64> tiles;
+	// dn_array_t<char*, 64> tile_full_paths;
+	// dn_array_t<dn_vector2i_t, 64> tile_positions;
+	s32 width;
+	s32 height;
+	s32 channels;
+	u32* data;
+	bool high_priority;
+
+	f64 mod_time;
+	f64 filesystem_mod_time;
+
+	bool need_async_build;
+	bool need_async_load;
+	bool need_config_update;
+
+	// dn_array_t<LoadedTile> loaded_tiles;
+	bool gpu_ready;
+	bool gpu_done;
+	int gpu_load_index;
+} dn_background_t;
+
+typedef struct {
+  // dn_array_t<Background> backgrounds;
+} dn_backgrounds_t;
+
+void dn_background_init(dn_background_t* background);
+void dn_background_deinit(dn_background_t* background);
+void dn_background_load_paths(dn_background_t* background);
+void dn_background_set_source_image_size(dn_background_t* background, s32 width, i32 height);
+void dn_background_set_source_data(dn_background_t* background, u32* data);
+bool dn_background_add_tile(dn_background_t* background);
+void dn_background_add_tiles(dn_background_t* background);
+bool dn_background_is_dirty(dn_background_t* background);
+void dn_background_build_from_source(dn_background_t* background);
+void dn_background_load_to_gpu(dn_background_t* background);
+void dn_background_load_one_to_gpu(dn_background_t* background);
+void dn_background_load_tiles(dn_background_t* background);
+void dn_background_update_config(dn_background_t* background);
+void dn_backgrounds_init();
+
+typedef struct {
+  u32 current_tile;
+  dn_mutex_t mutex;
+} dn_background_tile_processor_shared_t;
+
+typedef struct {
+	u32* source_data;
+	u32* tile_data;
+  dn_thread_t thread;
+
+} dn_background_tile_processor_t;
+
+void dn_background_tile_processor_init(u32* source_data);
+void dn_background_tile_processor_deinit();
+void dn_background_tile_processor_process(dn_background_t* background);
+
+
+
+
 //  ████████╗███████╗███████╗████████╗██╗███╗   ██╗ ██████╗
 //  ╚══██╔══╝██╔════╝██╔════╝╚══██╔══╝██║████╗  ██║██╔════╝
 //     ██║   █████╗  ███████╗   ██║   ██║██╔██╗ ██║██║  ███╗
@@ -895,6 +972,37 @@ nk_color      dn_color_to_nk_color(dn_color_t color);
 nk_style_item dn_color_to_nk_style_item(dn_color_t color);
 #endif
 
+// IMGUI
+#ifdef DN_IMGUI
+typedef struct {
+  dn_vector4_t light;
+  dn_vector4_t medium_light;
+  dn_vector4_t low_light;
+  dn_vector4_t neutral;
+  dn_vector4_t medium_dark;
+} dn_imgui_colors_t;
+
+typedef struct {
+  dn_string_t queued_layout;
+  dn_imgui_colors_t colors;
+} dn_imgui_t;
+dn_imgui_t dn_imgui;
+
+DN_API void    dn_imgui_push_font(const char* font_name, u32 size);
+DN_API void    dn_imgui_image(const char* image, float sx, float sy);
+DN_API void    dn_imgui_file_browser_open();
+DN_API void    dn_imgui_file_browser_close();
+DN_API void    dn_imgui_file_browser_set_work_dir(const char* directory);
+DN_API bool    dn_imgui_file_browser_is_file_selected();
+DN_API dn_tstring_t dn_imgui_file_browser_get_selected_file();
+DN_API void    dn_imgui_load_layout(const char* file_name);
+DN_API void    dn_imgui_save_layout(const char* file_name);
+DN_API void    dn_imgui_load_colors(dn_imgui_colors_t colors);
+DN_IMP void    dn_imgui_init();
+DN_IMP void    dn_imgui_shutdown();
+DN_IMP void    dn_imgui_update();
+#endif
+
 
 //  ██╗     ██╗   ██╗ █████╗
 //  ██║     ██║   ██║██╔══██╗
@@ -991,6 +1099,7 @@ typedef struct {
 
 typedef struct {
   dn_window_t window;
+  dn_backgrounds_t backgrounds;
   f32 target_fps;
   f32 dt;
   f32 elapsed_time;
@@ -2928,7 +3037,367 @@ nk_style_item dn_color_to_nk_style_item(dn_color_t color) {
 }
 #endif
 
+#ifdef DN_IMGUI
+void dn_imgui_init() {
+  DN_BROKEN();
+}
+
+void dn_imgui_update() {
+  DN_BROKEN();
+}
+
+void dn_imgui_shutdown() {
+  DN_BROKEN();
+}
+
+void dn_imgui_load_colors(dn_imgui_colors_t colors) {
+  DN_BROKEN();
+}
+
+void dn_imgui_load_layout(const char* file_name) {
+  DN_BROKEN();
+}
+
+void dn_imgui_save_layout(const char* file_name) {
+  DN_BROKEN();
+}
+
+
+void dn_imgui_push_font(const char* font_name, u32 size) {
+  DN_BROKEN();
+}
+
+void dn_imgui_image(const char* image, float sx, float sy) {
+  DN_BROKEN();
+}
+
+void dn_imgui_file_browser_open() {
+  DN_BROKEN();
+}
+
+void dn_imgui_file_browser_close() {
+  DN_BROKEN();
+}
+
+void dn_imgui_file_browser_set_work_dir(const char* directory) {
+  DN_BROKEN();
+}
+
+bool dn_imgui_file_browser_is_file_selected() {
+  DN_BROKEN();
+}
+
+dn_tstring_t dn_imgui_file_browser_get_selected_file() {
+  DN_BROKEN();
+  return dn_string_copy_cstr("DN_BROKEN");
+}
+#endif
+
+
 #ifdef DN_APP
+void dn_backgrounds_init() {
+  DN_BROKEN();
+}
+
+
+void dn_background_init(dn_background_t* background) {
+  DN_BROKEN();
+}
+
+void Background::deinit(dn_background_t* background) {
+  DN_BROKEN();
+}
+
+void Background::load_paths(dn_background_t* background) {
+	auto& lua = dn_lua;
+	auto l = dn_lua.state;
+		
+	// Find the path to the source image, i.e. the full size background
+	//lua.parse_string("source", &source_image);
+	this->source_image_full_path = dn_paths_resolve_format_ex("dn_image", source_image, &dn_allocators.standard);
+
+	// Find the folder we're going to write tiles to
+	//lua.parse_string(-2, &tile_output_folder);
+	this->tile_output_full_path = dn_paths_resolve_format_ex("dn_atlas", tile_output_folder, &dn_allocators.standard);
+		
+	// The name of the background is the folder we use for tiling
+	name = tile_output_folder;
+}
+
+void Background::set_source_image_size(dn_background_t* background, i32 width, i32 height) {
+	this->width = width;
+	this->height = height;
+}
+
+void Background::set_source_data(dn_background_t* background, u32* data) {
+	this->data = data;
+}
+
+bool Background::add_tile(dn_background_t* background) {
+	assert(width > 0);
+	assert(height > 0);
+		
+	// Calculate where the next tile will be
+	if (!tile_positions.size) {
+		// If we just started, it's just (0, 0)
+		dn_array_push(&tile_positions);
+	} else {
+		// Otherwise, advance the previous tile one column, and move to the next row if needed.
+		dn_vector2i_t last_tile_position = *dn_array_back(&tile_positions);
+		dn_vector2i_t tile_position = { 0, 0 };
+		tile_position.x = last_tile_position.x + Background::TILE_SIZE;
+		tile_position.y = last_tile_position.y;
+		if (tile_position.x >= width) {
+			tile_position.x = 0;
+			tile_position.y += Background::TILE_SIZE;
+		}
+
+		// If it falls outside of the image, we're done
+		if (tile_position.y >= height) {
+			return false;
+		} else {
+			dn_array_push(&tile_positions, tile_position);
+		}
+	}
+		
+		
+	char** tile = dn_array_push(&tiles);
+	*tile = dn::allocator::alloc<char>(&dn_allocators.standard, DN_MAX_PATH_LEN);
+	snprintf(*tile, 256, "%s_%03lld.png", name, tiles.size);
+		
+	char** tile_full_path = dn_array_push(&tile_full_paths);
+	*tile_full_path = dn::allocator::alloc<char>(&dn_allocators.standard, DN_MAX_PATH_LEN);
+	snprintf(*tile_full_path, DN_MAX_PATH_LEN, "%s/%s", tile_output_full_path, *tile);
+
+	return true;
+}
+
+void Background::add_tiles(dn_background_t* background) {
+	while(add_tile()) {}
+}
+
+void Background::build_from_source(dn_background_t* background) {
+	// Clean out old tiles 
+	std::filesystem::remove_all(tile_output_full_path);
+	std::filesystem::create_directories(tile_output_full_path);
+
+	// Load the source image
+	stbi_set_flip_vertically_on_load(false);
+	u32* source_data = (u32*)stbi_load(source_image_full_path, &width, &height, &channels, 0);
+	dn_defer { free(source_data); };
+
+	assert(channels == 4);
+
+	set_source_image_size(width, height);
+	add_tiles();
+
+	constexpr u32 nthreads = 16;
+	TileProcessor::current_tile = 0;
+	dn_array_t<TileProcessor> tile_processors;
+	dn_array_init(&tile_processors, nthreads, TileProcessor());
+
+	// Use a thread per-tile, up to the maximum number of threads in the pool.
+	auto use_threads = dn_min(tiles.size, nthreads);
+	for (u32 i = 0; i < use_threads; i++) {
+		auto tile_processor = tile_processors[i];
+		tile_processor->init(source_data);
+		tile_processor->thread = std::thread(&TileProcessor::process, tile_processor, this);
+	}
+	
+	for (u32 i = 0; i < use_threads; i++) {
+		auto tile_processor = tile_processors[i];
+		tile_processor->thread.join();
+		tile_processor->deinit();
+	}
+}
+
+void Background::update_config(dn_background_t* background) {
+	lua_State* l = dn_lua.state;
+
+	lua_getglobal(l, "doublenickel");
+	DEFER_POP(l);
+	lua_pushstring(l, "background");
+	lua_gettable(l, -2);
+	DEFER_POP(l);
+	lua_pushstring(l, "data");
+	lua_gettable(l, -2);
+	DEFER_POP(l);
+	lua_pushstring(l, name);
+	lua_gettable(l, -2);
+	DEFER_POP(l);
+
+	// Write out the new tile data to disk
+	lua_pushstring(l, "mod_time");
+	lua_pushnumber(l, filesystem_mod_time);
+	lua_settable(l, -3);
+
+	// Clear the old tile names from the config
+	lua_pushstring(l, "tiles");
+	lua_newtable(l);
+	lua_settable(l, -3);
+
+	// Write each file's name to the config
+	for (u32 i = 0; i < tiles.size; i++) {
+		auto tile_file_name = *tiles[i];
+		lua_pushstring(l, "tiles");
+		lua_gettable(l, -2);
+		DEFER_POP(l);
+		lua_pushnumber(l, i + 1);
+		lua_pushstring(l, tile_file_name);
+		lua_settable(l, -3);
+	}
+
+	// Write size
+	lua_newtable(l);
+	lua_pushstring(l, "x");
+	lua_pushnumber(l, width);
+	lua_settable(l, -3);
+
+	lua_pushstring(l, "y");
+	lua_pushnumber(l, height);
+	lua_settable(l, -3);
+
+	lua_pushstring(l, "size");
+	lua_insert(l, -2);
+	lua_settable(l, -3);
+	
+	// Write the file to disk
+	lua_getglobal(l, "doublenickel");
+	lua_pushstring(l, "write_file_to_return_table");
+	lua_gettable(l, -2);
+
+	auto background_info = dn_paths_resolve("background_info");
+	lua_pushstring(l, background_info);
+
+	lua_getglobal(l, "doublenickel");
+	DEFER_POP(l);
+	lua_pushstring(l, "background");
+	lua_gettable(l, -2);
+	lua_pushstring(l, "data");
+	lua_gettable(l, -2);
+	lua_insert(l, -3);
+	lua_pop(l, 2);
+
+	lua_pushboolean(l, true);
+
+	lua_pcall(l, 3, 0, 0);
+}
+
+void Background::load_tiles(dn_background_t* background) {
+	// At this point, the background is correctly tiled (i.e. the tile images exist on disk, and are more current
+	// than the source image). Load the tiles into the GPU.
+	//
+	// This is definitely slower than it needs to be; when we regenerate tiles, we already have the source data.
+	// But instead of loading it directly into the GPU, we write it to a PNG and then reload it here. Why? Well,
+	// laziness. It's probably smarter to have LoadTileFromMemory(), and just call that in both the regenerate
+	// case + after we load them from disk in the cache case. But to be honest, I really don't care right
+	// now!
+
+	// Make a completion queue that's the exact size we need. (If you had a vector, this would be a great time
+	// to use a vector that allocates from temporary storage)
+
+	dn_array_init(&this->loaded_tiles, this->tiles.size, &dn_allocators.standard);
+
+	for (int tile_index = 0; tile_index < tiles.size; tile_index++) {
+		// Pull tile data
+		auto tile = *tiles[tile_index];
+		auto tile_full_path = *tile_full_paths[tile_index];
+
+		// Allocate any buffer resources
+		auto texture = alloc_texture();
+		texture->hash = dn_hash_cstr_dumb(tile);
+		stbi_set_flip_vertically_on_load(false);
+		u32* data = (u32*)stbi_load(tile_full_path, &texture->width, &texture->height, &texture->channels, 0);
+			
+		// Create a sprite so the tile can be drawn with the draw_image() API
+		auto sprite = alloc_sprite();
+		strncpy(sprite->file_path, tile, DN_MAX_PATH_LEN);
+		sprite->texture = texture->hash;
+		sprite->hash = texture->hash;
+		sprite->size = { texture->width, texture->height };
+
+		// Each tile spans the entire image, so use trivial UVs
+		dn_vector2_t uv [6] = dn_quad_literal(0, 1, 0, 1);
+		for (u32 i = 0; i < 6; i++) sprite->uv[i] = uv[i];
+
+		// Mark the data to be loaded to the GPU
+		auto item = dn_array_push(&loaded_tiles);
+		item->texture = texture;
+		item->data = data;
+	}
+}
+
+bool Background::is_dirty(dn_background_t* background) {
+	if (filesystem_mod_time > mod_time) return true;
+	if (!std::filesystem::exists(tile_output_full_path)) return true;
+
+	return false;
+}
+
+
+void Background::load_one_to_gpu(dn_background_t* background) {
+	auto tile = loaded_tiles[gpu_load_index++];
+	tile->texture->load_to_gpu(tile->data);
+	free(tile->data);
+
+	if (gpu_load_index == loaded_tiles.size) {
+		gpu_done = true;
+	}
+}
+
+void Background::load_to_gpu(dn_background_t* background) {
+	gpu_ready = true;
+	while (!gpu_done) {
+		load_one_to_gpu();
+	}
+}
+
+
+//
+// TILE PROCESSOR
+//
+void TileProcessor::init(u32* source_data) {
+	if (!tile_data) {
+		tile_data = dn::allocator::alloc<u32>(&dn_allocators.standard, Background::TILE_SIZE * Background::TILE_SIZE);
+	}
+	this->source_data = source_data;
+}
+
+void TileProcessor::deinit() {
+	dn::allocator::free(&dn_allocators.standard, tile_data);
+	tile_data = nullptr;
+	source_data = nullptr;
+}
+
+void TileProcessor::process(Background* background) {
+	while (current_tile < background->tiles.size) {
+		// Atomically get the next tile index, and pull that tile's data. I believe this could be an atomic
+		// instead of needing a full mutex, but it doesn't matter.
+		mutex.lock();
+		u32 tile = current_tile++;
+		mutex.unlock();
+
+		dn_vector2i_t source_position = *background->tile_positions[tile];
+		char*    tile_path       = *background->tile_full_paths[tile];
+		memset(tile_data, 0, Background::TILE_SIZE * Background::TILE_SIZE * sizeof(u32));
+			
+		// Blit a single tile to its own texture
+		u32 tile_offset = 0;
+		u32 source_offset = (background->width * source_position.y) + source_position.x;
+		u32 cols = dn_min(Background::TILE_SIZE, background->width - source_position.x);
+		u32 rows = dn_min(Background::TILE_SIZE, background->height - source_position.y);
+		for (u32 row = 0; row < rows; row++) {
+			memcpy(tile_data + tile_offset, source_data + source_offset, cols * sizeof(u32));
+			source_offset += background->width;
+			tile_offset += Background::TILE_SIZE;
+		}
+
+		// Write the tile image out to a PNG file
+		stbi_write_png(tile_path, Background::TILE_SIZE, Background::TILE_SIZE, 4, tile_data, 0);
+	}
+}
+
+
 /////////
 // GPU //
 /////////
@@ -3257,6 +3726,344 @@ dn_vector2_t dn_window_get_native_resolution() {
 dn_vector2_t dn_window_get_content_area() {
   return dn_app.window.content_area;
 }
+
+
+#ifndef DN_ASSET_H
+#define DN_ASSET_H
+typedef enum {
+  DN_ASSET_BUILTIN_BACKGROUND,
+  DN_ASSET_BUILTIN_ATLAS,
+} dn_asset_builtin_t;
+
+typedef struct {
+  i32 id;
+  static i32 next_id;
+
+  AssetKind kind;
+  union {
+    Background* background;
+    TextureAtlas* atlas;
+  };
+} dn_asset_load_request_t;
+
+s32 AssetLoadRequest::next_id = 0;
+
+struct AssetLoader {
+  std::thread thread;
+  std::condition_variable condition;
+  std::mutex mutex;
+
+  dn_ring_buffer_t<AssetLoadRequest> load_requests;
+  dn_ring_buffer_t<AssetLoadRequest> completion_queue;
+
+  void process_requests();
+  void process_completion_queue();
+  void submit(AssetLoadRequest request);
+};
+AssetLoader asset_loader;
+
+typedef struct {
+  void* user_data;
+} dn_asset_import_request_t;
+
+typedef enum {
+  DN_ASSET_COMPLETION_STATUS_RUNNING,
+  DN_ASSET_COMPLETION_STATUS_DONE,
+} dn_asset_completion_status_t;
+
+dn_typedef_fn(void,                         dn_asset_import_fn,     dn_asset_import_request_t* request);
+dn_typedef_fn(dn_asset_completion_status_t, dn_asset_completion_fn, dn_asset_import_request_t* request);
+
+typedef struct {
+  dn_asset_name_t id;
+  dn_asset_import_fn on_import;
+  dn_asset_completion_fn on_complete;
+} dn_asset_importer_t;
+
+typedef void* dn_asset_data_t;
+
+typedef struct {
+    dn_asset_name_t name;
+    dn_asset_data_t data;
+} dn_asset_t;
+
+typedef struct {
+  struct {
+    dn_asset_importer_t* data;
+    u32 count;
+  } importers;
+} dn_asset_config_t;
+
+//////////////
+// INTERNAL //
+//////////////
+typedef enum {
+  DN_BACKGROUND_COMPLETION_STATUS_UPDATE_CONFIG,
+  DN_BACKGROUND_COMPLETION_STATUS_LOAD_TILES,
+  DN_BACKGROUND_COMPLETION_STATUS_DONE,
+} dn_background_completion_status_t;
+
+typedef struct {
+  dn_background_completion_status_t status;
+  Background* background;
+} dn_background_import_request_t;
+
+typedef struct {
+  std::thread thread;
+  std::condition_variable condition;
+  std::mutex mutex;
+
+  std::unordered_map<std::string, dn_asset_t> assets;
+  std::unordered_map<std::string, dn_asset_importer_t> importers;
+
+  dn_ring_buffer_t<AssetLoadRequest> load_requests;
+  dn_ring_buffer_t<AssetLoadRequest> completion_queue;
+} dn_assets_t;
+dn_assets_t dn_assets;
+
+
+DN_API void dn_assets_init(dn_asset_config_t config);
+DN_API dn_asset_data_t dn_assets_find(const char* name);
+DN_API void dn_assets_add(const char* name, dn_asset_data_t data);
+DN_API void dn_asset_copy_name(const char* source, dn_asset_name_t dest);
+
+DN_IMP void dn_assets_update();
+DN_IMP void dn_background_import(dn_asset_import_request_t* request);
+DN_IMP dn_asset_completion_status_t dn_background_complete(dn_asset_import_request_t* request);
+#endif
+
+#ifdef DN_ASSET_IMPLEMENTATION
+void dn_background_import(dn_asset_import_request_t* request) {
+    auto background_request = (dn_background_import_request_t*)request->user_data;
+    auto background = background_request->background;
+    if (background->need_async_build) {
+        background->build_from_source();
+    }
+    if (background->need_async_load) {
+        background->load_tiles();
+    }
+}
+
+dn_asset_completion_status_t dn_background_complete(dn_asset_import_request_t* request) {
+    auto background_request = (dn_background_import_request_t*)request->user_data;
+    auto background = background_request->background;
+
+    switch (background_request->status) {
+        case DN_BACKGROUND_COMPLETION_STATUS_UPDATE_CONFIG: {
+            if (background->is_dirty()) {
+               background->update_config();
+            }
+
+            background_request->status = DN_BACKGROUND_COMPLETION_STATUS_LOAD_TILES;
+            return DN_ASSET_COMPLETION_STATUS_RUNNING;
+        } break;
+
+        case DN_BACKGROUND_COMPLETION_STATUS_LOAD_TILES: {
+            background->load_one_to_gpu();
+            if (background->gpu_done) {
+                background_request->status = DN_BACKGROUND_COMPLETION_STATUS_DONE;
+                return DN_ASSET_COMPLETION_STATUS_DONE;
+            }
+
+            return DN_ASSET_COMPLETION_STATUS_RUNNING;
+        } break;
+
+        default: {
+            DN_ASSERT(false);
+            return DN_ASSET_COMPLETION_STATUS_DONE;
+        }
+    }
+}
+
+void dn_assets_init(dn_asset_config_t user_config) {
+  dn_log("%s", __func__);
+
+  dn_asset_importer_t default_importers [] = {
+    {
+      .id = dn_type_name(Background),
+      .on_import = &dn_background_import,
+      .on_complete = &dn_background_complete
+    }
+  };
+
+  dn_asset_config_t configs [] = {
+    {
+      .importers = {
+        .data = default_importers,
+        .count = dn_arr_len(default_importers)
+      }
+    },
+    user_config
+  };
+   
+  dn_for_each(configs, config) {
+    dn_for_each_n(config->importers.data, importer, config->importers.count) {
+      dn_log("%s: Registered importer; id = %s, on_import = %d, on_complete = %d", 
+        __func__, 
+        importer->id, 
+        importer->on_import, importer->on_complete
+      );
+
+      dn_assets.importers[importer->id] = *importer;
+    }
+  }
+  
+
+  dn_ring_buffer_init(&asset_loader.load_requests, 2048);
+  dn_ring_buffer_init(&asset_loader.completion_queue, 2048);
+  
+  // asset_loader.thread = std::thread(&AssetLoader::process_requests, &asset_loader);
+  // asset_loader.thread.detach();
+
+}
+
+void dn_assets_add(const char* name, dn_asset_data_t data) {
+  dn_log("%s: name = %s, data = %p", __func__, name, data);
+  dn_asset_t asset;
+  dn_asset_copy_name(name, asset.name);
+  asset.data = data;
+  dn_assets.assets[name] = asset;
+}
+
+dn_asset_data_t dn_assets_find(const char* name) {
+    DN_ASSERT(name);
+
+    if (!dn_assets.assets.contains(name)) {
+    dn_log("Tried to find asset, but name was not registered; name = %s", name);
+        return NULL;
+    }
+
+    return dn_assets.assets[name].data;
+}
+
+void dn_asset_copy_name(const char* source, dn_asset_name_t dest) {
+  dn_cstr_copy(source, dest, DN_ASSET_NAME_LEN);
+}
+
+
+void dn_assets_update() {
+  asset_loader.process_completion_queue();
+
+  dn_array_for(backgrounds, background) {
+    if (background->gpu_ready && !background->gpu_done) {
+      background->load_one_to_gpu();
+
+      if (background->gpu_done) {
+        background->deinit();
+      }
+
+      if (dn_engine_exceeded_frame_time()) break;
+    }
+  }
+}
+
+void AssetLoader::process_requests() {
+  while (true) {
+    std::unique_lock lock(mutex);
+
+    condition.wait(lock, [this] {
+      return load_requests.size > 0;
+      });
+
+    auto request = dn_ring_buffer_pop(&load_requests);
+    lock.unlock();
+
+    if (request.kind == AssetKind::TextureAtlas) {
+      auto atlas = request.atlas;
+      if (atlas->need_async_build) {
+        atlas->build_from_source();
+      }
+      if (atlas->need_async_load) {
+        atlas->load_to_memory();
+      }
+
+      lock.lock();
+      dn_ring_buffer_push(&completion_queue, request);
+      lock.unlock();
+
+    }
+    else if (request.kind == AssetKind::Background) {
+      auto background = request.background;
+      if (background->need_async_build) {
+        background->build_from_source();
+      }
+      if (background->need_async_load) {
+        background->load_tiles();
+      }
+
+      lock.lock();
+      dn_ring_buffer_push(&completion_queue, request);
+      lock.unlock();
+    }
+  }
+}
+
+void AssetLoader::process_completion_queue() {
+  int num_assets_loaded = 0;
+  auto begin = glfwGetTime();
+  while (true) {
+    std::unique_lock lock(mutex);
+    if (!completion_queue.size) {
+      break;
+    }
+
+    auto completion = dn_ring_buffer_pop(&completion_queue);
+    lock.unlock();
+
+    num_assets_loaded++;
+
+    if (completion.kind == AssetKind::Background) {
+      auto background = completion.background;
+      dn_log_flags(DN_LOG_FLAG_FILE, "%s: AssetKind = Background, AssetName = %s", __func__, background->name);
+      
+      if (background->is_dirty()) {
+        background->update_config();
+      }
+
+      background->gpu_ready = true;
+    }
+    else if (completion.kind == AssetKind::TextureAtlas) {
+      auto atlas = completion.atlas;
+      dn_log_flags(DN_LOG_FLAG_FILE, "%s: atlas, %s", __func__, atlas->name);
+      
+      if (atlas->need_gl_init) {
+        atlas->load_to_gpu();
+        atlas->need_gl_init = false;
+      }
+
+      if (atlas->need_config_update) {
+        atlas->write_to_config();
+        atlas->need_config_update = false;
+      }
+      
+    }
+
+    if (dn_engine_exceeded_frame_time()) break;
+  }
+
+  if (num_assets_loaded) {
+    std::unique_lock lock(mutex);
+    auto now = glfwGetTime();
+    dn_log_flags(DN_LOG_FLAG_FILE,
+             "AssetLoader: frame = %d, assets_loaded =  %d, assets_remaining = %d, time_ms =  %f",
+             engine.frame,
+             num_assets_loaded, completion_queue.size,
+             (now - begin) * 1000);
+  }
+}
+
+
+void AssetLoader::submit(AssetLoadRequest request) {
+  request.id = AssetLoadRequest::next_id++;
+
+  mutex.lock();
+  dn_ring_buffer_push(&load_requests, request);
+  mutex.unlock();
+
+  condition.notify_all();
+}
+
+#endif
 
 /////////
 // APP //
