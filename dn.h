@@ -1,13 +1,14 @@
-#include "stdint.h"
-#include "assert.h"
-#include <time.h>
+#include <assert.h>
+#include <float.h>
+#include <inttypes.h>
+#include <stdatomic.h>
 #include <stdint.h>
 // #include <sys/time.h> @fix
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
-#include <inttypes.h>
-#include <float.h>
+#include <time.h>
 
 #ifdef DN_APP
 #define DN_LUA
@@ -149,6 +150,8 @@ typedef WIN32_FIND_DATA dn_win32_find_data_t;
 #define DN_QSORT_A_FIRST -1
 #define DN_QSORT_B_FIRST 1
 #define DN_QSORT_EQUAL 0
+
+#define DN_ATOMIC _Atomic
 
 #include "gunslinger/gs.h"
 
@@ -483,6 +486,9 @@ DN_IMP dn_os_file_attr_t            dn_os_winapi_attr_to_dn_attr(u32 attr);
 //    ██║   ██╔══██║██╔══██╗██╔══╝  ██╔══██║██║  ██║██║██║╚██╗██║██║   ██║
 //    ██║   ██║  ██║██║  ██║███████╗██║  ██║██████╔╝██║██║ ╚████║╚██████╔╝
 //    ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═════╝ ╚═╝╚═╝  ╚═══╝ ╚═════╝ 
+///////////
+// MUTEX //
+///////////
 typedef enum {
   DN_MUTEX_ATTR_NONE = 0,
   DN_MUTEX_ATTR_RECURSIVE = 1
@@ -498,6 +504,26 @@ void dn_mutex_init(dn_mutex_t* mutex);
 void dn_mutex_lock(dn_mutex_t* mutex);
 void dn_mutex_unlock(dn_mutex_t* mutex);
 
+////////////
+// THREAD //
+////////////
+dn_typedef_fn(void*, dn_thread_fn_t, void*);
+
+typedef struct {
+  dn_win32_handle_t handle;
+  dn_win32_dword_t id;
+  dn_thread_fn_t fn;
+} dn_thread_t;
+
+void dn_thread_init(dn_thread_t* thread, dn_thread_fn_t fn, void* argument);
+void dn_thread_join(dn_thread_t* thread);
+
+////////////////////////
+// CONDITION VARIABLE //
+////////////////////////
+typedef struct {
+  s32 dummy;  
+} dn_condition_variable_t;
 
 //  ██╗  ██╗ █████╗ ███████╗██╗  ██╗██╗███╗   ██╗ ██████╗
 //  ██║  ██║██╔══██╗██╔════╝██║  ██║██║████╗  ██║██╔════╝
@@ -810,8 +836,7 @@ DN_IMP void                   _dn_paths_set_write_path(dn_path_config_t config);
 // ███████║██║   ██║██║  ██║██║██║   ██║
 // ██╔══██║██║   ██║██║  ██║██║██║   ██║
 // ██║  ██║╚██████╔╝██████╔╝██║╚██████╔╝
-// ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝ ╚═════╝ 
-                                     
+// ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝ ╚═════╝                                      
 typedef enum {
   DN_AUDIO_FILTER_MODE_FIRST_ORDER = 0,
   DN_AUDIO_FILTER_MODE_BUTTERWORTH = 1,
@@ -905,10 +930,10 @@ DN_API void                       dn_audio_set_master_filter_cutoff_enabled(bool
 DN_API void                       dn_audio_set_master_filter_mode(dn_audio_filter_mode_t mode);
 DN_API void                       dn_audio_set_volume(dn_audio_instance_handle_t handle, f32 volume);
 DN_API void                       dn_audio_set_filter_cutoff(dn_audio_instance_handle_t handle, f32 cutoff);
-DN_API void                       dn_audio_set_filter_mode(dn_audio_instance_handle_t handle, f32 cutoff);
+DN_API void                       dn_audio_set_filter_mode(dn_audio_instance_handle_t handle, dn_audio_filter_mode_t mode);
 DN_API void                       dn_audio_set_filter_enabled(dn_audio_instance_handle_t handle, bool enabled);
-DN_API dn_audio_instance_handle_t dn_audio_play_sound(dn_string_t name);
-DN_API dn_audio_instance_handle_t dn_audio_play_looped(dn_string_t name);
+DN_API dn_audio_instance_handle_t dn_audio_play_sound(const char* name);
+DN_API dn_audio_instance_handle_t dn_audio_play_looped(const char* name);
 DN_API void                       dn_audio_queue(dn_audio_instance_handle_t current, dn_audio_instance_handle_t next);
 DN_API void                       dn_audio_stop(dn_audio_instance_handle_t handle);
 DN_API void                       dn_audio_stop_all();
@@ -916,8 +941,8 @@ DN_API void                       dn_audio_pause(dn_audio_instance_handle_t hand
 DN_API void                       dn_audio_resume(dn_audio_instance_handle_t handle);
 DN_API bool                       dn_audio_is_playing(dn_audio_instance_handle_t handle);
 DN_API bool                       dn_audio_is_any_playing();
-DN_API void                       dn_audio_load(dn_string_t file_path, dn_string_t file_name);
-DN_API void                       dn_audio_load_dir(dn_string_t path);
+DN_API void                       dn_audio_load(const char* file_path, const char* file_name);
+DN_API void                       dn_audio_load_dir(const char* path);
 DN_API void                       dn_low_pass_filter_set_mode(dn_low_pass_filter_t* filter, dn_audio_filter_mode_t mode);
 DN_API void                       dn_low_pass_filter_set_cutoff(dn_low_pass_filter_t* filter, f32 cutoff);
 DN_API f32                        dn_low_pass_filter_apply(dn_low_pass_filter_t* filter, f32 input);
@@ -932,6 +957,313 @@ DN_IMP dn_audio_instance_t*       dn_audio_resolve_instance(dn_audio_instance_ha
 DN_IMP dn_audio_instance_handle_t dn_audio_reserve();
 DN_IMP dn_audio_instance_handle_t dn_audio_play_sound_ex(dn_audio_info_t* sound, bool loop);
 DN_IMP void                       dn_audio_stop_ex(dn_audio_instance_t* active_sound);
+
+
+
+// ██╗███╗   ███╗ █████╗  ██████╗ ███████╗███████╗
+// ██║████╗ ████║██╔══██╗██╔════╝ ██╔════╝██╔════╝
+// ██║██╔████╔██║███████║██║  ███╗█████╗  ███████╗
+// ██║██║╚██╔╝██║██╔══██║██║   ██║██╔══╝  ╚════██║
+// ██║██║ ╚═╝ ██║██║  ██║╚██████╔╝███████╗███████║
+// ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝
+typedef struct {
+  dn_hash_t hash;
+  u32 handle;
+  u32 width;
+  u32 height;
+  u32 channels;
+} dn_texture_t;
+
+DN_API void          dn_texture_init(s32 width, s32 height, s32 channels);
+DN_API void          dn_texture_load_to_gpu(u32* data);
+DN_API void          dn_texture_unload_from_gpu();
+DN_API dn_texture_t* dn_images_find_texture_by_name(dn_string_t name);
+DN_API dn_texture_t* dn_images_find_texture_by_hash(dn_hash_t hash);
+
+typedef struct {
+  dn_string_t file_path;
+  dn_hash_t hash;
+  dn_hash_t texture;
+  dn_vector2_t* uv;
+  dn_vector2i_t size;
+} dn_sprite_t;
+
+DN_API dn_sprite_t* dn_images_find_sprite(const char* name);
+DN_API dn_sprite_t* dn_images_find_sprite_no_default(const char* name);
+
+
+typedef struct {
+  s32 id;
+  dn_sprite_t* sprite;
+  u32* data;
+  s32 channels;
+} dn_atlas_pack_item_t;
+
+void dn_atlas_pack_item_init(dn_atlas_pack_item_t* item);
+
+#define DN_MAX_DIRECTORIES_PER_ATLAS 32
+#define DN_MAX_IMAGES_PER_ATLAS 256
+#define DN_TEXTURE_ATLAS_SIZE 2048
+
+typedef struct {
+  char name [64];
+  double cfg_mod_time;
+  double mod_time;
+  dn_hash_t cfg_files_hash;
+  dn_hash_t files_hash;
+  bool high_priority;
+  // dn_array_t<char*> directories;
+  dn_texture_t* texture;
+
+  // Data used for generation. These are initialized to temporary storage, so
+  // don't expect them to be valid in other cases.
+  // dn_array_t<RectPackId> ids;
+  // dn_array_t<stbrp_rect> rects;
+  // dn_array_t<stbrp_node> nodes;
+  // dn_array_t<u32> buffer;
+
+  bool need_async_build;
+  bool need_async_load;
+  bool need_gl_init;
+  bool need_config_update;
+
+  // FileMonitor* file_monitor;
+} dn_atlas_t;
+
+typedef struct {
+  dn_dynamic_array(dn_string_t) files;
+} dn_atlas_bucket_t;
+
+typedef struct {
+  dn_string_t* dirs;
+  u32 num_dirs;
+} dn_image_config_t;
+
+typedef struct {
+  dn_mutex_t mutex;
+  dn_mutex_t config_mutex;
+
+  dn_fixed_array(dn_vector2_t, 65536) uv_data;
+  dn_fixed_array(dn_texture_t, 256) textures;
+  dn_fixed_array(dn_sprite_t, 1024) sprites;
+  dn_fixed_array(dn_atlas_t, 64) atlases;
+  dn_fixed_array(dn_atlas_bucket_t, 16) buckets;
+} dn_images_t;
+dn_images_t dn_images;
+
+
+void                  dn_atlases_init();
+void                  dn_atlas_deinit();
+void                  dn_atlas_set_name(const char* name);
+void                  dn_atlas_build_sync();
+void                  dn_atlas_load_to_memory();
+bool                  dn_atlas_is_dirty();
+void                  dn_atlas_calc_hash_and_mod_time();  
+void                  dn_atlas_build_from_config();
+void                  dn_atlas_build_from_source();
+void                  dn_atlas_write_to_config();
+void                  dn_atlas_write_to_png();
+void                  dn_atlas_load_to_gpu();
+void                  dn_atlas_unload_from_gpu();
+void                  dn_atlas_watch_files();
+void                  dn_atlas_on_file_add(const char* file_path);
+void                  dn_atlas_on_file_change(const char* file_path);
+dn_atlas_pack_item_t* dn_atlas_find_pack_item(s32 id);
+void                  dn_image_init_atlases();
+dn_sprite_t*          dn_image_alloc_sprite();
+dn_texture_t*         dn_image_alloc_texture();
+dn_vector2_t*         dn_image_alloc_uvs();
+void                  dn_image_build_sprite_from_file(const char* id, const char* file_path);
+void                  dn_image_build_sprite_from_data(const char* id, unsigned char* data, s32 width, s32 height, s32 channels);
+void                  dn_image_build_sprite_ex(dn_sprite_t* sprite, const char* id, unsigned char* data, s32 width, s32 height, s32 channels);
+DN_IMP void           dn_images_init(dn_image_config_t config);
+DN_IMP void           dn_atlas_bucket_init(dn_atlas_bucket_t* bucket);
+DN_IMP u32            dn_atlas_calc_bucket(dn_string_t path);
+DN_API void           dn_screenshots_init();
+DN_API void           dn_screenshot_take();
+DN_API void           dn_screenshot_write(const char* file_name);
+
+
+// ██████╗  █████╗  ██████╗██╗  ██╗ ██████╗ ██████╗  ██████╗ ██╗   ██╗███╗   ██╗██████╗ ███████╗
+// ██╔══██╗██╔══██╗██╔════╝██║ ██╔╝██╔════╝ ██╔══██╗██╔═══██╗██║   ██║████╗  ██║██╔══██╗██╔════╝
+// ██████╔╝███████║██║     █████╔╝ ██║  ███╗██████╔╝██║   ██║██║   ██║██╔██╗ ██║██║  ██║███████╗
+// ██╔══██╗██╔══██║██║     ██╔═██╗ ██║   ██║██╔══██╗██║   ██║██║   ██║██║╚██╗██║██║  ██║╚════██║
+// ██████╔╝██║  ██║╚██████╗██║  ██╗╚██████╔╝██║  ██║╚██████╔╝╚██████╔╝██║ ╚████║██████╔╝███████║
+// ╚═════╝ ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚═════╝ ╚══════╝
+#define DN_BACKGROUND
+#define DN_BACKGROUND_TILE_SIZE 2048
+
+typedef struct {
+  dn_texture_t* texture;
+  u32* data;
+} dn_background_loaded_tile_t;
+
+typedef struct {
+  char* name;
+  char* tile_output_folder;
+  char* tile_output_full_path;
+  char* source_image;
+  char* source_image_full_path;
+  // dn_array_t<char*, 64> tiles;
+  // dn_array_t<char*, 64> tile_full_paths;
+  // dn_array_t<dn_vector2i_t, 64> tile_positions;
+  s32 width;
+  s32 height;
+  s32 channels;
+  u32* data;
+  bool high_priority;
+
+  f64 mod_time;
+  f64 filesystem_mod_time;
+
+  bool need_async_build;
+  bool need_async_load;
+  bool need_config_update;
+
+  // dn_array_t<LoadedTile> loaded_tiles;
+  bool gpu_ready;
+  bool gpu_done;
+  int gpu_load_index;
+} dn_background_t;
+
+typedef struct {
+  dn_dynamic_array(dn_background_t) backgrounds;
+} dn_backgrounds_t;
+
+
+typedef struct {
+  u32 current_tile;
+  dn_mutex_t mutex;
+} dn_background_tile_processor_shared_t;
+
+typedef struct {
+  u32* source_data;
+  u32* tile_data;
+  dn_thread_t thread;
+
+} dn_background_tile_processor_t;
+
+void dn_background_tile_processor_init(u32* source_data);
+void dn_background_tile_processor_deinit();
+void dn_background_tile_processor_process(dn_background_t* background);
+void dn_background_init(dn_background_t* background);
+void dn_background_deinit(dn_background_t* background);
+void dn_background_load_paths(dn_background_t* background);
+void dn_background_set_source_image_size(dn_background_t* background, s32 width, s32 height);
+void dn_background_set_source_data(dn_background_t* background, u32* data);
+bool dn_background_add_tile(dn_background_t* background);
+void dn_background_add_tiles(dn_background_t* background);
+bool dn_background_is_dirty(dn_background_t* background);
+void dn_background_build_from_source(dn_background_t* background);
+void dn_background_load_to_gpu(dn_background_t* background);
+void dn_background_load_one_to_gpu(dn_background_t* background);
+void dn_background_load_tiles(dn_background_t* background);
+void dn_background_update_config(dn_background_t* background);
+void dn_backgrounds_init();
+
+
+//  █████╗ ███████╗███████╗███████╗████████╗███████╗
+// ██╔══██╗██╔════╝██╔════╝██╔════╝╚══██╔══╝██╔════╝
+// ███████║███████╗███████╗█████╗     ██║   ███████╗
+// ██╔══██║╚════██║╚════██║██╔══╝     ██║   ╚════██║
+// ██║  ██║███████║███████║███████╗   ██║   ███████║
+// ╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝   ╚═╝   ╚══════╝
+typedef enum {
+  DN_ASSET_KIND_BACKGROUND,
+  DN_ASSET_KIND_ATLAS,
+  DN_ASSET_KIND_USER,
+} dn_asset_kind_t;
+
+typedef enum {
+  DN_ASSET_COMPLETION_STATUS_RUNNING,
+  DN_ASSET_COMPLETION_STATUS_DONE,
+} dn_asset_completion_status_t;
+
+typedef void* dn_asset_data_t;
+
+typedef struct {
+  dn_asset_name_t name;
+  dn_asset_data_t data;
+} dn_asset_t;
+
+////////////
+// LOADER //
+////////////
+typedef struct {
+  s32 id;
+  dn_asset_kind_t kind;
+
+  union {
+    dn_background_t* background;
+    dn_atlas_t* atlas;
+  };
+} dn_asset_load_request_t;
+
+typedef struct {
+  dn_thread_t thread;
+  dn_condition_variable_t condition;
+  dn_mutex_t mutex;
+
+  dn_ring_buffer(dn_asset_load_request_t) load_requests;
+  dn_ring_buffer(dn_asset_load_request_t) completion_queue;
+} dn_asset_loader_t;
+
+DN_IMP void dn_asset_loader_process_requests();
+DN_IMP void dn_asset_loader_process_completion_queue();
+DN_IMP void dn_asset_loader_submit(dn_asset_load_request_t request);
+
+//////////////
+// IMPORTER //
+//////////////
+typedef struct {
+  void* user_data;
+} dn_asset_import_request_t;
+
+dn_typedef_fn(void,                         dn_asset_import_fn,     dn_asset_import_request_t* request);
+dn_typedef_fn(dn_asset_completion_status_t, dn_asset_completion_fn, dn_asset_import_request_t* request);
+
+typedef struct {
+  dn_asset_name_t id;
+  dn_asset_import_fn on_import;
+  dn_asset_completion_fn on_complete;
+} dn_asset_importer_t;
+
+//////////////
+// REGISTRY //
+//////////////
+typedef struct {
+  struct {
+    dn_asset_importer_t* data;
+    u32 count;
+  } importers;
+} dn_asset_config_t;
+
+typedef struct {
+  gs_hash_table(dn_hash_t, dn_asset_t) assets;
+  gs_hash_table(dn_hash_t, dn_asset_importer_t) importers;
+} dn_asset_registry_t;
+
+DN_API void            dn_asset_registry_init(dn_asset_config_t config);
+DN_API dn_asset_data_t dn_asset_registry_find(const char* name);
+DN_API void            dn_asset_registry_add(const char* name, dn_asset_data_t data);
+DN_IMP void            dn_asset_registry_update();
+
+/////////////////////////
+// BACKGROUND IMPORTER //
+/////////////////////////
+typedef enum {
+  DN_BACKGROUND_COMPLETION_STATUS_UPDATE_CONFIG,
+  DN_BACKGROUND_COMPLETION_STATUS_LOAD_TILES,
+  DN_BACKGROUND_COMPLETION_STATUS_DONE,
+} dn_background_completion_status_t;
+
+typedef struct {
+  dn_background_completion_status_t status;
+  dn_background_t* background;
+} dn_background_import_request_t;
+
+DN_IMP void                         dn_background_import(dn_asset_import_request_t* request);
+DN_IMP dn_asset_completion_status_t dn_background_complete(dn_asset_import_request_t* request);
 
 
 //  ████████╗███████╗███████╗████████╗██╗███╗   ██╗ ██████╗
@@ -1158,12 +1490,12 @@ typedef struct {
 
 typedef struct {
   dn_window_config_t window;
-  // dn_audio_config_t audio;
+  dn_audio_config_t audio;
   // dn_font_config_t font;
   // dn_gpu_config_t gpu;
-  // dn_asset_config_t asset;
+  dn_asset_config_t asset;
   // dn_steam_config_t steam;
-  // dn_image_config_t image;
+  dn_image_config_t image;
   u32 target_fps;
 } dn_app_config_t;
 
@@ -1181,10 +1513,14 @@ typedef struct {
 
 typedef struct {
   dn_window_t window;
+  dn_asset_loader_t loader;
+  dn_asset_registry_t asset_registry;
+
   f32 target_fps;
   f32 dt;
   f32 elapsed_time;
   s32 frame;
+  DN_ATOMIC u32 monotonic_id;
   bool exit_game;
   bool steam;
 } dn_app_t;
@@ -1202,6 +1538,7 @@ DN_API f32                 dn_app_get_target_fps();
 DN_API bool                dn_app_exceeded_frame_time();
 DN_API bool                dn_app_should_exit();
 DN_API dn_type_info_list_t dn_app_query_types();
+DN_API u32                 dn_app_monotonic_id();
 DN_IMP void                dn_app_update();
 
 #endif
@@ -1213,8 +1550,67 @@ DN_IMP void                dn_app_update();
 //  ██║██║╚██╔╝██║██╔═══╝ ██║     ██╔══╝  ██║╚██╔╝██║██╔══╝  ██║╚██╗██║   ██║   ██╔══██║   ██║   ██║██║   ██║██║╚██╗██║
 //  ██║██║ ╚═╝ ██║██║     ███████╗███████╗██║ ╚═╝ ██║███████╗██║ ╚████║   ██║   ██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║
 //  ╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+/////////////////////////
+// BACKGROUND IMPORTER //
+/////////////////////////
+void dn_asset_registry_init(dn_asset_config_t config) {
+  DN_BROKEN();
+}
 
-#ifdef DN_IMPLEMENTATION
+void dn_images_init(dn_image_config_t config) {
+  DN_BROKEN();
+}
+
+void dn_atlases_init() {
+  DN_BROKEN();
+}
+
+void dn_screenshots_init() {
+  DN_BROKEN();
+}
+
+void dn_backgrounds_init() {
+  DN_BROKEN();
+}
+
+void dn_background_import(dn_asset_import_request_t* request) {
+  DN_BROKEN();
+}
+
+dn_asset_completion_status_t dn_background_complete(dn_asset_import_request_t* request) {
+  DN_BROKEN();
+  return DN_ASSET_COMPLETION_STATUS_DONE;
+}
+
+void dn_assets_init(dn_asset_config_t user_config) {
+  DN_BROKEN();
+}
+
+void dn_assets_add(const char* name, dn_asset_data_t data) {
+  DN_BROKEN();
+}
+
+dn_asset_data_t dn_assets_find(const char* name) {
+  DN_BROKEN();
+  return dn_zero_struct(dn_asset_data_t);
+}
+
+void dn_assets_update() {
+  DN_BROKEN();
+}
+
+void dn_asset_loader_process_requests() {
+  DN_BROKEN();
+}
+
+void dn_asset_loader_process_completion_queue() {
+  DN_BROKEN();
+}
+
+void dn_asset_loader_submit(dn_asset_load_request_t request) {
+  DN_BROKEN();
+}
+
 ///////////
 // MUTEX //
 ///////////
@@ -2890,7 +3286,6 @@ void dn_test_run_internal() {
   dn_string_builder_test();
   dn_pool_test();
   // dn_color_test();
-  exit(0);
 }
 
 ///////////////
@@ -3500,8 +3895,9 @@ dn_vector2_t dn_window_get_content_area() {
   return dn_app.window.content_area;
 }
 
-// AUDIO
-#ifdef DN_AUDIO
+///////////
+// AUDIO //
+///////////
 dn_audio_config_t dn_audio_config_default() {
   return (dn_audio_config_t) {
     .dirs = NULL,
@@ -3531,13 +3927,13 @@ dn_audio_config_t dn_audio_config_default() {
 void dn_audio_init(dn_audio_config_t config) {
   dn_log("%s", __func__);
 
-  dn_audio = {
+  dn_audio = (dn_audio_t) {
     .compressor = config.compressor,
     .filter = config.filter,
     .sample_frequency = config.sample_frequency,
     .master_volume = config.master_volume,
     .master_volume_mod = config.master_volume_mod,
-    .file_monitor = dn_file_monitors_add(),
+    // .file_monitor = dn_file_monitors_add(),
     .sample_buffer = {0}
   };
 
@@ -3546,155 +3942,14 @@ void dn_audio_init(dn_audio_config_t config) {
 
   dn_low_pass_filter_set_cutoff(&dn_audio.filter, 10000);
 
-  // @fix
-  // auto on_file_event = [](FileMonitor* monitor, FileChange* event, void* userdata) {
-  //   dn_log("dn_audio_init: Reloading audio file; file = %s", __func__, event->file_path);
-  //   dn_audio_load(event->file_path, event->file_name);
-  // };
-
-  // auto events = DN_FILE_CHANGE_EVENT_ADDED | DN_FILE_CHANGE_EVENT_MODIFIED;
-  // dn_audio.file_monitor->init(on_file_event, events, nullptr);
-  
-  dn_string_t audio_dir = dn_paths_resolve(dn_string_literal("dn_audio"));
-  dn_log("%s: Loading default audio directory; directory = %s", __func__, dn_string_to_cstr(audio_dir));
-  dn_audio_load_dir(audio_dir);
-  for (u32 i = 0; i < config.num_dirs; i++) {
-    dn_audio_load_dir(config.dirs[i]);
-  }
-
-  // Initialize the audio backend
-  dn_log("%s: Initializing audio backend", __func__);
-  saudio_desc descriptor = { 0 };
-  descriptor.num_channels = 2;
-  descriptor.buffer_frames = 2048;
-  descriptor.logger.func = slog_func;
-  descriptor.stream_cb = dn_audio_update;
-  saudio_setup(&descriptor);
-
-  auto max_samples_requested = saudio_expect() * saudio_channels() * 2;
-  dn_array_init(&dn_audio.sample_buffer, max_samples_requested);
-  dn_audio.sample_buffer.size = dn_audio.sample_buffer.capacity;
 }
 
 void dn_audio_add_samples(dn_audio_instance_t* instance, int samples_requested, int offset) {
-  for (s32 i = 0; i < samples_requested; i++) {
-    dn_audio_info_t* info = dn_audio_resolve(instance->info);
-    s32 index = instance->next_sample++;
-
-    if (index == info->num_samples) {
-      if (instance->loop) {
-        instance->next_sample = 0;
-        index = 0;
-      }
-      else if (dn_gen_arena_handle_valid(instance->next)) {
-        instance->sample_buffer_offset = i;
-        instance->samples_from_next = samples_requested - i;
-        break;
-      }
-      else {
-        dn_audio_stop_ex(instance);
-        break;
-      }
-    }
-
-    // Take the next sample from the sound and add it to the sample buffer
-    auto sample = info->samples[index];
-    sample = sample * instance->volume;
-    sample = dn_low_pass_filter_apply(&instance->filter, sample);
-
-    *dn_fixed_array_at(&dn_audio.sample_buffer, i + offset) += sample;
-  }
-  
+  DN_BROKEN();  
 }
   
-
 void dn_audio_update(f32* buffer, int frames_requested, int num_channels) {
-  if (!frames_requested) return;
-
-  // Cap the number of samples so we don't overwrite the buffer
-  s32 samples_requested = frames_requested * num_channels;
-  if (samples_requested > dn_audio.sample_buffer.capacity) {
-    dn_log("requested too many audio samples: %d", samples_requested);
-    samples_requested = dn_audio.sample_buffer.capacity;
-  }
-
-  // You must write zeros, or else whatever the last requested samples were will linger
-  if (!dn_audio_is_any_playing()) {
-    memset(buffer, 0, samples_requested * sizeof(float));
-    return;
-  }
-
-  dn_mutex_lock(&dn_audio.mutex);
-
-  for (u32 i = 0; i < dn_audio.instances.capacity; i++) {
-    dn_audio_instance_t* instance = dn_pool_at_i(&dn_audio.instances, i, dn_audio_instance_t);
-    if (!instance->occupied) continue;
-    if (instance->paused) continue;
-
-    if (!dn_pool_contains(&dn_audio.sounds, instance->info)) {
-      dn_audio_stop_ex(instance);
-      continue;
-    }
-    
-    dn_audio_add_samples(instance, samples_requested, 0);
-  }
-
-  bool chaining_sounds = true;
-  while (chaining_sounds) {
-    chaining_sounds = false;
-    
-    for (u32 i = 0; i < dn_audio.instances.capacity; i++) {
-      dn_pool_slot_t* slot = dn_audio.instances.slots + i;
-      if (!slot->occupied) continue;
-
-      dn_audio_instance_t* instance = dn_pool_at_i(&dn_audio.instances, i, dn_audio_instance_t);
-      if (!instance->occupied) continue;
-      if (instance->paused) continue;
-
-      if (instance->samples_from_next) {
-        chaining_sounds = true;
-        
-        dn_audio_instance_t* next_sound = dn_audio_resolve_instance(instance->next);
-        if (!next_sound) continue;
-        
-        dn_audio_resume(instance->next);
-        dn_audio_add_samples(next_sound, instance->samples_from_next, instance->sample_buffer_offset);
-        dn_audio_stop_ex(instance);
-      }
-    }
-  }
-
-  dn_mutex_unlock(&dn_audio.mutex);
-  
-  float envelope = 0.0f;
-  float gain = 1.0f;
-  for (int i = 0; i < samples_requested; i++) {
-    f32* sample = (f32*)dn_fixed_array_at(&dn_audio.sample_buffer, i);
-    *sample *= dn_audio.master_volume * dn_audio.master_volume_mod;
-
-    f32 abs_sample = abs(*sample);
-    if (dn_audio.compressor.enabled) {
-      envelope = dn_math_lerp(envelope, abs_sample, dn_audio.compressor.attack_time);
-
-      if (envelope > dn_audio.compressor.threshold) {
-        auto decibel = 10 * log10(envelope / dn_audio.compressor.threshold);
-        auto target_decibel = decibel / dn_audio.compressor.ratio;
-        auto target_bel = target_decibel / 10;
-        auto target_envelope = pow(10, target_bel) * dn_audio.compressor.threshold;
-        gain = target_envelope / envelope;
-      }
-      else {
-        gain = dn_math_lerp(gain, 1.0f, dn_audio.compressor.release_time);
-      }
-    }
-
-    *sample *= gain;
-    *sample = dn_low_pass_filter_apply(&dn_audio.filter, *sample);
-    *sample = dn_math_clamp(sample, -1.f, 1.f);
-  }
-
-  memcpy(buffer, dn_audio.sample_buffer.data, samples_requested * sizeof(float));
-  dn_fixed_array_clear(&dn_audio.sample_buffer);
+  DN_BROKEN();
 }
 
 void dn_audio_shutdown() {
@@ -3702,49 +3957,23 @@ void dn_audio_shutdown() {
 }
 
 bool dn_audio_is_any_playing() {
-  dn_mutex_lock(&dn_audio.mutex);
-  
-  dn_pool_for(&dn_audio.instances, it) {
-    dn_audio_instance_t* instance = dn_pool_it(&dn_audio.instances, it, dn_audio_instance_t);
-    if (instance->occupied) return true;
-  }
-
+  DN_BROKEN();
   return false;
 }
 
 dn_audio_info_t* dn_audio_find_no_default(dn_string_t name) {
-  dn_mutex_lock(&dn_audio.mutex);
-
-  dn_hash_t hash = dn_hash_string(name);
-  dn_pool_for(&dn_audio.sounds, it) {
-    dn_audio_info_t* info = dn_pool_it(&dn_audio.sounds, it, dn_audio_info_t);
-    if (info->hash == hash) return hash;
-  }
-
+  DN_BROKEN();
   return NULL;
 }
 
 dn_audio_info_t* dn_audio_find(dn_string_t name) {
-  dn_audio_info_t* sound = dn_audio_find_no_default(name);
-  if (!sound) sound = dn_audio_find_no_default(dn_string_literal("debug.wav"));
-  return sound;
+  DN_BROKEN();
+  return NULL;
 }
 
 dn_audio_instance_handle_t dn_audio_reserve() {
-  dn_mutex_lock(&dn_audio.mutex);
-  
-  for (u32 index = 0; index < dn_audio.instances.size; index++) {
-    auto active_sound = dn_audio.instances[index];
-    if (!active_sound->occupied) {
-      active_sound->occupied = true;
-      return { 
-        .index = index, 
-        .generation = active_sound->generation 
-      };
-    }
-  }
-
-  return dn_gen_arena_invalid_handle();
+  DN_BROKEN();
+  return dn_zero_struct(dn_audio_instance_handle_t);
 }
 
 dn_audio_info_t* dn_audio_resolve(dn_audio_info_handle_t handle) {
@@ -3762,30 +3991,8 @@ dn_audio_instance_t* dn_audio_resolve_instance(dn_audio_instance_handle_t handle
 }
 
 dn_audio_instance_handle_t dn_audio_play_sound_ex(dn_audio_info_t* sound, bool loop) { 
-  dn_mutex_lock(&dn_audio.mutex);
-  
-  auto handle = dn_audio_reserve();
-  if (!dn_gen_arena_handle_valid(handle)) return handle;
-
-  auto active_sound = dn_audio_resolve_instance(handle);
-  active_sound->info = { dn_array_indexof(&dn_audio.sounds, sound), sound->generation };
-  active_sound->volume = 1.f;
-  active_sound->next_sample = 0;
-  active_sound->loop = loop;
-  active_sound->paused = false;
-  active_sound->next = dn_gen_arena_invalid_handle();
-  active_sound->samples_from_next = 0;
-  active_sound->sample_buffer_offset = 0;
-  active_sound->filter = {
-    .mode = DN_AUDIO_FILTER_MODE_BUTTERWORTH,
-    .enabled = false,
-    .a0 = 0.f, .a1 = 0.f, .a2 = 0.f, .b1 = 0.f, .b2 = 0.f,
-    .input_history = { 0 },
-    .output_history = { 0 },
-  };
-  dn_low_pass_filter_set_cutoff(&active_sound->filter, dn_audio_get_master_filter_cutoff());
-
-  return handle;
+  DN_BROKEN();
+  return dn_zero_struct(dn_audio_instance_handle_t);
 }
 
 void dn_audio_stop_ex(dn_audio_instance_t* active_sound) {
@@ -3800,41 +4007,16 @@ void dn_audio_stop_ex(dn_audio_instance_t* active_sound) {
 }
 
 dn_audio_info_t* alloc_sound(const char* file_name) {
-  auto sound = dn_audio_find_no_default(file_name);
-  if (!sound) sound = dn_array_push(&dn_audio.sounds);
-  sound->generation++;
-
-  return sound;
+  DN_BROKEN();
+  return NULL;
 }
 
 void dn_audio_load_dir(const char* path) {
-  dn_os_directory_entry_list_t entries = dn_os_scan_directory(dn_string_literal(path));
-  for (u32 i = 0; i < entries.count; i++) {
-    dn_os_directory_entry_t entry = entries.data[i];
-    if (entry.attributes & DN_OS_FILE_ATTR_DIRECTORY) {
-      // @string
-      dn_audio.file_monitor->add_directory(dn_string_to_cstr_ex(entry.file_path, &dn_allocators.bump));
-      dn_audio_load_dir(dn_string_to_cstr_ex(entry.file_path, &dn_allocators.bump));
-    }
-    else {
-      // @string
-      dn_audio_load(dn_string_to_cstr_ex(entry.file_path, &dn_allocators.bump), dn_string_to_cstr_ex(entry.file_name, &dn_allocators.bump));
-    }
-  }
+  DN_BROKEN();
 }
 
 void dn_audio_load(const char* file_path, const char* file_name) {
-  dn_mutex_lock(&dn_audio.mutex);
-
-  auto sound = alloc_sound(file_name);
-  strncpy(sound->name, file_name, DN_ASSET_NAME_LEN);
-  sound->hash = dn_hash_cstr_dumb(sound->name);
-  
-  sound->samples = drwav_open_file_and_read_pcm_frames_f32(file_path, &sound->num_channels, &sound->sample_rate, &sound->num_frames, NULL);
-  if (!sound->samples) {
-    dn_log("failed to load sound file sound file: %s", file_path);
-  }
-  sound->num_samples = sound->num_frames * sound->num_channels;
+  DN_BROKEN();
 };
 
 
@@ -3915,57 +4097,37 @@ float dn_low_pass_filter_apply(dn_low_pass_filter_t* filter, float input) {
 // LUA API //
 /////////////
 dn_audio_instance_handle_t dn_audio_play_sound(const char* name) {
-  auto info = dn_audio_find(name);
-  return dn_audio_play_sound_ex(info, false);
+  DN_BROKEN();
+  return dn_zero_struct(dn_audio_instance_handle_t);
 }
 
 dn_audio_instance_handle_t dn_audio_play_looped(const char* name) {
-  auto info = dn_audio_find(name);
-  return dn_audio_play_sound_ex(info, true);
+  DN_BROKEN();
+  return dn_zero_struct(dn_audio_instance_handle_t);
 }
 
 void dn_audio_stop(dn_audio_instance_handle_t handle) {
-  auto active_sound = dn_audio_resolve_instance(handle);
-  dn_audio_stop_ex(active_sound);
+  DN_BROKEN();
 }
 
 void dn_audio_stop_all() {
-  dn_array_for(dn_audio.instances, active_sound) {
-    dn_audio_stop_ex(active_sound);
-  }
+  DN_BROKEN();
 }
 
 void dn_audio_set_volume(dn_audio_instance_handle_t handle, float volume) {
-  auto active_sound = dn_audio_resolve_instance(handle);
-  if (!active_sound) return;
-
-  dn_mutex_lock(&dn_audio.mutex);
-
-  active_sound->volume = dn_math_clamp(volume, 0.f, 1.f);
+  DN_BROKEN();
 }
 
 void dn_audio_set_filter_mode(dn_audio_instance_handle_t handle, dn_audio_filter_mode_t mode) {
-  auto active_sound = dn_audio_resolve_instance(handle);
-  if (!active_sound) return;
-
-  dn_mutex_lock(&dn_audio.mutex);
-  dn_low_pass_filter_set_mode(&active_sound->filter, mode);
+  DN_BROKEN();
 }
 
 void dn_audio_set_filter_cutoff(dn_audio_instance_handle_t handle, float cutoff) {
-  auto active_sound = dn_audio_resolve_instance(handle);
-  if (!active_sound) return;
-
-  dn_mutex_lock(&dn_audio.mutex);
-  dn_low_pass_filter_set_cutoff(&active_sound->filter, cutoff);
+  DN_BROKEN();
 }
 
 void dn_audio_set_filter_enabled(dn_audio_instance_handle_t handle, bool enabled) {
-  auto active_sound = dn_audio_resolve_instance(handle);
-  if (!active_sound) return;
-
-  dn_mutex_lock(&dn_audio.mutex);
-  active_sound->filter.enabled = enabled;
+  DN_BROKEN();
 }
 
 void dn_audio_set_compressor_threshold(float threshold) {
@@ -4031,37 +4193,21 @@ float dn_audio_get_master_volume_mod() {
 }
 
 bool dn_audio_is_playing(dn_audio_instance_handle_t handle) {
-  return dn_audio_resolve_instance(handle);
+  DN_BROKEN();
+  return false;
 }
 
 void dn_audio_pause(dn_audio_instance_handle_t handle) {
-  auto sound = dn_audio_resolve_instance(handle);
-  if (!sound) return;
-  
-  sound->paused = true;
+  DN_BROKEN();
 }
 
 void dn_audio_resume(dn_audio_instance_handle_t handle) {
-  auto sound = dn_audio_resolve_instance(handle);
-  if (!sound) return;
-  
-  sound->paused = false;
+  DN_BROKEN();
 }
 
 void dn_audio_queue(dn_audio_instance_handle_t current, dn_audio_instance_handle_t next) {
-  auto next_sound = dn_audio_resolve_instance(next);
-  if (!dn_gen_arena_handle_valid(next)) return;
-  
-  auto current_sound = dn_audio_resolve_instance(current);
-  if (!current_sound) {
-    next_sound->paused = false;
-    return;
-  };
-
-  current_sound->next = next;
-  dn_audio_pause(next);
+  DN_BROKEN();
 }
-#endif
 
 
 /////////
@@ -4071,18 +4217,19 @@ void dn_app_configure(dn_app_config_t config) {
   dn_log("%s", __func__);
 
   dn_window_init(config.window);
+  dn_asset_registry_init(config.asset);
+  dn_images_init(config.image);
+  dn_audio_init(config.audio);
+  dn_backgrounds_init();
+  dn_screenshots_init();
+  dn_atlases_init();
+
   // dn_imgui_init();
-  // dn_assets_init(config.asset);
-  // dn_audio_init(config.audio);
   // dn_font_init(config.font);
   // dn_gpu_init(config.gpu);
-  // dn_images_init(config.image);
   // dn_noise_init();
   // dn_steam_init(config.steam);
 
-  // init_texture_atlas(); // Invert control
-  // init_backgrounds(); // Invert control
-  // init_screenshots(); // Use the asset loader
   // init_particles();
   // init_fluid();
 }
@@ -4191,6 +4338,10 @@ dn_type_info_list_t dn_app_query_types() {
   };
 }
 
+u32 dn_app_monotonic_id() {
+  return atomic_fetch_add(&dn_app.monotonic_id, 1);
+}
+
 bool dn_app_exceeded_frame_time() {
   return false; // @fix
   // auto& frame_timer = time_metrics["frame"];
@@ -4221,5 +4372,3 @@ int dn_main() {
 }
 
 #endif
-#endif
-
