@@ -1,36 +1,66 @@
 IF NOT "%~1"=="" (SHIFT & GOTO %~1)
 
-set "DN_RELATIVE=%~dp0\.."
-set "DN=%~f0"
-for %%I in ("%DN_RELATIVE%") do set DN=%%~fI
+SET "DN_RELATIVE=%~dp0\.."
+SET "DN=%~f0"
+for %%I in ("%DN_RELATIVE%") do SET DN=%%~fI
 
-set "DN_EXTERNAL=%DN%\external"
-  set "DN_INCLUDE=%DN_EXTERNAL%\include"
-    set "DN_IMGUI=%DN_INCLUDE%\imgui"
-    set "DN_FREETYPE=%DN_INCLUDE%\freetype"
-  set "DN_LIB=%DN_EXTERNAL%\lib\debug"
-    set "DN_LIB_LUA=luajit-2.1.0.3-windows-x64.lib"
-    set "DN_LIB_FREETYPE=freetype-2.10.4-windows-x64.lib"
-    set "DN_LIB_GLFW=glfw-3.3.8-windows-x64.lib"
-    set "DN_LIB_GLAD=glad-0.1.36-windows-x64.lib"
-    set "DN_LIB_CIMGUI=cimgui-1.91.9-windows-x64.lib"
-    set "DN_LIB_STEAM=steam_api64.lib"
-    set "DN_DLL_CIMGUI=%DN_LIB%\cimgui-1.91.9-windows-x64.dll"
-    set "DN_DLL_STEAM=%DN_LIB%\steam_api64.dll"
-    set "DN_DLLS="%DN_DLL_CIMGUI%" "%DN_DLL_STEAM%""
+SET "DN_H=%DN%\dn.h"
+SET "DN_SOURCE=%DN%\source"
+  SET "DN_SCRIPTS=%DN_SOURCE%\scripts"
+    SET "DN_DATA=%DN_SCRIPTS%\data"
+      SET "DN_FFI_H=%DN_DATA%\dn.h"
+SET "DN_EXTERNAL=%DN%\external"
+  SET "DN_INCLUDE=%DN_EXTERNAL%\include"
+    SET "DN_IMGUI=%DN_INCLUDE%\imgui"
+    SET "DN_FREETYPE=%DN_INCLUDE%\freetype"
+  SET "DN_LIB=%DN_EXTERNAL%\lib\debug"
+    SET "DN_LIB_LUA=luajit-2.1.0.3-windows-x64.lib"
+    SET "DN_LIB_FREETYPE=freetype-2.10.4-windows-x64.lib"
+    SET "DN_LIB_GLFW=glfw-3.3.8-windows-x64.lib"
+    SET "DN_LIB_GLAD=glad-0.1.36-windows-x64.lib"
+    SET "DN_LIB_CIMGUI=cimgui-1.91.9-windows-x64.lib"
+    SET "DN_LIB_STEAM=steam_api64.lib"
+    SET "DN_DLL_CIMGUI=%DN_LIB%\cimgui-1.91.9-windows-x64.dll"
+    SET "DN_DLL_STEAM=%DN_LIB%\steam_api64.dll"
+    SET "DN_DLLS="%DN_DLL_CIMGUI%" "%DN_DLL_STEAM%""
 
-set "DN_SWITCH_INCLUDE=/I%DN% /I%DN_INCLUDE% /I%DN_IMGUI% /I%DN_FREETYPE%"
-set "DN_SWITCH_LIBS="%DN_LIB_FREETYPE%" "%DN_LIB_GLFW%" "%DN_LIB_GLAD%" "%DN_LIB_LUA%" "%DN_LIB_STEAM%" "%DN_LIB_CIMGUI%""
+SET "DN_SWITCH_INCLUDE=/I%DN% /I%DN_INCLUDE% /I%DN_IMGUI% /I%DN_FREETYPE%"
+SET "DN_SWITCH_LIBS="%DN_LIB_FREETYPE%" "%DN_LIB_GLFW%" "%DN_LIB_GLAD%" "%DN_LIB_LUA%" "%DN_LIB_STEAM%" "%DN_LIB_CIMGUI%""
 
-set "DN_FOREGROUND_BLUE=[34m"
-set "DN_FOREGROUND_MAGENTA=[35m"
-set "DN_FOREGROUND_RESET=[0m"
+SET "DN_FOREGROUND_BLUE=[34m"
+SET "DN_FOREGROUND_MAGENTA=[35m"
+SET "DN_FOREGROUND_RESET=[0m"
 
 EXIT /B
 
+:::::::::::::
+:: TARGETS ::
+:::::::::::::
+:DN_BUILD_FFI
+  CALL :DN_ECHO_USER "TARGET: DN_BUILD_FFI"
+
+  CALL :DN_INITIALIZE_VS_PROMPT
+
+  SET "DN_FFI_H_TMP=%DN_FFI_H%.tmp"
+  SET "PREPROCESSOR_DEFINES=/D DN_BUILD_FFI=1"
+
+  @ECHO ON
+  cl.exe /EP %PREPROCESSOR_DEFINES% %DN_H% > %DN_FFI_H%
+  @ECHO OFF
+
+  FINDSTR /R /V "^$" %DN_FFI_H% > %DN_FFI_H_TMP%
+  MOVE /Y %DN_FFI_H_TMP% %DN_FFI_H%
+  FINDSTR /R /V /B /C:"@DN_FFI_CANARY" %DN_FFI_H% > %DN_FFI_H_TMP%
+  MOVE /Y %DN_FFI_H_TMP% %DN_FFI_H%
+
+  EXIT /B
+
+:::::::::::::::
+:: UTILITIES ::
+:::::::::::::::
 :DN_ECHO_COLOR
   @ECHO ON
-  @ECHO %~1 %~2: %DN_FOREGROUND_RESET% %~3
+  @ECHO %~1%~2:%DN_FOREGROUND_RESET% %~3
   @ECHO OFF
   EXIT /B
 
@@ -53,8 +83,8 @@ EXIT /B
   SET DN_VSDEVCMD="%DN_VS_PREFIX%\Microsoft Visual Studio\%DN_VS_YEAR%\%DN_VS_VERSION%\Common7\Tools\VsDevCmd.bat"
   SET DN_VSDEVCMD_FLAGS=/arch=amd64 /host_arch=amd64 /no_logo
 
+  CALL :DN_ECHO_INFO "Initializing Visual Studio command prompt with arguments: %DN_VSDEVCMD_FLAGS%"
   CALL %DN_VSDEVCMD% %DN_VSDEVCMD_FLAGS%
-  CALL :DN_ECHO_INFO "Initialized Visual Studio command prompt with arguments: %DN_VSDEVCMD_FLAGS%"
   EXIT /B
 
 :DN_COPY_DLLS

@@ -18,67 +18,94 @@
 // dn_noise
 // dn_steam
 
-#include <assert.h>
-#include <float.h>
-#include <inttypes.h>
-#include <stdatomic.h>
-#include <stdint.h>
-// #include <sys/time.h> @fix
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stddef.h>
-#include <time.h>
+#ifndef DN_BUILD_FFI
+  #include <assert.h>
+  #include <float.h>
+  #include <inttypes.h>
+  #include <stdatomic.h>
+  #include <stdint.h>
+  // #include <sys/time.h> @fix
+  #include <stdint.h>
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <stddef.h>
+  #include <time.h>
 
-#ifdef DN_APP
-#define DN_LUA
+  // Platform includes
+  #define NOMINMAX
+  #include "windows.h"
+  #include "shlobj.h"
 
-// Platform includes
-#define NOMINMAX
-#include "windows.h"
-#include "shlobj.h"
+  #include "KHR/khrplatform.h"
 
-#include "KHR/khrplatform.h"
+  // Library includes
+  #include "glad/glad.h"
+  #include "GLFW/glfw3.h"
 
-// Library includes
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
+  #ifndef DN_MATH_BACKEND_CUSTOM
+    #include "handmade/HandmadeMath.h"
+  #endif
 
-#include "handmade/HandmadeMath.h"
+  #define STB_IMAGE_IMPLEMENTATION
+  #include "stb/stb_image.h"
+  #define STB_RECT_PACK_IMPLEMENTATION
+  #include "stb/stb_rect_pack.h"
+  #define STB_IMAGE_WRITE_IMPLEMENTATION
+  #include "stb/stb_image_write.h"
+  #define STB_TRUETYPE_IMPLEMENTATION
+  #include "stb/stb_truetype.h"
+  #define STB_INCLUDE_IMPLEMENTATION
+  #define STB_INCLUDE_LINE_NONE
+  #include "stb/stb_include.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb/stb_image.h"
-#define STB_RECT_PACK_IMPLEMENTATION
-#include "stb/stb_rect_pack.h"
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb/stb_image_write.h"
-#define STB_TRUETYPE_IMPLEMENTATION
-#include "stb/stb_truetype.h"
-#define STB_INCLUDE_IMPLEMENTATION
-#define STB_INCLUDE_LINE_NONE
-#include "stb/stb_include.h"
+  #define DR_WAV_IMPLEMENTATION
+  #include "dr_libs/dr_wav.h"
 
-#define DR_WAV_IMPLEMENTATION
-#include "dr_libs/dr_wav.h"
+  #include "freetype/ft2build.h"
+  #include "freetype/freetype.h"
+  #include "freetype/ftsizes.h"
 
-#include "freetype/ft2build.h"
-#include "freetype/freetype.h"
-#include "freetype/ftsizes.h"
+  #include "lua/lua.h"
+  #include "lua/lauxlib.h"
+  #include "lua/lualib.h"
+  #include "lua/luajit.h"
 
-#include "lua/lua.h"
-#include "lua/lauxlib.h"
-#include "lua/lualib.h"
-#include "lua/luajit.h"
+  #define SOKOL_IMPL
+  #include "sokol/sokol_audio.h"
+  #include "sokol/sokol_log.h"
 
-#define SOKOL_IMPL
-#include "sokol/sokol_audio.h"
-#include "sokol/sokol_log.h"
+  #define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
+  #include "cimgui/cimgui.h"
 
-#define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
-#include "cimgui/cimgui.h"
+  #include "gunslinger/gs.h"
 
-// #include "steam/steam_api.h"
+  // #include "steam/steam_api.h"
+#else    
+  typedef enum gs_hash_table_entry_state
+  {
+      GS_HASH_TABLE_ENTRY_INACTIVE = 0x00,
+      GS_HASH_TABLE_ENTRY_ACTIVE = 0x01
+  } gs_hash_table_entry_state;
+
+  #define __gs_hash_table_entry(__HMK, __HMV)\
+      struct\
+      {\
+          __HMK key;\
+          __HMV val;\
+          gs_hash_table_entry_state state;\
+      }
+
+  #define gs_hash_table(__HMK, __HMV)\
+      struct {\
+          __gs_hash_table_entry(__HMK, __HMV)* data;\
+          __HMK tmp_key;\
+          __HMV tmp_val;\
+          size_t stride;\
+          size_t klpvl;\
+          size_t tmp_idx;\
+      }*
 #endif
+
 
 //  ████████╗██╗   ██╗██████╗ ███████╗███████╗
 //  ╚══██╔══╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔════╝
@@ -86,7 +113,6 @@
 //     ██║     ╚██╔╝  ██╔═══╝ ██╔══╝  ╚════██║
 //     ██║      ██║   ██║     ███████╗███████║
 //     ╚═╝      ╚═╝   ╚═╝     ╚══════╝╚══════╝
-#ifndef DN_NO_HIJACK_NUMERIC_TYPES
 typedef int8_t   s8;
 typedef int16_t  s16;
 typedef int32_t  s32;
@@ -99,7 +125,6 @@ typedef uint64_t u64;
 
 typedef float f32;
 typedef double f64;
-#endif
 
 #define DN_F64_MAX DBL_MAX
 
@@ -108,10 +133,19 @@ typedef u64 dn_hash_t;
 #define DN_ASSET_NAME_LEN 64
 typedef char dn_asset_name_t [DN_ASSET_NAME_LEN];
 
-typedef HANDLE dn_win32_handle_t;
-typedef DWORD dn_win32_dword_t;
-typedef WIN32_FIND_DATA dn_win32_find_data_t;
+#ifndef DN_BUILD_FFI
+  typedef HANDLE dn_win32_handle_t;
+  typedef DWORD dn_win32_dword_t;
+  typedef WIN32_FIND_DATA dn_win32_find_data_t;
+  typedef CRITICAL_SECTION dn_win32_critical_section_t;
+#else
+  #define DN_WIN32_UNKNOWN_SIZE_STRUCT void*
 
+  typedef void* dn_win32_handle_t;
+  typedef u32 dn_win32_dword_t;
+  typedef DN_WIN32_UNKNOWN_SIZE_STRUCT dn_win32_find_data_t;
+  typedef DN_WIN32_UNKNOWN_SIZE_STRUCT dn_win32_critical_section_t;
+#endif
 
 //  ███╗   ███╗ █████╗  ██████╗██████╗  ██████╗ ███████╗
 //  ████╗ ████║██╔══██╗██╔════╝██╔══██╗██╔═══██╗██╔════╝
@@ -144,10 +178,6 @@ typedef WIN32_FIND_DATA dn_win32_find_data_t;
 
 #define dn_typedef_fn(return_type, name, ...) typedef return_type(*name)(__VA_ARGS__)
 
-#define DN_API __declspec(dllexport)
-#define DN_IMP
-
-#define dn_align(n) __declspec(align(n))
 #define DN_ASSERT(condition) assert(condition)
 #define DN_SOFT_ASSERT(condition) DN_ASSERT(condition) // For things you want to crash in development, but fix before release (as opposed to assers which are left in release builds and, say, logged)
 #define DN_UNTESTED() DN_ASSERT(false)
@@ -174,11 +204,19 @@ typedef WIN32_FIND_DATA dn_win32_find_data_t;
 #define DN_QSORT_B_FIRST 1
 #define DN_QSORT_EQUAL 0
 
-#define DN_ATOMIC _Atomic
-
-#include "gunslinger/gs.h"
-
 #define gs_hash_table_for(_HT, it) for (gs_hash_table_iter it = 0; gs_hash_table_iter_valid((_HT), it); gs_hash_table_iter_advance((_HT), it))
+
+#ifndef DN_BUILD_FFI
+  #define DN_API __declspec(dllexport)
+  #define DN_IMP
+  #define dn_align(n) __declspec(align(n))
+  #define DN_ATOMIC _Atomic
+#else
+  #define DN_API
+  #define DN_IMP  @DN_FFI_CANARY
+  #define dn_align(n)
+  #define DN_ATOMIC
+#endif
 
 
 //  ███╗   ███╗ █████╗ ████████╗██╗  ██╗
@@ -187,55 +225,58 @@ typedef WIN32_FIND_DATA dn_win32_find_data_t;
 //  ██║╚██╔╝██║██╔══██║   ██║   ██╔══██║
 //  ██║ ╚═╝ ██║██║  ██║   ██║   ██║  ██║
 //  ╚═╝     ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝
-#ifndef DN_MATH_BACKEND_CUSTOM
-#include "handmade/HandmadeMath.h"
-typedef HMM_Vec2 dn_vector2_t;
-typedef HMM_Vec3 dn_vector3_t;
-typedef HMM_Vec4 dn_vector4_t;
-typedef HMM_Mat4 dn_matrix4_t;
-typedef HMM_Mat3 dn_matrix3_t;
-typedef HMM_Mat2 dn_matrix2_t;
+#if defined(DN_MATH_BACKEND_CUSTOM) || defined(DN_BUILD_FFI)
+  typedef union {
+    struct {
+      float x;
+      float y;
+    };
+
+    struct {
+      float r;
+      float g;
+    };
+  } dn_vector2_t;
+
+  typedef union {
+    struct {
+      float x;
+      float y;
+      float z;
+    };
+
+    struct {
+      float r;
+      float g;
+      float b;
+    };
+  } dn_vector3_t;
+
+  typedef union {
+    struct {
+      float x;
+      float y;
+      float z;
+      float w;
+    };
+    struct {
+      float r;
+      float g;
+      float b;
+      float a;
+    };
+  } dn_vector4_t;
+
+  typedef struct { dn_vector4_t entries [4]; } dn_matrix4_t;
+  typedef struct { dn_vector3_t entries [3]; } dn_matrix3_t;
+  typedef struct { dn_vector2_t entries [2]; } dn_matrix2_t;
 #else
-typedef union {
-  struct {
-    float x;
-    float y;
-  };
-
-  struct {
-    float r;
-    float g;
-  };
-} dn_vector2_t;
-
-typedef union {
-  struct {
-    float x;
-    float y;
-    float z;
-  };
-
-  struct {
-    float r;
-    float g;
-    float b;
-  };
-} dn_vector3_t;
-
-typedef union {
-  struct {
-    float x;
-    float y;
-    float z;
-    float w;
-  };
-  struct {
-    float r;
-    float g;
-    float b;
-    float a;
-  };
-} dn_vector4_t;
+  typedef HMM_Vec2 dn_vector2_t;
+  typedef HMM_Vec3 dn_vector3_t;
+  typedef HMM_Vec4 dn_vector4_t;
+  typedef HMM_Mat4 dn_matrix4_t;
+  typedef HMM_Mat3 dn_matrix3_t;
+  typedef HMM_Mat2 dn_matrix2_t;
 #endif
 
 typedef struct {
@@ -271,6 +312,7 @@ typedef struct {
 } dn_noise_t;
 dn_noise_t dn_noise;
 
+#ifndef DN_BUILD_FFI
 static const int dn_perlin_permutation_raw[256] = {
   151,160,137,91,90,15,131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,
   190,6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,
@@ -287,6 +329,7 @@ static const int dn_perlin_permutation_raw[256] = {
 };
 
 static int dn_perlin_permutation[512];
+#endif
 
 DN_IMP void dn_noise_init();
 DN_API f64 dn_noise_perlin(f64 x, f64 y);
@@ -332,6 +375,10 @@ typedef struct {
   dn_color_t white;
 } dn_colors_t;
 
+dn_color_t dn_color_rgb_to_hsv(dn_color_t color);
+dn_color_t dn_color_hsv_to_rgb(dn_color_t color);
+
+#ifndef DN_BUILD_FFI
 dn_colors_t dn_colors = {
   .indian_red       = dn_rgb_255(180, 101, 111), // RED
   .tyrian_purple    = dn_rgb_255(95,  26,  55),
@@ -358,10 +405,7 @@ dn_colors_t dn_colors = {
   .rich_black       = dn_rgb_255(4,   10,  15),
   .white            = dn_rgb_255(255, 255, 255),
 };
-
-dn_color_t dn_color_rgb_to_hsv(dn_color_t color);
-dn_color_t dn_color_hsv_to_rgb(dn_color_t color);
-
+#endif
 
 //  ███╗   ███╗███████╗███╗   ███╗ ██████╗ ██████╗ ██╗   ██╗
 //  ████╗ ████║██╔════╝████╗ ████║██╔═══██╗██╔══██╗╚██╗ ██╔╝
@@ -489,6 +533,7 @@ DN_API s32         dn_string_sort_kernel_alphabetical(const void* a, const void*
 DN_API s32         dn_string_compare_alphabetical(dn_string_t a, dn_string_t b);
 DN_API bool        dn_string_valid(dn_string_t str);
 
+
 //   ██████╗ ███████╗
 //  ██╔═══██╗██╔════╝
 //  ██║   ██║███████╗
@@ -502,13 +547,13 @@ typedef enum {
 } dn_os_file_attr_t;
 
 typedef struct {
-  int year;
-  int month;
-  int day;
-  int hour;
-  int minute;
-  int second;
-  int millisecond;
+  s32 year;
+  s32 month;
+  s32 day;
+  s32 hour;
+  s32 minute;
+  s32 second;
+  s32 millisecond;
 } dn_os_date_time_t;
 
 typedef struct {
@@ -564,7 +609,7 @@ typedef enum {
 typedef struct {
   dn_mutex_attr_t attrs;
   bool initialized;
-  CRITICAL_SECTION handle;
+  dn_win32_critical_section_t handle;
 } dn_mutex_t;
 
 void dn_mutex_init(dn_mutex_t* mutex);
@@ -591,6 +636,7 @@ void dn_thread_join(dn_thread_t* thread);
 typedef struct {
   s32 dummy;  
 } dn_condition_variable_t;
+
 
 //  ██╗  ██╗ █████╗ ███████╗██╗  ██╗██╗███╗   ██╗ ██████╗
 //  ██║  ██║██╔══██╗██╔════╝██║  ██║██║████╗  ██║██╔════╝
@@ -720,28 +766,6 @@ DN_API bool               dn_pool_iterator_done(dn_pool_iterator_t* it);
 #define            dn_pool_for(POOL, IT) for (dn_pool_iterator_t IT = dn_pool_iterator_init((POOL)); !dn_pool_iterator_done(&(IT)); dn_pool_iterator_next(&(IT)))
 #define            dn_pool_it(POOL, IT, T) dn_pool_at_i(POOL, (IT).index, T)
 
-dn_pool_iterator_t dn_pool_iterator_init(dn_pool_t* pool) {
-  return (dn_pool_iterator_t) {
-    .index = 0,
-    .pool = pool
-  };
-}
-
-void dn_pool_iterator_next(dn_pool_iterator_t* it) {
-  while (true) {
-    it->index++;
-    if (it->index >= it->pool->capacity) break;
-
-    dn_pool_slot_t* slot = &it->pool->slots[it->index];
-    if (slot->occupied) break;
-  } 
-}
-
-bool dn_pool_iterator_done(dn_pool_iterator_t* it) {
-  if (it->index >= it->pool->capacity) return true;
-  return false;
-}
-
 /////////////////
 // RING BUFFER //
 /////////////////
@@ -869,8 +893,8 @@ typedef struct {
 } dn_named_path_result_t;
 
 typedef struct {
-  dn_string_t install;
   dn_string_t engine;
+  dn_string_t install;
   dn_string_t write;
 } dn_path_config_t;
 
@@ -888,6 +912,7 @@ DN_API void                   dn_paths_add_subpath(dn_string_t name, dn_string_t
 DN_API dn_string_t            dn_paths_resolve(dn_string_t name);
 DN_API dn_string_t            dn_paths_resolve_format(dn_string_t name, dn_string_t file_name);
 DN_API dn_string_t            dn_paths_resolve_cstr(const char* name);
+DN_API const char*            dn_paths_resolve_bootstrap(const char* name);
 DN_API dn_string_t            dn_paths_resolve_ex(dn_string_t name, dn_allocator_t* allocator);
 DN_API dn_string_t            dn_paths_resolve_format_cstr(const char* name, const char* file_name);
 DN_API dn_string_t            dn_paths_resolve_format_ex(dn_string_t name, dn_string_t file_name, dn_allocator_t* allocator);
@@ -1119,7 +1144,6 @@ typedef struct {
 } dn_images_t;
 dn_images_t dn_images;
 
-
 void                  dn_atlases_init();
 void                  dn_atlas_deinit();
 void                  dn_atlas_set_name(const char* name);
@@ -1158,7 +1182,6 @@ DN_API void           dn_screenshot_write(const char* file_name);
 // ██╔══██╗██╔══██║██║     ██╔═██╗ ██║   ██║██╔══██╗██║   ██║██║   ██║██║╚██╗██║██║  ██║╚════██║
 // ██████╔╝██║  ██║╚██████╗██║  ██╗╚██████╔╝██║  ██║╚██████╔╝╚██████╔╝██║ ╚████║██████╔╝███████║
 // ╚═════╝ ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚═════╝ ╚══════╝
-#define DN_BACKGROUND
 #define DN_BACKGROUND_TILE_SIZE 2048
 
 typedef struct {
@@ -1397,7 +1420,6 @@ void dn_test_end();
 void dn_test_end_suite();
 
 
-#ifdef DN_APP
 //  ██╗    ██╗██╗███╗   ██╗██████╗  ██████╗ ██╗    ██╗
 //  ██║    ██║██║████╗  ██║██╔══██╗██╔═══██╗██║    ██║
 //  ██║ █╗ ██║██║██╔██╗ ██║██║  ██║██║   ██║██║ █╗ ██║
@@ -1438,8 +1460,14 @@ typedef struct {
   u32 target_fps;
 } dn_window_config_t;
 
+#ifndef DN_BUILD_FFI
+  typedef GLFWwindow* dn_window_handle_t;
+#else
+  typedef void* dn_window_handle_t;
+#endif
+
 typedef struct {
-  GLFWwindow* handle;
+  dn_window_handle_t handle;
   dn_window_flags_t flags;
   dn_display_mode_t display_mode;
   dn_vector2i_t windowed_position;
@@ -1461,34 +1489,8 @@ DN_API void               dn_window_set_size(int x, int y);
 DN_IMP void               dn_window_shutdown();
 
 
-//  ███╗   ██╗██╗   ██╗██╗  ██╗██╗     ███████╗ █████╗ ██████╗
-//  ████╗  ██║██║   ██║██║ ██╔╝██║     ██╔════╝██╔══██╗██╔══██╗
-//  ██╔██╗ ██║██║   ██║█████╔╝ ██║     █████╗  ███████║██████╔╝
-//  ██║╚██╗██║██║   ██║██╔═██╗ ██║     ██╔══╝  ██╔══██║██╔══██╗
-//  ██║ ╚████║╚██████╔╝██║  ██╗███████╗███████╗██║  ██║██║  ██║
-//  ╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝
-#ifdef DN_NUKLEAR
-typedef struct nk_context nk_context;
-typedef struct nk_color nk_color;
-typedef struct nk_style_item nk_style_item;
-typedef struct nk_style_button nk_style_button;
 
-#define NK_RATIO(...) ((float []){ __VA_ARGS__ })
 
-void          nk_dn_string(nk_context* nk, dn_string_t str, nk_flags flags);
-void          nk_dn_string_wrap(nk_context* nk, dn_string_t str);
-void          nk_dn_string_colored(nk_context* nk, dn_string_t str, nk_flags alignment, dn_color_t color);
-void          nk_dn_string_wrap_colored(nk_context* nk, dn_string_t str, dn_color_t color);
-void          nk_edit_dn_string(nk_context* nk, nk_flags flags, dn_string_t* buffer, u32 max_len, nk_plugin_filter filter);
-bool          nk_selectable_dn_string(nk_context* nk, dn_string_t str, nk_flags flags, nk_bool* value);
-bool          nk_button_dn_string(nk_context* nk, dn_string_t str);
-bool          nk_button_dn_string_styled(nk_context* nk, nk_style_button* style, dn_string_t str);
-nk_color      dn_color_to_nk_color(dn_color_t color);
-nk_style_item dn_color_to_nk_style_item(dn_color_t color);
-#endif
-
-// IMGUI
-#ifdef DN_IMGUI
 typedef struct {
   dn_vector4_t light;
   dn_vector4_t medium_light;
@@ -1516,7 +1518,6 @@ DN_API void    dn_imgui_load_colors(dn_imgui_colors_t colors);
 DN_IMP void    dn_imgui_init();
 DN_IMP void    dn_imgui_shutdown();
 DN_IMP void    dn_imgui_update();
-#endif
 
 
 //  ██╗     ██╗   ██╗ █████╗
@@ -1525,12 +1526,11 @@ DN_IMP void    dn_imgui_update();
 //  ██║     ██║   ██║██╔══██║
 //  ███████╗╚██████╔╝██║  ██║
 //  ╚══════╝ ╚═════╝ ╚═╝  ╚═╝
-#ifdef DN_LUA
-#ifndef LUA_VERSION
-  #error "Please include Lua before including dn.h. If you aren't using Lua, find where DN_LUA is being defined and fix it."
+#ifndef DN_BUILD_FFI
+  typedef lua_State* dn_lua_interpreter_t;
+#else
+  typedef void* dn_lua_interpreter_t;
 #endif
-
-typedef lua_State* dn_lua_interpreter_t;
 
 typedef struct {
   dn_string_t scripts;
@@ -1551,7 +1551,6 @@ DN_IMP void        dn_lua_script_named_dir(dn_string_t name);
 DN_IMP s32         dn_lua_directory_sort_kernel(const void* va, const void* vb);
 DN_IMP const char* dn_lua_format_file_load_error(const char* error);
 DN_IMP s32         dn_lua_format_file_load_error_l(dn_lua_interpreter_t lua);
-#endif
 
 
 // ███████╗ ██████╗ ███╗   ██╗████████╗███████╗
@@ -1610,8 +1609,8 @@ typedef struct {
 typedef struct {
   dn_fixed_array(dn_baked_font_t, 64) baked_fonts;
   dn_fixed_array(dn_baked_glyph_t, 8192) baked_glyphs;
-  dn_fixed_array(dn_vector2_t, 65536>)vertex_data;
-  dn_fixed_array(dn_vector2_t, 65536>)uv_data;
+  dn_fixed_array(dn_vector2_t, 65536>) vertex_data;
+  dn_fixed_array(dn_vector2_t, 65536>) uv_data;
 
   dn_baked_font_t* default_font;
 } dn_fonts_t;
@@ -2228,8 +2227,6 @@ DN_API dn_type_info_list_t dn_app_query_types();
 DN_API u32                 dn_app_monotonic_id();
 DN_IMP void                dn_app_update();
 
-#endif
-
 
 //  ██╗███╗   ███╗██████╗ ██╗     ███████╗███╗   ███╗███████╗███╗   ██╗████████╗ █████╗ ████████╗██╗ ██████╗ ███╗   ██╗
 //  ██║████╗ ████║██╔══██╗██║     ██╔════╝████╗ ████║██╔════╝████╗  ██║╚══██╔══╝██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║
@@ -2237,6 +2234,7 @@ DN_IMP void                dn_app_update();
 //  ██║██║╚██╔╝██║██╔═══╝ ██║     ██╔══╝  ██║╚██╔╝██║██╔══╝  ██║╚██╗██║   ██║   ██╔══██║   ██║   ██║██║   ██║██║╚██╗██║
 //  ██║██║ ╚═╝ ██║██║     ███████╗███████╗██║ ╚═╝ ██║███████╗██║ ╚████║   ██║   ██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║
 //  ╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+#ifdef DN_IMPLEMENTATION
 ///////////
 // STEAM //
 ///////////
@@ -3195,6 +3193,28 @@ bool dn_pool_slot_is_match(dn_pool_slot_t* slot, dn_pool_handle_t handle) {
   return slot->generation == handle.generation;
 }
 
+dn_pool_iterator_t dn_pool_iterator_init(dn_pool_t* pool) {
+  return (dn_pool_iterator_t) {
+    .index = 0,
+    .pool = pool
+  };
+}
+
+void dn_pool_iterator_next(dn_pool_iterator_t* it) {
+  while (true) {
+    it->index++;
+    if (it->index >= it->pool->capacity) break;
+
+    dn_pool_slot_t* slot = &it->pool->slots[it->index];
+    if (slot->occupied) break;
+  } 
+}
+
+bool dn_pool_iterator_done(dn_pool_iterator_t* it) {
+  if (it->index >= it->pool->capacity) return true;
+  return false;
+}
+
 ///////////////////
 // DYNAMIC ARRAY //
 ///////////////////
@@ -3993,6 +4013,11 @@ dn_string_t dn_paths_resolve_cstr(const char* name) {
   return dn_paths_resolve_ex(dn_string_cstr(name), &dn_allocators.bump.allocator);
 }
 
+const char* dn_paths_resolve_bootstrap(const char* name) {
+  dn_string_t result = dn_paths_resolve_ex(dn_string_cstr(name), &dn_allocators.bump.allocator);
+  return result.data;
+}
+
 dn_string_t dn_paths_resolve_ex(dn_string_t name, dn_allocator_t* allocator) {
   dn_hash_t hash = dn_hash_string(name);
   
@@ -4113,6 +4138,7 @@ void dn_paths_init(dn_path_config_t config) {
   dn_paths_add_install_subpath(dn_string_literal("dn_log"), dn_string_literal("doublenickel.log"));
   dn_paths_add_engine_subpath(dn_string_literal("dn_bootstrap"), dn_string_literal("source/scripts/core/bootstrap.lua"));
   dn_paths_add_engine_subpath(dn_string_literal("dn_paths"), dn_string_literal("source/scripts/data/paths.lua"));
+  dn_paths_add_engine_subpath(dn_string_literal("dn_ffi_h"), dn_string_literal("source/scripts/data/dn.h"));
 }
 
 //////////
@@ -4392,7 +4418,6 @@ void dn_test_init() {
 /////////
 // LUA //
 /////////
-#ifdef DN_LUA
 void dn_lua_init(dn_lua_config_t config) {
   // dn_string_t dn_install = dn_paths_resolve(dn_string_literal("dn_install"));
   // dn_string_builder_t builder = {
@@ -4613,54 +4638,8 @@ s32 dn_lua_format_file_load_error_l(dn_lua_interpreter_t l) {
   lua_pushstring(dn_lua.state, error);
   return 1;
 }
-#endif
 
-/////////////
-// NUKLEAR //
-/////////////
-#ifdef DN_NUKLEAR
-void nk_dn_string(struct nk_context* nk, dn_string_t str, nk_flags flags) {
-  nk_text(nk, (char*)str.data, (s32)str.len, flags);
-}
 
-void nk_dn_string_wrap(nk_context* nk, dn_string_t str) {
-  nk_text_wrap(nk, (char*)str.data, (s32)str.len);
-}
-
-void nk_dn_string_colored(struct nk_context* nk, dn_string_t str, nk_flags alignment, dn_color_t color) {
-  nk_text_colored(nk, (char*)str.data, (s32)str.len, alignment, dn_color_to_nk_color(color));
-}
-
-void nk_dn_string_wrap_colored(nk_context* nk, dn_string_t str, dn_color_t color) {
-  nk_text_wrap_colored(nk, (char*)str.data, (s32)str.len, dn_color_to_nk_color(color));
-}
-
-void nk_edit_dn_string(struct nk_context* nk, nk_flags flags, dn_string_t* buffer, u32 max_len, nk_plugin_filter filter) {
-  nk_edit_string(nk, flags, (char*)buffer->data, (s32*)&buffer->len, max_len, filter);
-}
-
-bool nk_selectable_dn_string(nk_context* nk, dn_string_t str, nk_flags flags, nk_bool* value) {
-  return nk_selectable_text(nk, (char*)str.data, (s32)str.len, flags, value);
-}
-
-bool nk_button_dn_string(nk_context* nk, dn_string_t str) {
-  return nk_button_text(nk, (char*)str.data, (s32)str.len);
-}
-
-bool nk_button_dn_string_styled(nk_context* nk, nk_style_button* style, dn_string_t str) {
-  return nk_button_text_styled(nk, style, (char*)str.data, (s32)str.len);
-}
-
-nk_color dn_color_to_nk_color(dn_color_t color) {
-  return nk_rgba(color.r * 255, color.g * 255, color.b * 255, color.a * 255);
-}
-
-nk_style_item dn_color_to_nk_style_item(dn_color_t color) {
-  return nk_style_item_color(dn_color_to_nk_color(color));
-}
-#endif
-
-#ifdef DN_IMGUI
 void dn_imgui_init() {
   DN_BROKEN();
 }
@@ -4708,316 +4687,12 @@ void dn_imgui_file_browser_set_work_dir(const char* directory) {
 
 bool dn_imgui_file_browser_is_file_selected() {
   DN_BROKEN();
+  return false;
 }
 
 dn_tstring_t dn_imgui_file_browser_get_selected_file() {
   DN_BROKEN();
-  return dn_string_copy_cstr("DN_BROKEN");
-}
-#endif
-
-
-#ifdef DN_APP
-void dn_backgrounds_init() {
-  DN_BROKEN();
-}
-
-
-void dn_background_init(dn_background_t* background) {
-  DN_BROKEN();
-}
-
-void Background::deinit(dn_background_t* background) {
-  DN_BROKEN();
-}
-
-void Background::load_paths(dn_background_t* background) {
-	auto& lua = dn_lua;
-	auto l = dn_lua.state;
-		
-	// Find the path to the source image, i.e. the full size background
-	//lua.parse_string("source", &source_image);
-	this->source_image_full_path = dn_paths_resolve_format_ex("dn_image", source_image, &dn_allocators.standard);
-
-	// Find the folder we're going to write tiles to
-	//lua.parse_string(-2, &tile_output_folder);
-	this->tile_output_full_path = dn_paths_resolve_format_ex("dn_atlas", tile_output_folder, &dn_allocators.standard);
-		
-	// The name of the background is the folder we use for tiling
-	name = tile_output_folder;
-}
-
-void Background::set_source_image_size(dn_background_t* background, i32 width, i32 height) {
-	this->width = width;
-	this->height = height;
-}
-
-void Background::set_source_data(dn_background_t* background, u32* data) {
-	this->data = data;
-}
-
-bool Background::add_tile(dn_background_t* background) {
-	assert(width > 0);
-	assert(height > 0);
-		
-	// Calculate where the next tile will be
-	if (!tile_positions.size) {
-		// If we just started, it's just (0, 0)
-		dn_array_push(&tile_positions);
-	} else {
-		// Otherwise, advance the previous tile one column, and move to the next row if needed.
-		dn_vector2i_t last_tile_position = *dn_array_back(&tile_positions);
-		dn_vector2i_t tile_position = { 0, 0 };
-		tile_position.x = last_tile_position.x + Background::TILE_SIZE;
-		tile_position.y = last_tile_position.y;
-		if (tile_position.x >= width) {
-			tile_position.x = 0;
-			tile_position.y += Background::TILE_SIZE;
-		}
-
-		// If it falls outside of the image, we're done
-		if (tile_position.y >= height) {
-			return false;
-		} else {
-			dn_array_push(&tile_positions, tile_position);
-		}
-	}
-		
-		
-	char** tile = dn_array_push(&tiles);
-	*tile = dn::allocator::alloc<char>(&dn_allocators.standard, DN_MAX_PATH_LEN);
-	snprintf(*tile, 256, "%s_%03lld.png", name, tiles.size);
-		
-	char** tile_full_path = dn_array_push(&tile_full_paths);
-	*tile_full_path = dn::allocator::alloc<char>(&dn_allocators.standard, DN_MAX_PATH_LEN);
-	snprintf(*tile_full_path, DN_MAX_PATH_LEN, "%s/%s", tile_output_full_path, *tile);
-
-	return true;
-}
-
-void Background::add_tiles(dn_background_t* background) {
-	while(add_tile()) {}
-}
-
-void Background::build_from_source(dn_background_t* background) {
-	// Clean out old tiles 
-	std::filesystem::remove_all(tile_output_full_path);
-	std::filesystem::create_directories(tile_output_full_path);
-
-	// Load the source image
-	stbi_set_flip_vertically_on_load(false);
-	u32* source_data = (u32*)stbi_load(source_image_full_path, &width, &height, &channels, 0);
-	dn_defer { free(source_data); };
-
-	assert(channels == 4);
-
-	set_source_image_size(width, height);
-	add_tiles();
-
-	constexpr u32 nthreads = 16;
-	TileProcessor::current_tile = 0;
-	dn_array_t<TileProcessor> tile_processors;
-	dn_array_init(&tile_processors, nthreads, TileProcessor());
-
-	// Use a thread per-tile, up to the maximum number of threads in the pool.
-	auto use_threads = dn_min(tiles.size, nthreads);
-	for (u32 i = 0; i < use_threads; i++) {
-		auto tile_processor = tile_processors[i];
-		tile_processor->init(source_data);
-		tile_processor->thread = std::thread(&TileProcessor::process, tile_processor, this);
-	}
-	
-	for (u32 i = 0; i < use_threads; i++) {
-		auto tile_processor = tile_processors[i];
-		tile_processor->thread.join();
-		tile_processor->deinit();
-	}
-}
-
-void Background::update_config(dn_background_t* background) {
-	lua_State* l = dn_lua.state;
-
-	lua_getglobal(l, "doublenickel");
-	DEFER_POP(l);
-	lua_pushstring(l, "background");
-	lua_gettable(l, -2);
-	DEFER_POP(l);
-	lua_pushstring(l, "data");
-	lua_gettable(l, -2);
-	DEFER_POP(l);
-	lua_pushstring(l, name);
-	lua_gettable(l, -2);
-	DEFER_POP(l);
-
-	// Write out the new tile data to disk
-	lua_pushstring(l, "mod_time");
-	lua_pushnumber(l, filesystem_mod_time);
-	lua_settable(l, -3);
-
-	// Clear the old tile names from the config
-	lua_pushstring(l, "tiles");
-	lua_newtable(l);
-	lua_settable(l, -3);
-
-	// Write each file's name to the config
-	for (u32 i = 0; i < tiles.size; i++) {
-		auto tile_file_name = *tiles[i];
-		lua_pushstring(l, "tiles");
-		lua_gettable(l, -2);
-		DEFER_POP(l);
-		lua_pushnumber(l, i + 1);
-		lua_pushstring(l, tile_file_name);
-		lua_settable(l, -3);
-	}
-
-	// Write size
-	lua_newtable(l);
-	lua_pushstring(l, "x");
-	lua_pushnumber(l, width);
-	lua_settable(l, -3);
-
-	lua_pushstring(l, "y");
-	lua_pushnumber(l, height);
-	lua_settable(l, -3);
-
-	lua_pushstring(l, "size");
-	lua_insert(l, -2);
-	lua_settable(l, -3);
-	
-	// Write the file to disk
-	lua_getglobal(l, "doublenickel");
-	lua_pushstring(l, "write_file_to_return_table");
-	lua_gettable(l, -2);
-
-	auto background_info = dn_paths_resolve("background_info");
-	lua_pushstring(l, background_info);
-
-	lua_getglobal(l, "doublenickel");
-	DEFER_POP(l);
-	lua_pushstring(l, "background");
-	lua_gettable(l, -2);
-	lua_pushstring(l, "data");
-	lua_gettable(l, -2);
-	lua_insert(l, -3);
-	lua_pop(l, 2);
-
-	lua_pushboolean(l, true);
-
-	lua_pcall(l, 3, 0, 0);
-}
-
-void Background::load_tiles(dn_background_t* background) {
-	// At this point, the background is correctly tiled (i.e. the tile images exist on disk, and are more current
-	// than the source image). Load the tiles into the GPU.
-	//
-	// This is definitely slower than it needs to be; when we regenerate tiles, we already have the source data.
-	// But instead of loading it directly into the GPU, we write it to a PNG and then reload it here. Why? Well,
-	// laziness. It's probably smarter to have LoadTileFromMemory(), and just call that in both the regenerate
-	// case + after we load them from disk in the cache case. But to be honest, I really don't care right
-	// now!
-
-	// Make a completion queue that's the exact size we need. (If you had a vector, this would be a great time
-	// to use a vector that allocates from temporary storage)
-
-	dn_array_init(&this->loaded_tiles, this->tiles.size, &dn_allocators.standard);
-
-	for (int tile_index = 0; tile_index < tiles.size; tile_index++) {
-		// Pull tile data
-		auto tile = *tiles[tile_index];
-		auto tile_full_path = *tile_full_paths[tile_index];
-
-		// Allocate any buffer resources
-		auto texture = alloc_texture();
-		texture->hash = dn_hash_cstr_dumb(tile);
-		stbi_set_flip_vertically_on_load(false);
-		u32* data = (u32*)stbi_load(tile_full_path, &texture->width, &texture->height, &texture->channels, 0);
-			
-		// Create a sprite so the tile can be drawn with the draw_image() API
-		auto sprite = alloc_sprite();
-		strncpy(sprite->file_path, tile, DN_MAX_PATH_LEN);
-		sprite->texture = texture->hash;
-		sprite->hash = texture->hash;
-		sprite->size = { texture->width, texture->height };
-
-		// Each tile spans the entire image, so use trivial UVs
-		dn_vector2_t uv [6] = dn_quad_literal(0, 1, 0, 1);
-		for (u32 i = 0; i < 6; i++) sprite->uv[i] = uv[i];
-
-		// Mark the data to be loaded to the GPU
-		auto item = dn_array_push(&loaded_tiles);
-		item->texture = texture;
-		item->data = data;
-	}
-}
-
-bool Background::is_dirty(dn_background_t* background) {
-	if (filesystem_mod_time > mod_time) return true;
-	if (!std::filesystem::exists(tile_output_full_path)) return true;
-
-	return false;
-}
-
-
-void Background::load_one_to_gpu(dn_background_t* background) {
-	auto tile = loaded_tiles[gpu_load_index++];
-	tile->texture->load_to_gpu(tile->data);
-	free(tile->data);
-
-	if (gpu_load_index == loaded_tiles.size) {
-		gpu_done = true;
-	}
-}
-
-void Background::load_to_gpu(dn_background_t* background) {
-	gpu_ready = true;
-	while (!gpu_done) {
-		load_one_to_gpu();
-	}
-}
-
-
-//
-// TILE PROCESSOR
-//
-void TileProcessor::init(u32* source_data) {
-	if (!tile_data) {
-		tile_data = dn::allocator::alloc<u32>(&dn_allocators.standard, Background::TILE_SIZE * Background::TILE_SIZE);
-	}
-	this->source_data = source_data;
-}
-
-void TileProcessor::deinit() {
-	dn::allocator::free(&dn_allocators.standard, tile_data);
-	tile_data = nullptr;
-	source_data = nullptr;
-}
-
-void TileProcessor::process(Background* background) {
-	while (current_tile < background->tiles.size) {
-		// Atomically get the next tile index, and pull that tile's data. I believe this could be an atomic
-		// instead of needing a full mutex, but it doesn't matter.
-		mutex.lock();
-		u32 tile = current_tile++;
-		mutex.unlock();
-
-		dn_vector2i_t source_position = *background->tile_positions[tile];
-		char*    tile_path       = *background->tile_full_paths[tile];
-		memset(tile_data, 0, Background::TILE_SIZE * Background::TILE_SIZE * sizeof(u32));
-			
-		// Blit a single tile to its own texture
-		u32 tile_offset = 0;
-		u32 source_offset = (background->width * source_position.y) + source_position.x;
-		u32 cols = dn_min(Background::TILE_SIZE, background->width - source_position.x);
-		u32 rows = dn_min(Background::TILE_SIZE, background->height - source_position.y);
-		for (u32 row = 0; row < rows; row++) {
-			memcpy(tile_data + tile_offset, source_data + source_offset, cols * sizeof(u32));
-			source_offset += background->width;
-			tile_offset += Background::TILE_SIZE;
-		}
-
-		// Write the tile image out to a PNG file
-		stbi_write_png(tile_path, Background::TILE_SIZE, Background::TILE_SIZE, 4, tile_data, 0);
-	}
+  return "DN_BROKEN";
 }
 
 
@@ -5841,5 +5516,4 @@ int dn_main() {
 
   return 0;
 }
-
 #endif

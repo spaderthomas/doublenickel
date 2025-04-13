@@ -18,8 +18,8 @@ int main(int num_args, char** args) {
   dn_init((dn_config_t) {
     .mode = DN_MODE_APP,
     .path = (dn_path_config_t) {
+      .engine  = dn_string_literal("../../.."),
       .install = dn_string_literal("../../sdf_clock"),
-      .engine  = dn_string_literal("../../thirdparty/doublenickel"),
       .write   = dn_string_literal("../../sdf_clock/source/app/data"),
     },
     .lua = (dn_lua_config_t) {
