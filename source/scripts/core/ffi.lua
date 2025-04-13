@@ -951,8 +951,8 @@ end
 WindowConfig = doublenickel.class.metatype('dn_window_config_t')
 function WindowConfig:init(params)
   local default = dn.window_config_default();
-  self.title = params.title or default.title
-  self.icon = params.icon or default.icon
+  self.title = dn.String:new(params.title) or default.title
+  self.icon = dn.String:new(params.icon) or default.icon
   self.native_resolution = params.native_resolution or default.native_resolution
   self.flags = params.flags or default.flags
   self.display_mode = params.display_mode or default.display_mode

@@ -33,6 +33,10 @@ typedef uint64_t u64;
 typedef float f32;
 typedef double f64;
 
+typedef u64 dn_hash_t;
+
+typedef char dn_asset_name_t [64];
+
 typedef struct {
   float x;
   float y;
@@ -50,6 +54,11 @@ typedef struct {
   float z;
   float w;
 } dn_vector4_t;
+
+typedef struct {
+  s32 x;
+  s32 y;
+} dn_vector2i_t;
 
 typedef struct {
   float data [2] [2];
@@ -260,10 +269,46 @@ void dn_fixed_array_clear(dn_fixed_array_t* vertex_buffer);
 u32  dn_fixed_array_byte_size(dn_fixed_array_t* vertex_buffer);
 u8*  dn_fixed_array_at(dn_fixed_array_t* vertex_buffer, u32 index);
 
+//////////
+// POOL //
+//////////
 typedef struct {
-  s32 index;
-  s32 generation;
-} dn_gen_arena_handle_t;
+  u32 index;
+  u32 generation;
+} dn_pool_handle_t;
+
+typedef struct {
+  s32 next_free;
+  u32 generation;
+  bool occupied;
+} dn_pool_slot_t;
+
+typedef struct {
+  u8* data;
+  dn_pool_slot_t* slots;
+  u32 element_size;
+  u32 capacity;
+  s32 free_list;
+} dn_pool_t;
+
+typedef struct {
+  u32 index;
+  dn_pool_t* pool;
+} dn_pool_iterator_t;
+
+void               dn_pool_init(dn_pool_t* pool, u32 capacity, u32 element_size);
+dn_pool_handle_t   dn_pool_insert(dn_pool_t* pool, void* value);
+dn_pool_handle_t   dn_pool_reserve(dn_pool_t* pool);
+void               dn_pool_remove(dn_pool_t* pool, dn_pool_handle_t handle);
+bool               dn_pool_contains(dn_pool_t* pool, dn_pool_handle_t handle);
+void               dn_pool_clear(dn_pool_t* pool);
+dn_pool_handle_t   dn_pool_invalid_handle();
+bool               dn_pool_is_handle_valid(dn_pool_handle_t handle);
+bool               dn_pool_slot_has_next_free(dn_pool_slot_t* slot);
+bool               dn_pool_slot_is_match(dn_pool_slot_t* slot, dn_pool_handle_t handle);
+dn_pool_iterator_t dn_pool_iterator_init(dn_pool_t* pool);
+void               dn_pool_iterator_next(dn_pool_iterator_t* it);
+bool               dn_pool_iterator_done(dn_pool_iterator_t* it);
 
 void dn_cstr_copy(const char* str, char* buffer, u32 buffer_length);
 void dn_cstr_copy_n(const char* str, u32 length, char* buffer, u32 buffer_length);
@@ -340,7 +385,6 @@ void              dn_time_metrics_add(dn_string_t name);
 // ██║  ██║╚██████╔╝██████╔╝██║╚██████╔╝ //
 // ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝ ╚═════╝  //
 ///////////////////////////////////////////
-
 typedef enum {
   DN_AUDIO_FILTER_MODE_FIRST_ORDER = 0,
   DN_AUDIO_FILTER_MODE_BUTTERWORTH = 1,
@@ -349,49 +393,76 @@ typedef enum {
 typedef struct {
   dn_audio_filter_mode_t mode;
   bool enabled;
-  float cutoff_frequency;
-  float cutoff_alpha;
-  float a0, a1, a2, b1, b2;
-  float input_history [2];
-  float output_history [2];
+  f32 cutoff_frequency;
+  f32 cutoff_alpha;
+  f32 a0, a1, a2, b1, b2;
+  f32 input_history [2];
+  f32 output_history [2];
 } dn_low_pass_filter_t;
 
 typedef struct {
-  float threshold;
-  float ratio;
-  float attack_time;
-  float release_time;
+  f32 threshold;
+  f32 ratio;
+  f32 attack_time;
+  f32 release_time;
   bool enabled;
 } dn_compressor_t;
+
+typedef dn_pool_handle_t dn_audio_info_handle_t;
+typedef struct {
+  dn_asset_name_t name;
+  dn_hash_t hash;
+  u32 num_channels;
+  u32 sample_rate;
+  u64 num_frames;
+  u32 num_samples;
+  f32* samples;
+  u32 generation;
+  double file_mod_time;
+} dn_audio_info_t;
+
+typedef dn_pool_handle_t dn_audio_instance_handle_t;
+typedef struct {
+  dn_audio_info_handle_t info;
+  dn_audio_instance_handle_t next;
+  u32 next_sample;
+  bool loop;
+  f32 volume;
+  dn_low_pass_filter_t filter;
+  bool paused;
+  s32 sample_buffer_offset;
+  s32 samples_from_next;
+  
+  bool occupied;
+  u32 generation;
+} dn_audio_instance_t;
 
 typedef struct {
   dn_path_t* dirs;
   u32 num_dirs;
   dn_compressor_t compressor;
   dn_low_pass_filter_t filter;
-  float sample_frequency;
-  float master_volume;
-  float master_volume_mod;
+  f32 sample_frequency;
+  f32 master_volume;
+  f32 master_volume_mod;
 } dn_audio_config_t;
 
-typedef dn_gen_arena_handle_t dn_audio_instance_handle_t;
-
-void                       dn_audio_set_compressor_threshold(float t);
-void                       dn_audio_set_compressor_ratio(float v);
-void                       dn_audio_set_compressor_attack(float v);
-void                       dn_audio_set_compressor_release(float v);
-void                       dn_audio_set_sample_rate(float v);
-float                      dn_audio_get_master_volume();
-void                       dn_audio_set_master_volume(float v);
-float                      dn_audio_get_master_volume_mod();
-void                       dn_audio_set_master_volume_mod(float v);
-float                      dn_audio_get_master_filter_cutoff();
-void                       dn_audio_set_master_filter_cutoff(float v);
+void                       dn_audio_set_compressor_threshold(f32 t);
+void                       dn_audio_set_compressor_ratio(f32 v);
+void                       dn_audio_set_compressor_attack(f32 v);
+void                       dn_audio_set_compressor_release(f32 v);
+void                       dn_audio_set_sample_rate(f32 v);
+f32                        dn_audio_get_master_volume();
+void                       dn_audio_set_master_volume(f32 v);
+f32                        dn_audio_get_master_volume_mod();
+void                       dn_audio_set_master_volume_mod(f32 v);
+f32                        dn_audio_get_master_filter_cutoff();
+void                       dn_audio_set_master_filter_cutoff(f32 v);
 void                       dn_audio_set_master_filter_cutoff_enabled(bool enabled);
 void                       dn_audio_set_master_filter_mode(dn_audio_filter_mode_t mode);
-void                       dn_audio_set_volume(dn_audio_instance_handle_t handle, float volume);
-void                       dn_audio_set_filter_cutoff(dn_audio_instance_handle_t handle, float cutoff);
-void                       dn_audio_set_filter_mode(dn_audio_instance_handle_t handle, float cutoff);
+void                       dn_audio_set_volume(dn_audio_instance_handle_t handle, f32 volume);
+void                       dn_audio_set_filter_cutoff(dn_audio_instance_handle_t handle, f32 cutoff);
+void                       dn_audio_set_filter_mode(dn_audio_instance_handle_t handle, dn_audio_filter_mode_t mode);
 void                       dn_audio_set_filter_enabled(dn_audio_instance_handle_t handle, bool enabled);
 dn_audio_instance_handle_t dn_audio_play_sound(const char* name);
 dn_audio_instance_handle_t dn_audio_play_looped(const char* name);
@@ -403,11 +474,21 @@ void                       dn_audio_resume(dn_audio_instance_handle_t handle);
 bool                       dn_audio_is_playing(dn_audio_instance_handle_t handle);
 bool                       dn_audio_is_any_playing();
 void                       dn_audio_load(const char* file_path, const char* file_name);
+void                       dn_audio_load_dir(const char* path);
 void                       dn_low_pass_filter_set_mode(dn_low_pass_filter_t* filter, dn_audio_filter_mode_t mode);
-void                       dn_low_pass_filter_set_cutoff(dn_low_pass_filter_t* filter, float cutoff);
-float                      dn_low_pass_filter_apply(dn_low_pass_filter_t* filter, float input);
+void                       dn_low_pass_filter_set_cutoff(dn_low_pass_filter_t* filter, f32 cutoff);
+f32                        dn_low_pass_filter_apply(dn_low_pass_filter_t* filter, f32 input);
 dn_audio_config_t          dn_audio_config_default();
 void                       dn_audio_init(dn_audio_config_t config);
+void                       dn_audio_update(f32* buffer, int frames_requested, int num_channels);
+void                       dn_audio_shutdown();
+dn_audio_info_t*           dn_audio_find(dn_string_t name);
+dn_audio_info_t*           dn_audio_find_no_default(dn_string_t name);
+dn_audio_info_t*           dn_audio_resolve(dn_audio_info_handle_t handle);
+dn_audio_instance_t*       dn_audio_resolve_instance(dn_audio_instance_handle_t handle);
+dn_audio_instance_handle_t dn_audio_reserve();
+dn_audio_instance_handle_t dn_audio_play_sound_ex(dn_audio_info_t* sound, bool loop);
+void                       dn_audio_stop_ex(dn_audio_instance_t* active_sound);
 
 
 /////////////////////////////////////////////
@@ -559,12 +640,11 @@ dn_font_config_t dn_font_config_default();
 // ╚███╔███╔╝██║██║ ╚████║██████╔╝╚██████╔╝╚███╔███╔╝ //
 //  ╚══╝╚══╝ ╚═╝╚═╝  ╚═══╝╚═════╝  ╚═════╝  ╚══╝╚══╝  //
 ////////////////////////////////////////////////////////
-
 typedef enum {
-  DN_WINDOW_FLAG_NONE = 0,
-  DN_WINDOW_FLAG_WINDOWED = 1,
-  DN_WINDOW_FLAG_BORDER = 2,
-  DN_WINDOW_FLAG_VSYNC = 4
+  DN_WINDOW_FLAG_NONE,
+  DN_WINDOW_FLAG_WINDOWED,
+  DN_WINDOW_FLAG_BORDER,
+  DN_WINDOW_FLAG_VSYNC,
 } dn_window_flags_t;
 
 typedef enum {
@@ -591,17 +671,29 @@ typedef struct {
   dn_display_mode_t display_mode;
   dn_vector2_t native_resolution;
   dn_window_flags_t flags;
+  u32 target_fps;
 } dn_window_config_t;
 
+typedef struct {
+  void* handle;
+  dn_window_flags_t flags;
+  dn_display_mode_t display_mode;
+  dn_vector2i_t windowed_position;
+  dn_vector2_t native_resolution;
+  dn_vector2_t requested_area;
+  dn_vector2_t content_area;
+} dn_window_t;
+
 dn_window_config_t dn_window_config_default();
-void               dn_window_init(dn_window_config_t descriptor);
+void               dn_window_init(dn_window_config_t config);
 void               dn_window_set_native_resolution(float width, float height);
-dn_vector2_t            dn_window_get_content_area();
-dn_vector2_t            dn_window_get_native_resolution();
-void               dn_window_set_icon(const char* path);
+dn_vector2_t       dn_window_get_content_area();
+dn_vector2_t       dn_window_get_native_resolution();
+void               dn_window_set_icon(dn_string_t path);
 void               dn_window_set_display_mode(dn_display_mode_t mode);
 dn_display_mode_t  dn_window_get_display_mode();
 void               dn_window_set_cursor_visible(bool visible);
+void               dn_window_set_size(int x, int y);
 
 
 
@@ -1266,12 +1358,12 @@ typedef struct {
 
 typedef struct {
   dn_window_config_t window;
-  // dn_audio_config_t audio;
-  // dn_font_config_t font;
-  // dn_gpu_config_t gpu;
-  // dn_asset_config_t asset;
-  // dn_steam_config_t steam;
-  // dn_image_config_t image;
+  dn_audio_config_t audio;
+  dn_font_config_t font;
+  dn_gpu_config_t gpu;
+  dn_asset_config_t asset;
+  dn_steam_config_t steam;
+  dn_image_config_t image;
   u32 target_fps;
 } dn_app_config_t;
 
@@ -1287,55 +1379,6 @@ void dn_app_init(dn_app_descriptor_t descriptor);
 void dn_app_configure(dn_app_config_t config);
 
 
-
-///////////////////////////////////////////////////////////////////////////
-// ██╗   ██╗███╗   ██╗██████╗  ██████╗ ██████╗ ████████╗███████╗██████╗  //
-// ██║   ██║████╗  ██║██╔══██╗██╔═══██╗██╔══██╗╚══██╔══╝██╔════╝██╔══██╗ //
-// ██║   ██║██╔██╗ ██║██████╔╝██║   ██║██████╔╝   ██║   █████╗  ██║  ██║ //
-// ██║   ██║██║╚██╗██║██╔═══╝ ██║   ██║██╔══██╗   ██║   ██╔══╝  ██║  ██║ //
-// ╚██████╔╝██║ ╚████║██║     ╚██████╔╝██║  ██║   ██║   ███████╗██████╔╝ //
-//  ╚═════╝ ╚═╝  ╚═══╝╚═╝      ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═════╝  //
-///////////////////////////////////////////////////////////////////////////
-
-//
-// FLUID
-//
-  typedef struct {
-    u32 next_unprocessed_index;
-    u32 grid_size;
-  } EulerianFluidSystem;
-
-dn_gen_arena_handle_t lf_create(u32 num_particles);
-void lf_destroy(dn_gen_arena_handle_t handle);
-void lf_destroy_all();
-void lf_init(dn_gen_arena_handle_t handle);
-void lf_inspect(dn_gen_arena_handle_t handle);
-void lf_set_volume(dn_gen_arena_handle_t handle, float ax, float ay, float bx, float by, float radius);
-void lf_set_velocity(dn_gen_arena_handle_t handle, float x, float y);
-void lf_set_smoothing_radius(dn_gen_arena_handle_t handle, float r);
-void lf_set_particle_mass(dn_gen_arena_handle_t handle, float mass);
-void lf_set_viscosity(dn_gen_arena_handle_t handle, float viscosity);
-void lf_set_pressure(dn_gen_arena_handle_t handle, float pressure);
-void lf_set_gravity(dn_gen_arena_handle_t handle, float gravity);
-void lf_set_timestep(dn_gen_arena_handle_t handle, float dt);
-void lf_bind(dn_gen_arena_handle_t handle);
-void lf_update(dn_gen_arena_handle_t handle);
-void lf_draw(dn_gen_arena_handle_t handle);
-
-dn_gen_arena_handle_t ef_create(u32 grid_size);
-void ef_destroy(dn_gen_arena_handle_t handle);
-void ef_destroy_all();
-void ef_init(dn_gen_arena_handle_t handle);
-void ef_inspect(dn_gen_arena_handle_t handle);
-u32 ef_pair_to_index(u32 grid_size, u32 x, u32 y);
-void ef_set_render_size(dn_gen_arena_handle_t handle, u32 size);
-void ef_set_velocity(dn_gen_arena_handle_t handle, u32 x, u32 y, float vx, float vy);
-void ef_clear_density_source(dn_gen_arena_handle_t handle);
-void ef_set_density_source(dn_gen_arena_handle_t handle, u32 x, u32 y, float amount);
-void ef_set_gauss_seidel(dn_gen_arena_handle_t handle, u32 iterations);
-void ef_bind(dn_gen_arena_handle_t handle);
-void ef_update(dn_gen_arena_handle_t handle);
-void ef_draw(dn_gen_arena_handle_t handle);
 
 
 // SCREENSHOTS
@@ -1663,7 +1706,6 @@ function doublenickel.init_phase_0()
   end
   if type_mismatch then 
     ffi.C.dn_app_set_exit_game() -- Technically useless, since the game will explode without bootstrapping
-    return 
   end
 
   -- Bootstrap the engine paths, so we can load the rest of the scripts
@@ -1759,9 +1801,9 @@ function doublenickel.init_phase_1()
   doublenickel.texture.load()
   doublenickel.background.load()
   doublenickel.dialogue.init()
-  doublenickel.audio.init()
-  doublenickel.gui.init()
-  doublenickel.scene.init()
+  -- doublenickel.audio.init()
+  -- doublenickel.gui.init()
+  -- doublenickel.scene.init()
   doublenickel.asset.init()
 end
 

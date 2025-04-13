@@ -34,7 +34,7 @@ function imgui.internal.init_lua_api()
   
   local function ffi_or_stub(fn_name)
     if not exists_in_ffi(fn_name) then
-      log.warn('CImGui function was not exported; fn = %s', fn_name)
+      -- log.warn('CImGui function was not exported; fn = %s', fn_name)
       return function() end
     end
   
