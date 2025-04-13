@@ -9,13 +9,13 @@ DN_IMP void        dn_path_normalize_std(std::string& str);
 DN_API void        dn_path_from_cstr(dn_path_t path, const char* a);
 DN_API dn_string_t dn_path_strip_extension(const char* file_name);
 DN_API dn_string_t dn_path_extract_file_name(const char* full_path);
+DN_API dn_string_t dn_path_string_view(dn_path_t path);
 DN_API char*       dn_string_16_to_8(u16* str, u32 length);
 DN_IMP bool        dn_path_is_extension(std::string_view str, dn_string_t extension);
 
 namespace path_util {
 	bool is_lua(std::string_view str);
 }
-
 
 #endif
 
@@ -72,6 +72,13 @@ dn_string_t dn_path_extract_file_name(const char* full_path) {
 		.data = (u8*)dn_cstr_copy(full_path + index, &dn_allocators.bump),
 		.len = (u32)(size - index)
 	};
+}
+
+dn_string_t dn_path_string_view(dn_path_t path) {
+  return {
+    .data = (u8*)path,
+    .len = dn_cstr_len(path)
+  };
 }
 
 char* dn_string_16_to_8(u16* str, u32 length) {

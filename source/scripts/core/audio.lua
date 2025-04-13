@@ -145,7 +145,7 @@ end
 -- INTERNALS --
 ---------------
 function doublenickel.audio.init()
-  doublenickel.dn_log('doublenickel.audio.init')
+  dn.log('doublenickel.audio.init')
   
   doublenickel.audio.internal = {
     deferred_stop = {},

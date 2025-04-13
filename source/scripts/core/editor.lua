@@ -3,14 +3,6 @@ local self = doublenickel.editor
 ----------------
 -- PUBLIC API --
 ----------------
-EditorFonts = doublenickel.enum.define(
-  'EditorFonts',
-  {
-    Regular = 0,
-    Bold = 1,
-  }
-)
-
 EditorConfig = doublenickel.class.define('EditorConfig')
 function EditorConfig:init(params)
   self.grid_enabled = params.grid_enabled
@@ -19,8 +11,35 @@ function EditorConfig:init(params)
   self.game_views = params.game_views or {}
   self.scene = params.scene or 'default'
   self.layout = params.layout or 'default'
-  self.render_pass = params.render_pass
-  self.command_buffer = params.command_buffer
+
+  if params.render_pass then
+    self.render_pass = params.render_pass
+    self.command_buffer = params.command_buffer
+  else
+    dn.gpu_render_target_create(GpuRenderTargetDescriptor:new({
+      name = DnRenderTargets.Editor,
+      size = Vector2:new(1024, 576)
+    }))
+    self.render_pass = GpuRenderPass:new({
+      color = {
+        attachment = DnRenderTargets.Editor,
+        load = GpuLoadOp.Clear
+      }
+    })
+    self.command_buffer = dn.gpu_command_buffer_create(GpuCommandBufferDescriptor:new({
+      max_commands = 1024
+    }))
+
+    table.insert(self.game_views, GameView:new(
+      'Editor View',
+      DnRenderTargets.Editor,
+      GameViewSize.ExactSize, Vector2:new(1024, 576),
+      GameViewPriority.Main
+    ))
+  end
+
+  doublenickel.asset.register_cast(DnRenderTargets, 'dn_gpu_render_target_t')
+
   self.fonts = {
     regular = params.fonts and params.fonts.regular or 'inconsolata',
     bold = params.fonts and params.fonts.bold or 'inconsolata-extrabold',
@@ -28,8 +47,62 @@ function EditorConfig:init(params)
   }
 end
 
+function doublenickel.editor.init()
+  doublenickel.dn_log('doublenickel.editor.init')
+
+  EditorFonts = doublenickel.enum.define(
+    'EditorFonts',
+    {
+      Regular = 0,
+      Bold = 1,
+    }
+  )
+
+  DnRenderTargets = doublenickel.enum.define(
+    'DnRenderTargets',
+    {
+      Editor = 0
+    }
+  )
+
+  self.focus_state = {}
+  self.hover_state = {}
+  self.window_stack = doublenickel.data_types.stack:new()
+
+  doublenickel.editor.entities = {}
+  for name, class in pairs(doublenickel.editor.types) do
+    doublenickel.editor.entities[name] = class:new()
+  end
+
+  doublenickel.editor.colors = {
+    main_list = doublenickel.colors.white:copy(),
+    cdata_member = doublenickel.colors.red:copy(),
+    lua_member = doublenickel.colors.green:copy(),
+    scalar = doublenickel.colors.zomp:copy(),
+  }
+end
+
+function doublenickel.editor.update()
+  dn.gpu_begin_render_pass(self.config.command_buffer, self.config.render_pass)
+  for editor in doublenickel.iterator.values(doublenickel.editor.entities) do
+    editor:update()
+    editor:draw()
+  end
+
+  dn.gpu_set_world_space(self.config.command_buffer, true)
+  local camera = self.find('EditorCamera').offset:to_ctype()
+  dn.gpu_set_camera(self.config.command_buffer, camera)
+  dn.coord_set_camera(camera.x, camera.y)
+  dn.sdf_renderer_draw(self.sdf, self.config.command_buffer)
+  dn.gpu_end_render_pass(self.config.command_buffer)
+  dn.gpu_command_buffer_submit(self.config.command_buffer)
+end
+
 function doublenickel.editor.configure(config)
   self.config = config
+
+  self.sdf = ffi.new('dn_sdf_renderer_t [1]');
+  self.sdf = dn.sdf_renderer_create(1024 * 1024)
 
   doublenickel.editor.find('EditorUtility').enabled.grid = config.grid_enabled
   doublenickel.editor.find('EditorUtility').style.grid.size = config.grid_size
@@ -42,7 +115,6 @@ function doublenickel.editor.configure(config)
   doublenickel.editor.find('SceneEditor'):load(config.scene)
   dn.imgui_load_layout(config.layout)
 end
-
 
 function doublenickel.editor.define(name)
   local class = doublenickel.class.define(name)
@@ -186,7 +258,8 @@ end
 
 function doublenickel.editor.ignore_field(t, field)
   ensure_editor_metadata(t, doublenickel.editor.MetadataKind.Ignore)
-  t[doublenickel.editor.sentinel].ignore[field] = true
+  local metadata = find_metadata(t, doublenickel.editor.MetadataKind.Ignore)
+  metadata[field] = true
 end
 
 function doublenickel.editor.is_ignoring_field(t, field)
@@ -244,33 +317,3 @@ doublenickel.editor.layers = {
   colliders = 110,
   collider_overlay = 120,
 }
-
-
---------------
--- INTERNAL --
---------------
-function doublenickel.editor.init()
-  doublenickel.dn_log('doublenickel.editor.init')
-  self.focus_state = {}
-  self.hover_state = {}
-  self.window_stack = doublenickel.data_types.stack:new()
-
-  doublenickel.editor.entities = {}
-  for name, class in pairs(doublenickel.editor.types) do
-    doublenickel.editor.entities[name] = class:new()
-  end
-
-  doublenickel.editor.colors = {
-    main_list = doublenickel.colors.white:copy(),
-    cdata_member = doublenickel.colors.red:copy(),
-    lua_member = doublenickel.colors.green:copy(),
-    scalar = doublenickel.colors.zomp:copy(),
-  }
-end
-
-function doublenickel.editor.update()
-  for editor in doublenickel.iterator.values(doublenickel.editor.entities) do
-    editor:update()
-    editor:draw()
-  end
-end

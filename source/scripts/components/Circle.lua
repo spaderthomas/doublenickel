@@ -63,8 +63,15 @@ end
 
 function ColliderCircle:show(color)
   color = color or doublenickel.colors.red
+  doublenickel.editor.sdf:circle({
+    position = self.position,
+    color = color,
+    rotation = 0,
+    edge_thickness = 1.0,
+    radius = self.radius
+  })
   --doublenickel.ffi.draw_quad(self.position.x, self.position.y, self.radius, self.radius, color)
-  doublenickel.ffi.draw_circle_sdf(self.position.x, self.position.y, self.radius, doublenickel.color_to_vec4(color), 1)
+  -- doublenickel.ffi.draw_circle_sdf(self.position.x, self.position.y, self.radius, doublenickel.color_to_vec4(color), 1)
 end
 
 function ColliderCircle:is_point_inside(point)

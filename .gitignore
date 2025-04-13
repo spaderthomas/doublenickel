@@ -6,13 +6,5 @@
 **/*.luac
 **/.DS_Store
 **/__pycache__
-asset/blender/virtual_environment
-build/windows/enc_temp_folder
-build/windows/bytecode
-build/windows/x64
-build/windows/.vs
-build/windows/DeepCopy
-build/windows/doublenickel.vcxproj.user
-build/linux/firmament
-build/steam
-src/build_info.hpp
+examples/**/build/*
+!examples/**/build/build.bat

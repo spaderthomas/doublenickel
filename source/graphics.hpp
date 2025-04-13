@@ -760,7 +760,8 @@ void dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
           .view = command_buffer->render.world_space ? 
             HMM_Translate(HMM_V3(-command_buffer->render.camera.x, -command_buffer->render.camera.y, 0.f)) :
             HMM_M4D(1.0),
-          .projection = HMM_Orthographic_RH_NO(0, target->size.x, 0, target->size.y, DN_GPU_NEAR_PLANE, DN_GPU_FAR_PLANE),
+           .projection = HMM_Orthographic_RH_NO(0, target->size.x, 0, target->size.y, DN_GPU_NEAR_PLANE, DN_GPU_FAR_PLANE),
+          //.projection = HMM_Orthographic_RH_NO(0, window.native_resolution.x, 0, window.native_resolution.y, DN_GPU_NEAR_PLANE, DN_GPU_FAR_PLANE),
           .camera = command_buffer->render.camera,
           .native_resolution = window.native_resolution,
           .output_resolution = target->size,

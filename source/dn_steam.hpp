@@ -50,6 +50,10 @@ DN_IMP void                        dn_steam_shutdown();
 
 #ifdef DN_STEAM_IMPLEMENTATION
 void dn_steam_init(dn_steam_config_t config) {
+  if (!config.app_id) {
+    dn_log("%s: No App ID specified, skipping Steam initialization", __func__);
+  }
+  
   dn_steam.app_id = config.app_id;
   dn_steam.state = DN_STEAM_INIT_NONE;
   dn_steam.text_input.state = DN_STEAM_INPUT_TEXT_UNINITIALIZED;

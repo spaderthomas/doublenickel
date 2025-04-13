@@ -818,6 +818,7 @@ void create_sprite_ex(Sprite* sprite, const char* id, u8* data, i32 width, i32 h
 /////////////////
 
 void init_screenshots() {
+  DN_BROKEN();
   auto screenshots = dn_paths_resolve("screenshots");
   if (!std::filesystem::exists(screenshots)) return;
   for (directory_iterator it(screenshots); it != directory_iterator(); ++it) {

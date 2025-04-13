@@ -9,7 +9,7 @@ function doublenickel.dialogue.init()
   end
   doublenickel.callback.register('debug', on_unknown_callback)
 
-  local info = dn.paths_resolve('character_info'):to_interned()
+  local info = dn.paths_resolve('character_info')
   if dn.os_does_path_exist(info) then
     doublenickel.dialogue.characters = doublenickel.module.read_from_named_path('character_info')
   else
@@ -51,7 +51,7 @@ function doublenickel.dialogue.save(name, data, pretty)
     serialized_data.nodes[uuid] = node:serialize()
   end
 
-  local file_path = dn.paths_resolve_format('dialogue_source', name):to_interned()
+  local file_path = dn.paths_resolve_format('dialogue_source', name)
   doublenickel.module.write(file_path, serialized_data, doublenickel.module.WriteOptions.Pretty)
 
   -- The cache always reflects what is on disk; so, if we update the copy on disk at runtime,
@@ -97,9 +97,9 @@ end
 function doublenickel.dialogue.list()
   local dialogues = {}
   
-  local directory = dn.paths_resolve('dialogues'):to_interned()
+  local directory = dn.paths_resolve('dialogues')
 	for entry in doublenickel.filesystem.iterate_directory(directory) do
-    table.insert(dialogues, entry.file_path:to_interned())
+    table.insert(dialogues, entry.file_path)
 	end
   return dialogues
 end
@@ -132,7 +132,7 @@ end
 
 function doublenickel.dialogue.cache:reload_single(name_or_path)
   local file_name = doublenickel.dialogue.clean_name(name_or_path)
-  local file_path = dn.paths_resolve_format('dialogue_source', file_name):to_interned()
+  local file_path = dn.paths_resolve_format('dialogue_source', file_name)
   doublenickel.dialogue.data[file_name] = doublenickel.module.read(file_path)
 end
 

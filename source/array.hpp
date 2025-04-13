@@ -7,7 +7,7 @@ template<typename T, u64 N = 0>
 struct dn_array_t {
 	u64 size      = 0;
 	u64 capacity  = 0;
-	T* data         = nullptr;
+	T* data       = nullptr;
 
 	T* operator[](u64 index) { DN_ASSERT(index < size); return data + index; }
 	operator bool() { return data; }

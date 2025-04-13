@@ -1,5 +1,5 @@
 function doublenickel.background.load()
-	local info = dn.paths_resolve('background_info'):to_interned()
+	local info = dn.paths_resolve('background_info')
   if dn.os_does_path_exist(info) then
 		doublenickel.background.data = doublenickel.module.read_from_named_path('background_info')
 	else

@@ -1,6 +1,6 @@
 GameView = doublenickel.class.define('GameView')
 
-doublenickel.enum.define(
+GameViewSize = doublenickel.enum.define(
   'GameViewSize',
   {
     Force_16_9 = 0,
@@ -8,7 +8,7 @@ doublenickel.enum.define(
   }
 )
 
-doublenickel.enum.define(
+GameViewPriority = doublenickel.enum.define(
   'GameViewPriority',
   {
     Standard = 0,

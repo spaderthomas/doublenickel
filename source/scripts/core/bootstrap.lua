@@ -20,12 +20,22 @@ local ffi_header = [[
 ////////////////////////////////////////////////
    
 
-typedef uint8_t u8;
+typedef int8_t   s8;
+typedef int16_t  s16;
+typedef int32_t  s32;
+typedef int64_t  s64;
+
+typedef uint8_t  u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
-typedef int32_t  i32;
+typedef uint64_t u64;
+
 typedef float f32;
 typedef double f64;
+
+typedef u64 dn_hash_t;
+
+typedef char dn_asset_name_t [64];
 
 typedef struct {
   float x;
@@ -46,6 +56,11 @@ typedef struct {
 } dn_vector4_t;
 
 typedef struct {
+  s32 x;
+  s32 y;
+} dn_vector2i_t;
+
+typedef struct {
   float data [2] [2];
 } dn_matrix2_t;
 
@@ -56,17 +71,6 @@ typedef struct {
 typedef struct {
   float data [4] [4];
 } dn_matrix4_t;
-
-// These are just in Lua, so I can add a metatype to returned strings for a nice interning API.
-// dn_tstring_t is a temporary string; i.e., one allocated with temporary storage. There's nothing different
-// about the underlying data, it's just a hint to the programmer to not hold onto this pointer.
-typedef struct {
-  char* data;
-} dn_tstring_t;
-
-typedef struct {
-  char* data;
-} string;
 
 typedef char dn_asset_name_t [64]; // [DN_ASSET_NAME_LEN];
 typedef char dn_path_t [256]; // [DN_MAX_PATH_LEN];
@@ -95,8 +99,8 @@ void*            dn_allocator_realloc(dn_allocator_t* allocator, void* memory, u
 void             dn_allocator_free(dn_allocator_t* allocator, void* buffer);
 
 typedef struct {
-  u8* data;
   u32 len;
+  u8* data;
 } dn_string_t;
 
 
@@ -178,8 +182,7 @@ bool                         dn_os_is_memory_equal(const void* a, const void* b,
 void                         dn_os_fill_memory(void* buffer, u32 buffer_size, void* fill, u32 fill_size);
 void                         dn_os_fill_memory_u8(void* buffer, u32 buffer_size, u8 fill);
 void                         dn_os_zero_memory(void* buffer, u32 buffer_size);
-
-
+u64                          dn_os_time_since_epoch();
 
 
 //////////////////////////////////////////////////////
@@ -201,26 +204,24 @@ typedef struct {
   u32 count;
 } dn_type_info_list_t;
 
-void                dn_engine_set_exit_game();
-const char*         dn_engine_get_game_hash();
-void                dn_engine_set_target_fps(double fps);
-double              dn_engine_get_target_fps();
-bool                dn_engine_exceeded_frame_time();
-bool                dn_engine_should_exit();
-dn_type_info_list_t dn_engine_query_types();
+void                dn_app_set_exit_game();
+const char*         dn_app_get_game_hash();
+void                dn_app_set_target_fps(double fps);
+double              dn_app_get_target_fps();
+bool                dn_app_exceeded_frame_time();
+bool                dn_app_should_exit();
+dn_type_info_list_t dn_app_query_types();
 
 
-void   dn_time_metric_add(const char* name);
-void   dn_time_metric_begin(const char* name);
-void   dn_time_metric_end(const char* name);
-double dn_time_metric_average(const char* name);
-double dn_time_metric_last(const char* name);
-double dn_time_metric_largest(const char* name);
-double dn_time_metric_smallest(const char* name);
-
+//  ██████╗  █████╗ ████████╗██╗  ██╗███████╗
+//  ██╔══██╗██╔══██╗╚══██╔══╝██║  ██║██╔════╝
+//  ██████╔╝███████║   ██║   ███████║███████╗
+//  ██╔═══╝ ██╔══██║   ██║   ██╔══██║╚════██║
+//  ██║     ██║  ██║   ██║   ██║  ██║███████║
+//  ╚═╝     ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚══════╝
 typedef struct {
-  const char* name;
-  const char* path;
+  dn_string_t name;
+  dn_string_t path;
 } dn_named_path_t;
 
 typedef struct {
@@ -229,13 +230,19 @@ typedef struct {
 } dn_named_path_result_t;
 
 dn_named_path_result_t dn_paths_find_all();
-void                   dn_paths_add_install_subpath(const char* name, const char* relative_path);
-void                   dn_paths_add_engine_subpath(const char* name, const char* relative_path);
-void                   dn_paths_add_write_subpath(const char* name, const char* relative_path);
-void                   dn_paths_add_subpath(const char* name, const char* parent_name, const char* relative_path);
-dn_tstring_t           dn_paths_resolve(const char* name);
-dn_tstring_t           dn_paths_resolve_format(const char* name, const char* file_name);
-
+void                   dn_paths_add_install_subpath(dn_string_t name, dn_string_t relative_path);
+void                   dn_paths_add_write_subpath(dn_string_t name, dn_string_t relative_path);
+void                   dn_paths_add_engine_subpath(dn_string_t name, dn_string_t relative_path);
+void                   dn_paths_add_app_subpath(dn_string_t name, dn_string_t relative_path);
+void                   dn_paths_add_subpath(dn_string_t name, dn_string_t parent_name, dn_string_t relative_path);
+dn_string_t            dn_paths_resolve(dn_string_t name);
+dn_string_t            dn_paths_resolve_cstr(const char* name);
+dn_string_t            dn_paths_resolve_format(dn_string_t name, dn_string_t file_name);
+dn_string_t            dn_paths_resolve_format_cstr(const char* name, const char* file_name);
+dn_string_t            dn_paths_resolve_ex(dn_string_t name, dn_allocator_t* allocator);
+dn_string_t            dn_paths_resolve_format_ex(dn_string_t name, dn_string_t file_name, dn_allocator_t* allocator);
+dn_string_t            dn_paths_strip(dn_string_t name, dn_string_t absolute_path);
+void                   dn_paths_add_ex(dn_string_t name, dn_string_t absolute_path);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -262,13 +269,112 @@ void dn_fixed_array_clear(dn_fixed_array_t* vertex_buffer);
 u32  dn_fixed_array_byte_size(dn_fixed_array_t* vertex_buffer);
 u8*  dn_fixed_array_at(dn_fixed_array_t* vertex_buffer, u32 index);
 
+//////////
+// POOL //
+//////////
 typedef struct {
-  i32 index;
-  i32 generation;
-} dn_gen_arena_handle_t;
+  u32 index;
+  u32 generation;
+} dn_pool_handle_t;
+
+typedef struct {
+  s32 next_free;
+  u32 generation;
+  bool occupied;
+} dn_pool_slot_t;
+
+typedef struct {
+  u8* data;
+  dn_pool_slot_t* slots;
+  u32 element_size;
+  u32 capacity;
+  s32 free_list;
+} dn_pool_t;
+
+typedef struct {
+  u32 index;
+  dn_pool_t* pool;
+} dn_pool_iterator_t;
+
+void               dn_pool_init(dn_pool_t* pool, u32 capacity, u32 element_size);
+dn_pool_handle_t   dn_pool_insert(dn_pool_t* pool, void* value);
+dn_pool_handle_t   dn_pool_reserve(dn_pool_t* pool);
+void               dn_pool_remove(dn_pool_t* pool, dn_pool_handle_t handle);
+bool               dn_pool_contains(dn_pool_t* pool, dn_pool_handle_t handle);
+void               dn_pool_clear(dn_pool_t* pool);
+dn_pool_handle_t   dn_pool_invalid_handle();
+bool               dn_pool_is_handle_valid(dn_pool_handle_t handle);
+bool               dn_pool_slot_has_next_free(dn_pool_slot_t* slot);
+bool               dn_pool_slot_is_match(dn_pool_slot_t* slot, dn_pool_handle_t handle);
+dn_pool_iterator_t dn_pool_iterator_init(dn_pool_t* pool);
+void               dn_pool_iterator_next(dn_pool_iterator_t* it);
+bool               dn_pool_iterator_done(dn_pool_iterator_t* it);
 
 void dn_cstr_copy(const char* str, char* buffer, u32 buffer_length);
 void dn_cstr_copy_n(const char* str, u32 length, char* buffer, u32 buffer_length);
+
+
+/////////////////
+// RING BUFFER //
+/////////////////
+typedef struct {
+	u8* data;
+  u32 element_size;
+	u32 head;
+	u32 size;
+	u32 capacity;
+} dn_ring_buffer_t;
+
+typedef struct {
+	u32 index;
+	bool reverse;
+	dn_ring_buffer_t* buffer;
+} dn_ring_buffer_iterator_t;
+
+void*                     dn_ring_buffer_at(dn_ring_buffer_t* buffer, u32 index);
+void                      dn_ring_buffer_init(dn_ring_buffer_t* buffer, u32 capacity, u32 element_size);
+void*                     dn_ring_buffer_back(dn_ring_buffer_t* buffer);
+void*                     dn_ring_buffer_push(dn_ring_buffer_t* buffer, void* data);
+void*                     dn_ring_buffer_push_zero(dn_ring_buffer_t* buffer);
+void*                     dn_ring_buffer_push_overwrite(dn_ring_buffer_t* buffer, void* data);
+void*                     dn_ring_buffer_push_overwrite_zero(dn_ring_buffer_t* buffer);
+void*                     dn_ring_buffer_pop(dn_ring_buffer_t* buffer);
+u32                       dn_ring_buffer_bytes(dn_ring_buffer_t* buffer);
+void                      dn_ring_buffer_clear(dn_ring_buffer_t* buffer);
+bool                      dn_ring_buffer_is_full(dn_ring_buffer_t* buffer);
+bool                      dn_ring_buffer_is_empty(dn_ring_buffer_t* buffer);
+void*                     dn_ring_buffer_iter_deref(dn_ring_buffer_iterator_t* it);
+void                      dn_ring_buffer_iter_next(dn_ring_buffer_iterator_t* it);
+void                      dn_ring_buffer_iter_prev(dn_ring_buffer_iterator_t* it);
+bool                      dn_ring_buffer_iter_done(dn_ring_buffer_iterator_t* it);
+dn_ring_buffer_iterator_t dn_ring_buffer_iter(dn_ring_buffer_t* buffer);
+dn_ring_buffer_iterator_t dn_ring_buffer_riter(dn_ring_buffer_t* buffer);
+
+
+// ████████╗██╗███╗   ███╗███████╗██████╗ ███████╗
+// ╚══██╔══╝██║████╗ ████║██╔════╝██╔══██╗██╔════╝
+//    ██║   ██║██╔████╔██║█████╗  ██████╔╝███████╗
+//    ██║   ██║██║╚██╔╝██║██╔══╝  ██╔══██╗╚════██║
+//    ██║   ██║██║ ╚═╝ ██║███████╗██║  ██║███████║
+//    ╚═╝   ╚═╝╚═╝     ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝
+typedef struct {
+	dn_ring_buffer_t queue;
+	f64 time_begin;
+} dn_time_metric_t;
+
+void              dn_time_metric_init(dn_time_metric_t* metric);
+void              dn_time_metric_begin_ex(dn_time_metric_t* metric);
+void              dn_time_metric_end_ex(dn_time_metric_t* metric);
+f64               dn_time_metric_average(dn_time_metric_t* metric);
+f64               dn_time_metric_last(dn_time_metric_t* metric);
+f64               dn_time_metric_largest(dn_time_metric_t* metric);
+f64               dn_time_metric_smallest(dn_time_metric_t* metric);
+void              dn_time_metric_busy_wait(dn_time_metric_t* metric, f64 target);
+void              dn_time_metric_sleep_wait(dn_time_metric_t* metric, f64 target);
+void              dn_time_metric_begin(dn_string_t name);
+void              dn_time_metric_end(dn_string_t name);
+dn_time_metric_t* dn_time_metrics_find(dn_string_t name);
+void              dn_time_metrics_add(dn_string_t name);
 
 
 ///////////////////////////////////////////
@@ -279,7 +385,6 @@ void dn_cstr_copy_n(const char* str, u32 length, char* buffer, u32 buffer_length
 // ██║  ██║╚██████╔╝██████╔╝██║╚██████╔╝ //
 // ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝ ╚═════╝  //
 ///////////////////////////////////////////
-
 typedef enum {
   DN_AUDIO_FILTER_MODE_FIRST_ORDER = 0,
   DN_AUDIO_FILTER_MODE_BUTTERWORTH = 1,
@@ -288,49 +393,76 @@ typedef enum {
 typedef struct {
   dn_audio_filter_mode_t mode;
   bool enabled;
-  float cutoff_frequency;
-  float cutoff_alpha;
-  float a0, a1, a2, b1, b2;
-  float input_history [2];
-  float output_history [2];
+  f32 cutoff_frequency;
+  f32 cutoff_alpha;
+  f32 a0, a1, a2, b1, b2;
+  f32 input_history [2];
+  f32 output_history [2];
 } dn_low_pass_filter_t;
 
 typedef struct {
-  float threshold;
-  float ratio;
-  float attack_time;
-  float release_time;
+  f32 threshold;
+  f32 ratio;
+  f32 attack_time;
+  f32 release_time;
   bool enabled;
 } dn_compressor_t;
+
+typedef dn_pool_handle_t dn_audio_info_handle_t;
+typedef struct {
+  dn_asset_name_t name;
+  dn_hash_t hash;
+  u32 num_channels;
+  u32 sample_rate;
+  u64 num_frames;
+  u32 num_samples;
+  f32* samples;
+  u32 generation;
+  double file_mod_time;
+} dn_audio_info_t;
+
+typedef dn_pool_handle_t dn_audio_instance_handle_t;
+typedef struct {
+  dn_audio_info_handle_t info;
+  dn_audio_instance_handle_t next;
+  u32 next_sample;
+  bool loop;
+  f32 volume;
+  dn_low_pass_filter_t filter;
+  bool paused;
+  s32 sample_buffer_offset;
+  s32 samples_from_next;
+  
+  bool occupied;
+  u32 generation;
+} dn_audio_instance_t;
 
 typedef struct {
   dn_path_t* dirs;
   u32 num_dirs;
   dn_compressor_t compressor;
   dn_low_pass_filter_t filter;
-  float sample_frequency;
-  float master_volume;
-  float master_volume_mod;
+  f32 sample_frequency;
+  f32 master_volume;
+  f32 master_volume_mod;
 } dn_audio_config_t;
 
-typedef dn_gen_arena_handle_t dn_audio_instance_handle_t;
-
-void                       dn_audio_set_compressor_threshold(float t);
-void                       dn_audio_set_compressor_ratio(float v);
-void                       dn_audio_set_compressor_attack(float v);
-void                       dn_audio_set_compressor_release(float v);
-void                       dn_audio_set_sample_rate(float v);
-float                      dn_audio_get_master_volume();
-void                       dn_audio_set_master_volume(float v);
-float                      dn_audio_get_master_volume_mod();
-void                       dn_audio_set_master_volume_mod(float v);
-float                      dn_audio_get_master_filter_cutoff();
-void                       dn_audio_set_master_filter_cutoff(float v);
+void                       dn_audio_set_compressor_threshold(f32 t);
+void                       dn_audio_set_compressor_ratio(f32 v);
+void                       dn_audio_set_compressor_attack(f32 v);
+void                       dn_audio_set_compressor_release(f32 v);
+void                       dn_audio_set_sample_rate(f32 v);
+f32                        dn_audio_get_master_volume();
+void                       dn_audio_set_master_volume(f32 v);
+f32                        dn_audio_get_master_volume_mod();
+void                       dn_audio_set_master_volume_mod(f32 v);
+f32                        dn_audio_get_master_filter_cutoff();
+void                       dn_audio_set_master_filter_cutoff(f32 v);
 void                       dn_audio_set_master_filter_cutoff_enabled(bool enabled);
 void                       dn_audio_set_master_filter_mode(dn_audio_filter_mode_t mode);
-void                       dn_audio_set_volume(dn_audio_instance_handle_t handle, float volume);
-void                       dn_audio_set_filter_cutoff(dn_audio_instance_handle_t handle, float cutoff);
-void                       dn_audio_set_filter_mode(dn_audio_instance_handle_t handle, float cutoff);
+void                       dn_audio_set_volume(dn_audio_instance_handle_t handle, f32 volume);
+void                       dn_audio_set_filter_cutoff(dn_audio_instance_handle_t handle, f32 cutoff);
+void                       dn_audio_set_filter_mode(dn_audio_instance_handle_t handle, dn_audio_filter_mode_t mode);
 void                       dn_audio_set_filter_enabled(dn_audio_instance_handle_t handle, bool enabled);
 dn_audio_instance_handle_t dn_audio_play_sound(const char* name);
 dn_audio_instance_handle_t dn_audio_play_looped(const char* name);
@@ -342,11 +474,21 @@ void                       dn_audio_resume(dn_audio_instance_handle_t handle);
 bool                       dn_audio_is_playing(dn_audio_instance_handle_t handle);
 bool                       dn_audio_is_any_playing();
 void                       dn_audio_load(const char* file_path, const char* file_name);
+void                       dn_audio_load_dir(const char* path);
 void                       dn_low_pass_filter_set_mode(dn_low_pass_filter_t* filter, dn_audio_filter_mode_t mode);
-void                       dn_low_pass_filter_set_cutoff(dn_low_pass_filter_t* filter, float cutoff);
-float                      dn_low_pass_filter_apply(dn_low_pass_filter_t* filter, float input);
+void                       dn_low_pass_filter_set_cutoff(dn_low_pass_filter_t* filter, f32 cutoff);
+f32                        dn_low_pass_filter_apply(dn_low_pass_filter_t* filter, f32 input);
 dn_audio_config_t          dn_audio_config_default();
 void                       dn_audio_init(dn_audio_config_t config);
+void                       dn_audio_update(f32* buffer, int frames_requested, int num_channels);
+void                       dn_audio_shutdown();
+dn_audio_info_t*           dn_audio_find(dn_string_t name);
+dn_audio_info_t*           dn_audio_find_no_default(dn_string_t name);
+dn_audio_info_t*           dn_audio_resolve(dn_audio_info_handle_t handle);
+dn_audio_instance_t*       dn_audio_resolve_instance(dn_audio_instance_handle_t handle);
+dn_audio_instance_handle_t dn_audio_reserve();
+dn_audio_instance_handle_t dn_audio_play_sound_ex(dn_audio_info_t* sound, bool loop);
+void                       dn_audio_stop_ex(dn_audio_instance_t* active_sound);
 
 
 /////////////////////////////////////////////
@@ -498,12 +640,11 @@ dn_font_config_t dn_font_config_default();
 // ╚███╔███╔╝██║██║ ╚████║██████╔╝╚██████╔╝╚███╔███╔╝ //
 //  ╚══╝╚══╝ ╚═╝╚═╝  ╚═══╝╚═════╝  ╚═════╝  ╚══╝╚══╝  //
 ////////////////////////////////////////////////////////
-
 typedef enum {
-  DN_WINDOW_FLAG_NONE = 0,
-  DN_WINDOW_FLAG_WINDOWED = 1,
-  DN_WINDOW_FLAG_BORDER = 2,
-  DN_WINDOW_FLAG_VSYNC = 4
+  DN_WINDOW_FLAG_NONE,
+  DN_WINDOW_FLAG_WINDOWED,
+  DN_WINDOW_FLAG_BORDER,
+  DN_WINDOW_FLAG_VSYNC,
 } dn_window_flags_t;
 
 typedef enum {
@@ -525,22 +666,34 @@ typedef enum {
 } dn_display_mode_t;
 
 typedef struct {
-  const char* title;
-  const char* icon;
+  dn_string_t title;
+  dn_string_t icon;
   dn_display_mode_t display_mode;
   dn_vector2_t native_resolution;
   dn_window_flags_t flags;
+  u32 target_fps;
 } dn_window_config_t;
 
+typedef struct {
+  void* handle;
+  dn_window_flags_t flags;
+  dn_display_mode_t display_mode;
+  dn_vector2i_t windowed_position;
+  dn_vector2_t native_resolution;
+  dn_vector2_t requested_area;
+  dn_vector2_t content_area;
+} dn_window_t;
+
 dn_window_config_t dn_window_config_default();
-void               dn_window_init(dn_window_config_t descriptor);
+void               dn_window_init(dn_window_config_t config);
 void               dn_window_set_native_resolution(float width, float height);
-dn_vector2_t            dn_window_get_content_area();
-dn_vector2_t            dn_window_get_native_resolution();
-void               dn_window_set_icon(const char* path);
+dn_vector2_t       dn_window_get_content_area();
+dn_vector2_t       dn_window_get_native_resolution();
+void               dn_window_set_icon(dn_string_t path);
 void               dn_window_set_display_mode(dn_display_mode_t mode);
 dn_display_mode_t  dn_window_get_display_mode();
 void               dn_window_set_cursor_visible(bool visible);
+void               dn_window_set_size(int x, int y);
 
 
 
@@ -682,8 +835,8 @@ typedef union {
   dn_vector3_t vec3;
   dn_vector2_t vec2;
   float f32;
-  i32 texture;
-  i32 i32;
+  s32 texture;
+  s32 s32;
 } dn_gpu_uniform_data_t;
 
 typedef struct {
@@ -914,7 +1067,7 @@ void                     dn_gpu_memory_barrier(dn_gpu_memory_barrier_t barrier);
 void                     dn_gpu_dispatch_compute(dn_gpu_buffer_t* buffer, u32 size);
 void                     dn_gpu_swap_buffers();
 void                     dn_gpu_error_clear();
-dn_tstring_t                  dn_gpu_error_read();
+dn_string_t              dn_gpu_error_read();
 void                     dn_gpu_error_log_one();
 void                     dn_gpu_error_log_all();
 void                     dn_gpu_set_resource_name(dn_gpu_resource_id_t id, u32 handle, u32 name_len, const char* name);
@@ -1048,16 +1201,16 @@ typedef struct {
   dn_vector4_t medium_dark;
 } dn_imgui_colors_t;
 
-void    dn_imgui_push_font(const char* font_name, u32 size);
-void    dn_imgui_image(const char* image, float sx, float sy);
-void    dn_imgui_file_browser_open();
-void    dn_imgui_file_browser_close();
-void    dn_imgui_file_browser_set_work_dir(const char* directory);
-bool    dn_imgui_file_browser_is_file_selected();
-dn_tstring_t dn_imgui_file_browser_get_selected_file();
-void    dn_imgui_load_layout(const char* file_name);
-void    dn_imgui_save_layout(const char* file_name);
-void    dn_imgui_load_colors(dn_imgui_colors_t colors);
+void        dn_imgui_push_font(const char* font_name, u32 size);
+void        dn_imgui_image(const char* image, float sx, float sy);
+void        dn_imgui_file_browser_open();
+void        dn_imgui_file_browser_close();
+void        dn_imgui_file_browser_set_work_dir(const char* directory);
+bool        dn_imgui_file_browser_is_file_selected();
+dn_string_t dn_imgui_file_browser_get_selected_file();
+void        dn_imgui_load_layout(const char* file_name);
+void        dn_imgui_save_layout(const char* file_name);
+void        dn_imgui_load_colors(dn_imgui_colors_t colors);
 
 
 
@@ -1081,7 +1234,7 @@ void activate_action_set(const char* name);
 bool is_digital_active(const char* name);
 bool was_digital_active(const char* name);
 bool was_digital_pressed(const char* name);
-i32 get_action_set_cooldown();
+s32 get_action_set_cooldown();
 const char* get_active_action_set();
 
 
@@ -1227,55 +1380,6 @@ void dn_app_configure(dn_app_config_t config);
 
 
 
-///////////////////////////////////////////////////////////////////////////
-// ██╗   ██╗███╗   ██╗██████╗  ██████╗ ██████╗ ████████╗███████╗██████╗  //
-// ██║   ██║████╗  ██║██╔══██╗██╔═══██╗██╔══██╗╚══██╔══╝██╔════╝██╔══██╗ //
-// ██║   ██║██╔██╗ ██║██████╔╝██║   ██║██████╔╝   ██║   █████╗  ██║  ██║ //
-// ██║   ██║██║╚██╗██║██╔═══╝ ██║   ██║██╔══██╗   ██║   ██╔══╝  ██║  ██║ //
-// ╚██████╔╝██║ ╚████║██║     ╚██████╔╝██║  ██║   ██║   ███████╗██████╔╝ //
-//  ╚═════╝ ╚═╝  ╚═══╝╚═╝      ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═════╝  //
-///////////////////////////////////////////////////////////////////////////
-
-//
-// FLUID
-//
-  typedef struct {
-    u32 next_unprocessed_index;
-    u32 grid_size;
-  } EulerianFluidSystem;
-
-dn_gen_arena_handle_t lf_create(u32 num_particles);
-void lf_destroy(dn_gen_arena_handle_t handle);
-void lf_destroy_all();
-void lf_init(dn_gen_arena_handle_t handle);
-void lf_inspect(dn_gen_arena_handle_t handle);
-void lf_set_volume(dn_gen_arena_handle_t handle, float ax, float ay, float bx, float by, float radius);
-void lf_set_velocity(dn_gen_arena_handle_t handle, float x, float y);
-void lf_set_smoothing_radius(dn_gen_arena_handle_t handle, float r);
-void lf_set_particle_mass(dn_gen_arena_handle_t handle, float mass);
-void lf_set_viscosity(dn_gen_arena_handle_t handle, float viscosity);
-void lf_set_pressure(dn_gen_arena_handle_t handle, float pressure);
-void lf_set_gravity(dn_gen_arena_handle_t handle, float gravity);
-void lf_set_timestep(dn_gen_arena_handle_t handle, float dt);
-void lf_bind(dn_gen_arena_handle_t handle);
-void lf_update(dn_gen_arena_handle_t handle);
-void lf_draw(dn_gen_arena_handle_t handle);
-
-dn_gen_arena_handle_t ef_create(u32 grid_size);
-void ef_destroy(dn_gen_arena_handle_t handle);
-void ef_destroy_all();
-void ef_init(dn_gen_arena_handle_t handle);
-void ef_inspect(dn_gen_arena_handle_t handle);
-u32 ef_pair_to_index(u32 grid_size, u32 x, u32 y);
-void ef_set_render_size(dn_gen_arena_handle_t handle, u32 size);
-void ef_set_velocity(dn_gen_arena_handle_t handle, u32 x, u32 y, float vx, float vy);
-void ef_clear_density_source(dn_gen_arena_handle_t handle);
-void ef_set_density_source(dn_gen_arena_handle_t handle, u32 x, u32 y, float amount);
-void ef_set_gauss_seidel(dn_gen_arena_handle_t handle, u32 iterations);
-void ef_bind(dn_gen_arena_handle_t handle);
-void ef_update(dn_gen_arena_handle_t handle);
-void ef_draw(dn_gen_arena_handle_t handle);
-
 
 // SCREENSHOTS
 void take_screenshot();
@@ -1332,8 +1436,8 @@ typedef enum {
 } ParticlePositionMode;
 
 typedef struct {
-  i32 index;
-  i32 generation;
+  s32 index;
+  s32 generation;
 } ParticleSystemHandle;
 
 typedef struct {
@@ -1376,7 +1480,7 @@ void set_particle_opacity_jitter(ParticleSystemHandle handle, float jitter);
 void set_particle_jitter_opacity(ParticleSystemHandle handle, bool jitter);
 void set_particle_opacity_interpolation(ParticleSystemHandle handle, bool active, float start_time, float interpolate_to);
 void set_particle_warm(ParticleSystemHandle system, bool warm);
-void set_particle_warmup(ParticleSystemHandle system, i32 warmup);
+void set_particle_warmup(ParticleSystemHandle system, s32 warmup);
 void set_particle_gravity_source(ParticleSystemHandle handle, float x, float y);
 void set_particle_gravity_intensity(ParticleSystemHandle handle, float intensity);
 void set_particle_gravity_enabled(ParticleSystemHandle handle, bool enabled);
@@ -1401,59 +1505,15 @@ typedef enum {
   DN_LOG_FLAG_DEFAULT = 3,
 } dn_log_flags_t;
 
-//void dn_log(const char* fmt, ...);
-//void dn_log_flags(dn_log_flags_t flags, const char* fmt, ...);
+void dn_log(const char* fmt, ...);
+void dn_log_flags(dn_log_flags_t flags, const char* fmt, ...);
+void dn_log_builder(dn_string_builder_t builder);
+void dn_log_str(dn_string_t message);
 
 ]]
 
 ffi = require('ffi')
 bit = require('bit')
-
--- function doublenickel.handle_error(message)
---   -- Strip the message's filename the script filename to make it more readable
---   local parts = split(message, ' ')
---   local path = parts[1]
---   local path_elements = split(path, '/')
---   local filename = path_elements[#path_elements]
-
---   local message = filename
---   for index = 2, #parts do
---     message = message .. ' ' .. parts[index]
---   end
-
---   local stack_trace = debug.traceback()
---   stack_trace = stack_trace:gsub('stack traceback:\n', '')
---   stack_trace = stack_trace:gsub('\t', ' ')
-
---   -- The stack trace contains absolute paths, which are just hard to read. Also, if the path is long, it is
---   -- shortened with "...". Remove the absolute part of the path, including the "..."
---   local install_dir = dn.paths_resolve('install'):to_interned()
---   local escaped_install = install_dir:gsub('%.', '%%.')
---   local last_path_element = install_dir:match("([^/]+)$")
---   local pattern = '%.%.%.(.*)/' .. last_path_element
-
---   -- Replace the full path first
---   stack_trace = stack_trace:gsub(escaped_install, '')
-
---   -- Then replace any possible shortened versions with ...
---   local shortened_path_pattern = '[^%.]+%.[^%.]+%.[^%.]+%.[^%.]+%.[^%.]+'
---   stack_trace = stack_trace:gsub(pattern, '')
-
---   -- Print
---   local error_message = string.format('lua runtime error:\n\t%s', message)
---   local trace_message = string.format('stack trace:\n%s', stack_trace)
-
---   doublenickel.debug.last_error = error_message
---   doublenickel.debug.last_trace = trace_message
-
---   doublenickel.dn_log(error_message)
---   doublenickel.dn_log(trace_message)
-
---   doublenickel.debug.open_debugger(1)
---   --doublenickel.analytics.submit_crash(error_message, trace_message)
-
---   return
--- end
 
 function doublenickel.handle_error()
   local stack_trace = debug.traceback()
@@ -1462,7 +1522,7 @@ function doublenickel.handle_error()
 
   -- The stack trace contains absolute paths, which are just hard to read. Also, if the path is long, it is
   -- shortened with "...". Remove the absolute part of the path, including the "..."
-  local install_dir = dn.paths_resolve('install'):to_interned()
+  local install_dir = dn.paths_resolve('dn_install')
   local escaped_install = install_dir:gsub('%.', '%%.')
   local last_path_element = install_dir:match("([^/]+)$")
   local pattern = '%.%.%.(.*)/' .. last_path_element
@@ -1475,7 +1535,7 @@ function doublenickel.handle_error()
   stack_trace = stack_trace:gsub(pattern, '')
 
   local trace_message = string.format('stack trace:\n%s', stack_trace)
-  doublenickel.dn_log(trace_message)
+  dn.log(trace_message)
 
   doublenickel.debug.open_debugger(1)
 end
@@ -1630,7 +1690,7 @@ function doublenickel.init_phase_0()
   -- The only reason this is here is because I *have* seen MSVC generate a different size than what 
   -- the FFI reports. See the types in the header which are force aligned to 16 bytes.
   local type_mismatch = false
-  local type_infos = ffi.C.dn_engine_query_types()
+  local type_infos = ffi.C.dn_app_query_types()
   for i = 0, type_infos.count - 1 do
     local type_info = type_infos.data[i]
     local ffi_size = ffi.sizeof(ffi.string(type_info.name))
@@ -1645,8 +1705,7 @@ function doublenickel.init_phase_0()
     end
   end
   if type_mismatch then 
-    ffi.C.dn_engine_set_exit_game() -- Technically useless, since the game will explode without bootstrapping
-    return 
+    ffi.C.dn_app_set_exit_game() -- Technically useless, since the game will explode without bootstrapping
   end
 
   -- Bootstrap the engine paths, so we can load the rest of the scripts
@@ -1681,23 +1740,32 @@ function doublenickel.init_phase_0()
   
     return collected_paths
   end
-  
-  local file_path = ffi.string(ffi.C.dn_paths_resolve('dn_install').data)
+  local file_path = ffi.C.dn_paths_resolve_cstr('dn_paths')
+  local file_path = ffi.string(file_path.data, file_path.len)
   local path_info = dofile(file_path)
 
   local dn_install_paths = collect_paths(path_info.dn_install)
   for index, path in pairs(dn_install_paths) do
-    ffi.C.dn_paths_add_engine_subpath(path.name, path.path)
+    ffi.C.dn_paths_add_engine_subpath(
+      ffi.new('dn_string_t', #path.name, ffi.cast('u8*', path.name)),
+      ffi.new('dn_string_t', #path.path, ffi.cast('u8*', path.path))
+    )
   end
 
   local app_paths = collect_paths(path_info.app_paths)
   for index, path in pairs(app_paths) do
-    ffi.C.dn_paths_add_subpath(path.name, 'app', path.path)
+    ffi.C.dn_paths_add_app_subpath(
+      ffi.new('dn_string_t', #path.name, ffi.cast('u8*', path.name)),
+      ffi.new('dn_string_t', #path.path, ffi.cast('u8*', path.path))
+    )
   end
 
   local write_paths = collect_paths(path_info.write_paths)
   for index, path in pairs(write_paths) do
-    ffi.C.dn_paths_add_write_subpath(path.name, path.path)
+    ffi.C.dn_paths_add_write_subpath(
+      ffi.new('dn_string_t', #path.name, ffi.cast('u8*', path.name)),
+      ffi.new('dn_string_t', #path.path, ffi.cast('u8*', path.path))
+    )
   end
 
   -- We need a couple of files to even be able to load other files (since they
@@ -1713,8 +1781,8 @@ function doublenickel.init_phase_0()
   }
 
   for _, file_name in pairs(loader) do
-    local file_path = ffi.string(ffi.C.dn_paths_resolve_format('engine_script', file_name).data)
-    dofile(file_path)
+    local file_path = ffi.C.dn_paths_resolve_format_cstr('engine_script', file_name)
+    dofile(ffi.string(file_path.data, file_path.len))
   end
 
 
@@ -1733,9 +1801,9 @@ function doublenickel.init_phase_1()
   doublenickel.texture.load()
   doublenickel.background.load()
   doublenickel.dialogue.init()
-  doublenickel.audio.init()
-  doublenickel.gui.init()
-  doublenickel.scene.init()
+  -- doublenickel.audio.init()
+  -- doublenickel.gui.init()
+  -- doublenickel.scene.init()
   doublenickel.asset.init()
 end
 
@@ -1747,7 +1815,7 @@ function doublenickel.init_phase_2()
   doublenickel.app:on_init_game()
 
   doublenickel.window.init()
-  doublenickel.save.init()
+  -- doublenickel.save.init()
   doublenickel.editor.init()
   doublenickel.persistent.init()
 

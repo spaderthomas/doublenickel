@@ -15,7 +15,6 @@ function doublenickel.ffi.namespace(prefix)
   return namespace
 end
 
-
 function doublenickel.ffi.init()
   setmetatable(
     doublenickel.ffi,
@@ -43,12 +42,30 @@ function doublenickel.ffi.init()
     __index = {
       to_interned = function(self)
         if doublenickel.ffi.is_nil(self.data) then dbg() end
-        return ffi.string(self.data)
+        return ffi.string(self.data, self.len)
       end,
     }
   }
-  ffi.metatype('dn_tstring_t', string_metatable)
-  ffi.metatype('string', string_metatable)
+  -- ffi.metatype('dn_string_t', string_metatable)
+
+  CType = doublenickel.enum.define(
+    'ctype',
+    {
+      void = 0,
+      int = 1,
+      float = 2,
+      enum = 3,
+      constant = 4,
+      ptr = 5,
+      ref = 6,
+      array = 7,
+      struct = 8,
+      union = 9,
+      func = 10,
+      field = 11,
+      bitfield = 12
+    }
+  )
 
   Sdf = doublenickel.enum.define(
     'Sdf',
@@ -255,28 +272,12 @@ function doublenickel.ffi.init()
 end
 
 
-----------------
--- REFLECTION --
-----------------
-doublenickel.enum.define(
-  'ctype',
-  {
-    void = 0,
-    int = 1,
-    float = 2,
-    enum = 3,
-    constant = 4,
-    ptr = 5,
-    ref = 6,
-    array = 7,
-    struct = 8,
-    union = 9,
-    func = 10,
-    field = 11,
-    bitfield = 12
-  }
-)
-
+-- ██████╗ ███████╗███████╗██╗     ███████╗ ██████╗████████╗██╗ ██████╗ ███╗   ██╗
+-- ██╔══██╗██╔════╝██╔════╝██║     ██╔════╝██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║
+-- ██████╔╝█████╗  █████╗  ██║     █████╗  ██║        ██║   ██║██║   ██║██╔██╗ ██║
+-- ██╔══██╗██╔══╝  ██╔══╝  ██║     ██╔══╝  ██║        ██║   ██║██║   ██║██║╚██╗██║
+-- ██║  ██║███████╗██║     ███████╗███████╗╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║
+-- ╚═╝  ╚═╝╚══════╝╚═╝     ╚══════╝╚══════╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
 function doublenickel.ffi.is_nil(cdata)
   return cdata == nil
 end
@@ -505,19 +506,26 @@ end
 
 
 
----------------
--- METATYPES -- 
----------------
+-- ███╗   ███╗███████╗████████╗ █████╗ ████████╗██╗   ██╗██████╗ ███████╗███████╗
+-- ████╗ ████║██╔════╝╚══██╔══╝██╔══██╗╚══██╔══╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔════╝
+-- ██╔████╔██║█████╗     ██║   ███████║   ██║    ╚████╔╝ ██████╔╝█████╗  ███████╗
+-- ██║╚██╔╝██║██╔══╝     ██║   ██╔══██║   ██║     ╚██╔╝  ██╔═══╝ ██╔══╝  ╚════██║
+-- ██║ ╚═╝ ██║███████╗   ██║   ██║  ██║   ██║      ██║   ██║     ███████╗███████║
+-- ╚═╝     ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝   ╚═╝      ╚═╝   ╚═╝     ╚══════╝╚══════╝
 
 ------------
 -- STRING --
 ------------
-
 dn.String = doublenickel.class.metatype('dn_string_t')
 function dn.String:init(path)
   self.data = ffi.cast('u8*', path)
   self.len = #path
 end
+
+function dn.String:to_interned()
+  return ffi.string(self.data, self.len)
+end
+
 
 ----------------------
 -- MEMORY ALLOCATOR --
@@ -589,7 +597,6 @@ function Matrix3:serialize()
   return serialized
 end
 
-
 Matrix4 = doublenickel.class.metatype('dn_matrix4_t')
 
 function Matrix4:init(data)
@@ -614,6 +621,7 @@ function Matrix4:serialize()
   return serialized
 end
 
+
 ------------
 -- VECTOR --
 ------------
@@ -625,6 +633,10 @@ end
 
 function Vector2:scale(scalar)
   return Vector2:new(self.x * scalar, self.y * scalar)
+end
+
+function Vector2:copy()
+  return Vector2:new(self.x, self.y)
 end
 
 Vector3 = doublenickel.class.metatype('dn_vector3_t')
@@ -658,7 +670,9 @@ function Vertex:Quad(top, bottom, left, right)
 end
 
 
-
+---------------
+-- CPU BUFFER --
+---------------
 CpuBuffer = doublenickel.class.define('CpuBuffer')
 
 function CpuBuffer:init(ctype, capacity)
@@ -700,6 +714,10 @@ setmetatable(FastCpuBuffer, {
   }
 })
 
+
+-----------------------
+-- BACKED GPU BUFFER --
+-----------------------
 BackedGpuBuffer = doublenickel.class.define('BackedGpuBuffer')
 function BackedGpuBuffer:init(ctype, capacity, gpu_buffer)
   self.ctype = ctype
@@ -732,7 +750,9 @@ function BackedGpuBuffer:sync()
 end
 
 
-
+----------------
+-- GPU BUFFER --
+----------------
 GpuBuffer = doublenickel.class.define('GpuBuffer')
 
 function GpuBuffer:init(ctype, capacity, gpu_buffer)
@@ -756,6 +776,7 @@ end
 function GpuBuffer:bind_base(base)
   doublenickel.ffi.gpu_buffer_bind_base(self.buffer, base)
 end
+
 
 ---------------------
 -- GPU DESCRIPTORS --
@@ -854,7 +875,6 @@ function GpuRenderPass:init(params)
 
     doublenickel.debug.assert(not doublenickel.ffi.is_nil(self.color.attachment))
   end
-
 end
 
 GpuUniformBinding = doublenickel.class.metatype('dn_gpu_uniform_binding_t')
@@ -931,8 +951,8 @@ end
 WindowConfig = doublenickel.class.metatype('dn_window_config_t')
 function WindowConfig:init(params)
   local default = dn.window_config_default();
-  self.title = params.title or default.title
-  self.icon = params.icon or default.icon
+  self.title = dn.String:new(params.title) or default.title
+  self.icon = dn.String:new(params.icon) or default.icon
   self.native_resolution = params.native_resolution or default.native_resolution
   self.flags = params.flags or default.flags
   self.display_mode = params.display_mode or default.display_mode
@@ -1033,11 +1053,30 @@ function AppConfig:init(params)
 end
 
 
-------------------
--- FFI WRAPPERS --
-------------------
-function dn.window_get_display_mode()
-  return doublenickel.enums.DisplayMode(ffi.C.dn_window_get_display_mode())
+-- ███████╗███████╗██╗    ██╗    ██╗██████╗  █████╗ ██████╗ ██████╗ ███████╗██████╗ ███████╗
+-- ██╔════╝██╔════╝██║    ██║    ██║██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔════╝██╔══██╗██╔════╝
+-- █████╗  █████╗  ██║    ██║ █╗ ██║██████╔╝███████║██████╔╝██████╔╝█████╗  ██████╔╝███████╗
+-- ██╔══╝  ██╔══╝  ██║    ██║███╗██║██╔══██╗██╔══██║██╔═══╝ ██╔═══╝ ██╔══╝  ██╔══██╗╚════██║
+-- ██║     ██║     ██║    ╚███╔███╔╝██║  ██║██║  ██║██║     ██║     ███████╗██║  ██║███████║
+-- ╚═╝     ╚═╝     ╚═╝     ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝     ╚══════╝╚═╝  ╚═╝╚══════╝
+function dn.log(fmt, ...)
+  return ffi.C.dn_log_str(dn.String:new(string.format(fmt, ...)))
+end
+
+function dn.time_metrics_add(name)
+    return ffi.C.dn_time_metrics_add(dn.String:new(name))
+end
+
+function dn.paths_resolve(name)
+  return ffi.C.dn_paths_resolve(dn.String:new(name)):to_interned()
+end
+
+function dn.paths_resolve_format(name, file_name)
+  return ffi.C.dn_paths_resolve_format(dn.String:new(name), dn.String:new(file_name)):to_interned()
+end
+
+function dn.paths_add_subpath(name, parent_name, relative_path)
+  return ffi.C.dn_paths_add_subpath(dn.String:new(name), dn.String:new(parent_name), dn.String:new(relative_path))
 end
 
 function dn.os_scan_directory(path)
@@ -1080,13 +1119,12 @@ function dn.os_file_mod_time(path)
   return ffi.C.dn_os_file_mod_time(dn.String:new(path))
 end
 
-function dn.stuff()
-  return 69
+function dn.window_get_display_mode()
+  return doublenickel.enums.DisplayMode(ffi.C.dn_window_get_display_mode())
 end
 
 function doublenickel.ffi.set_camera()
 end
-
 
 function doublenickel.ffi.push_fullscreen_quad()
   local n = ffi.C.dn_window_get_native_resolution()

@@ -27,18 +27,20 @@ end
 
 -- IMGUI_LAYER_2
 function imgui.internal.init_lua_api()
+  cimgui_dll = ffi.load('cimgui-1.91.9-windows-x64.dll')
+
   local function exists_in_ffi(fn_name)
-    local success, fn = pcall(function() return ffi.C[fn_name] end)
+    local success, fn = pcall(function() return cimgui_dll[fn_name] end)
     return success and type(fn) == "cdata"
   end
   
   local function ffi_or_stub(fn_name)
     if not exists_in_ffi(fn_name) then
-      log.warn('CImGui function was not exported; fn = %s', fn_name)
+      log.debug('CImGui function was not exported; fn = %s', fn_name)
       return function() end
     end
   
-    return ffi.C[fn_name]
+    return cimgui_dll[fn_name]
   end
   
   -- The original code expects ImGui to be compiled into a library (...?), and so expects lib to be the result
@@ -176,7 +178,7 @@ function imgui.internal.init_lua_api_overwrites()
 		local allocator = dn.allocator_find('bump')
 		local buffer_len = len + max_chars_per_frame
 		local buffer = allocator:alloc(buffer_len)
-		dn.string_copy_n(value, len, buffer, buffer_len)
+		dn.cstr_copy_n(value, len, buffer, buffer_len)
 	
 		flags = flags or 0
 		flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiInputTextFlags_CallbackResize)

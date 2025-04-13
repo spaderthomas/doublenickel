@@ -10,7 +10,7 @@ end
 
 function doublenickel.time_metric.add(name)
   self.metrics:add(name)
-  dn.time_metric_add(name)
+  dn.time_metrics_add(name)
 end
 
 function doublenickel.time_metric.query(name)

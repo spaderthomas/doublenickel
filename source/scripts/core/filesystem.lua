@@ -36,13 +36,13 @@ end
 function doublenickel.filesystem.collect_directory(path)
   local files = {}
   for entry in doublenickel.filesystem.iterate_directory(path) do
-    table.insert(files, entry.file_name:to_interned())
+    table.insert(files, entry.file_name)
   end
 
   return files
 end
 
 function doublenickel.filesystem.collect_named_directory(name)
-  local path = dn.paths_resolve(name):to_interned()
+  local path = dn.paths_resolve(name)
   return doublenickel.filesystem.collect_directory(path)
 end

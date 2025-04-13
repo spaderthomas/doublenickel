@@ -90,18 +90,19 @@ end
 function EditorUtility:draw_grid()
   if not self.enabled.grid then return end
 
-  doublenickel.ffi.set_world_space(true)
-  doublenickel.ffi.set_layer(doublenickel.editor.layers.grid)
-
   local grid_size = self.style.grid.size
-  local line_thickness = 1
+  local line_thickness = 8
+  local edge_thickness = 0
 
-  local size = doublenickel.gpu.find(RenderTarget.Editor).size
+  local sdf = doublenickel.editor.sdf
+  local render_target = doublenickel.asset.find(DnRenderTargets.Editor)
+  local size = render_target.size
   local camera = doublenickel.editor.find('EditorCamera')
   if doublenickel.tick then
     local game_camera = doublenickel.entity.find('Camera')
     camera = game_camera or camera
   end
+
   local slop = 300
 
   local min = doublenickel.vec2(
@@ -116,29 +117,64 @@ function EditorUtility:draw_grid()
     camera.offset.y + size.y + doublenickel.math.fmod(size.y, grid_size) + slop
   )
 
+  local center = Vector2:new(
+    camera.offset.x + (render_target.size.x / 2),
+    camera.offset.y + (render_target.size.y / 2)
+  )
   if self.style.grid.draw_body then
-    local i = 0
     -- Draw vertical lines
-    for x = min.x, max.x, grid_size do  
-      i = i + 1
-      doublenickel.ffi.draw_line(x, min.y, x, max.y, line_thickness, self.colors.grid:to_vec4())
+    for x = min.x, max.x, grid_size do
+      -- ffi.C.dn_sdf_oriented_box_ex(
+      --   sdf,
+      --   x, center.y,
+      --   self.colors.grid.r, self.colors.grid.g, self.colors.grid.b,
+      --   pi / 2,
+      --   edge_thickness,
+      --   render_target.size.y,
+      --   line_thickness
+      -- )
+      sdf:oriented_box({
+        position = Vector2:new(x, center.y),
+        color = self.colors.grid,
+        rotation = doublenickel.math.pi / 2,
+        edge_thickness = edge_thickness,
+        length = render_target.size.y,
+        thickness = line_thickness
+      })
     end
 
     -- Draw horizontal lines
     for y = min.y, max.y, grid_size do
-      i = i + 1
-      doublenickel.ffi.draw_line(min.x, y, max.x, y, line_thickness, self.colors.grid:to_vec4())
+      sdf:oriented_box({ 
+        position = Vector2:new(center.x, y),
+        color = self.colors.grid,
+        rotation = 0,
+        edge_thickness = edge_thickness,
+        length = render_target.size.x,
+        thickness = line_thickness
+      })
     end
-
-
   end
 
 
   if self.style.grid.draw_axes then
-    doublenickel.ffi.draw_line(1, min.y, 1, max.y, line_thickness,
-      self.colors.axis.x:to_vec4())
-    doublenickel.ffi.draw_line(min.x, 0, max.x, 0, line_thickness,
-      self.colors.axis.y:to_vec4())
+    sdf:oriented_box({
+      position = Vector2:new(center.x, 0),
+      color = self.colors.axis.x,
+      rotation = 0,
+      edge_thickness = edge_thickness,
+      length = render_target.size.x,
+      thickness = line_thickness
+    })
+
+    sdf:oriented_box({
+      position = Vector2:new(0, center.y),
+      color = self.colors.axis.y,
+      rotation = pi / 2,
+      edge_thickness = edge_thickness,
+      length = render_target.size.y,
+      thickness = line_thickness
+    })
   end
 end
 
