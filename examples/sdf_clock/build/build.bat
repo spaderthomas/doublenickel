@@ -1,35 +1,45 @@
-@echo off
-if not defined DevEnvDir (
-  call "C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Auxiliary\Build\vcvarsall.bat" x86_amd64
-)
+@ECHO OFF
+PROMPT $G$S
 
-set "project=SdfClock"
-set "DN_EXAMPLES_DIR=..\.."
-set "PROJECT_DIR=%DN_EXAMPLES_DIR%\sdf_clock"
-set "SOURCE_DIR=%PROJECT_DIR%\source"
-set "THIRD_PARTY=%DN_EXAMPLES_DIR%\thirdparty"
+SET "DN_DIR=..\..\.."
+SET "DN_BUILD_TOOLS=%DN_DIR%\build\dn.bat"
+CALL %DN_BUILD_TOOLS%
 
-call "%THIRD_PARTY%\doublenickel\build\dn.bat"
+SET "PROJECT=SdfClock"
+SET "EXECUTABLE=%PROJECT%.exe"
+CALL %DN_BUILD_TOOLS% :NORMALIZEPATH "%DN_DIR%" DN_DIR
+CALL %DN_BUILD_TOOLS% :NORMALIZEPATH "%DN_BUILD_TOOLS%" DN_BUILD_TOOLS
+CALL %DN_BUILD_TOOLS% :NORMALIZEPATH "%DN_DIR%\examples" DN_EXAMPLES_DIR
+CALL %DN_BUILD_TOOLS% :NORMALIZEPATH "%DN_EXAMPLES_DIR%\sdf_clock" PROJECT_DIR
+CALL %DN_BUILD_TOOLS% :NORMALIZEPATH "%PROJECT_DIR%\source" SOURCE_DIR
+CALL %DN_BUILD_TOOLS% :NORMALIZEPATH "%SOURCE_DIR%\main.c" SOURCE_FILES
+CALL %DN_BUILD_TOOLS% :NORMALIZEPATH "%PROJECT_DIR%\build" BUILD_DIR
+CALL %DN_BUILD_TOOLS% :NORMALIZEPATH "%BUILD_DIR%\intermediate" INTERMEDIATE_DIR
 
-@echo on
-echo %DN_SWITCH_INCLUDE%
-mkdir intermediate
-copy "%DN_STEAM%" .
+CALL %DN_BUILD_TOOLS% :DN_ECHO_USER "Building %PROJECT%"
+CALL %DN_BUILD_TOOLS% :DN_ECHO_USER "Project directory: %PROJECT_DIR%"
+CALL %DN_BUILD_TOOLS% :DN_ECHO_USER "Doublenickel directory: %DN_DIR%"
+CALL %DN_BUILD_TOOLS% :DN_ECHO_USER "Build directory: %BUILD_DIR%"
 
-@echo on
-cl.exe ^
-/Zi /Od /JMC ^
-/Fe%project%.exe /Fo.\intermediate\ /Fd.\intermediate\ ^
-%SOURCE_DIR%\main.c ^
-%DN_SWITCH_INCLUDE% ^
-/MDd ^
-/TC ^
-/std:c11 ^
-/Zc:wchar_t /Zc:forScope /Zc:inline ^
-/experimental:c11atomics ^
-/EHa ^
-/W3 /wd"4530" /wd"4201" /wd"4577" /wd"4310" /wd"4624" /wd"4099" /wd"4068" /wd"4267" /wd"4244" /wd"4018" ^
-/D "DN_EDITOR" /D "_CRT_SECURE_NO_WARNINGS" /D "_SILENCE_CXX17_ALL_DEPRECATION_WARNINGS" ^
-/link /LIBPATH:%DN_LIB% /DEBUG:FULL /MACHINE:X64 /NOLOGO /SUBSYSTEM:CONSOLE /INCREMENTAL:NO /NOIMPLIB /NOEXP /PDB:.\intermediate\ /ignore:4099 /ignore:4204 ^
-%DN_SWITCH_LIBS% "user32.lib" "opengl32.lib" "gdi32.lib" "Shell32.lib" "Kernel32.lib" "Advapi32.lib" "Ole32.lib" "OleAut32.lib"
-pause
+CALL %DN_BUILD_TOOLS% :DN_ECHO_USER "Creating intermediate directory at %INTERMEDIATE_DIR%"
+MKDIR %INTERMEDIATE_DIR%
+
+CALL %DN_BUILD_TOOLS% :DN_ECHO_USER "Copying DLLs to build directory..."
+CALL %DN_BUILD_TOOLS% :DN_COPY_DLLS %BUILD_DIR% 
+
+CALL %DN_BUILD_TOOLS% :DN_INITIALIZE_VS_PROMPT
+
+SET "OUTPUT_FLAGS=/Fe%EXECUTABLE% /Fo%INTERMEDIATE_DIR% /Fd%INTERMEDIATE_DIR%"
+SET "RUNTIME_FLAGS=/MDd"
+SET "EXTRA_FLAGS=/Od /JMC /EHa"
+SET "DEBUG_FLAGS=/Zi /Zc:wchar_t /Zc:forScope /Zc:inline"
+SET "LANGUAGE_FLAGS=/std:c11 /experimental:c11atomics /TC"
+SET "WARNING_FLAGS=/W3 /wd"4530" /wd"4201" /wd"4577" /wd"4310" /wd"4624" /wd"4099" /wd"4068" /wd"4267" /wd"4244" /wd"4018""
+SET "PREPROCESSOR_DEFINES=/D "DN_EDITOR" /D "_CRT_SECURE_NO_WARNINGS" /D "_SILENCE_CXX17_ALL_DEPRECATION_WARNINGS""
+SET "LINKER_FLAGS=/link /LIBPATH:%DN_LIB% /DEBUG:FULL /MACHINE:X64 /NOLOGO /SUBSYSTEM:CONSOLE /INCREMENTAL:NO /NOIMPLIB /NOEXP /PDB:%INTERMEDIATE_DIR% /ignore:4099 /ignore:4204"
+SET "SYSTEM_LIBRARIES="user32.lib" "opengl32.lib" "gdi32.lib" "Shell32.lib" "Kernel32.lib" "Advapi32.lib" "Ole32.lib" "OleAut32.lib""
+
+@ECHO ON
+cl.exe  %OUTPUT_FLAGS% %SOURCE_FILES% %DN_SWITCH_INCLUDE% %RUNTIME_FLAGS% %LANGUAGE_FLAGS% %DEBUG_FLAGS% %EXTRA_FLAGS% %WARNING_FLAGS% %PREPROCESSOR_DEFINES% %LINKER_FLAGS% %DN_SWITCH_LIBS% %SYSTEM_LIBRARIES%
+
+EXIT /B
