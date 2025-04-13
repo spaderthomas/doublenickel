@@ -1,13 +1,34 @@
-#include "stdint.h"
-#include "assert.h"
-#include <time.h>
+// action.hpp
+// file_monitor.hpp
+// fluid.hpp
+// interpolation.hpp
+// particle.hpp
+// preprocessor.hpp
+// sdf.hpp
+// text.hpp
+
+// dn_asset_registry
+// dn_images
+// dn_audio
+// dn_backgrounds
+// dn_screenshots
+// dn_atlases
+// dn_gpu
+// dn_font
+// dn_noise
+// dn_steam
+
+#include <assert.h>
+#include <float.h>
+#include <inttypes.h>
+#include <stdatomic.h>
 #include <stdint.h>
 // #include <sys/time.h> @fix
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
-#include <inttypes.h>
-#include <float.h>
+#include <time.h>
 
 #ifdef DN_APP
 #define DN_LUA
@@ -153,6 +174,8 @@ typedef WIN32_FIND_DATA dn_win32_find_data_t;
 #define DN_QSORT_B_FIRST 1
 #define DN_QSORT_EQUAL 0
 
+#define DN_ATOMIC _Atomic
+
 #include "gunslinger/gs.h"
 
 #define gs_hash_table_for(_HT, it) for (gs_hash_table_iter it = 0; gs_hash_table_iter_valid((_HT), it); gs_hash_table_iter_advance((_HT), it))
@@ -164,8 +187,8 @@ typedef WIN32_FIND_DATA dn_win32_find_data_t;
 //  ██║╚██╔╝██║██╔══██║   ██║   ██╔══██║
 //  ██║ ╚═╝ ██║██║  ██║   ██║   ██║  ██║
 //  ╚═╝     ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝
-#ifdef DN_MATH_BACKEND_HANDMADE
-#include "HandmadeMath.h"
+#ifndef DN_MATH_BACKEND_CUSTOM
+#include "handmade/HandmadeMath.h"
 typedef HMM_Vec2 dn_vector2_t;
 typedef HMM_Vec3 dn_vector3_t;
 typedef HMM_Vec4 dn_vector4_t;
@@ -216,16 +239,60 @@ typedef union {
 #endif
 
 typedef struct {
-	s32 x;
-	s32 y;
+  s32 x;
+  s32 y;
 } dn_vector2i_t;
 
-f32          dn_math_step(f32 edge, f32 x);
-f32          dn_math_lerp(f32 a, f32 b, f32 t);
-dn_vector4_t dn_math_lerp4(dn_vector4_t a, dn_vector4_t b, f32 t);
-dn_vector4_t dn_math_abs4(dn_vector4_t v);
-dn_vector4_t dn_math_fract4(dn_vector4_t v);
-dn_vector4_t dn_math_clamp4(dn_vector4_t v, float minVal, float maxVal);
+DN_API f32          dn_math_step(f32 edge, f32 x);
+DN_API f32          dn_math_lerp(f32 a, f32 b, f32 t);
+DN_API dn_vector4_t dn_math_lerp4(dn_vector4_t a, dn_vector4_t b, f32 t);
+DN_API dn_vector4_t dn_math_abs4(dn_vector4_t v);
+DN_API dn_vector4_t dn_math_fract4(dn_vector4_t v);
+DN_API f32          dn_math_clamp(f32 value, f32 lower, f32 upper);
+DN_API dn_vector4_t dn_math_clamp4(dn_vector4_t v, f32 vmin, f32 vmax);
+DN_API u32          dn_math_ceilf(f32 f);
+DN_API u32          dn_math_ceil_divide(u32 a, u32 b);
+DN_API f32          dn_random_f32_slow(f32 vmin, f32 vmax);
+DN_API s32          dn_random_i32(s32 vmin, s32 vmax);
+DN_IMP void         dn_random_init();
+
+
+// ███╗   ██╗ ██████╗ ██╗███████╗███████╗
+// ████╗  ██║██╔═══██╗██║██╔════╝██╔════╝
+// ██╔██╗ ██║██║   ██║██║███████╗█████╗  
+// ██║╚██╗██║██║   ██║██║╚════██║██╔══╝  
+// ██║ ╚████║╚██████╔╝██║███████║███████╗
+// ╚═╝  ╚═══╝ ╚═════╝ ╚═╝╚══════╝╚══════╝
+typedef struct {
+  struct {
+    u32 perlin;
+    u32 chaoric;
+  } textures;
+} dn_noise_t;
+dn_noise_t dn_noise;
+
+static const int dn_perlin_permutation_raw[256] = {
+  151,160,137,91,90,15,131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,
+  190,6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,
+  88,237,149,56,87,174,20,125,136,171,168,68,175,74,165,71,134,139,48,27,166,
+  77,146,158,231,83,111,229,122,60,211,133,230,220,105,92,41,55,46,245,40,244,
+  102,143,54,65,25,63,161,1,216,80,73,209,76,132,187,208,89,18,169,200,196,
+  135,130,116,188,159,86,164,100,109,198,173,186,3,64,52,217,226,250,124,123,
+  5,202,38,147,118,126,255,82,85,212,207,206,59,227,47,16,58,17,182,189,28,42,
+  223,183,170,213,119,248,152,2,44,154,163,70,221,153,101,155,167,43,172,9,
+  129,22,39,253,19,98,108,110,79,113,224,232,178,185,112,104,218,246,97,228,
+  251,34,242,193,238,210,144,12,191,179,162,241,81,51,145,235,249,14,239,107,
+  49,192,214,31,181,199,106,157,184,84,204,176,115,121,50,45,127,4,150,254,
+  138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180
+};
+
+static int dn_perlin_permutation[512];
+
+DN_IMP void dn_noise_init();
+DN_API f64 dn_noise_perlin(f64 x, f64 y);
+DN_API f64 dn_noise_perlin_scaled(f64 x, f64 y, f64 vmin, f64 vmax);
+DN_API f64 dn_noise_chaotic(f64 x, f64 y);
+DN_API f64 dn_noise_chaotic_scaled(f64 x, f64 y, f64 vmin, f64 vmax);
 
 
 //   ██████╗ ██████╗ ██╗      ██████╗ ██████╗ ███████╗
@@ -240,56 +307,56 @@ typedef dn_vector4_t dn_color_t;
 
 typedef struct {
   dn_color_t indian_red;
-	dn_color_t tyrian_purple;
-	dn_color_t cardinal;
+  dn_color_t tyrian_purple;
+  dn_color_t cardinal;
   dn_color_t celadon;
-	dn_color_t spring_green;
-	dn_color_t mindaro;
-	dn_color_t light_green;
+  dn_color_t spring_green;
+  dn_color_t mindaro;
+  dn_color_t light_green;
   dn_color_t zomp;
-	dn_color_t midnight_green;
-	dn_color_t prussian_blue;
-	dn_color_t orange;
-	dn_color_t sunglow;
-	dn_color_t selective_yellow;
+  dn_color_t midnight_green;
+  dn_color_t prussian_blue;
+  dn_color_t orange;
+  dn_color_t sunglow;
+  dn_color_t selective_yellow;
   dn_color_t gunmetal;
-	dn_color_t paynes_gray;
-	dn_color_t cadet_gray;
-	dn_color_t charcoal;
-	dn_color_t cool_gray;
-	dn_color_t cream;
-	dn_color_t misty_rose;
-	dn_color_t taupe;
-	dn_color_t dark_green;
-	dn_color_t rich_black;
-	dn_color_t white;
+  dn_color_t paynes_gray;
+  dn_color_t cadet_gray;
+  dn_color_t charcoal;
+  dn_color_t cool_gray;
+  dn_color_t cream;
+  dn_color_t misty_rose;
+  dn_color_t taupe;
+  dn_color_t dark_green;
+  dn_color_t rich_black;
+  dn_color_t white;
 } dn_colors_t;
 
 dn_colors_t dn_colors = {
   .indian_red       = dn_rgb_255(180, 101, 111), // RED
-	.tyrian_purple    = dn_rgb_255(95,  26,  55),
-	.cardinal         = dn_rgb_255(194, 37,  50),
+  .tyrian_purple    = dn_rgb_255(95,  26,  55),
+  .cardinal         = dn_rgb_255(194, 37,  50),
   .celadon          = dn_rgb_255(183, 227, 204), // GREEN
-	.spring_green     = dn_rgb_255(89,  255, 160),
-	.mindaro          = dn_rgb_255(188, 231, 132),
-	.light_green      = dn_rgb_255(161, 239, 139),
+  .spring_green     = dn_rgb_255(89,  255, 160),
+  .mindaro          = dn_rgb_255(188, 231, 132),
+  .light_green      = dn_rgb_255(161, 239, 139),
   .zomp             = dn_rgb_255(99,  160, 136),
-	.midnight_green   = dn_rgb_255(25,  83,  95),
-	.prussian_blue    = dn_rgb_255(16,  43,  63),  // BLUE
-	.orange           = dn_rgb_255(249, 166, 32),  // ORANGE
-	.sunglow          = dn_rgb_255(255, 209, 102),
+  .midnight_green   = dn_rgb_255(25,  83,  95),
+  .prussian_blue    = dn_rgb_255(16,  43,  63),  // BLUE
+  .orange           = dn_rgb_255(249, 166, 32),  // ORANGE
+  .sunglow          = dn_rgb_255(255, 209, 102),
   .selective_yellow = dn_rgb_255(250, 188, 42),
   .gunmetal         = dn_rgb_255(43,  61,  65),  // GRAY
-	.paynes_gray      = dn_rgb_255(76,  95,  107),
-	.cadet_gray       = dn_rgb_255(131, 160, 160),
-	.charcoal         = dn_rgb_255(64,  67,  78),
-	.cool_gray        = dn_rgb_255(140, 148, 173),
-	.cream            = dn_rgb_255(245, 255, 198),  // OFF WHITE
-	.misty_rose       = dn_rgb_255(255, 227, 227),
-	.taupe            = dn_rgb_255(68,  53,  39),   // BROWN
-	.dark_green       = dn_rgb_255(4,   27,  21),   // BLACK
-	.rich_black       = dn_rgb_255(4,   10,  15),
-	.white            = dn_rgb_255(255, 255, 255),
+  .paynes_gray      = dn_rgb_255(76,  95,  107),
+  .cadet_gray       = dn_rgb_255(131, 160, 160),
+  .charcoal         = dn_rgb_255(64,  67,  78),
+  .cool_gray        = dn_rgb_255(140, 148, 173),
+  .cream            = dn_rgb_255(245, 255, 198),  // OFF WHITE
+  .misty_rose       = dn_rgb_255(255, 227, 227),
+  .taupe            = dn_rgb_255(68,  53,  39),   // BROWN
+  .dark_green       = dn_rgb_255(4,   27,  21),   // BLACK
+  .rich_black       = dn_rgb_255(4,   10,  15),
+  .white            = dn_rgb_255(255, 255, 255),
 };
 
 dn_color_t dn_color_rgb_to_hsv(dn_color_t color);
@@ -303,28 +370,28 @@ dn_color_t dn_color_hsv_to_rgb(dn_color_t color);
 //  ██║ ╚═╝ ██║███████╗██║ ╚═╝ ██║╚██████╔╝██║  ██║   ██║
 //  ╚═╝     ╚═╝╚══════╝╚═╝     ╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝
 typedef enum {
-	DN_ALLOCATOR_MODE_ALLOC,
-	DN_ALLOCATOR_MODE_FREE,
-	DN_ALLOCATOR_MODE_RESIZE,
+  DN_ALLOCATOR_MODE_ALLOC,
+  DN_ALLOCATOR_MODE_FREE,
+  DN_ALLOCATOR_MODE_RESIZE,
 } dn_allocator_mode_t;
 
 struct dn_allocator_t;
 
 dn_typedef_fn(
-	void*,
-	dn_alloc_fn_t,
-	struct dn_allocator_t* allocator, dn_allocator_mode_t mode, u32 size, void* previous_allocation
+  void*,
+  dn_alloc_fn_t,
+  struct dn_allocator_t* allocator, dn_allocator_mode_t mode, u32 size, void* previous_allocation
 );
 
 typedef struct dn_allocator_t {
-	dn_alloc_fn_t on_alloc;
+  dn_alloc_fn_t on_alloc;
 } dn_allocator_t;
 
 typedef struct {
   dn_allocator_t allocator;
-	u8* buffer;
-	u32 capacity;
-	u32 bytes_used;
+  u8* buffer;
+  u32 capacity;
+  u32 bytes_used;
   gs_hash_table(u32, u32) allocations;
 } dn_bump_allocator_t;
 
@@ -333,8 +400,8 @@ typedef struct {
 } dn_standard_allocator_t;
 
 typedef struct {
-	dn_standard_allocator_t standard;
-	dn_bump_allocator_t bump;
+  dn_standard_allocator_t standard;
+  dn_bump_allocator_t bump;
   gs_hash_table(dn_hash_t, dn_allocator_t*) allocators;
 } dn_allocators_t;
 dn_allocators_t dn_allocators;
@@ -480,6 +547,51 @@ DN_IMP dn_os_file_attr_t            dn_os_winapi_attr_to_dn_attr(u32 attr);
 #define dn_os_arr_copy(source, dest) { static_assert(sizeof(source) == sizeof(dest), "dn_os_arr_copy expects two C arrays of the same size"); dn_os_memory_copy(source, dest, sizeof(dest)); }
 
 
+// ████████╗██╗  ██╗██████╗ ███████╗ █████╗ ██████╗ ██╗███╗   ██╗ ██████╗ 
+// ╚══██╔══╝██║  ██║██╔══██╗██╔════╝██╔══██╗██╔══██╗██║████╗  ██║██╔════╝ 
+//    ██║   ███████║██████╔╝█████╗  ███████║██║  ██║██║██╔██╗ ██║██║  ███╗
+//    ██║   ██╔══██║██╔══██╗██╔══╝  ██╔══██║██║  ██║██║██║╚██╗██║██║   ██║
+//    ██║   ██║  ██║██║  ██║███████╗██║  ██║██████╔╝██║██║ ╚████║╚██████╔╝
+//    ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═════╝ ╚═╝╚═╝  ╚═══╝ ╚═════╝ 
+///////////
+// MUTEX //
+///////////
+typedef enum {
+  DN_MUTEX_ATTR_NONE = 0,
+  DN_MUTEX_ATTR_RECURSIVE = 1
+} dn_mutex_attr_t;
+
+typedef struct {
+  dn_mutex_attr_t attrs;
+  bool initialized;
+  CRITICAL_SECTION handle;
+} dn_mutex_t;
+
+void dn_mutex_init(dn_mutex_t* mutex);
+void dn_mutex_lock(dn_mutex_t* mutex);
+void dn_mutex_unlock(dn_mutex_t* mutex);
+
+////////////
+// THREAD //
+////////////
+dn_typedef_fn(void*, dn_thread_fn_t, void*);
+
+typedef struct {
+  dn_win32_handle_t handle;
+  dn_win32_dword_t id;
+  dn_thread_fn_t fn;
+} dn_thread_t;
+
+void dn_thread_init(dn_thread_t* thread, dn_thread_fn_t fn, void* argument);
+void dn_thread_join(dn_thread_t* thread);
+
+////////////////////////
+// CONDITION VARIABLE //
+////////////////////////
+typedef struct {
+  s32 dummy;  
+} dn_condition_variable_t;
+
 //  ██╗  ██╗ █████╗ ███████╗██╗  ██╗██╗███╗   ██╗ ██████╗
 //  ██║  ██║██╔══██╗██╔════╝██║  ██║██║████╗  ██║██╔════╝
 //  ███████║███████║███████╗███████║██║██╔██╗ ██║██║  ███╗
@@ -527,8 +639,10 @@ typedef struct {
 } dn_fixed_array_t;
 
 #define dn_fixed_array(t, n) dn_fixed_array_t
+#define dn_fixed_array_for(arr, it, t) for (t* it = (t*)arr.data; (it - (t*)arr.data) < arr.size; it++)
+#define DN_FIXED_ARRAY_RUNTIME_SIZE
 
-DN_API void dn_fixed_array_init(dn_fixed_array_t* fixed_array, u32 max_vertices, u32 element_size, dn_allocator_t* allocator);
+DN_API void dn_fixed_array_init(dn_fixed_array_t* fixed_array, u32 capacity, u32 element_size, dn_allocator_t* allocator);
 DN_API u8*  dn_fixed_array_push(dn_fixed_array_t* fixed_array, void* data, u32 count);
 DN_API u8*  dn_fixed_array_reserve(dn_fixed_array_t* fixed_array, u32 count);
 DN_API void dn_fixed_array_clear(dn_fixed_array_t* fixed_array);
@@ -560,9 +674,11 @@ DN_API void dn_dynamic_array_grow(dn_dynamic_array_t* dynamic_array, u32 capacit
 //////////
 // POOL //
 //////////
+#define DN_POOL_NO_FREE_SLOT -1
+
 typedef struct {
-	u32 index;
-	u32 generation;
+  u32 index;
+  u32 generation;
 } dn_pool_handle_t;
 
 typedef struct {
@@ -579,37 +695,70 @@ typedef struct {
   s32 free_list;
 } dn_pool_t;
 
+typedef struct {
+  u32 index;
+  dn_pool_t* pool;
+} dn_pool_iterator_t;
+
 #define dn_pool(t) dn_pool_t
 
-void             dn_pool_init(dn_pool_t* pool, u32 capacity, u32 element_size);
-dn_pool_handle_t dn_pool_insert(dn_pool_t* pool, void* value);
-dn_pool_handle_t dn_pool_reserve(dn_pool_t* pool);
-void             dn_pool_remove(dn_pool_t* pool, dn_pool_handle_t handle);
-bool             dn_pool_contains(dn_pool_t* pool, dn_pool_handle_t handle);
-void             dn_pool_clear(dn_pool_t* pool);
-dn_pool_handle_t dn_pool_invalid_handle();
-bool             dn_pool_is_handle_valid(dn_pool_handle_t handle);
-bool             dn_pool_slot_has_next_free(dn_pool_slot_t* slot);
-bool             dn_pool_slot_is_match(dn_pool_slot_t* slot, dn_pool_handle_t handle);
-#define dn_pool_at(T, POOL, HANDLE) ((T*)((POOL)->data + ((HANDLE).index * (POOL)->element_size)))
+DN_API void               dn_pool_init(dn_pool_t* pool, u32 capacity, u32 element_size);
+DN_API dn_pool_handle_t   dn_pool_insert(dn_pool_t* pool, void* value);
+DN_API dn_pool_handle_t   dn_pool_reserve(dn_pool_t* pool);
+DN_API void               dn_pool_remove(dn_pool_t* pool, dn_pool_handle_t handle);
+DN_API bool               dn_pool_contains(dn_pool_t* pool, dn_pool_handle_t handle);
+DN_API void               dn_pool_clear(dn_pool_t* pool);
+DN_API dn_pool_handle_t   dn_pool_invalid_handle();
+DN_API bool               dn_pool_is_handle_valid(dn_pool_handle_t handle);
+DN_API bool               dn_pool_slot_has_next_free(dn_pool_slot_t* slot);
+DN_API bool               dn_pool_slot_is_match(dn_pool_slot_t* slot, dn_pool_handle_t handle);
+DN_API dn_pool_iterator_t dn_pool_iterator_init(dn_pool_t* pool);
+DN_API void               dn_pool_iterator_next(dn_pool_iterator_t* it);
+DN_API bool               dn_pool_iterator_done(dn_pool_iterator_t* it);
+#define            dn_pool_at(POOL, HANDLE, T) ((T*)((POOL)->data + ((HANDLE).index * (POOL)->element_size)))
+#define            dn_pool_at_i(POOL, INDEX, T) ((T*)((POOL)->data + ((INDEX) * (POOL)->element_size)))
+#define            dn_pool_for(POOL, IT) for (dn_pool_iterator_t IT = dn_pool_iterator_init((POOL)); !dn_pool_iterator_done(&(IT)); dn_pool_iterator_next(&(IT)))
+#define            dn_pool_it(POOL, IT, T) dn_pool_at_i(POOL, (IT).index, T)
+
+dn_pool_iterator_t dn_pool_iterator_init(dn_pool_t* pool) {
+  return (dn_pool_iterator_t) {
+    .index = 0,
+    .pool = pool
+  };
+}
+
+void dn_pool_iterator_next(dn_pool_iterator_t* it) {
+  while (true) {
+    it->index++;
+    if (it->index >= it->pool->capacity) break;
+
+    dn_pool_slot_t* slot = &it->pool->slots[it->index];
+    if (slot->occupied) break;
+  } 
+}
+
+bool dn_pool_iterator_done(dn_pool_iterator_t* it) {
+  if (it->index >= it->pool->capacity) return true;
+  return false;
+}
 
 /////////////////
 // RING BUFFER //
 /////////////////
 typedef struct {
-	u8* data;
+  u8* data;
   u32 element_size;
-	u32 head;
-	u32 size;
-	u32 capacity;
+  u32 head;
+  u32 size;
+  u32 capacity;
 } dn_ring_buffer_t;
 
 #define dn_ring_buffer(t) dn_ring_buffer_t
 
 typedef struct {
-	u32 index;
-	bool reverse;
-	dn_ring_buffer_t* buffer;
+  u32 index;
+  bool reverse;
+  dn_ring_buffer_t* buffer;
 } dn_ring_buffer_iterator_t;
 
 DN_API void*                     dn_ring_buffer_at(dn_ring_buffer_t* buffer, u32 index);
@@ -635,6 +784,8 @@ DN_API dn_ring_buffer_iterator_t dn_ring_buffer_riter(dn_ring_buffer_t* buffer);
 #define dn_ring_buffer_rfor(rb, it) for (dn_ring_buffer_iterator_t (it) = dn_ring_buffer_riter((&(rb))); !dn_ring_buffer_iter_done(&(it)); dn_ring_buffer_iter_prev(&(it)))
 #define dn_rb_it(it, t) (t*)dn_ring_buffer_iter_deref(&(it))
 
+
+
 // ████████╗██╗███╗   ███╗███████╗██████╗ ███████╗
 // ╚══██╔══╝██║████╗ ████║██╔════╝██╔══██╗██╔════╝
 //    ██║   ██║██╔████╔██║█████╗  ██████╔╝███████╗
@@ -642,8 +793,8 @@ DN_API dn_ring_buffer_iterator_t dn_ring_buffer_riter(dn_ring_buffer_t* buffer);
 //    ██║   ██║██║ ╚═╝ ██║███████╗██║  ██║███████║
 //    ╚═╝   ╚═╝╚═╝     ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝
 typedef struct {
-	dn_ring_buffer(f64) queue;
-	f64 time_begin;
+  dn_ring_buffer(f64) queue;
+  f64 time_begin;
 } dn_time_metric_t;
 
 typedef struct {
@@ -675,16 +826,16 @@ DN_IMP void              dn_time_metrics_update();
 //  ███████╗╚██████╔╝╚██████╔╝
 //  ╚══════╝ ╚═════╝  ╚═════╝
 typedef enum {
-	DN_LOG_FLAG_CONSOLE = 1,
-	DN_LOG_FLAG_FILE = 2,
-	DN_LOG_FLAG_DEFAULT = 3,
+  DN_LOG_FLAG_CONSOLE = 1,
+  DN_LOG_FLAG_FILE = 2,
+  DN_LOG_FLAG_DEFAULT = 3,
 } dn_log_flags_t;
 
 #define DN_LOGGER_MESSAGE_BUFFER_SIZE 4096
 #define DN_LOGGER_PREAMBLE_BUFFER_SIZE 512
 typedef struct {
-	char message_buffer [DN_LOGGER_MESSAGE_BUFFER_SIZE];
-	char preamble_buffer [DN_LOGGER_PREAMBLE_BUFFER_SIZE];
+  char message_buffer [DN_LOGGER_MESSAGE_BUFFER_SIZE];
+  char preamble_buffer [DN_LOGGER_PREAMBLE_BUFFER_SIZE];
 } dn_log_t;
 dn_log_t dn_logger;
 
@@ -699,6 +850,7 @@ DN_IMP void dn_log_build_preamble();
 DN_IMP void dn_log_zero();
 DN_IMP void dn_log_init();
 #define DN_LOG(fmt, ...) dn_log("%s: " fmt, __func__, __VA_ARGS__)
+
 
 //  ██████╗  █████╗ ████████╗██╗  ██╗███████╗
 //  ██╔══██╗██╔══██╗╚══██╔══╝██║  ██║██╔════╝
@@ -747,7 +899,266 @@ DN_IMP void                   _dn_paths_set_install_roots(dn_path_config_t confi
 DN_IMP void                   _dn_paths_set_write_path(dn_path_config_t config);
 
 
-// BACKGROUND
+//  █████╗ ██╗   ██╗██████╗ ██╗ ██████╗ 
+// ██╔══██╗██║   ██║██╔══██╗██║██╔═══██╗
+// ███████║██║   ██║██║  ██║██║██║   ██║
+// ██╔══██║██║   ██║██║  ██║██║██║   ██║
+// ██║  ██║╚██████╔╝██████╔╝██║╚██████╔╝
+// ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝ ╚═════╝                                      
+typedef enum {
+  DN_AUDIO_FILTER_MODE_FIRST_ORDER = 0,
+  DN_AUDIO_FILTER_MODE_BUTTERWORTH = 1,
+} dn_audio_filter_mode_t;
+
+typedef struct {
+  dn_audio_filter_mode_t mode;
+  bool enabled;
+  f32 cutoff_frequency;
+  f32 cutoff_alpha;
+  f32 a0, a1, a2, b1, b2;
+  f32 input_history [2];
+  f32 output_history [2];
+} dn_low_pass_filter_t;
+
+typedef struct {
+  f32 threshold;
+  f32 ratio;
+  f32 attack_time;
+  f32 release_time;
+  bool enabled;
+} dn_compressor_t;
+
+typedef dn_pool_handle_t dn_audio_info_handle_t;
+typedef struct {
+  dn_asset_name_t name;
+  dn_hash_t hash;
+  u32 num_channels;
+  u32 sample_rate;
+  u64 num_frames;
+  u32 num_samples;
+  f32* samples;
+  u32 generation;
+  double file_mod_time;
+} dn_audio_info_t;
+
+typedef dn_pool_handle_t dn_audio_instance_handle_t;
+typedef struct {
+  dn_audio_info_handle_t info;
+  dn_audio_instance_handle_t next;
+  u32 next_sample;
+  bool loop;
+  f32 volume;
+  dn_low_pass_filter_t filter;
+  bool paused;
+  s32 sample_buffer_offset;
+  s32 samples_from_next;
+  
+  bool occupied;
+  u32 generation;
+} dn_audio_instance_t;
+
+typedef struct {
+  dn_path_t* dirs;
+  u32 num_dirs;
+  dn_compressor_t compressor;
+  dn_low_pass_filter_t filter;
+  f32 sample_frequency;
+  f32 master_volume;
+  f32 master_volume_mod;
+} dn_audio_config_t;
+
+#define DN_AUDIO_MAX_SOUNDS 1024
+#define DN_AUDIO_MAX_INSTANCES 128
+typedef struct {
+  dn_mutex_t mutex;
+  dn_compressor_t compressor;
+  dn_low_pass_filter_t filter;
+  f32 sample_frequency;
+  f32 master_volume;
+  f32 master_volume_mod;
+  // FileMonitor* file_monitor;
+  dn_fixed_array(f32, DN_FIXED_ARRAY_RUNTIME_SIZE) sample_buffer;
+  dn_pool(dn_audio_info_t) sounds;
+  dn_pool(dn_audio_instance_t) instances;
+} dn_audio_t;
+dn_audio_t dn_audio;
+
+DN_API void                       dn_audio_set_compressor_threshold(f32 t);
+DN_API void                       dn_audio_set_compressor_ratio(f32 v);
+DN_API void                       dn_audio_set_compressor_attack(f32 v);
+DN_API void                       dn_audio_set_compressor_release(f32 v);
+DN_API void                       dn_audio_set_sample_rate(f32 v);
+DN_API f32                        dn_audio_get_master_volume();
+DN_API void                       dn_audio_set_master_volume(f32 v);
+DN_API f32                        dn_audio_get_master_volume_mod();
+DN_API void                       dn_audio_set_master_volume_mod(f32 v);
+DN_API f32                        dn_audio_get_master_filter_cutoff();
+DN_API void                       dn_audio_set_master_filter_cutoff(f32 v);
+DN_API void                       dn_audio_set_master_filter_cutoff_enabled(bool enabled);
+DN_API void                       dn_audio_set_master_filter_mode(dn_audio_filter_mode_t mode);
+DN_API void                       dn_audio_set_volume(dn_audio_instance_handle_t handle, f32 volume);
+DN_API void                       dn_audio_set_filter_cutoff(dn_audio_instance_handle_t handle, f32 cutoff);
+DN_API void                       dn_audio_set_filter_mode(dn_audio_instance_handle_t handle, dn_audio_filter_mode_t mode);
+DN_API void                       dn_audio_set_filter_enabled(dn_audio_instance_handle_t handle, bool enabled);
+DN_API dn_audio_instance_handle_t dn_audio_play_sound(const char* name);
+DN_API dn_audio_instance_handle_t dn_audio_play_looped(const char* name);
+DN_API void                       dn_audio_queue(dn_audio_instance_handle_t current, dn_audio_instance_handle_t next);
+DN_API void                       dn_audio_stop(dn_audio_instance_handle_t handle);
+DN_API void                       dn_audio_stop_all();
+DN_API void                       dn_audio_pause(dn_audio_instance_handle_t handle);
+DN_API void                       dn_audio_resume(dn_audio_instance_handle_t handle);
+DN_API bool                       dn_audio_is_playing(dn_audio_instance_handle_t handle);
+DN_API bool                       dn_audio_is_any_playing();
+DN_API void                       dn_audio_load(const char* file_path, const char* file_name);
+DN_API void                       dn_audio_load_dir(const char* path);
+DN_API void                       dn_low_pass_filter_set_mode(dn_low_pass_filter_t* filter, dn_audio_filter_mode_t mode);
+DN_API void                       dn_low_pass_filter_set_cutoff(dn_low_pass_filter_t* filter, f32 cutoff);
+DN_API f32                        dn_low_pass_filter_apply(dn_low_pass_filter_t* filter, f32 input);
+DN_API dn_audio_config_t          dn_audio_config_default();
+DN_API void                       dn_audio_init(dn_audio_config_t config);
+DN_IMP void                       dn_audio_update(f32* buffer, int frames_requested, int num_channels);
+DN_IMP void                       dn_audio_shutdown();
+DN_IMP dn_audio_info_t*           dn_audio_find(dn_string_t name);
+DN_IMP dn_audio_info_t*           dn_audio_find_no_default(dn_string_t name);
+DN_IMP dn_audio_info_t*           dn_audio_resolve(dn_audio_info_handle_t handle);
+DN_IMP dn_audio_instance_t*       dn_audio_resolve_instance(dn_audio_instance_handle_t handle);
+DN_IMP dn_audio_instance_handle_t dn_audio_reserve();
+DN_IMP dn_audio_instance_handle_t dn_audio_play_sound_ex(dn_audio_info_t* sound, bool loop);
+DN_IMP void                       dn_audio_stop_ex(dn_audio_instance_t* active_sound);
+
+
+
+// ██╗███╗   ███╗ █████╗  ██████╗ ███████╗███████╗
+// ██║████╗ ████║██╔══██╗██╔════╝ ██╔════╝██╔════╝
+// ██║██╔████╔██║███████║██║  ███╗█████╗  ███████╗
+// ██║██║╚██╔╝██║██╔══██║██║   ██║██╔══╝  ╚════██║
+// ██║██║ ╚═╝ ██║██║  ██║╚██████╔╝███████╗███████║
+// ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝
+typedef struct {
+  dn_hash_t hash;
+  u32 handle;
+  u32 width;
+  u32 height;
+  u32 channels;
+} dn_texture_t;
+
+DN_API void          dn_texture_init(s32 width, s32 height, s32 channels);
+DN_API void          dn_texture_load_to_gpu(u32* data);
+DN_API void          dn_texture_unload_from_gpu();
+DN_API dn_texture_t* dn_images_find_texture_by_name(dn_string_t name);
+DN_API dn_texture_t* dn_images_find_texture_by_hash(dn_hash_t hash);
+
+typedef struct {
+  dn_string_t file_path;
+  dn_hash_t hash;
+  dn_hash_t texture;
+  dn_vector2_t* uv;
+  dn_vector2i_t size;
+} dn_sprite_t;
+
+DN_API dn_sprite_t* dn_images_find_sprite(const char* name);
+DN_API dn_sprite_t* dn_images_find_sprite_no_default(const char* name);
+
+
+typedef struct {
+  s32 id;
+  dn_sprite_t* sprite;
+  u32* data;
+  s32 channels;
+} dn_atlas_pack_item_t;
+
+void dn_atlas_pack_item_init(dn_atlas_pack_item_t* item);
+
+#define DN_MAX_DIRECTORIES_PER_ATLAS 32
+#define DN_MAX_IMAGES_PER_ATLAS 256
+#define DN_TEXTURE_ATLAS_SIZE 2048
+
+typedef struct {
+  char name [64];
+  double cfg_mod_time;
+  double mod_time;
+  dn_hash_t cfg_files_hash;
+  dn_hash_t files_hash;
+  bool high_priority;
+  // dn_array_t<char*> directories;
+  dn_texture_t* texture;
+
+  // Data used for generation. These are initialized to temporary storage, so
+  // don't expect them to be valid in other cases.
+  // dn_array_t<RectPackId> ids;
+  // dn_array_t<stbrp_rect> rects;
+  // dn_array_t<stbrp_node> nodes;
+  // dn_array_t<u32> buffer;
+
+  bool need_async_build;
+  bool need_async_load;
+  bool need_gl_init;
+  bool need_config_update;
+
+  // FileMonitor* file_monitor;
+} dn_atlas_t;
+
+typedef struct {
+  dn_dynamic_array(dn_string_t) files;
+} dn_atlas_bucket_t;
+
+typedef struct {
+  dn_string_t* dirs;
+  u32 num_dirs;
+} dn_image_config_t;
+
+typedef struct {
+  dn_mutex_t mutex;
+  dn_mutex_t config_mutex;
+
+  dn_fixed_array(dn_vector2_t, 65536) uv_data;
+  dn_fixed_array(dn_texture_t, 256) textures;
+  dn_fixed_array(dn_sprite_t, 1024) sprites;
+  dn_fixed_array(dn_atlas_t, 64) atlases;
+  dn_fixed_array(dn_atlas_bucket_t, 16) buckets;
+} dn_images_t;
+dn_images_t dn_images;
+
+
+void                  dn_atlases_init();
+void                  dn_atlas_deinit();
+void                  dn_atlas_set_name(const char* name);
+void                  dn_atlas_build_sync();
+void                  dn_atlas_load_to_memory();
+bool                  dn_atlas_is_dirty();
+void                  dn_atlas_calc_hash_and_mod_time();  
+void                  dn_atlas_build_from_config();
+void                  dn_atlas_build_from_source();
+void                  dn_atlas_write_to_config();
+void                  dn_atlas_write_to_png();
+void                  dn_atlas_load_to_gpu();
+void                  dn_atlas_unload_from_gpu();
+void                  dn_atlas_watch_files();
+void                  dn_atlas_on_file_add(const char* file_path);
+void                  dn_atlas_on_file_change(const char* file_path);
+dn_atlas_pack_item_t* dn_atlas_find_pack_item(s32 id);
+void                  dn_image_init_atlases();
+dn_sprite_t*          dn_image_alloc_sprite();
+dn_texture_t*         dn_image_alloc_texture();
+dn_vector2_t*         dn_image_alloc_uvs();
+void                  dn_image_build_sprite_from_file(const char* id, const char* file_path);
+void                  dn_image_build_sprite_from_data(const char* id, unsigned char* data, s32 width, s32 height, s32 channels);
+void                  dn_image_build_sprite_ex(dn_sprite_t* sprite, const char* id, unsigned char* data, s32 width, s32 height, s32 channels);
+DN_IMP void           dn_images_init(dn_image_config_t config);
+DN_IMP void           dn_atlas_bucket_init(dn_atlas_bucket_t* bucket);
+DN_IMP u32            dn_atlas_calc_bucket(dn_string_t path);
+DN_API void           dn_screenshots_init();
+DN_API void           dn_screenshot_take();
+DN_API void           dn_screenshot_write(const char* file_name);
+
+
+// ██████╗  █████╗  ██████╗██╗  ██╗ ██████╗ ██████╗  ██████╗ ██╗   ██╗███╗   ██╗██████╗ ███████╗
+// ██╔══██╗██╔══██╗██╔════╝██║ ██╔╝██╔════╝ ██╔══██╗██╔═══██╗██║   ██║████╗  ██║██╔══██╗██╔════╝
+// ██████╔╝███████║██║     █████╔╝ ██║  ███╗██████╔╝██║   ██║██║   ██║██╔██╗ ██║██║  ██║███████╗
+// ██╔══██╗██╔══██║██║     ██╔═██╗ ██║   ██║██╔══██╗██║   ██║██║   ██║██║╚██╗██║██║  ██║╚════██║
+// ██████╔╝██║  ██║╚██████╗██║  ██╗╚██████╔╝██║  ██║╚██████╔╝╚██████╔╝██║ ╚████║██████╔╝███████║
+// ╚═════╝ ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚═════╝ ╚══════╝
+#define DN_BACKGROUND
 #define DN_BACKGROUND_TILE_SIZE 2048
 
 typedef struct {
@@ -756,41 +1167,57 @@ typedef struct {
 } dn_background_loaded_tile_t;
 
 typedef struct {
-	char* name;
-	char* tile_output_folder;
-	char* tile_output_full_path;
-	char* source_image;
-	char* source_image_full_path;
-	// dn_array_t<char*, 64> tiles;
-	// dn_array_t<char*, 64> tile_full_paths;
-	// dn_array_t<dn_vector2i_t, 64> tile_positions;
-	s32 width;
-	s32 height;
-	s32 channels;
-	u32* data;
-	bool high_priority;
+  char* name;
+  char* tile_output_folder;
+  char* tile_output_full_path;
+  char* source_image;
+  char* source_image_full_path;
+  // dn_array_t<char*, 64> tiles;
+  // dn_array_t<char*, 64> tile_full_paths;
+  // dn_array_t<dn_vector2i_t, 64> tile_positions;
+  s32 width;
+  s32 height;
+  s32 channels;
+  u32* data;
+  bool high_priority;
 
-	f64 mod_time;
-	f64 filesystem_mod_time;
+  f64 mod_time;
+  f64 filesystem_mod_time;
 
-	bool need_async_build;
-	bool need_async_load;
-	bool need_config_update;
+  bool need_async_build;
+  bool need_async_load;
+  bool need_config_update;
 
-	// dn_array_t<LoadedTile> loaded_tiles;
-	bool gpu_ready;
-	bool gpu_done;
-	int gpu_load_index;
+  // dn_array_t<LoadedTile> loaded_tiles;
+  bool gpu_ready;
+  bool gpu_done;
+  int gpu_load_index;
 } dn_background_t;
 
 typedef struct {
-  // dn_array_t<Background> backgrounds;
+  dn_dynamic_array(dn_background_t) backgrounds;
 } dn_backgrounds_t;
 
+
+typedef struct {
+  u32 current_tile;
+  dn_mutex_t mutex;
+} dn_background_tile_processor_shared_t;
+
+typedef struct {
+  u32* source_data;
+  u32* tile_data;
+  dn_thread_t thread;
+
+} dn_background_tile_processor_t;
+
+void dn_background_tile_processor_init(u32* source_data);
+void dn_background_tile_processor_deinit();
+void dn_background_tile_processor_process(dn_background_t* background);
 void dn_background_init(dn_background_t* background);
 void dn_background_deinit(dn_background_t* background);
 void dn_background_load_paths(dn_background_t* background);
-void dn_background_set_source_image_size(dn_background_t* background, s32 width, i32 height);
+void dn_background_set_source_image_size(dn_background_t* background, s32 width, s32 height);
 void dn_background_set_source_data(dn_background_t* background, u32* data);
 bool dn_background_add_tile(dn_background_t* background);
 void dn_background_add_tiles(dn_background_t* background);
@@ -802,23 +1229,109 @@ void dn_background_load_tiles(dn_background_t* background);
 void dn_background_update_config(dn_background_t* background);
 void dn_backgrounds_init();
 
-typedef struct {
-  u32 current_tile;
-  dn_mutex_t mutex;
-} dn_background_tile_processor_shared_t;
+
+//  █████╗ ███████╗███████╗███████╗████████╗███████╗
+// ██╔══██╗██╔════╝██╔════╝██╔════╝╚══██╔══╝██╔════╝
+// ███████║███████╗███████╗█████╗     ██║   ███████╗
+// ██╔══██║╚════██║╚════██║██╔══╝     ██║   ╚════██║
+// ██║  ██║███████║███████║███████╗   ██║   ███████║
+// ╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝   ╚═╝   ╚══════╝
+typedef enum {
+  DN_ASSET_KIND_BACKGROUND,
+  DN_ASSET_KIND_ATLAS,
+  DN_ASSET_KIND_USER,
+} dn_asset_kind_t;
+
+typedef enum {
+  DN_ASSET_COMPLETION_STATUS_RUNNING,
+  DN_ASSET_COMPLETION_STATUS_DONE,
+} dn_asset_completion_status_t;
+
+typedef void* dn_asset_data_t;
 
 typedef struct {
-	u32* source_data;
-	u32* tile_data;
+  dn_asset_name_t name;
+  dn_asset_data_t data;
+} dn_asset_t;
+
+////////////
+// LOADER //
+////////////
+typedef struct {
+  s32 id;
+  dn_asset_kind_t kind;
+
+  union {
+    dn_background_t* background;
+    dn_atlas_t* atlas;
+  };
+} dn_asset_load_request_t;
+
+typedef struct {
   dn_thread_t thread;
+  dn_condition_variable_t condition;
+  dn_mutex_t mutex;
 
-} dn_background_tile_processor_t;
+  dn_ring_buffer(dn_asset_load_request_t) load_requests;
+  dn_ring_buffer(dn_asset_load_request_t) completion_queue;
+} dn_asset_loader_t;
 
-void dn_background_tile_processor_init(u32* source_data);
-void dn_background_tile_processor_deinit();
-void dn_background_tile_processor_process(dn_background_t* background);
+DN_IMP void dn_asset_loader_process_requests();
+DN_IMP void dn_asset_loader_process_completion_queue();
+DN_IMP void dn_asset_loader_submit(dn_asset_load_request_t request);
 
+//////////////
+// IMPORTER //
+//////////////
+typedef struct {
+  void* user_data;
+} dn_asset_import_request_t;
 
+dn_typedef_fn(void,                         dn_asset_import_fn,     dn_asset_import_request_t* request);
+dn_typedef_fn(dn_asset_completion_status_t, dn_asset_completion_fn, dn_asset_import_request_t* request);
+
+typedef struct {
+  dn_asset_name_t id;
+  dn_asset_import_fn on_import;
+  dn_asset_completion_fn on_complete;
+} dn_asset_importer_t;
+
+//////////////
+// REGISTRY //
+//////////////
+typedef struct {
+  struct {
+    dn_asset_importer_t* data;
+    u32 count;
+  } importers;
+} dn_asset_config_t;
+
+typedef struct {
+  gs_hash_table(dn_hash_t, dn_asset_t) assets;
+  gs_hash_table(dn_hash_t, dn_asset_importer_t) importers;
+} dn_asset_registry_t;
+
+DN_API void            dn_asset_registry_init(dn_asset_config_t config);
+DN_API dn_asset_data_t dn_asset_registry_find(const char* name);
+DN_API void            dn_asset_registry_add(const char* name, dn_asset_data_t data);
+DN_IMP void            dn_asset_registry_update();
+
+/////////////////////////
+// BACKGROUND IMPORTER //
+/////////////////////////
+typedef enum {
+  DN_BACKGROUND_COMPLETION_STATUS_UPDATE_CONFIG,
+  DN_BACKGROUND_COMPLETION_STATUS_LOAD_TILES,
+  DN_BACKGROUND_COMPLETION_STATUS_DONE,
+} dn_background_completion_status_t;
+
+typedef struct {
+  dn_background_completion_status_t status;
+  dn_background_t* background;
+} dn_background_import_request_t;
+
+DN_IMP void                         dn_background_import(dn_asset_import_request_t* request);
+DN_IMP dn_asset_completion_status_t dn_background_complete(dn_asset_import_request_t* request);
 
 
 //  ████████╗███████╗███████╗████████╗██╗███╗   ██╗ ██████╗
@@ -883,6 +1396,7 @@ void dn_test_begin(dn_string_t name);
 void dn_test_end();
 void dn_test_end_suite();
 
+
 #ifdef DN_APP
 //  ██╗    ██╗██╗███╗   ██╗██████╗  ██████╗ ██╗    ██╗
 //  ██║    ██║██║████╗  ██║██╔══██╗██╔═══██╗██║    ██║
@@ -891,10 +1405,10 @@ void dn_test_end_suite();
 //  ╚███╔███╔╝██║██║ ╚████║██████╔╝╚██████╔╝╚███╔███╔╝
 //   ╚══╝╚══╝ ╚═╝╚═╝  ╚═══╝╚═════╝  ╚═════╝  ╚══╝╚══╝
 typedef enum {
-  DN_WINDOW_FLAG_NONE = 0,
-  DN_WINDOW_FLAG_WINDOWED = 1,
-  DN_WINDOW_FLAG_BORDER = 2,
-  DN_WINDOW_FLAG_VSYNC = 4
+  DN_WINDOW_FLAG_NONE,
+  DN_WINDOW_FLAG_WINDOWED,
+  DN_WINDOW_FLAG_BORDER,
+  DN_WINDOW_FLAG_VSYNC,
 } dn_window_flags_t;
 
 typedef enum {
@@ -921,6 +1435,7 @@ typedef struct {
   dn_display_mode_t display_mode;
   dn_vector2_t native_resolution;
   dn_window_flags_t flags;
+  u32 target_fps;
 } dn_window_config_t;
 
 typedef struct {
@@ -1012,7 +1527,7 @@ DN_IMP void    dn_imgui_update();
 //  ╚══════╝ ╚═════╝ ╚═╝  ╚═╝
 #ifdef DN_LUA
 #ifndef LUA_VERSION
-	#error "Please include Lua before including dn.h. If you aren't using Lua, find where DN_LUA is being defined and fix it."
+  #error "Please include Lua before including dn.h. If you aren't using Lua, find where DN_LUA is being defined and fix it."
 #endif
 
 typedef lua_State* dn_lua_interpreter_t;
@@ -1024,7 +1539,7 @@ typedef struct {
 #define DN_LUA_MAX_DIRECTORIES 32
 typedef struct {
   dn_string_t scripts;
-	dn_lua_interpreter_t state;
+  dn_lua_interpreter_t state;
   dn_fixed_array(dn_string_t, DN_LUA_MAX_DIRECTORIES) directories;
 } dn_lua_t;
 dn_lua_t dn_lua;
@@ -1038,6 +1553,593 @@ DN_IMP const char* dn_lua_format_file_load_error(const char* error);
 DN_IMP s32         dn_lua_format_file_load_error_l(dn_lua_interpreter_t lua);
 #endif
 
+
+// ███████╗ ██████╗ ███╗   ██╗████████╗███████╗
+// ██╔════╝██╔═══██╗████╗  ██║╚══██╔══╝██╔════╝
+// █████╗  ██║   ██║██╔██╗ ██║   ██║   ███████╗
+// ██╔══╝  ██║   ██║██║╚██╗██║   ██║   ╚════██║
+// ██║     ╚██████╔╝██║ ╚████║   ██║   ███████║
+// ╚═╝      ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚══════╝
+typedef enum {
+  DN_FONT_FLAG_NONE = 0,
+  DN_FONT_FLAG_IMGUI = 1,
+  DN_FONT_FLAG_DEFAULT = 2,
+  DN_FONT_FLAG_BOLD = 4,
+  DN_FONT_FLAG_EXTRABOLD = 8,
+  DN_FONT_FLAG_ITALIC = 16,
+} dn_font_flags_t;
+
+typedef struct {
+  dn_vector2_t* verts;
+  dn_vector2_t* uv;
+  dn_vector2_t size;
+  dn_vector2_t bearing;
+  dn_vector2_t advance;
+  f32 descender;
+} dn_baked_glyph_t;
+
+typedef struct {
+  dn_asset_name_t name;
+  dn_hash_t hash;
+  dn_path_t path;
+  dn_font_flags_t flags;
+  
+  u32 size;
+  u32 texture;
+  // ImFont* imfont;
+  dn_vector2_t resolution;
+   
+  dn_baked_glyph_t* glyphs;
+  dn_vector2_t max_advance;
+  dn_vector2_t max_glyph;
+  f32 line_spacing;
+} dn_baked_font_t;
+
+typedef struct {
+  const char* id;
+  const char* file_path;
+  u32 sizes [16];
+  dn_font_flags_t flags;
+} dn_font_descriptor_t;
+
+typedef struct {
+  dn_font_descriptor_t* fonts;
+  u32 num_fonts;
+} dn_font_config_t;
+
+typedef struct {
+  dn_fixed_array(dn_baked_font_t, 64) baked_fonts;
+  dn_fixed_array(dn_baked_glyph_t, 8192) baked_glyphs;
+  dn_fixed_array(dn_vector2_t, 65536>)vertex_data;
+  dn_fixed_array(dn_vector2_t, 65536>)uv_data;
+
+  dn_baked_font_t* default_font;
+} dn_fonts_t;
+dn_fonts_t dn_fonts;
+
+DN_API void             dn_font_init(dn_font_config_t config);
+DN_API void             dn_font_bake_n(dn_font_descriptor_t* descriptors, u32 num_descriptors);
+DN_API void             dn_font_bake(dn_font_descriptor_t descriptor);
+DN_API dn_font_config_t dn_font_config_default();
+DN_API dn_baked_font_t* dn_font_default();
+DN_API dn_baked_font_t* dn_font_find(const char* id, u32 size);
+DN_IMP dn_hash_t        dn_font_hash(const char* id, u32 size);
+
+
+//  ██████╗ ██████╗ ██╗   ██╗
+// ██╔════╝ ██╔══██╗██║   ██║
+// ██║  ███╗██████╔╝██║   ██║
+// ██║   ██║██╔═══╝ ██║   ██║
+// ╚██████╔╝██║     ╚██████╔╝
+//  ╚═════╝ ╚═╝      ╚═════╝ 
+#define DN_GPU_NEAR_PLANE -100.0
+#define DN_GPU_FAR_PLANE 100.0
+
+typedef enum {
+  DN_GPU_COMMAND_OP_BIND_BUFFERS = 10,
+  DN_GPU_COMMAND_OP_BEGIN_RENDER_PASS = 20,
+  DN_GPU_COMMAND_OP_END_RENDER_PASS = 21,
+  DN_GPU_COMMAND_OP_BIND_PIPELINE = 30,
+  DN_GPU_COMMAND_OP_SET_CAMERA = 40,
+  DN_GPU_COMMAND_OP_SET_LAYER = 41,
+  DN_GPU_COMMAND_OP_SET_WORLD_SPACE = 42,
+  DN_GPU_COMMAND_OP_SET_SCISSOR = 43,
+  DN_GPU_COMMAND_OP_DRAW = 70,
+} dn_gpu_command_op_t;
+
+typedef enum {
+  DN_GPU_PRIMITIVE_TRIANGLES = 0
+} dn_gpu_draw_primitive_t;
+
+typedef enum {
+  DN_GPU_DRAW_MODE_ARRAYS = 0,
+  DN_GPU_DRAW_MODE_INSTANCE = 1,
+} dn_gpu_draw_mode_t;
+
+typedef enum {
+  DN_GPU_VERTEX_ATTRIBUTE_FLOAT = 0,
+  DN_GPU_VERTEX_ATTRIBUTE_U32 = 1,
+} dn_gpu_vertex_attribute_kind_t;
+
+typedef enum {
+  DN_GPU_UNIFORM_NONE = 0,
+  DN_GPU_UNIFORM_MATRIX4 = 1,
+  DN_GPU_UNIFORM_MATRIX3 = 2,
+  DN_GPU_UNIFORM_MATRIX2 = 3,
+  DN_GPU_UNIFORM_VECTOR4 = 4,
+  DN_GPU_UNIFORM_VECTOR3 = 5,
+  DN_GPU_UNIFORM_VECTOR2 = 6,
+  DN_GPU_UNIFORM_I32 = 7,
+  DN_GPU_UNIFORM_F32 = 8,
+  DN_GPU_UNIFORM_TEXTURE = 9,
+  DN_GPU_UNIFORM_ENUM = 10,
+} dn_gpu_uniform_kind_t;
+
+typedef enum {
+  DN_GPU_BUFFER_KIND_STORAGE = 0,
+  DN_GPU_BUFFER_KIND_ARRAY = 1,
+  DN_GPU_BUFFER_KIND_UNIFORM = 2,
+} dn_gpu_buffer_kind_t;
+
+typedef enum {
+  DN_GPU_BUFFER_USAGE_STATIC = 0,
+  DN_GPU_BUFFER_USAGE_DYNAMIC = 1,
+  DN_GPU_BUFFER_USAGE_STREAM = 2,
+} dn_gpu_buffer_usage_t;
+
+typedef enum {
+  DN_GPU_BLEND_FUNC_NONE,
+  DN_GPU_BLEND_FUNC_ADD,
+  DN_GPU_BLEND_FUNC_SUBTRACT,
+  DN_GPU_BLEND_FUNC_REVERSE_SUBTRACT,
+  DN_GPU_BLEND_FUNC_MIN,
+  DN_GPU_BLEND_FUNC_MAX
+} dn_gpu_blend_func_t;
+
+typedef enum {
+  DN_GPU_BLEND_MODE_ZERO,
+  DN_GPU_BLEND_MODE_ONE,
+  DN_GPU_BLEND_MODE_SRC_COLOR,
+  DN_GPU_BLEND_MODE_ONE_MINUS_SRC_COLOR,
+  DN_GPU_BLEND_MODE_DST_COLOR,
+  DN_GPU_BLEND_MODE_ONE_MINUS_DST_COLOR,
+  DN_GPU_BLEND_MODE_SRC_ALPHA,
+  DN_GPU_BLEND_MODE_ONE_MINUS_SRC_ALPHA,
+  DN_GPU_BLEND_MODE_DST_ALPHA,
+  DN_GPU_BLEND_MODE_ONE_MINUS_DST_ALPHA,
+  DN_GPU_BLEND_MODE_CONSTANT_COLOR,
+  DN_GPU_BLEND_MODE_ONE_MINUS_CONSTANT_COLOR,
+  DN_GPU_BLEND_MODE_CONSTANT_ALPHA,
+  DN_GPU_BLEND_MODE_ONE_MINUS_CONSTANT_ALPHA,
+  DN_GPU_BLEND_MODE_SRC_ALPHA_SATURATE,
+  DN_GPU_BLEND_MODE_SRC1_COLOR,
+  DN_GPU_BLEND_MODE_ONE_MINUS_SRC1_COLOR,
+  DN_GPU_BLEND_MODE_SRC1_ALPHA,
+  DN_GPU_BLEND_MODE_ONE_MINUS_SRC1_ALPHA
+} dn_gpu_blend_mode_t;
+
+typedef enum {
+  DN_GPU_LOAD_OP_NONE = 0,
+  DN_GPU_LOAD_OP_CLEAR = 1
+} dn_gpu_load_op_t;
+
+typedef enum {
+  DN_GPU_RESOURCE_FRAMEBUFFER = 0,
+  DN_GPU_RESOURCE_SHADER = 1,
+  DN_GPU_RESOURCE_PROGRAM = 2,
+} dn_gpu_resource_id_t;
+
+typedef enum {
+  DN_GPU_MEMORY_BARRIER_STORAGE = 0,
+  DN_GPU_MEMORY_BARRIER_BUFFER_UPDATE = 1,
+} dn_gpu_memory_barrier_t;
+
+typedef enum {
+  DN_GPU_SHADER_GRAPHICS = 0,
+  DN_GPU_SHADER_COMPUTE = 1,
+} dn_gpu_shader_kind_t;
+
+/////////////
+// SHADERS //
+/////////////
+
+typedef struct {
+  const char* name;
+  const char* vertex_shader;
+  const char* fragment_shader;
+  const char* compute_shader;
+
+  dn_gpu_shader_kind_t kind;
+} dn_gpu_shader_descriptor_t;
+
+typedef struct {
+  dn_gpu_shader_kind_t kind;
+  dn_asset_name_t name;
+  u32 program;
+  
+  union {
+    struct {
+      char* vertex_path;
+      char* fragment_path;
+      u32 vertex_shader;
+      u32 fragment_shader;
+    } graphics;
+
+    struct {
+      char* path;
+      u32 shader;
+    } compute;
+  };
+} dn_gpu_shader_t;
+
+//////////////
+// UNIFORMS //
+//////////////
+typedef union {
+  dn_matrix4_t mat4;
+  dn_matrix3_t mat3;
+  dn_matrix2_t mat2;
+  dn_vector4_t vec4;
+  dn_vector3_t vec3;
+  dn_vector2_t vec2;
+  float f32;
+  s32 texture;
+  s32 i32;
+} dn_gpu_uniform_data_t;
+
+typedef struct {
+  dn_asset_name_t name;
+  dn_gpu_uniform_kind_t kind;
+} dn_gpu_uniform_descriptor_t;
+
+typedef struct {
+  dn_asset_name_t name;
+  dn_gpu_uniform_kind_t kind;
+} dn_gpu_uniform_t;
+
+/////////////////
+// GPU BUFFERS //
+/////////////////
+typedef struct {
+  dn_asset_name_t name;
+  dn_gpu_buffer_kind_t kind;
+  dn_gpu_buffer_usage_t usage;
+  u32 capacity;
+  u32 element_size;
+} dn_gpu_buffer_descriptor_t;
+
+typedef struct {
+  dn_asset_name_t name;
+  dn_gpu_buffer_kind_t kind;
+  dn_gpu_buffer_usage_t usage;
+  u32 size;
+  u32 handle;
+} dn_gpu_buffer_t;
+
+typedef struct {
+  dn_fixed_array_t buffer;
+  dn_gpu_buffer_t* gpu_buffer;
+} dn_gpu_backed_buffer_t;
+
+///////////////////////
+// GPU RENDER TARGET //
+///////////////////////
+typedef struct {
+  dn_asset_name_t name;
+  dn_vector2_t size;
+} dn_gpu_render_target_descriptor_t;
+
+typedef struct {
+  dn_asset_name_t name;
+  u32 handle;
+  u32 color_buffer;
+  dn_vector2_t size;
+} dn_gpu_render_target_t;
+
+/////////////////////
+// GPU RENDER PASS //
+/////////////////////
+typedef struct {
+  struct {
+    dn_gpu_load_op_t load;
+    dn_gpu_render_target_t* attachment;
+  } color;
+} dn_gpu_render_pass_t;
+
+////////////////////////
+// GPU BUFFER BINDING //
+////////////////////////
+typedef struct {
+  dn_gpu_buffer_t* buffer;
+} dn_gpu_vertex_buffer_binding_t;
+
+typedef struct {
+  dn_gpu_buffer_t* buffer;
+  u32 base;
+} dn_gpu_storage_buffer_binding_t;
+
+typedef struct {
+  dn_gpu_uniform_data_t data;
+  dn_gpu_uniform_t* uniform;
+  u32 binding_index;
+} dn_gpu_uniform_binding_t;
+
+typedef struct {
+  dn_asset_name_t name;
+  dn_gpu_buffer_t* buffer;
+  u32 binding_index;
+} dn_gpu_uniform_buffer_binding_t;
+
+typedef struct {
+  dn_align(16) struct {
+    dn_gpu_vertex_buffer_binding_t bindings [8];
+    u32 count;
+  } vertex;
+
+  dn_align(16) struct {
+    dn_gpu_uniform_binding_t bindings [8];
+    u32 count;
+  } uniforms;
+
+  dn_align(16) struct {
+    dn_gpu_storage_buffer_binding_t bindings [8];
+    u32 count;
+  } storage;
+
+  dn_align(16) struct {
+    dn_gpu_uniform_buffer_binding_t bindings [8];
+    u32 count;
+  } uniform_buffers;
+} dn_gpu_buffer_binding_t;
+
+//////////////////
+// GPU PIPELINE //
+//////////////////
+typedef struct {
+  dn_gpu_blend_func_t fn;
+  dn_gpu_blend_mode_t source;
+  dn_gpu_blend_mode_t destination;
+} dn_gpu_blend_state_t;
+
+typedef struct {
+  dn_gpu_shader_t* shader;
+  dn_gpu_draw_primitive_t primitive;
+} dn_gpu_raster_state_t;
+
+typedef struct {
+  dn_vector2_t position;
+  dn_vector2_t size;
+  bool enabled;
+} dn_gpu_scissor_state_t;
+
+typedef struct {
+  u32 layer;
+  bool world_space;
+  dn_vector2_t camera;
+  dn_matrix4_t projection;
+} dn_gpu_renderer_state_t;
+
+typedef struct {
+  dn_gpu_vertex_attribute_kind_t kind;
+  u32 count;
+  u32 divisor;
+} dn_gpu_vertex_attribute_t;
+
+typedef struct {
+  dn_gpu_vertex_attribute_t vertex_attributes [8];
+  u32 num_vertex_attributes;
+} dn_gpu_buffer_layout_t;
+
+typedef struct {
+  u32 size;
+  u32 value;
+} dn_gpu_vertex_attr_info_t;
+
+typedef struct {
+  dn_gpu_blend_state_t blend;
+  dn_gpu_raster_state_t raster;
+  dn_gpu_buffer_layout_t buffer_layouts [8];
+  u32 num_buffer_layouts;
+} dn_gpu_pipeline_descriptor_t;
+
+typedef struct {
+  dn_gpu_blend_state_t blend;
+  dn_gpu_raster_state_t raster;
+  dn_gpu_buffer_layout_t buffer_layouts [8];
+  u32 num_buffer_layouts;
+} dn_gpu_pipeline_t;
+
+////////////////////////
+// GPU COMMAND BUFFER //
+////////////////////////
+typedef struct {
+  dn_gpu_draw_mode_t mode;
+  u32 vertex_offset;
+  u32 num_vertices;
+  u32 num_instances;
+} dn_gpu_draw_call_t;
+
+typedef struct {
+  dn_gpu_command_op_t op;
+  union {
+    dn_gpu_pipeline_t*       pipeline;
+    dn_gpu_buffer_binding_t  bindings;
+    dn_gpu_render_pass_t     render_pass;
+    dn_gpu_renderer_state_t  render;
+    dn_gpu_scissor_state_t   scissor;
+    dn_gpu_draw_call_t       draw;
+  };
+} dn_gpu_command_t;
+
+typedef struct {
+  u32 max_commands;
+} dn_gpu_command_buffer_descriptor_t;
+
+typedef struct {
+  dn_gpu_pipeline_t* pipeline;
+  dn_gpu_buffer_binding_t bindings;
+  dn_gpu_render_pass_t render_pass;
+  dn_gpu_renderer_state_t render;
+  dn_gpu_scissor_state_t scissor;
+
+  dn_fixed_array(dn_gpu_command_t, DN_FIXED_ARRAY_RUNTIME_SIZE) commands;
+  u32 vao;
+} dn_gpu_command_buffer_t;
+
+////////////
+// DN GPU //
+////////////
+typedef struct {
+  dn_matrix4_t view;
+  dn_matrix4_t projection;
+  dn_vector2_t camera;
+  dn_vector2_t native_resolution;
+  dn_vector2_t output_resolution;
+  f32 master_time;
+} dn_gpu_uniforms_t;
+
+typedef struct {
+  const char* shader_path;
+  dn_gpu_shader_descriptor_t* shaders;
+  u32 num_shaders;
+  const char** search_paths;
+  u32 num_search_paths;
+  dn_gpu_render_target_descriptor_t* render_targets;
+  u32 num_render_targets;
+} dn_gpu_config_t;
+
+typedef struct {
+  dn_fixed_array(dn_gpu_command_buffer_t, 32) command_buffers;
+  dn_fixed_array(dn_gpu_uniform_t, 1024) uniforms;
+  dn_fixed_array(dn_gpu_pipeline_t, 64) pipelines;
+  dn_fixed_array(dn_gpu_buffer_t, 128)  gpu_buffers;
+  dn_fixed_array(dn_gpu_render_target_t, 32)  targets;
+  dn_fixed_array(dn_gpu_shader_t, 128) shaders;
+
+  // FileMonitor* shader_monitor;
+  dn_fixed_array(dn_path_t, 16) search_paths;
+
+  struct {
+    dn_gpu_buffer_t* buffer;
+    dn_gpu_uniform_buffer_binding_t binding;
+    dn_gpu_uniforms_t data;
+  } builtin_uniforms;
+} dn_gpu_t;
+dn_gpu_t dn_gpu;
+
+DN_API void                      dn_gpu_init(dn_gpu_config_t config);
+DN_API dn_gpu_command_buffer_t*  dn_gpu_command_buffer_create(dn_gpu_command_buffer_descriptor_t descriptor);
+DN_API void                      dn_gpu_command_buffer_draw(dn_gpu_command_buffer_t* command_buffer, dn_gpu_draw_call_t draw_call);
+DN_API void                      dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer);
+DN_API void                      dn_gpu_bind_pipeline(dn_gpu_command_buffer_t* command_buffer, dn_gpu_pipeline_t* pipeline);
+DN_API void                      dn_gpu_begin_render_pass(dn_gpu_command_buffer_t* command_buffer, dn_gpu_render_pass_t render_pass);
+DN_API void                      dn_gpu_end_render_pass(dn_gpu_command_buffer_t* command_buffer);
+DN_API void                      dn_gpu_apply_bindings(dn_gpu_command_buffer_t* command_buffer, dn_gpu_buffer_binding_t bindings);
+DN_API void                      dn_gpu_bind_render_state(dn_gpu_command_buffer_t* command_buffer, dn_gpu_renderer_state_t render);
+DN_API void                      dn_gpu_set_layer(dn_gpu_command_buffer_t* command_buffer, u32 layer);
+DN_API void                      dn_gpu_set_world_space(dn_gpu_command_buffer_t* command_buffer, bool world_space);
+DN_API void                      dn_gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, dn_vector2_t camera);
+DN_API dn_gpu_pipeline_t*        dn_gpu_pipeline_create(dn_gpu_pipeline_descriptor_t descriptor);
+DN_API dn_gpu_uniform_t*         dn_gpu_uniform_create(dn_gpu_uniform_descriptor_t descriptor);
+DN_API dn_gpu_buffer_t*          dn_gpu_buffer_create(dn_gpu_buffer_descriptor_t descriptor);
+DN_API void                      dn_gpu_buffer_bind(dn_gpu_buffer_t* buffer);
+DN_API void                      dn_gpu_buffer_bind_base(dn_gpu_buffer_t* buffer, u32 base);
+DN_API void                      dn_gpu_buffer_sync(dn_gpu_buffer_t* buffer, void* data, u32 size);
+DN_API void                      dn_gpu_buffer_sync_subdata(dn_gpu_buffer_t* buffer, void* data, u32 byte_size, u32 byte_offset);
+DN_API void                      dn_gpu_buffer_zero(dn_gpu_buffer_t* buffer, u32 size);
+DN_API dn_gpu_backed_buffer_t    dn_gpu_backed_buffer_create(dn_gpu_buffer_descriptor_t descriptor);
+DN_API u32                       dn_gpu_backed_buffer_size(dn_gpu_backed_buffer_t* buffer);
+DN_API void                      dn_gpu_backed_buffer_clear(dn_gpu_backed_buffer_t* buffer);
+DN_API u8*                       dn_gpu_backed_buffer_push(dn_gpu_backed_buffer_t* buffer, void* data, u32 num_elements);
+DN_API void                      dn_gpu_backed_buffer_sync(dn_gpu_backed_buffer_t* buffer);
+DN_API dn_gpu_shader_t*          dn_gpu_shader_create(dn_gpu_shader_descriptor_t descriptor);
+DN_API dn_gpu_shader_t*          dn_gpu_shader_find(const char* name);
+DN_API dn_gpu_render_target_t*   dn_gpu_render_target_create(dn_gpu_render_target_descriptor_t descriptor);
+DN_API dn_gpu_render_target_t*   dn_gpu_acquire_swapchain();
+DN_API dn_gpu_render_target_t*   dn_gpu_render_target_find(const char* name);
+DN_API void                      dn_gpu_render_target_bind(dn_gpu_render_target_t* target);
+DN_API void                      dn_gpu_render_target_clear(dn_gpu_render_target_t* target);
+DN_API void                      dn_gpu_render_target_blit(dn_gpu_render_target_t* source, dn_gpu_render_target_t* destination);
+DN_API void                      dn_gpu_memory_barrier(dn_gpu_memory_barrier_t barrier);
+DN_API void                      dn_gpu_dispatch_compute(dn_gpu_buffer_t* buffer, u32 size);
+DN_API void                      dn_gpu_swap_buffers();
+DN_API void                      dn_gpu_error_clear();
+DN_API dn_tstring_t              dn_gpu_error_read();
+DN_API void                      dn_gpu_error_log_one();
+DN_API void                      dn_gpu_error_log_all();
+DN_API void                      dn_gpu_set_resource_name(dn_gpu_resource_id_t id, u32 handle, u32 name_len, const char* name);
+DN_IMP void                      dn_gpu_shader_build_source(const char* file_path);
+DN_IMP void                      dn_gpu_shader_init(dn_gpu_shader_t* shader, dn_gpu_shader_descriptor_t descriptor);
+DN_IMP void                      dn_gpu_shader_init_graphics(dn_gpu_shader_t* shader, const char* name);
+DN_IMP void                      dn_gpu_shader_init_graphics_ex(dn_gpu_shader_t* shader, const char* name, const char* vertex_path, const char* fragment_path);
+DN_IMP void                      dn_gpu_shader_init_compute(dn_gpu_shader_t* shader, const char* name);
+DN_IMP void                      dn_gpu_shader_init_compute_ex(dn_gpu_shader_t* shader, const char* name, const char* compute_path);
+DN_IMP void                      dn_gpu_shader_reload(dn_gpu_shader_t* shader); 
+DN_IMP void                      dn_gpu_command_buffer_clear_cached_state(dn_gpu_command_buffer_t* command_buffer);
+DN_IMP u32                       dn_gpu_vertex_layout_calculate_stride(dn_gpu_buffer_layout_t* layout);
+DN_IMP u32                       dn_gpu_draw_primitive_to_gl_draw_primitive(dn_gpu_draw_primitive_t primitive);
+DN_IMP dn_gpu_vertex_attr_info_t dn_gpu_vertex_attribute_info(dn_gpu_vertex_attribute_kind_t kind);
+DN_IMP void*                     dn_gpu_u32_to_gl_void_pointer(u32 value);
+DN_IMP u32                       dn_gpu_buffer_kind_to_gl_buffer_kind(dn_gpu_buffer_kind_t kind);
+DN_IMP u32                       dn_gpu_buffer_usage_to_gl_buffer_usage(dn_gpu_buffer_usage_t usage);
+DN_IMP u32                       dn_gpu_buffer_kind_to_gl_barrier(dn_gpu_buffer_kind_t kind);
+DN_IMP u32                       dn_gpu_blend_func_to_gl_blend_func(dn_gpu_blend_func_t func);
+DN_IMP u32                       dn_gpu_blend_mode_to_gl_blend_mode(dn_gpu_blend_mode_t mode);
+DN_IMP u32                       dn_gpu_resource_id_to_gl_id(dn_gpu_resource_id_t id);
+DN_IMP u32                       dn_gpu_memory_barrier_to_gl_barrier(dn_gpu_memory_barrier_t barrier);
+DN_IMP void dn_gpu_apply_uniform_buffer_binding(dn_gpu_command_buffer_t* command_buffer, dn_gpu_uniform_buffer_binding_t* binding);
+
+
+// ███████╗████████╗███████╗ █████╗ ███╗   ███╗
+// ██╔════╝╚══██╔══╝██╔════╝██╔══██╗████╗ ████║
+// ███████╗   ██║   █████╗  ███████║██╔████╔██║
+// ╚════██║   ██║   ██╔══╝  ██╔══██║██║╚██╔╝██║
+// ███████║   ██║   ███████╗██║  ██║██║ ╚═╝ ██║
+// ╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝
+typedef enum {
+  DN_STEAM_INIT_NONE,
+  DN_STEAM_INIT_FAILED,
+  DN_STEAM_INIT_OK,
+} dn_steam_init_state_t;
+
+typedef enum {
+  DN_STEAM_INPUT_TEXT_UNINITIALIZED,
+  DN_STEAM_INPUT_TEXT_OPEN,
+  DN_STEAM_INPUT_TEXT_UNREAD,
+  DN_STEAM_INPUT_TEXT_CLOSED,
+} dn_steam_text_input_state_t;
+
+typedef struct {
+  // STEAM_CALLBACK(dn_steam_callbacks_t, on_dismiss_text_input, GamepadTextInputDismissed_t);
+  u32 dummy;
+} dn_steam_callbacks_t ;
+dn_steam_callbacks_t dn_steam_callbacks;
+
+typedef struct {
+  u32 app_id;
+} dn_steam_config_t;
+
+typedef struct {
+  u32 app_id;
+  dn_steam_init_state_t state;
+
+  struct {
+    dn_steam_text_input_state_t state;
+    dn_string_t contents;
+  } text_input;
+} dn_steam_t;
+dn_steam_t dn_steam;
+
+DN_API void                        dn_steam_init(dn_steam_config_t config);
+DN_API bool                        dn_steam_initialized();
+DN_API void                        dn_steam_open_store_page();
+DN_API void                        dn_steam_open_store_page_utm(dn_string_t utm);
+DN_API void                        dn_steam_open_store_page_ex(dn_string_t url);
+DN_API void                        dn_steam_open_text_input();
+DN_API dn_steam_text_input_state_t dn_steam_text_input_state();
+DN_API dn_string_t                 dn_string_read_text_input();
+DN_API bool                        dn_steam_is_deck();
+DN_IMP void                        dn_steam_shutdown();
 
 //   █████╗ ██████╗ ██████╗
 //  ██╔══██╗██╔══██╗██╔══██╗
@@ -1076,13 +2178,12 @@ typedef struct {
 
 typedef struct {
   dn_window_config_t window;
-  // dn_audio_config_t audio;
-  // dn_font_config_t font;
-  // dn_gpu_config_t gpu;
-  // dn_asset_config_t asset;
-  // dn_steam_config_t steam;
-  // dn_image_config_t image;
-  u32 target_fps;
+  dn_audio_config_t audio;
+  dn_font_config_t font;
+  dn_gpu_config_t gpu;
+  dn_asset_config_t asset;
+  dn_steam_config_t steam;
+  dn_image_config_t image;
 } dn_app_config_t;
 
 
@@ -1099,11 +2200,14 @@ typedef struct {
 
 typedef struct {
   dn_window_t window;
-  dn_backgrounds_t backgrounds;
+  dn_asset_loader_t loader;
+  dn_asset_registry_t asset_registry;
+
   f32 target_fps;
   f32 dt;
   f32 elapsed_time;
   s32 frame;
+  DN_ATOMIC u32 monotonic_id;
   bool exit_game;
   bool steam;
 } dn_app_t;
@@ -1121,6 +2225,7 @@ DN_API f32                 dn_app_get_target_fps();
 DN_API bool                dn_app_exceeded_frame_time();
 DN_API bool                dn_app_should_exit();
 DN_API dn_type_info_list_t dn_app_query_types();
+DN_API u32                 dn_app_monotonic_id();
 DN_IMP void                dn_app_update();
 
 #endif
@@ -1132,8 +2237,471 @@ DN_IMP void                dn_app_update();
 //  ██║██║╚██╔╝██║██╔═══╝ ██║     ██╔══╝  ██║╚██╔╝██║██╔══╝  ██║╚██╗██║   ██║   ██╔══██║   ██║   ██║██║   ██║██║╚██╗██║
 //  ██║██║ ╚═╝ ██║██║     ███████╗███████╗██║ ╚═╝ ██║███████╗██║ ╚████║   ██║   ██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║
 //  ╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+///////////
+// STEAM //
+///////////
+void dn_steam_init(dn_steam_config_t config) {
+  DN_BROKEN();
+}
 
-#ifdef DN_IMPLEMENTATION
+bool dn_steam_initialized() {
+  DN_BROKEN();
+  return false;
+}
+
+void dn_steam_open_store_page() {
+  DN_BROKEN();
+}
+
+void dn_steam_open_store_page_utm(dn_string_t utm) {
+  DN_BROKEN();
+}
+
+void dn_steam_open_store_page_ex(dn_string_t url) {
+  DN_BROKEN();
+}
+
+void dn_steam_open_text_input() {
+  DN_BROKEN();
+}
+
+dn_steam_text_input_state_t dn_steam_text_input_state() {
+  DN_BROKEN();
+  return DN_STEAM_INPUT_TEXT_UNINITIALIZED;
+}
+
+dn_string_t dn_string_read_text_input() {
+  DN_BROKEN();
+  return dn_zero_struct(dn_string_t);
+}
+
+bool dn_steam_is_deck() {
+  DN_BROKEN();
+  return false;
+}
+
+void dn_steam_shutdown() {
+  DN_BROKEN();
+}
+
+
+///////////
+// NOISE //
+///////////
+void dn_noise_init() {
+  DN_BROKEN();
+}
+
+f64 dn_noise_perlin(f64 x, f64 y) {
+  DN_BROKEN();
+  return 0;
+}
+
+f64 dn_noise_perlin_scaled(f64 x, f64 y, f64 vmin, f64 vmax) {
+  DN_BROKEN();
+  return 0;
+}
+
+f64 dn_noise_chaotic(f64 x, f64 y) {
+  DN_BROKEN();
+  return 0;
+}
+
+f64 dn_noise_chaotic_scaled(f64 x, f64 y, f64 vmin, f64 vmax) {
+  DN_BROKEN();
+  return 0;
+}
+
+
+///////////
+// FONTS //
+///////////
+void dn_font_init(dn_font_config_t config) {
+  DN_BROKEN();
+}
+
+void dn_font_bake_n(dn_font_descriptor_t* descriptors, u32 num_descriptors) {
+  DN_BROKEN();
+}
+
+void dn_font_bake(dn_font_descriptor_t descriptor) {
+  DN_BROKEN();
+}
+
+dn_font_config_t dn_font_config_default() {
+  DN_BROKEN();
+  return dn_zero_struct(dn_font_config_t);
+}
+
+dn_baked_font_t* dn_font_default() {
+  DN_BROKEN();
+  return NULL;
+}
+
+dn_baked_font_t* dn_font_find(const char* id, u32 size) {
+  DN_BROKEN();
+  return NULL;
+}
+
+dn_hash_t dn_font_hash(const char* id, u32 size) {
+  DN_BROKEN();
+  return 0;
+}
+
+
+/////////
+// GPU //
+/////////
+void dn_gpu_init(dn_gpu_config_t config) {
+  DN_BROKEN();
+}
+
+dn_gpu_command_buffer_t* dn_gpu_command_buffer_create(dn_gpu_command_buffer_descriptor_t descriptor) {
+  DN_BROKEN();
+  return NULL;
+}
+
+void dn_gpu_command_buffer_draw(dn_gpu_command_buffer_t* command_buffer, dn_gpu_draw_call_t draw_call) {
+  DN_BROKEN();
+}
+
+void dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
+  DN_BROKEN();
+}
+
+void dn_gpu_bind_pipeline(dn_gpu_command_buffer_t* command_buffer, dn_gpu_pipeline_t* pipeline) {
+  DN_BROKEN();
+}
+
+void dn_gpu_begin_render_pass(dn_gpu_command_buffer_t* command_buffer, dn_gpu_render_pass_t render_pass) {
+  DN_BROKEN();
+}
+
+void dn_gpu_end_render_pass(dn_gpu_command_buffer_t* command_buffer) {
+  DN_BROKEN();
+}
+
+void dn_gpu_apply_bindings(dn_gpu_command_buffer_t* command_buffer, dn_gpu_buffer_binding_t bindings) {
+  DN_BROKEN();
+}
+
+void dn_gpu_bind_render_state(dn_gpu_command_buffer_t* command_buffer, dn_gpu_renderer_state_t render) {
+  DN_BROKEN();
+}
+
+void dn_gpu_set_layer(dn_gpu_command_buffer_t* command_buffer, u32 layer) {
+  DN_BROKEN();
+}
+
+void dn_gpu_set_world_space(dn_gpu_command_buffer_t* command_buffer, bool world_space) {
+  DN_BROKEN();
+}
+
+void dn_gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, dn_vector2_t camera) {
+  DN_BROKEN();
+}
+
+dn_gpu_pipeline_t* dn_gpu_pipeline_create(dn_gpu_pipeline_descriptor_t descriptor) {
+  DN_BROKEN();
+  return NULL;
+}
+
+dn_gpu_uniform_t* dn_gpu_uniform_create(dn_gpu_uniform_descriptor_t descriptor) {
+  DN_BROKEN();
+  return NULL;
+}
+
+dn_gpu_buffer_t* dn_gpu_buffer_create(dn_gpu_buffer_descriptor_t descriptor) {
+  DN_BROKEN();
+  return NULL;
+}
+
+void dn_gpu_buffer_bind(dn_gpu_buffer_t* buffer) {
+  DN_BROKEN();
+}
+
+void dn_gpu_buffer_bind_base(dn_gpu_buffer_t* buffer, u32 base) {
+  DN_BROKEN();
+}
+
+void dn_gpu_buffer_sync(dn_gpu_buffer_t* buffer, void* data, u32 size) {
+  DN_BROKEN();
+}
+
+void dn_gpu_buffer_sync_subdata(dn_gpu_buffer_t* buffer, void* data, u32 byte_size, u32 byte_offset) {
+  DN_BROKEN();
+}
+
+void dn_gpu_buffer_zero(dn_gpu_buffer_t* buffer, u32 size) {
+  DN_BROKEN();
+}
+
+dn_gpu_backed_buffer_t dn_gpu_backed_buffer_create(dn_gpu_buffer_descriptor_t descriptor) {
+  DN_BROKEN();
+  return dn_zero_struct(dn_gpu_backed_buffer_t);
+}
+
+u32 dn_gpu_backed_buffer_size(dn_gpu_backed_buffer_t* buffer) {
+  DN_BROKEN();
+  return 0;
+}
+
+void dn_gpu_backed_buffer_clear(dn_gpu_backed_buffer_t* buffer) {
+  DN_BROKEN();
+}
+
+u8* dn_gpu_backed_buffer_push(dn_gpu_backed_buffer_t* buffer, void* data, u32 num_elements) {
+  DN_BROKEN();
+  return NULL;
+}
+
+void dn_gpu_backed_buffer_sync(dn_gpu_backed_buffer_t* buffer) {
+  DN_BROKEN();
+}
+
+dn_gpu_shader_t* dn_gpu_shader_create(dn_gpu_shader_descriptor_t descriptor) {
+  DN_BROKEN();
+  return NULL;
+}
+
+dn_gpu_shader_t* dn_gpu_shader_find(const char* name) {
+  DN_BROKEN();
+  return NULL;
+}
+
+dn_gpu_render_target_t* dn_gpu_render_target_create(dn_gpu_render_target_descriptor_t descriptor) {
+  DN_BROKEN();
+  return NULL;
+}
+
+dn_gpu_render_target_t* dn_gpu_acquire_swapchain() {
+  DN_BROKEN();
+  return NULL;
+}
+
+dn_gpu_render_target_t* dn_gpu_render_target_find(const char* name) {
+  DN_BROKEN();
+  return NULL;
+}
+
+void dn_gpu_render_target_bind(dn_gpu_render_target_t* target) {
+  DN_BROKEN();
+}
+
+void dn_gpu_render_target_clear(dn_gpu_render_target_t* target) {
+  DN_BROKEN();
+}
+
+void dn_gpu_render_target_blit(dn_gpu_render_target_t* source, dn_gpu_render_target_t* destination) {
+  DN_BROKEN();
+}
+
+void dn_gpu_memory_barrier(dn_gpu_memory_barrier_t barrier) {
+  DN_BROKEN();
+}
+
+void dn_gpu_dispatch_compute(dn_gpu_buffer_t* buffer, u32 size) {
+  DN_BROKEN();
+}
+
+void dn_gpu_swap_buffers() {
+  DN_BROKEN();
+}
+
+void dn_gpu_error_clear() {
+  DN_BROKEN();
+}
+
+dn_tstring_t dn_gpu_error_read() {
+  DN_BROKEN();
+  return dn_zero_struct(dn_tstring_t);
+}
+
+void dn_gpu_error_log_one() {
+  DN_BROKEN();
+}
+
+void dn_gpu_error_log_all() {
+  DN_BROKEN();
+}
+
+void dn_gpu_set_resource_name(dn_gpu_resource_id_t id, u32 handle, u32 name_len, const char* name) {
+  DN_BROKEN();
+}
+
+void dn_gpu_shader_build_source(const char* file_path) {
+  DN_BROKEN();
+}
+
+void dn_gpu_shader_init(dn_gpu_shader_t* shader, dn_gpu_shader_descriptor_t descriptor) {
+  DN_BROKEN();
+}
+
+void dn_gpu_shader_init_graphics(dn_gpu_shader_t* shader, const char* name) {
+  DN_BROKEN();
+}
+
+void dn_gpu_shader_init_graphics_ex(dn_gpu_shader_t* shader, const char* name, const char* vertex_path, const char* fragment_path) {
+  DN_BROKEN();
+}
+
+void dn_gpu_shader_init_compute(dn_gpu_shader_t* shader, const char* name) {
+  DN_BROKEN();
+}
+
+void dn_gpu_shader_init_compute_ex(dn_gpu_shader_t* shader, const char* name, const char* compute_path) {
+  DN_BROKEN();
+}
+
+void dn_gpu_shader_reload(dn_gpu_shader_t* shader) {
+  DN_BROKEN();
+}
+
+void dn_gpu_command_buffer_clear_cached_state(dn_gpu_command_buffer_t* command_buffer) {
+  DN_BROKEN();
+}
+
+u32 dn_gpu_vertex_layout_calculate_stride(dn_gpu_buffer_layout_t* layout) {
+  DN_BROKEN();
+  return 0;
+}
+
+u32 dn_gpu_draw_primitive_to_gl_draw_primitive(dn_gpu_draw_primitive_t primitive) {
+  DN_BROKEN();
+  return 0;
+}
+
+dn_gpu_vertex_attr_info_t dn_gpu_vertex_attribute_info(dn_gpu_vertex_attribute_kind_t kind) {
+  DN_BROKEN();
+  return dn_zero_struct(dn_gpu_vertex_attr_info_t);
+}
+
+void* dn_gpu_u32_to_gl_void_pointer(u32 value) {
+  DN_BROKEN();
+  return NULL;
+}
+
+u32 dn_gpu_buffer_kind_to_gl_buffer_kind(dn_gpu_buffer_kind_t kind) {
+  DN_BROKEN();
+  return 0;
+}
+
+u32 dn_gpu_buffer_usage_to_gl_buffer_usage(dn_gpu_buffer_usage_t usage) {
+  DN_BROKEN();
+  return 0;
+}
+
+u32 dn_gpu_buffer_kind_to_gl_barrier(dn_gpu_buffer_kind_t kind) {
+  DN_BROKEN();
+  return 0;
+}
+
+u32 dn_gpu_blend_func_to_gl_blend_func(dn_gpu_blend_func_t func) {
+  DN_BROKEN();
+  return 0;
+}
+
+u32 dn_gpu_blend_mode_to_gl_blend_mode(dn_gpu_blend_mode_t mode) {
+  DN_BROKEN();
+  return 0;
+}
+
+u32 dn_gpu_resource_id_to_gl_id(dn_gpu_resource_id_t id) {
+  DN_BROKEN();
+  return 0;
+}
+
+u32 dn_gpu_memory_barrier_to_gl_barrier(dn_gpu_memory_barrier_t barrier) {
+  DN_BROKEN();
+  return 0;
+}
+
+void dn_gpu_apply_uniform_buffer_binding(dn_gpu_command_buffer_t* command_buffer, dn_gpu_uniform_buffer_binding_t* binding) {
+  DN_BROKEN();
+}
+
+
+/////////////////////////
+// BACKGROUND IMPORTER //
+/////////////////////////
+void dn_asset_registry_init(dn_asset_config_t config) {
+  DN_BROKEN();
+}
+
+void dn_images_init(dn_image_config_t config) {
+  DN_BROKEN();
+}
+
+void dn_atlases_init() {
+  DN_BROKEN();
+}
+
+void dn_screenshots_init() {
+  DN_BROKEN();
+}
+
+void dn_backgrounds_init() {
+  DN_BROKEN();
+}
+
+void dn_background_import(dn_asset_import_request_t* request) {
+  DN_BROKEN();
+}
+
+dn_asset_completion_status_t dn_background_complete(dn_asset_import_request_t* request) {
+  DN_BROKEN();
+  return DN_ASSET_COMPLETION_STATUS_DONE;
+}
+
+void dn_assets_init(dn_asset_config_t user_config) {
+  DN_BROKEN();
+}
+
+void dn_assets_add(const char* name, dn_asset_data_t data) {
+  DN_BROKEN();
+}
+
+dn_asset_data_t dn_assets_find(const char* name) {
+  DN_BROKEN();
+  return dn_zero_struct(dn_asset_data_t);
+}
+
+void dn_assets_update() {
+  DN_BROKEN();
+}
+
+void dn_asset_loader_process_requests() {
+  DN_BROKEN();
+}
+
+void dn_asset_loader_process_completion_queue() {
+  DN_BROKEN();
+}
+
+void dn_asset_loader_submit(dn_asset_load_request_t request) {
+  DN_BROKEN();
+}
+
+///////////
+// MUTEX //
+///////////
+void dn_mutex_init(dn_mutex_t* mutex) {
+  DN_ASSERT(mutex);
+  DN_ASSERT(mutex->initialized);
+  InitializeCriticalSection(&mutex->handle);
+}
+
+void dn_mutex_lock(dn_mutex_t* mutex) {
+  DN_ASSERT(mutex);
+  DN_ASSERT(mutex->initialized);
+  EnterCriticalSection(&mutex->handle);
+}
+
+void dn_mutex_unlock(dn_mutex_t* mutex) {
+  DN_ASSERT(mutex);
+  DN_ASSERT(mutex->initialized);
+  LeaveCriticalSection(&mutex->handle);
+}
 /////////////
 // UTILITY //
 /////////////
@@ -1201,6 +2769,10 @@ dn_vector4_t dn_math_fract4(dn_vector4_t v) {
     return result;
 }
 
+f32 dn_math_clamp(f32 value, f32 lower, f32 upper) {
+  return dn_min(dn_max(value, lower), upper);
+}
+
 dn_vector4_t dn_math_clamp4(dn_vector4_t v, float minVal, float maxVal) {
     dn_vector4_t result;
     result.x = fmaxf(minVal, fminf(v.x, maxVal));
@@ -1210,12 +2782,35 @@ dn_vector4_t dn_math_clamp4(dn_vector4_t v, float minVal, float maxVal) {
     return result;
 }
 
+u32 dn_math_ceilf(f32 f) {
+    u32 i = (u32)f;
+    return f > i ? i + 1 : i;
+}
+
+u32 dn_math_ceil_divide(u32 a, u32 b) {
+  return dn_math_ceilf((f32)a / (f32)b);
+}
+
+f32 dn_random_f32_slow(f32 vmin, f32 vmax) {
+  DN_BROKEN();
+  return 0.0;
+}
+
+s32 dn_random_i32(s32 vmin, s32 vmax) {
+  DN_BROKEN();
+  return 0;
+}
+
+void dn_random_init() {
+  srand(time(NULL));
+}
+
 
 //////////////////
 // TIME METRICS //
 //////////////////
 void dn_time_metrics_init() {
-	dn_time_metrics_add(dn_string_literal("frame"));
+  dn_time_metrics_add(dn_string_literal("frame"));
 }
 
 void dn_time_metrics_update() {
@@ -1225,28 +2820,28 @@ void dn_time_metrics_update() {
 }
 
 void dn_time_metric_init(dn_time_metric_t* metric) {
-	dn_ring_buffer_init(&metric->queue, 64, sizeof(dn_time_metric_t));
+  dn_ring_buffer_init(&metric->queue, 64, sizeof(dn_time_metric_t));
 }
 
 void dn_time_metric_begin_ex(dn_time_metric_t* metric) {
-	metric->time_begin = glfwGetTime();
+  metric->time_begin = glfwGetTime();
 }
 
 void dn_time_metric_end_ex(dn_time_metric_t* metric) {
-	f64 time_end = glfwGetTime();
-	f64 delta = time_end - metric->time_begin;
-	dn_ring_buffer_push_overwrite(&metric->queue, &delta);
+  f64 time_end = glfwGetTime();
+  f64 delta = time_end - metric->time_begin;
+  dn_ring_buffer_push_overwrite(&metric->queue, &delta);
 }
 
 f64 dn_time_metric_get_average(dn_time_metric_t* metric) {
   if (dn_ring_buffer_is_empty(&metric->queue)) return 0;
-	
-	f64 total = 0;
-	dn_ring_buffer_for(metric->queue, entry) {
-		total += *dn_rb_it(entry, f64);
-	}
+  
+  f64 total = 0;
+  dn_ring_buffer_for(metric->queue, entry) {
+    total += *dn_rb_it(entry, f64);
+  }
 
-	return total / metric->queue.size;
+  return total / metric->queue.size;
 }
 
 f64 dn_time_metric_get_last(dn_time_metric_t* metric) {
@@ -1255,40 +2850,40 @@ f64 dn_time_metric_get_last(dn_time_metric_t* metric) {
 }
 
 f64 dn_time_metric_get_largest(dn_time_metric_t* metric) {
-	f64 max_entry = 0;
-	dn_ring_buffer_for(metric->queue, entry) {
-		max_entry = dn_max(max_entry, *dn_rb_it(entry, f64));
-	}
+  f64 max_entry = 0;
+  dn_ring_buffer_for(metric->queue, entry) {
+    max_entry = dn_max(max_entry, *dn_rb_it(entry, f64));
+  }
 
-	return max_entry;
+  return max_entry;
 }
 
 f64 dn_time_metric_get_smallest(dn_time_metric_t* metric) {
-	f64 min_entry = DN_F64_MAX;
-	dn_ring_buffer_for(metric->queue, entry) {
-		min_entry = dn_min(min_entry, *dn_rb_it(entry, f64));
-	}
+  f64 min_entry = DN_F64_MAX;
+  dn_ring_buffer_for(metric->queue, entry) {
+    min_entry = dn_min(min_entry, *dn_rb_it(entry, f64));
+  }
 
-	return min_entry;
+  return min_entry;
 }
 
 void dn_time_metric_sleep_wait(dn_time_metric_t* metric, f64 target) {
-	while (true) {
-		f64 delta = glfwGetTime() - metric->time_begin;
-		if (delta >= target) break;
+  while (true) {
+    f64 delta = glfwGetTime() - metric->time_begin;
+    if (delta >= target) break;
 
-		f64 remaining_time = target - delta;
-		if (remaining_time > 0) {
+    f64 remaining_time = target - delta;
+    if (remaining_time > 0) {
       dn_os_sleep_ms(remaining_time * 1e3);
-		}
-	}
+    }
+  }
 }
 
 void dn_time_metric_busy_wait(dn_time_metric_t* metric, f64 target) {
-	while (true) {
-		auto delta = glfwGetTime() - metric->time_begin;
-		if (delta >= target) break;
-	}
+  while (true) {
+    auto delta = glfwGetTime() - metric->time_begin;
+    if (delta >= target) break;
+  }
 }
 
 dn_time_metric_t* dn_time_metrics_find(dn_string_t name) {
@@ -1301,9 +2896,9 @@ dn_time_metric_t* dn_time_metrics_find(dn_string_t name) {
 }
 
 void dn_time_metrics_add(dn_string_t name) {
-	dn_time_metric_t time_metric;
+  dn_time_metric_t time_metric;
   dn_time_metric_init(&time_metric);
-	gs_hash_table_insert(dn_time_metrics.metrics, dn_hash_string(name), time_metric);
+  gs_hash_table_insert(dn_time_metrics.metrics, dn_hash_string(name), time_metric);
 }
 
 void dn_time_metric_begin(dn_string_t name) {
@@ -1328,40 +2923,40 @@ void dn_log_init() {
 }
 
 void dn_log(const char* fmt, ...) {
-	va_list fmt_args;
-	va_start(fmt_args, fmt);
-	dn_log_v(DN_LOG_FLAG_DEFAULT, fmt, fmt_args);
-	va_end(fmt_args);
+  va_list fmt_args;
+  va_start(fmt_args, fmt);
+  dn_log_v(DN_LOG_FLAG_DEFAULT, fmt, fmt_args);
+  va_end(fmt_args);
 }
 
 void dn_log_format_str(dn_string_t fmt, ...) {
-	va_list fmt_args;
-	va_start(fmt_args, fmt);
-	dn_log_v(DN_LOG_FLAG_DEFAULT, dn_string_to_cstr(fmt), fmt_args);
-	va_end(fmt_args);
+  va_list fmt_args;
+  va_start(fmt_args, fmt);
+  dn_log_v(DN_LOG_FLAG_DEFAULT, dn_string_to_cstr(fmt), fmt_args);
+  va_end(fmt_args);
 }
 
 void dn_log_flags(dn_log_flags_t flags, const char* fmt, ...) {
-	va_list fmt_args;
-	va_start(fmt_args, fmt);
-	dn_log_v(flags, fmt, fmt_args);
-	va_end(fmt_args);
+  va_list fmt_args;
+  va_start(fmt_args, fmt);
+  dn_log_v(flags, fmt, fmt_args);
+  va_end(fmt_args);
 }
 
 void dn_log_v(dn_log_flags_t flags, const char* fmt, va_list fmt_args) {
   dn_log_build_preamble();
-	vsnprintf(&dn_logger.message_buffer[0], DN_LOGGER_MESSAGE_BUFFER_SIZE, fmt, fmt_args);
-	dn_log_flush(flags);
+  vsnprintf(&dn_logger.message_buffer[0], DN_LOGGER_MESSAGE_BUFFER_SIZE, fmt, fmt_args);
+  dn_log_flush(flags);
 }
 
 void dn_log_str(dn_string_t message) {
   dn_log_build_preamble();
-	snprintf(dn_logger.message_buffer, DN_LOGGER_MESSAGE_BUFFER_SIZE, "%.*s", message.len, message.data);
-	dn_log_flush(DN_LOG_FLAG_CONSOLE);
+  snprintf(dn_logger.message_buffer, DN_LOGGER_MESSAGE_BUFFER_SIZE, "%.*s", message.len, message.data);
+  dn_log_flush(DN_LOG_FLAG_CONSOLE);
 }
 
 void dn_log_builder(dn_string_builder_t builder) {
-	dn_log_str(dn_string_builder_write(&builder));
+  dn_log_str(dn_string_builder_write(&builder));
 }
 
 void dn_log_build_preamble() {
@@ -1369,97 +2964,97 @@ void dn_log_build_preamble() {
   time_t sec_since_epoch = (time_t)(ms_since_epoch / 1000);
   struct tm* time_info = localtime(&sec_since_epoch);
 
-	snprintf(dn_logger.preamble_buffer, DN_LOGGER_PREAMBLE_BUFFER_SIZE, "[%04d-%02d-%02d %02d:%02d:%02d.%03" DN_FMT_U64 "]",
-			 1900 + time_info->tm_year, 1 + time_info->tm_mon, time_info->tm_mday,
-			 time_info->tm_hour, time_info->tm_min, time_info->tm_sec, ms_since_epoch % 1000);
+  snprintf(dn_logger.preamble_buffer, DN_LOGGER_PREAMBLE_BUFFER_SIZE, "[%04d-%02d-%02d %02d:%02d:%02d.%03" DN_FMT_U64 "]",
+       1900 + time_info->tm_year, 1 + time_info->tm_mon, time_info->tm_mday,
+       time_info->tm_hour, time_info->tm_min, time_info->tm_sec, ms_since_epoch % 1000);
 }
 
 void dn_log_flush(dn_log_flags_t flags) {
-	if (flags & DN_LOG_FLAG_CONSOLE) {
-		printf("%s %s\n", dn_logger.preamble_buffer, dn_logger.message_buffer);
-	}
+  if (flags & DN_LOG_FLAG_CONSOLE) {
+    printf("%s %s\n", dn_logger.preamble_buffer, dn_logger.message_buffer);
+  }
 
-	dn_log_zero();
+  dn_log_zero();
 }
 
 void dn_log_zero() {
-	memset(&dn_logger.preamble_buffer[0], 0, DN_LOGGER_PREAMBLE_BUFFER_SIZE);
-	memset(&dn_logger.message_buffer[0], 0, DN_LOGGER_MESSAGE_BUFFER_SIZE);
+  memset(&dn_logger.preamble_buffer[0], 0, DN_LOGGER_PREAMBLE_BUFFER_SIZE);
+  memset(&dn_logger.message_buffer[0], 0, DN_LOGGER_MESSAGE_BUFFER_SIZE);
 }
 
 /////////////////
 // RING BUFFER //
 /////////////////
 void* dn_ring_buffer_at(dn_ring_buffer_t* buffer, u32 index) {
-		return buffer->data + ((buffer->head + buffer->element_size * index) % buffer->capacity);
+    return buffer->data + ((buffer->head + buffer->element_size * index) % buffer->capacity);
 }
 
 void dn_ring_buffer_init(dn_ring_buffer_t* buffer, u32 capacity, u32 element_size) {
-	buffer->size = 0;
-	buffer->head = 0;
-	buffer->capacity = capacity;
-	buffer->element_size = element_size;
-	buffer->data = dn_allocator_alloc(&dn_allocators.standard.allocator, capacity * element_size);
+  buffer->size = 0;
+  buffer->head = 0;
+  buffer->capacity = capacity;
+  buffer->element_size = element_size;
+  buffer->data = dn_allocator_alloc(&dn_allocators.standard.allocator, capacity * element_size);
 }
 
 void* dn_ring_buffer_back(dn_ring_buffer_t* buffer) {
-	DN_ASSERT(buffer->size);
+  DN_ASSERT(buffer->size);
   return dn_ring_buffer_at(buffer, buffer->size - 1);
 }
 
 void* dn_ring_buffer_push(dn_ring_buffer_t* buffer, void* data) {
-	DN_ASSERT(buffer->size < buffer->capacity);
+  DN_ASSERT(buffer->size < buffer->capacity);
 
-	u32 index = (buffer->head + buffer->size) % buffer->capacity;
+  u32 index = (buffer->head + buffer->size) % buffer->capacity;
   dn_os_memory_copy(data, buffer->data + index * buffer->element_size, buffer->element_size);
-	buffer->size += 1;
-	return dn_ring_buffer_back(buffer);
+  buffer->size += 1;
+  return dn_ring_buffer_back(buffer);
 }
 
 void* dn_ring_buffer_push_zero(dn_ring_buffer_t* buffer) {
-	DN_ASSERT(buffer->size < buffer->capacity);
+  DN_ASSERT(buffer->size < buffer->capacity);
 
-	u32 index = (buffer->head + buffer->size) % buffer->capacity;
+  u32 index = (buffer->head + buffer->size) % buffer->capacity;
   dn_os_zero_memory(buffer->data + index, buffer->element_size);
-	buffer->size += 1;
-	return dn_ring_buffer_back(buffer);
+  buffer->size += 1;
+  return dn_ring_buffer_back(buffer);
 }
 
 void* dn_ring_buffer_push_overwrite(dn_ring_buffer_t* buffer, void* data) {
-	if (buffer->size == buffer->capacity) dn_ring_buffer_pop(buffer);
-	return dn_ring_buffer_push(buffer, data);
+  if (buffer->size == buffer->capacity) dn_ring_buffer_pop(buffer);
+  return dn_ring_buffer_push(buffer, data);
 }
 
 void* dn_ring_buffer_push_overwrite_zero(dn_ring_buffer_t* buffer) {
-	if (buffer->size == buffer->capacity) dn_ring_buffer_pop(buffer);
-	return dn_ring_buffer_push_zero(buffer);
+  if (buffer->size == buffer->capacity) dn_ring_buffer_pop(buffer);
+  return dn_ring_buffer_push_zero(buffer);
 }
 
 void* dn_ring_buffer_pop(dn_ring_buffer_t* buffer) {
-	DN_ASSERT(buffer->size);
+  DN_ASSERT(buffer->size);
 
-	void* element = buffer->data + (buffer->head * buffer->element_size);
-	buffer->head = (buffer->head + 1) % buffer->capacity;
-	buffer->size--;
-	return element;
+  void* element = buffer->data + (buffer->head * buffer->element_size);
+  buffer->head = (buffer->head + 1) % buffer->capacity;
+  buffer->size--;
+  return element;
 }
 
 u32 dn_ring_buffer_bytes(dn_ring_buffer_t* buffer) {
-	return buffer->capacity * buffer->element_size;
+  return buffer->capacity * buffer->element_size;
 }
 
 void dn_ring_buffer_clear(dn_ring_buffer_t* buffer) {
-	memset(buffer->data, 0, dn_ring_buffer_bytes(buffer));
-	buffer->size = 0;
-	buffer->head = 0;
+  memset(buffer->data, 0, dn_ring_buffer_bytes(buffer));
+  buffer->size = 0;
+  buffer->head = 0;
 }
 
 bool dn_ring_buffer_is_full(dn_ring_buffer_t* buffer) {
-	return buffer->capacity == buffer->size;
+  return buffer->capacity == buffer->size;
 }
 
 bool dn_ring_buffer_is_empty(dn_ring_buffer_t* buffer) {
-	return buffer->size == 0;
+  return buffer->size == 0;
 }
 
 void* dn_ring_buffer_iter_deref(dn_ring_buffer_iterator_t* it) {
@@ -1482,88 +3077,88 @@ bool dn_ring_buffer_iter_done(dn_ring_buffer_iterator_t* it) {
 }
 
 dn_ring_buffer_iterator_t dn_ring_buffer_iter(dn_ring_buffer_t* buffer) {
-	dn_ring_buffer_iterator_t iterator;
-	iterator.index = 0;
-	iterator.reverse = false;
-	iterator.buffer = buffer;
-	return iterator;
+  dn_ring_buffer_iterator_t iterator;
+  iterator.index = 0;
+  iterator.reverse = false;
+  iterator.buffer = buffer;
+  return iterator;
 }
 
 dn_ring_buffer_iterator_t dn_ring_buffer_riter(dn_ring_buffer_t* buffer) {
-	dn_ring_buffer_iterator_t iterator;
-	iterator.index = buffer->size - 1;
-	iterator.reverse = true;
-	iterator.buffer = buffer;
-	return iterator;
+  dn_ring_buffer_iterator_t iterator;
+  iterator.index = buffer->size - 1;
+  iterator.reverse = true;
+  iterator.buffer = buffer;
+  return iterator;
 }
 
 //////////
 // POOL //
 //////////
 void dn_pool_init(dn_pool_t* pool, u32 capacity, u32 element_size) {
-	pool->capacity = capacity;
-	pool->free_list = 0;
+  pool->capacity = capacity;
+  pool->free_list = 0;
   pool->element_size = element_size;
-	pool->data = (u8*)dn_allocator_alloc(&dn_allocators.standard.allocator, capacity * element_size);
-	pool->slots = (dn_pool_slot_t*)dn_allocator_alloc(&dn_allocators.standard.allocator, capacity * sizeof(dn_pool_slot_t));
+  pool->data = (u8*)dn_allocator_alloc(&dn_allocators.standard.allocator, capacity * element_size);
+  pool->slots = (dn_pool_slot_t*)dn_allocator_alloc(&dn_allocators.standard.allocator, capacity * sizeof(dn_pool_slot_t));
 
   dn_for(i, capacity) {
-		pool->slots[i].next_free = i + 1;
+    pool->slots[i].next_free = i + 1;
   }
-	pool->slots[capacity - 1].next_free = -1;
+  pool->slots[capacity - 1].next_free = DN_POOL_NO_FREE_SLOT;
 }
 
 dn_pool_handle_t dn_pool_insert(dn_pool_t* pool, void* value) {
-	assert(!pool->slots[pool->free_list].occupied);
+  assert(!pool->slots[pool->free_list].occupied);
 
   dn_pool_slot_t* slot = pool->slots + pool->free_list;
-	slot->occupied = true;
-	slot->generation++;
+  slot->occupied = true;
+  slot->generation++;
 
   dn_os_memory_copy(value, pool->data + pool->element_size * pool->free_list, pool->element_size);
 
-	dn_pool_handle_t handle;
-	handle.index = pool->free_list;
-	handle.generation = slot->generation;
+  dn_pool_handle_t handle;
+  handle.index = pool->free_list;
+  handle.generation = slot->generation;
 
-	pool->free_list = slot->next_free;
+  pool->free_list = slot->next_free;
 
-	return handle;
+  return handle;
 }
 
 dn_pool_handle_t dn_pool_reserve(dn_pool_t* pool) {
-	assert(!pool->slots[pool->free_list].occupied);
+  assert(!pool->slots[pool->free_list].occupied);
 
   dn_pool_slot_t* slot = pool->slots + pool->free_list;
-	slot->occupied = true;
-	slot->generation++;
+  slot->occupied = true;
+  slot->generation++;
 
   dn_os_zero_memory(pool->data + pool->element_size * pool->free_list, pool->element_size);
 
-	dn_pool_handle_t handle;
-	handle.index = pool->free_list;
-	handle.generation = slot->generation;
+  dn_pool_handle_t handle;
+  handle.index = pool->free_list;
+  handle.generation = slot->generation;
 
-	pool->free_list = slot->next_free;
+  pool->free_list = slot->next_free;
 
-	return handle;
+  return handle;
 }
 
 void dn_pool_remove(dn_pool_t* pool, dn_pool_handle_t handle) {
-	if (handle.index >= pool->capacity) return;
+  if (handle.index >= pool->capacity) return;
 
   dn_pool_slot_t* slot = pool->slots + handle.index;
   if (!dn_pool_slot_is_match(slot, handle)) return;
   if (!dn_pool_slot_has_next_free(slot)) return;
 
-	slot->occupied = false;
-	slot->generation++;
-	slot->next_free = pool->free_list;
-	pool->free_list = handle.index;
+  slot->occupied = false;
+  slot->generation++;
+  slot->next_free = pool->free_list;
+  pool->free_list = handle.index;
 }
 
 bool dn_pool_contains(dn_pool_t* pool, dn_pool_handle_t handle) {
-	if (handle.index >= pool->capacity) return false;
+  if (handle.index >= pool->capacity) return false;
 
   dn_pool_slot_t* slot = pool->slots + handle.index;
   return dn_pool_slot_is_match(slot, handle);
@@ -1571,25 +3166,25 @@ bool dn_pool_contains(dn_pool_t* pool, dn_pool_handle_t handle) {
 
 void dn_pool_clear(dn_pool_t* pool) {
   dn_for(i, pool->capacity) {
-		pool->slots[i].next_free = i + 1;
-		pool->slots[i].occupied = false;
-		pool->slots[i].generation++;
-	}
+    pool->slots[i].next_free = i + 1;
+    pool->slots[i].occupied = false;
+    pool->slots[i].generation++;
+  }
 
-	pool->slots[pool->capacity - 1].next_free = -1;
+  pool->slots[pool->capacity - 1].next_free = -1;
 
-	pool->free_list = 0;
+  pool->free_list = 0;
 }
 
 dn_pool_handle_t dn_pool_invalid_handle() {
-	return (dn_pool_handle_t){
-		.index = 0,
-		.generation = 0
-	};
+  return (dn_pool_handle_t){
+    .index = 0,
+    .generation = 0
+  };
 }
 
 bool dn_pool_is_handle_valid(dn_pool_handle_t handle) {
-	return handle.generation > 0;
+  return handle.generation > 0;
 }
 
 bool dn_pool_slot_has_next_free(dn_pool_slot_t* slot) {
@@ -2209,18 +3804,18 @@ u64 dn_os_time_since_epoch() {
 // BUMP ALLOCATOR //
 ////////////////////
 void dn_bump_allocator_init(dn_bump_allocator_t* allocator, u32 capacity) {
-	allocator->buffer = (u8*)dn_allocator_alloc(&dn_allocators.standard.allocator, capacity);
-	allocator->capacity = capacity;
-	allocator->allocator.on_alloc = &dn_bump_allocator_on_alloc;
+  allocator->buffer = (u8*)dn_allocator_alloc(&dn_allocators.standard.allocator, capacity);
+  allocator->capacity = capacity;
+  allocator->allocator.on_alloc = &dn_bump_allocator_on_alloc;
 }
 
 void dn_bump_allocator_clear(dn_bump_allocator_t* allocator) {
-	memset(allocator->buffer, 0, allocator->bytes_used);
-	allocator->bytes_used = 0;
+  memset(allocator->buffer, 0, allocator->bytes_used);
+  allocator->bytes_used = 0;
 }
 
 void* dn_bump_allocator_on_alloc(dn_allocator_t* allocator, dn_allocator_mode_t mode, u32 size, void* old_memory) {
-	dn_bump_allocator_t* bump = (dn_bump_allocator_t*)allocator;
+  dn_bump_allocator_t* bump = (dn_bump_allocator_t*)allocator;
   switch (mode) {
     case DN_ALLOCATOR_MODE_ALLOC: {
       if (bump->bytes_used + size > bump->capacity) {
@@ -2235,7 +3830,7 @@ void* dn_bump_allocator_on_alloc(dn_allocator_t* allocator, dn_allocator_mode_t 
       return memory_block;
     }
     case DN_ALLOCATOR_MODE_FREE: {
- 		  return NULL;
+      return NULL;
     }
     case DN_ALLOCATOR_MODE_RESIZE: {
       if (!old_memory) {
@@ -2263,23 +3858,23 @@ void* dn_bump_allocator_on_alloc(dn_allocator_t* allocator, dn_allocator_mode_t 
 // STANDARD ALLOCATOR //
 ////////////////////////
 void dn_standard_allocator_init(dn_standard_allocator_t* allocator) {
-	allocator->allocator.on_alloc = &dn_standard_allocator_on_alloc;
+  allocator->allocator.on_alloc = &dn_standard_allocator_on_alloc;
 }
 
 void* dn_standard_allocator_on_alloc(dn_allocator_t* allocator, dn_allocator_mode_t mode, u32 size, void* old_memory) {
-	if (mode == DN_ALLOCATOR_MODE_ALLOC) {
-		return calloc(size, 1);
-	}
-	else if (mode == DN_ALLOCATOR_MODE_FREE) {
-		free(old_memory);
-		return NULL;
-	}
-	else if (mode == DN_ALLOCATOR_MODE_RESIZE) {
-		return realloc(old_memory, size);
-	}
+  if (mode == DN_ALLOCATOR_MODE_ALLOC) {
+    return calloc(size, 1);
+  }
+  else if (mode == DN_ALLOCATOR_MODE_FREE) {
+    free(old_memory);
+    return NULL;
+  }
+  else if (mode == DN_ALLOCATOR_MODE_RESIZE) {
+    return realloc(old_memory, size);
+  }
 
-	DN_UNREACHABLE();
-	return NULL;
+  DN_UNREACHABLE();
+  return NULL;
 }
 
 ///////////////
@@ -2294,31 +3889,31 @@ dn_allocator_t* dn_allocator_find(const char* name) {
 }
 
 void* dn_allocator_alloc(dn_allocator_t* allocator, u32 size) {
-	DN_ASSERT(allocator);
-	return allocator->on_alloc(allocator, DN_ALLOCATOR_MODE_ALLOC, size, NULL);
+  DN_ASSERT(allocator);
+  return allocator->on_alloc(allocator, DN_ALLOCATOR_MODE_ALLOC, size, NULL);
 }
 
 void* dn_allocator_realloc(dn_allocator_t* allocator, void* memory, u32 size) {
-	DN_ASSERT(allocator);
-	return allocator->on_alloc(allocator, DN_ALLOCATOR_MODE_RESIZE, size, memory);
+  DN_ASSERT(allocator);
+  return allocator->on_alloc(allocator, DN_ALLOCATOR_MODE_RESIZE, size, memory);
 }
 
 void dn_allocator_free(dn_allocator_t* allocator, void* buffer) {
-	DN_ASSERT(allocator);
-	DN_ASSERT(buffer);
-	allocator->on_alloc(allocator, DN_ALLOCATOR_MODE_FREE, 0, buffer);
+  DN_ASSERT(allocator);
+  DN_ASSERT(buffer);
+  allocator->on_alloc(allocator, DN_ALLOCATOR_MODE_FREE, 0, buffer);
 }
 
 void dn_allocators_init() {
-	dn_standard_allocator_init(&dn_allocators.standard);
-	dn_bump_allocator_init(&dn_allocators.bump, 50 * 1024 * 1024);
+  dn_standard_allocator_init(&dn_allocators.standard);
+  dn_bump_allocator_init(&dn_allocators.bump, 50 * 1024 * 1024);
 
-	dn_allocator_add("bump", &dn_allocators.bump.allocator);
-	dn_allocator_add("standard", &dn_allocators.standard.allocator);
+  dn_allocator_add("bump", &dn_allocators.bump.allocator);
+  dn_allocator_add("standard", &dn_allocators.standard.allocator);
 }
 
 void dn_allocators_update() {
-	dn_bump_allocator_clear(&dn_allocators.bump);
+  dn_bump_allocator_clear(&dn_allocators.bump);
 }
 
 ///////////
@@ -2583,30 +4178,60 @@ void dn_test_begin(dn_string_t name) {
 void dn_test_end() {
 }
 
-void dn_gen_arena_test() {
+void dn_pool_test() {
   dn_test_suite_t suite = {
-    .name = dn_string_literal("dn_gen_arena_t"),
+    .name = dn_string_literal("dn_pool_t"),
     .flags = DN_TEST_CONTEXT_FLAG_DEFAULT
   };
   dn_test_begin_suite(&suite);
 
-  dn_test_begin(dn_string_literal("dn_gen_arena"));
+  dn_test_begin(dn_string_literal("dn_pool"));
     dn_pool(u32) arena = dn_zero_initialize();
     dn_pool_init(&arena, 32, sizeof(u32));
     dn_pool_handle_t rza = dn_pool_insert(&arena, dn_ptr_lval(u32, 69));
     dn_pool_handle_t gza = dn_pool_insert(&arena, dn_ptr_lval(u32, 420));
     dn_pool_handle_t bill = dn_pool_insert(&arena, dn_ptr_lval(u32, 7));
 
-    dn_test_assert(*dn_pool_at(u32, &arena, rza) == 69);
-    dn_test_assert(*dn_pool_at(u32, &arena, gza) == 420);
-    dn_test_assert(*dn_pool_at(u32, &arena, bill) == 7);
+    dn_test_assert(*dn_pool_at(&arena, rza, u32) == 69);
+    dn_test_assert(*dn_pool_at(&arena, gza, u32) == 420);
+    dn_test_assert(*dn_pool_at(&arena, bill, u32) == 7);
 
+    // Check that dn_pool_for() works
+    {
+      u32 values [] = { 69, 420, 7 };
+      dn_pool_for(&arena, it) {
+        u32* value = dn_pool_it(&arena, it, u32);
+        dn_test_assert(*value = values[it.index]);
+      }
+    }
+
+    // Remove an element at the end
     dn_pool_remove(&arena, bill);
 
     dn_pool_handle_t murray = dn_pool_insert(&arena, dn_ptr_lval(u32, 9001));
     dn_test_assert(!dn_pool_contains(&arena, bill));
     dn_test_assert(dn_pool_contains(&arena, murray));
-    dn_test_assert(*dn_pool_at(u32, &arena, murray) == 9001);
+    dn_test_assert(*dn_pool_at(&arena, murray, u32) == 9001);
+
+    {
+      u32 values [] = { 69, 420, 9001 };
+      dn_pool_for(&arena, it) {
+        u32* value = dn_pool_it(&arena, it, u32);
+        dn_test_assert(*value = values[it.index]);
+      }
+    }
+
+    // Remove an element in the middle
+    dn_pool_remove(&arena, gza);
+
+    {
+      u32 values [] = { 69, 9001 };
+      dn_pool_for(&arena, it) {
+        u32* value = dn_pool_it(&arena, it, u32);
+        dn_test_assert(*value = values[it.index]);
+      }
+    }
+
   dn_test_end();
 
   dn_test_end_suite();
@@ -2754,35 +4379,15 @@ void dn_color_test() {
   dn_test_end_suite();
 }
 
-void dn_test_run_internal() {
+void dn_test_init() {
+  #ifdef DN_TEST_RUN_INTERNAL_TESTS
   dn_string_test();
   dn_string_builder_test();
-  dn_gen_arena_test();
+  dn_pool_test();
   // dn_color_test();
+  #endif
 }
 
-///////////////
-// LIFECYCLE //
-///////////////
-void dn_init(dn_config_t config) {
-  dn_allocators_init();
-  dn_log_init();
-  // dn_random_init();
-  // dn_test_init();
-
-  if (config.mode == DN_MODE_APP || config.mode == DN_MODE_CORE_LUA) {
-    dn_paths_init(config.path);
-
-    #ifdef DN_LUA
-    dn_lua_init(config.lua);
-    #endif
-  }
-
-}
-
-void dn_update() {
-  dn_allocators_update();
-}
 
 /////////
 // LUA //
@@ -2860,22 +4465,40 @@ void dn_lua_init(dn_lua_config_t config) {
     exit(0);
   }
 
+  // PHASE 2:
+  // Lua itself has been initialized, and we've loaded in other assets our scripts
+  // may use (shaders, fonts, etc). The last step is to load the game scripts and
+  // configure the game itself through Lua
+  dn_lua_script_named_dir(dn_string_literal("dn_components"));
+  dn_lua_script_named_dir(dn_string_literal("dn_editor"));
+  dn_lua_script_named_dir(dn_string_literal("dn_entities"));
+  dn_lua_script_named_dir(dn_string_literal("dn_app"));
+  
+  lua_pushstring(dn_lua.state, "init_phase_2");
+  lua_gettable(dn_lua.state, -2);
+  result = lua_pcall(dn_lua.state, 0, 0, 0);
+  if (result) {
+    const char* error = lua_tostring(dn_lua.state, -1);
+    dn_log("init_phase_2(): error = %s", error);
+    exit(0);
+  }
+
   dn_for(it, defer_pop) {
     lua_pop(dn_lua.state, 1);
   }
 }
 
 void dn_lua_pcall(dn_string_t fn) {
-	lua_pushstring(dn_lua.state, dn_string_to_cstr(fn));
+  lua_pushstring(dn_lua.state, dn_string_to_cstr(fn));
   lua_gettable(dn_lua.state, -2);
   
   bool result = lua_pcall(dn_lua.state, 0, 0, 0);
   if (result) {
-		dn_string_builder_t builder = dn_tstring_builder();
-		dn_string_builder_append_fmt(&builder, dn_string_literal("%.*s() failed; error = %s"),
-			fn.len, fn.data,
-			lua_tostring(dn_lua.state, -1)
-		);
+    dn_string_builder_t builder = dn_tstring_builder();
+    dn_string_builder_append_fmt(&builder, dn_string_literal("%.*s() failed; error = %s"),
+      fn.len, fn.data,
+      lua_tostring(dn_lua.state, -1)
+    );
 
     dn_log_builder(builder);
     exit(0);
@@ -2886,11 +4509,11 @@ bool dn_lua_script_file(dn_string_t file_path) {
   dn_lua_interpreter_t l = dn_lua.state;
   s32 initial_stack_size = lua_gettop(l);
 
-	dn_log_format_str(dn_string_literal("%s: scripting %.*s"), __func__, file_path.len, file_path.data);
+  dn_log_format_str(dn_string_literal("%s: scripting %.*s"), __func__, file_path.len, file_path.data);
 
   lua_pushcfunction(l, &dn_lua_format_file_load_error_l);
 
-	const char* file_path_cstr = dn_string_to_cstr(file_path);
+  const char* file_path_cstr = dn_string_to_cstr(file_path);
   bool result = luaL_loadfile(l, file_path_cstr);
 
   // In all error cases, do not return early.
@@ -2898,11 +4521,11 @@ bool dn_lua_script_file(dn_string_t file_path) {
     // There's a syntax error in the file. Since loadfile doesn't call the
     // function we put on the stack, format the message manually.
     const char* unformatted_error = lua_tostring(l, -1);
-		dn_log_format_str(dn_string_literal("%s: error loading %.*s\n%s"),
-			__func__,
-			file_path.len, file_path.data,
-			dn_lua_format_file_load_error(unformatted_error)
-		);
+    dn_log_format_str(dn_string_literal("%s: error loading %.*s\n%s"),
+      __func__,
+      file_path.len, file_path.data,
+      dn_lua_format_file_load_error(unformatted_error)
+    );
 
     lua_pop(l, 2);
     goto check_stack;
@@ -2913,12 +4536,12 @@ bool dn_lua_script_file(dn_string_t file_path) {
 
     if (result) {
       // There was a runtime error running the chunk.
-			const char* unformatted_error = lua_tostring(l, -1);
-			dn_log_format_str(dn_string_literal("%s: error running %.*s\n%s"),
-				__func__,
-				file_path.len, file_path.data,
-				dn_lua_format_file_load_error(unformatted_error)
-			);
+      const char* unformatted_error = lua_tostring(l, -1);
+      dn_log_format_str(dn_string_literal("%s: error running %.*s\n%s"),
+        __func__,
+        file_path.len, file_path.data,
+        dn_lua_format_file_load_error(unformatted_error)
+      );
 
       lua_pop(l, 2);
       goto check_stack;
@@ -3727,363 +5350,357 @@ dn_vector2_t dn_window_get_content_area() {
   return dn_app.window.content_area;
 }
 
-
-#ifndef DN_ASSET_H
-#define DN_ASSET_H
-typedef enum {
-  DN_ASSET_BUILTIN_BACKGROUND,
-  DN_ASSET_BUILTIN_ATLAS,
-} dn_asset_builtin_t;
-
-typedef struct {
-  i32 id;
-  static i32 next_id;
-
-  AssetKind kind;
-  union {
-    Background* background;
-    TextureAtlas* atlas;
+///////////
+// AUDIO //
+///////////
+dn_audio_config_t dn_audio_config_default() {
+  return (dn_audio_config_t) {
+    .dirs = NULL,
+    .num_dirs = 0,
+    .compressor = {
+      .threshold = 0.5f,
+      .ratio = 2.0f,
+      .attack_time = 0.95f,
+      .release_time = 1.0f,
+      .enabled = true
+    },
+    .filter = {
+      .mode = DN_AUDIO_FILTER_MODE_BUTTERWORTH,
+      .enabled = false,
+      .cutoff_frequency = 10000,
+      .cutoff_alpha = 0,
+      .a0 = 0.f, .a1 = 0.f, .a2 = 0.f, .b1 = 0.f, .b2 = 0.f,
+      .input_history = { 0 },
+      .output_history = { 0 },
+    },
+    .sample_frequency = 44100,
+    .master_volume = 1.0f,
+    .master_volume_mod = 1.0f,
   };
-} dn_asset_load_request_t;
-
-s32 AssetLoadRequest::next_id = 0;
-
-struct AssetLoader {
-  std::thread thread;
-  std::condition_variable condition;
-  std::mutex mutex;
-
-  dn_ring_buffer_t<AssetLoadRequest> load_requests;
-  dn_ring_buffer_t<AssetLoadRequest> completion_queue;
-
-  void process_requests();
-  void process_completion_queue();
-  void submit(AssetLoadRequest request);
-};
-AssetLoader asset_loader;
-
-typedef struct {
-  void* user_data;
-} dn_asset_import_request_t;
-
-typedef enum {
-  DN_ASSET_COMPLETION_STATUS_RUNNING,
-  DN_ASSET_COMPLETION_STATUS_DONE,
-} dn_asset_completion_status_t;
-
-dn_typedef_fn(void,                         dn_asset_import_fn,     dn_asset_import_request_t* request);
-dn_typedef_fn(dn_asset_completion_status_t, dn_asset_completion_fn, dn_asset_import_request_t* request);
-
-typedef struct {
-  dn_asset_name_t id;
-  dn_asset_import_fn on_import;
-  dn_asset_completion_fn on_complete;
-} dn_asset_importer_t;
-
-typedef void* dn_asset_data_t;
-
-typedef struct {
-    dn_asset_name_t name;
-    dn_asset_data_t data;
-} dn_asset_t;
-
-typedef struct {
-  struct {
-    dn_asset_importer_t* data;
-    u32 count;
-  } importers;
-} dn_asset_config_t;
-
-//////////////
-// INTERNAL //
-//////////////
-typedef enum {
-  DN_BACKGROUND_COMPLETION_STATUS_UPDATE_CONFIG,
-  DN_BACKGROUND_COMPLETION_STATUS_LOAD_TILES,
-  DN_BACKGROUND_COMPLETION_STATUS_DONE,
-} dn_background_completion_status_t;
-
-typedef struct {
-  dn_background_completion_status_t status;
-  Background* background;
-} dn_background_import_request_t;
-
-typedef struct {
-  std::thread thread;
-  std::condition_variable condition;
-  std::mutex mutex;
-
-  std::unordered_map<std::string, dn_asset_t> assets;
-  std::unordered_map<std::string, dn_asset_importer_t> importers;
-
-  dn_ring_buffer_t<AssetLoadRequest> load_requests;
-  dn_ring_buffer_t<AssetLoadRequest> completion_queue;
-} dn_assets_t;
-dn_assets_t dn_assets;
-
-
-DN_API void dn_assets_init(dn_asset_config_t config);
-DN_API dn_asset_data_t dn_assets_find(const char* name);
-DN_API void dn_assets_add(const char* name, dn_asset_data_t data);
-DN_API void dn_asset_copy_name(const char* source, dn_asset_name_t dest);
-
-DN_IMP void dn_assets_update();
-DN_IMP void dn_background_import(dn_asset_import_request_t* request);
-DN_IMP dn_asset_completion_status_t dn_background_complete(dn_asset_import_request_t* request);
-#endif
-
-#ifdef DN_ASSET_IMPLEMENTATION
-void dn_background_import(dn_asset_import_request_t* request) {
-    auto background_request = (dn_background_import_request_t*)request->user_data;
-    auto background = background_request->background;
-    if (background->need_async_build) {
-        background->build_from_source();
-    }
-    if (background->need_async_load) {
-        background->load_tiles();
-    }
 }
 
-dn_asset_completion_status_t dn_background_complete(dn_asset_import_request_t* request) {
-    auto background_request = (dn_background_import_request_t*)request->user_data;
-    auto background = background_request->background;
-
-    switch (background_request->status) {
-        case DN_BACKGROUND_COMPLETION_STATUS_UPDATE_CONFIG: {
-            if (background->is_dirty()) {
-               background->update_config();
-            }
-
-            background_request->status = DN_BACKGROUND_COMPLETION_STATUS_LOAD_TILES;
-            return DN_ASSET_COMPLETION_STATUS_RUNNING;
-        } break;
-
-        case DN_BACKGROUND_COMPLETION_STATUS_LOAD_TILES: {
-            background->load_one_to_gpu();
-            if (background->gpu_done) {
-                background_request->status = DN_BACKGROUND_COMPLETION_STATUS_DONE;
-                return DN_ASSET_COMPLETION_STATUS_DONE;
-            }
-
-            return DN_ASSET_COMPLETION_STATUS_RUNNING;
-        } break;
-
-        default: {
-            DN_ASSERT(false);
-            return DN_ASSET_COMPLETION_STATUS_DONE;
-        }
-    }
-}
-
-void dn_assets_init(dn_asset_config_t user_config) {
+void dn_audio_init(dn_audio_config_t config) {
   dn_log("%s", __func__);
 
-  dn_asset_importer_t default_importers [] = {
-    {
-      .id = dn_type_name(Background),
-      .on_import = &dn_background_import,
-      .on_complete = &dn_background_complete
-    }
+  dn_audio = (dn_audio_t) {
+    .compressor = config.compressor,
+    .filter = config.filter,
+    .sample_frequency = config.sample_frequency,
+    .master_volume = config.master_volume,
+    .master_volume_mod = config.master_volume_mod,
+    // .file_monitor = dn_file_monitors_add(),
+    .sample_buffer = {0}
   };
 
-  dn_asset_config_t configs [] = {
-    {
-      .importers = {
-        .data = default_importers,
-        .count = dn_arr_len(default_importers)
-      }
-    },
-    user_config
-  };
-   
-  dn_for_each(configs, config) {
-    dn_for_each_n(config->importers.data, importer, config->importers.count) {
-      dn_log("%s: Registered importer; id = %s, on_import = %d, on_complete = %d", 
-        __func__, 
-        importer->id, 
-        importer->on_import, importer->on_complete
-      );
+  dn_pool_init(&dn_audio.sounds, DN_AUDIO_MAX_SOUNDS, sizeof(dn_audio_info_t));
+  dn_pool_init(&dn_audio.instances, DN_AUDIO_MAX_INSTANCES, sizeof(dn_audio_instance_t));
 
-      dn_assets.importers[importer->id] = *importer;
-    }
-  }
+  dn_low_pass_filter_set_cutoff(&dn_audio.filter, 10000);
+
+}
+
+void dn_audio_add_samples(dn_audio_instance_t* instance, int samples_requested, int offset) {
+  DN_BROKEN();  
+}
   
+void dn_audio_update(f32* buffer, int frames_requested, int num_channels) {
+  DN_BROKEN();
+}
 
-  dn_ring_buffer_init(&asset_loader.load_requests, 2048);
-  dn_ring_buffer_init(&asset_loader.completion_queue, 2048);
+void dn_audio_shutdown() {
+  saudio_shutdown();
+}
+
+bool dn_audio_is_any_playing() {
+  DN_BROKEN();
+  return false;
+}
+
+dn_audio_info_t* dn_audio_find_no_default(dn_string_t name) {
+  DN_BROKEN();
+  return NULL;
+}
+
+dn_audio_info_t* dn_audio_find(dn_string_t name) {
+  DN_BROKEN();
+  return NULL;
+}
+
+dn_audio_instance_handle_t dn_audio_reserve() {
+  DN_BROKEN();
+  return dn_zero_struct(dn_audio_instance_handle_t);
+}
+
+dn_audio_info_t* dn_audio_resolve(dn_audio_info_handle_t handle) {
+  dn_mutex_lock(&dn_audio.mutex);
+
+  if (!dn_pool_contains(&dn_audio.sounds, handle)) return NULL;
+  return dn_pool_at(&dn_audio.sounds, handle, dn_audio_info_t);
+}
+
+dn_audio_instance_t* dn_audio_resolve_instance(dn_audio_instance_handle_t handle) {
+  dn_mutex_lock(&dn_audio.mutex);
+
+  if (!dn_pool_contains(&dn_audio.instances, handle)) return NULL;
+  return dn_pool_at(&dn_audio.instances, handle, dn_audio_instance_t);
+}
+
+dn_audio_instance_handle_t dn_audio_play_sound_ex(dn_audio_info_t* sound, bool loop) { 
+  DN_BROKEN();
+  return dn_zero_struct(dn_audio_instance_handle_t);
+}
+
+void dn_audio_stop_ex(dn_audio_instance_t* active_sound) {
+  dn_mutex_lock(&dn_audio.mutex);  
+
+  if (!active_sound) return;
   
-  // asset_loader.thread = std::thread(&AssetLoader::process_requests, &asset_loader);
-  // asset_loader.thread.detach();
+  active_sound->occupied = false;
+  active_sound->generation++;
 
+  dn_audio_stop_ex(dn_audio_resolve_instance(active_sound->next));
 }
 
-void dn_assets_add(const char* name, dn_asset_data_t data) {
-  dn_log("%s: name = %s, data = %p", __func__, name, data);
-  dn_asset_t asset;
-  dn_asset_copy_name(name, asset.name);
-  asset.data = data;
-  dn_assets.assets[name] = asset;
+dn_audio_info_t* alloc_sound(const char* file_name) {
+  DN_BROKEN();
+  return NULL;
 }
 
-dn_asset_data_t dn_assets_find(const char* name) {
-    DN_ASSERT(name);
-
-    if (!dn_assets.assets.contains(name)) {
-    dn_log("Tried to find asset, but name was not registered; name = %s", name);
-        return NULL;
-    }
-
-    return dn_assets.assets[name].data;
+void dn_audio_load_dir(const char* path) {
+  DN_BROKEN();
 }
 
-void dn_asset_copy_name(const char* source, dn_asset_name_t dest) {
-  dn_cstr_copy(source, dest, DN_ASSET_NAME_LEN);
+void dn_audio_load(const char* file_path, const char* file_name) {
+  DN_BROKEN();
+};
+
+
+//////////////////////
+// LOW PASS FILTER  //
+//////////////////////
+void dn_low_pass_filter_set_mode(dn_low_pass_filter_t* filter, dn_audio_filter_mode_t mode) {
+  filter->mode = mode;
+  dn_low_pass_filter_set_cutoff(filter, filter->cutoff_frequency);
 }
 
+void dn_low_pass_filter_set_cutoff(dn_low_pass_filter_t* filter, float cutoff) {
+  // The low pass filters are unstable at frequencies higher than the Nyquist frequency, so clamp. Add a little wiggle room
+  // to make sure we're not close to it, because it sounds a little bad that high anyway.
+  float nyquist = dn_audio.sample_frequency / 2.1;
+  filter->cutoff_frequency = dn_min(cutoff, nyquist);
 
-void dn_assets_update() {
-  asset_loader.process_completion_queue();
+  // Butterworth filter
+  float omega = 2.0f * 3.14159 * filter->cutoff_frequency / dn_audio.sample_frequency;
+  float cos_omega = cos(omega);
+  float sin_omega = sin(omega);
+  float alpha = sin_omega / sqrt(2.0f); // Butterworth filter (sqrt(2) damping factor)
 
-  dn_array_for(backgrounds, background) {
-    if (background->gpu_ready && !background->gpu_done) {
-      background->load_one_to_gpu();
+  filter->a0 = (1.0f - cos_omega) / 2.0f;
+  filter->a1 = 1.0f - cos_omega;
+  filter->a2 = (1.0f - cos_omega) / 2.0f;
+  filter->b1 = -2.0f * cos_omega;
+  filter->b2 = 1.0f - alpha;
 
-      if (background->gpu_done) {
-        background->deinit();
-      }
+  float a0_inv = 1.0f / (1.0f + alpha);
+  filter->a0 *= a0_inv;
+  filter->a1 *= a0_inv;
+  filter->a2 *= a0_inv;
+  filter->b1 *= a0_inv;
+  filter->b2 *= a0_inv;
 
-      if (dn_engine_exceeded_frame_time()) break;
+  // Simple first order low pass filter
+  filter->cutoff_alpha = 2.0f * 3.14159 * filter->cutoff_frequency / (dn_audio.sample_frequency + 2.0f * 3.14159 * filter->cutoff_frequency);
+}
+
+float dn_low_pass_filter_apply(dn_low_pass_filter_t* filter, float input) {
+  if (!filter->enabled) return input;
+  
+  switch (filter->mode) {
+    case DN_AUDIO_FILTER_MODE_BUTTERWORTH: {
+      float output = 0;
+      output += (filter->a0 * input) + (filter->a1 * filter->input_history[0]) + (filter->a2 * filter->input_history[1]);
+      output -= (filter->b1 * filter->output_history[0]) + (filter->b2 * filter->output_history[1]);
+
+      filter->input_history[1] = filter->input_history[0];
+      filter->input_history[0] = input;
+
+      filter->output_history[1] = filter->output_history[0];
+      filter->output_history[0] = output;
+
+      return output;
+    } break;
+
+    case DN_AUDIO_FILTER_MODE_FIRST_ORDER: {
+      float output = 0;
+      output += filter->cutoff_alpha * input;
+      output += (1.0f - filter->cutoff_alpha) * filter->output_history[0];
+    
+      filter->output_history[0] = output;
+    
+      return output;
+    } break;
+
+    default: {
+      DN_ASSERT(false);
+      return input;
     }
   }
 }
 
-void AssetLoader::process_requests() {
-  while (true) {
-    std::unique_lock lock(mutex);
 
-    condition.wait(lock, [this] {
-      return load_requests.size > 0;
-      });
-
-    auto request = dn_ring_buffer_pop(&load_requests);
-    lock.unlock();
-
-    if (request.kind == AssetKind::TextureAtlas) {
-      auto atlas = request.atlas;
-      if (atlas->need_async_build) {
-        atlas->build_from_source();
-      }
-      if (atlas->need_async_load) {
-        atlas->load_to_memory();
-      }
-
-      lock.lock();
-      dn_ring_buffer_push(&completion_queue, request);
-      lock.unlock();
-
-    }
-    else if (request.kind == AssetKind::Background) {
-      auto background = request.background;
-      if (background->need_async_build) {
-        background->build_from_source();
-      }
-      if (background->need_async_load) {
-        background->load_tiles();
-      }
-
-      lock.lock();
-      dn_ring_buffer_push(&completion_queue, request);
-      lock.unlock();
-    }
-  }
+/////////////
+// LUA API //
+/////////////
+dn_audio_instance_handle_t dn_audio_play_sound(const char* name) {
+  DN_BROKEN();
+  return dn_zero_struct(dn_audio_instance_handle_t);
 }
 
-void AssetLoader::process_completion_queue() {
-  int num_assets_loaded = 0;
-  auto begin = glfwGetTime();
-  while (true) {
-    std::unique_lock lock(mutex);
-    if (!completion_queue.size) {
-      break;
-    }
-
-    auto completion = dn_ring_buffer_pop(&completion_queue);
-    lock.unlock();
-
-    num_assets_loaded++;
-
-    if (completion.kind == AssetKind::Background) {
-      auto background = completion.background;
-      dn_log_flags(DN_LOG_FLAG_FILE, "%s: AssetKind = Background, AssetName = %s", __func__, background->name);
-      
-      if (background->is_dirty()) {
-        background->update_config();
-      }
-
-      background->gpu_ready = true;
-    }
-    else if (completion.kind == AssetKind::TextureAtlas) {
-      auto atlas = completion.atlas;
-      dn_log_flags(DN_LOG_FLAG_FILE, "%s: atlas, %s", __func__, atlas->name);
-      
-      if (atlas->need_gl_init) {
-        atlas->load_to_gpu();
-        atlas->need_gl_init = false;
-      }
-
-      if (atlas->need_config_update) {
-        atlas->write_to_config();
-        atlas->need_config_update = false;
-      }
-      
-    }
-
-    if (dn_engine_exceeded_frame_time()) break;
-  }
-
-  if (num_assets_loaded) {
-    std::unique_lock lock(mutex);
-    auto now = glfwGetTime();
-    dn_log_flags(DN_LOG_FLAG_FILE,
-             "AssetLoader: frame = %d, assets_loaded =  %d, assets_remaining = %d, time_ms =  %f",
-             engine.frame,
-             num_assets_loaded, completion_queue.size,
-             (now - begin) * 1000);
-  }
+dn_audio_instance_handle_t dn_audio_play_looped(const char* name) {
+  DN_BROKEN();
+  return dn_zero_struct(dn_audio_instance_handle_t);
 }
 
-
-void AssetLoader::submit(AssetLoadRequest request) {
-  request.id = AssetLoadRequest::next_id++;
-
-  mutex.lock();
-  dn_ring_buffer_push(&load_requests, request);
-  mutex.unlock();
-
-  condition.notify_all();
+void dn_audio_stop(dn_audio_instance_handle_t handle) {
+  DN_BROKEN();
 }
 
-#endif
+void dn_audio_stop_all() {
+  DN_BROKEN();
+}
+
+void dn_audio_set_volume(dn_audio_instance_handle_t handle, float volume) {
+  DN_BROKEN();
+}
+
+void dn_audio_set_filter_mode(dn_audio_instance_handle_t handle, dn_audio_filter_mode_t mode) {
+  DN_BROKEN();
+}
+
+void dn_audio_set_filter_cutoff(dn_audio_instance_handle_t handle, float cutoff) {
+  DN_BROKEN();
+}
+
+void dn_audio_set_filter_enabled(dn_audio_instance_handle_t handle, bool enabled) {
+  DN_BROKEN();
+}
+
+void dn_audio_set_compressor_threshold(float threshold) {
+  dn_mutex_lock(&dn_audio.mutex);
+  dn_audio.compressor.threshold = threshold;
+}
+
+void dn_audio_set_compressor_ratio(float ratio) {
+  dn_mutex_lock(&dn_audio.mutex);
+  dn_audio.compressor.ratio = ratio;
+}
+
+void dn_audio_set_compressor_attack(float attack) {
+  dn_mutex_lock(&dn_audio.mutex);
+  dn_audio.compressor.attack_time = attack;
+}
+
+void dn_audio_set_compressor_release(float release) {
+  dn_mutex_lock(&dn_audio.mutex);
+  dn_audio.compressor.release_time = release;
+}
+
+void dn_audio_set_sample_rate(float rate) {
+  dn_mutex_lock(&dn_audio.mutex);
+  dn_audio.sample_frequency = rate;
+}
+
+void dn_audio_set_master_volume(float volume) {
+  dn_mutex_lock(&dn_audio.mutex);
+  dn_audio.master_volume = volume;
+}
+
+void dn_audio_set_master_volume_mod(float volume_mod) {
+  dn_mutex_lock(&dn_audio.mutex);
+  dn_audio.master_volume_mod = volume_mod;
+}
+
+void dn_audio_set_master_filter_cutoff(float frequency) {
+  dn_mutex_lock(&dn_audio.mutex);
+  dn_low_pass_filter_set_cutoff(&dn_audio.filter, frequency);
+}
+
+void dn_audio_set_master_filter_cutoff_enabled(bool enabled) {
+  dn_mutex_lock(&dn_audio.mutex);
+  dn_audio.filter.enabled = enabled;
+}
+
+void dn_audio_set_master_filter_mode(dn_audio_filter_mode_t mode) {
+  dn_mutex_lock(&dn_audio.mutex);
+  dn_audio.filter.mode = mode;
+}
+
+float dn_audio_get_master_filter_cutoff() {
+  return dn_audio.filter.cutoff_frequency;
+}
+
+float dn_audio_get_master_volume() {
+  return dn_audio.master_volume;
+}
+
+float dn_audio_get_master_volume_mod() {
+  return dn_audio.master_volume_mod;
+}
+
+bool dn_audio_is_playing(dn_audio_instance_handle_t handle) {
+  DN_BROKEN();
+  return false;
+}
+
+void dn_audio_pause(dn_audio_instance_handle_t handle) {
+  DN_BROKEN();
+}
+
+void dn_audio_resume(dn_audio_instance_handle_t handle) {
+  DN_BROKEN();
+}
+
+void dn_audio_queue(dn_audio_instance_handle_t current, dn_audio_instance_handle_t next) {
+  DN_BROKEN();
+}
+
 
 /////////
 // APP //
 /////////
+void dn_update() {
+  dn_allocators_update();
+}
+
+void dn_init(dn_config_t config) {
+  dn_allocators_init();
+  dn_log_init();
+  dn_random_init();
+  dn_paths_init(config.path);
+  dn_time_metrics_init();
+  // dn_file_monitors_init();
+  dn_test_init();
+  dn_lua_init(config.lua);
+}
+
 void dn_app_configure(dn_app_config_t config) {
   dn_log("%s", __func__);
 
   dn_window_init(config.window);
-  // dn_imgui_init();
-  // dn_assets_init(config.asset);
-  // dn_audio_init(config.audio);
-  // dn_font_init(config.font);
-  // dn_gpu_init(config.gpu);
-  // dn_images_init(config.image);
-  // dn_noise_init();
-  // dn_steam_init(config.steam);
+  dn_asset_registry_init(config.asset);
+  dn_images_init(config.image);
+  dn_audio_init(config.audio);
+  dn_backgrounds_init();
+  dn_screenshots_init();
+  dn_atlases_init();
+  dn_backgrounds_init();
+  dn_gpu_init(config.gpu);
+  dn_font_init(config.font);
+  dn_noise_init();
+  dn_steam_init(config.steam);
 
-  // init_texture_atlas(); // Invert control
-  // init_backgrounds(); // Invert control
-  // init_screenshots(); // Use the asset loader
+  // dn_imgui_init();
+
   // init_particles();
   // init_fluid();
 }
@@ -4124,7 +5741,7 @@ dn_type_info_list_t dn_app_query_types() {
   dn_type_info_list_t list = dn_zero_initialize();
 
   static dn_type_info_t types [] = {
-    dn_type_info(dn_app_config_t),
+    // dn_type_info(dn_app_config_t),
     // dn_type_info(dn_app_descriptor_t),
     // dn_type_info(dn_asset_t),
     // dn_type_info(dn_asset_completion_status_t),
@@ -4183,13 +5800,17 @@ dn_type_info_list_t dn_app_query_types() {
     // dn_type_info(dn_sdf_smoothing_kernel_t),
     dn_type_info(dn_type_info_t),
     dn_type_info(dn_type_info_list_t),
-    dn_type_info(dn_window_config_t),
+    // dn_type_info(dn_window_config_t),
   };
 
   return (dn_type_info_list_t) {
     .data = types,
     .count = dn_arr_len(types)
   };
+}
+
+u32 dn_app_monotonic_id() {
+  return atomic_fetch_add(&dn_app.monotonic_id, 1);
 }
 
 bool dn_app_exceeded_frame_time() {
@@ -4222,5 +5843,3 @@ int dn_main() {
 }
 
 #endif
-#endif
-
