@@ -567,6 +567,12 @@ typedef struct {
   u32 count;
 } dn_os_directory_entry_list_t;
 
+#ifndef DN_BUILD_FFI
+typedef FILE* dn_os_file_t;
+#else
+typedef void* dn_os_file_t;
+#endif
+
 DN_API bool                         dn_os_does_path_exist(dn_string_t path);
 DN_API bool                         dn_os_is_regular_file(dn_string_t path);
 DN_API bool                         dn_os_is_directory(dn_string_t path);
@@ -875,6 +881,8 @@ DN_IMP void dn_log_build_preamble();
 DN_IMP void dn_log_zero();
 DN_IMP void dn_log_init();
 #define DN_LOG(fmt, ...) dn_log("%s: " fmt, __func__, __VA_ARGS__)
+#define DN_LOG_2(message) dn_log("%s: " message, __func__)
+#define DN_LOG_FN() dn_log("%s", __func__)
 
 
 //  ██████╗  █████╗ ████████╗██╗  ██╗███████╗
@@ -1336,8 +1344,8 @@ typedef struct {
 } dn_asset_registry_t;
 
 DN_API void            dn_asset_registry_init(dn_asset_config_t config);
-DN_API dn_asset_data_t dn_asset_registry_find(const char* name);
 DN_API void            dn_asset_registry_add(const char* name, dn_asset_data_t data);
+DN_API dn_asset_data_t dn_asset_registry_find(const char* name);
 DN_IMP void            dn_asset_registry_update();
 
 /////////////////////////
@@ -1356,6 +1364,26 @@ typedef struct {
 
 DN_IMP void                         dn_background_import(dn_asset_import_request_t* request);
 DN_IMP dn_asset_completion_status_t dn_background_complete(dn_asset_import_request_t* request);
+
+
+typedef struct {
+  // Input
+  const char* file_path;
+  struct {
+    dn_path_t* data;
+    u32 count;
+  } include_dirs;
+
+  // Output
+  char error [256];
+  char* result;
+
+  // Work
+  dn_os_file_t file;
+  dn_string_t file_data;
+} dn_preprocessor_context_t;
+
+DN_API void dn_preprocess(dn_preprocessor_context_t* context);
 
 
 //  ████████╗███████╗███████╗████████╗██╗███╗   ██╗ ██████╗
@@ -2004,6 +2032,12 @@ typedef struct {
 } dn_gpu_uniforms_t;
 
 typedef struct {
+  dn_gpu_buffer_t* buffer;
+  dn_gpu_uniform_buffer_binding_t binding;
+  dn_gpu_uniforms_t data;
+} dn_gpu_builtin_uniforms_t;
+
+typedef struct {
   const char* shader_path;
   dn_gpu_shader_descriptor_t* shaders;
   u32 num_shaders;
@@ -2013,22 +2047,24 @@ typedef struct {
   u32 num_render_targets;
 } dn_gpu_config_t;
 
+#define DN_GPU_MAX_COMMAND_BUFFERS 32
+#define DN_GPU_MAX_UNIFORMS 1024
+#define DN_GPU_MAX_PIPELINES 64
+#define DN_GPU_MAX_BUFFERS 128
+#define DN_GPU_MAX_RENDER_TARGETS 32
+#define DN_GPU_MAX_SHADERS 128
+#define DN_GPU_MAX_SHADER_SEARCH_PATHS 16
 typedef struct {
-  dn_fixed_array(dn_gpu_command_buffer_t, 32) command_buffers;
-  dn_fixed_array(dn_gpu_uniform_t, 1024) uniforms;
-  dn_fixed_array(dn_gpu_pipeline_t, 64) pipelines;
-  dn_fixed_array(dn_gpu_buffer_t, 128)  gpu_buffers;
-  dn_fixed_array(dn_gpu_render_target_t, 32)  targets;
-  dn_fixed_array(dn_gpu_shader_t, 128) shaders;
+  dn_fixed_array(dn_gpu_command_buffer_t, DN_GPU_MAX_COMMAND_BUFFERS)     command_buffers;
+  dn_fixed_array(dn_gpu_uniform_t,        DN_GPU_MAX_UNIFORMS)            uniforms;
+  dn_fixed_array(dn_gpu_pipeline_t,       DN_GPU_MAX_PIPELINES)           pipelines;
+  dn_fixed_array(dn_gpu_buffer_t,         DN_GPU_MAX_BUFFERS)             gpu_buffers;
+  dn_fixed_array(dn_gpu_render_target_t,  DN_GPU_MAX_RENDER_TARGETS)      targets;
+  dn_fixed_array(dn_gpu_shader_t,         DN_GPU_MAX_SHADERS)             shaders;
+  dn_fixed_array(dn_path_t,               DN_GPU_MAX_SHADER_SEARCH_PATHS) search_paths;
 
   // FileMonitor* shader_monitor;
-  dn_fixed_array(dn_path_t, 16) search_paths;
-
-  struct {
-    dn_gpu_buffer_t* buffer;
-    dn_gpu_uniform_buffer_binding_t binding;
-    dn_gpu_uniforms_t data;
-  } builtin_uniforms;
+  dn_gpu_builtin_uniforms_t builtin_uniforms;
 } dn_gpu_t;
 dn_gpu_t dn_gpu;
 
@@ -2069,10 +2105,13 @@ DN_API void                      dn_gpu_memory_barrier(dn_gpu_memory_barrier_t b
 DN_API void                      dn_gpu_dispatch_compute(dn_gpu_buffer_t* buffer, u32 size);
 DN_API void                      dn_gpu_swap_buffers();
 DN_API void                      dn_gpu_error_clear();
-DN_API dn_tstring_t              dn_gpu_error_read();
+DN_API char*                     dn_gpu_error_read();
 DN_API void                      dn_gpu_error_log_one();
 DN_API void                      dn_gpu_error_log_all();
 DN_API void                      dn_gpu_set_resource_name(dn_gpu_resource_id_t id, u32 handle, u32 name_len, const char* name);
+DN_IMP char*                     dn_gpu_shader_preprocess(const char* file_path);
+DN_IMP void                      dn_gpu_shader_check_compilation(u32 shader, const char* file_path);
+DN_IMP void                      dn_gpu_shader_check_linkage(u32 shader, const char* file_path);
 DN_IMP void                      dn_gpu_shader_build_source(const char* file_path);
 DN_IMP void                      dn_gpu_shader_init(dn_gpu_shader_t* shader, dn_gpu_shader_descriptor_t descriptor);
 DN_IMP void                      dn_gpu_shader_init_graphics(dn_gpu_shader_t* shader, const char* name);
@@ -2467,7 +2506,107 @@ dn_hash_t dn_font_hash(const char* id, u32 size) {
 // GPU //
 /////////
 void dn_gpu_init(dn_gpu_config_t config) {
-  DN_BROKEN();
+  DN_LOG_FN();
+  dn_fixed_array_init(&dn_gpu.command_buffers, DN_GPU_MAX_COMMAND_BUFFERS,     sizeof(dn_gpu_command_buffer_t), &dn_allocators.standard.allocator);
+  dn_fixed_array_init(&dn_gpu.uniforms,        DN_GPU_MAX_UNIFORMS,            sizeof(dn_gpu_uniform_t),        &dn_allocators.standard.allocator);
+  dn_fixed_array_init(&dn_gpu.pipelines,       DN_GPU_MAX_PIPELINES,           sizeof(dn_gpu_pipeline_t),       &dn_allocators.standard.allocator);
+  dn_fixed_array_init(&dn_gpu.gpu_buffers,     DN_GPU_MAX_BUFFERS,             sizeof(dn_gpu_buffer_t),         &dn_allocators.standard.allocator);
+  dn_fixed_array_init(&dn_gpu.targets,         DN_GPU_MAX_RENDER_TARGETS,      sizeof(dn_gpu_render_target_t),  &dn_allocators.standard.allocator);
+  dn_fixed_array_init(&dn_gpu.shaders,         DN_GPU_MAX_SHADERS,             sizeof(dn_gpu_shader_t),         &dn_allocators.standard.allocator);
+  dn_fixed_array_init(&dn_gpu.search_paths,    DN_GPU_MAX_SHADER_SEARCH_PATHS, sizeof(dn_path_t),               &dn_allocators.standard.allocator);
+
+  dn_gpu_render_target_t* swapchain = (dn_gpu_render_target_t*)dn_fixed_array_reserve(&dn_gpu.targets, 1);
+  swapchain->handle = 0;
+  swapchain->color_buffer = 0;
+  swapchain->size = dn_app.window.content_area;
+
+  // DN_LOG("Initializing shader file monitor");
+  // auto reload_all_shaders = [](FileMonitor* file_monitor, FileChange* event, void* userdata) {
+  //   dn_log("SHADER_RELOAD");
+  //   dn_array_for(dn_gpu.shaders, shader) {
+  //     dn_gpu_shader_reload(shader);
+  //   }
+  // };
+  // dn_gpu.shader_monitor = dn_file_monitors_add();
+  // dn_gpu.shader_monitor->init(reload_all_shaders, DN_FILE_CHANGE_EVENT_MODIFIED, nullptr);
+  // dn_gpu.shader_monitor->add_directory(config.shader_path);
+  // dn_gpu.shader_monitor->add_directory(dn_paths_resolve("dn_shaders"));
+
+
+  DN_LOG("Initializing default uniform block");
+  dn_gpu.builtin_uniforms.buffer = dn_gpu_buffer_create((dn_gpu_buffer_descriptor_t) {
+    .name = "dn_uniform_buffer_default",
+    .kind = DN_GPU_BUFFER_KIND_UNIFORM,
+    .usage = DN_GPU_BUFFER_USAGE_DYNAMIC,
+    .capacity = 1,
+    .element_size = sizeof(dn_gpu_uniforms_t)
+  });
+
+  dn_gpu.builtin_uniforms.binding = (dn_gpu_uniform_buffer_binding_t) {
+    .name = "DnUniformBlock",
+    .buffer = dn_gpu.builtin_uniforms.buffer,
+    .binding_index = 0
+  };
+
+  DN_LOG("Initializing default shader include directories");
+  dn_string_t default_include_paths [] = {
+    dn_paths_resolve(dn_string_literal("dn_shaders")),
+    dn_paths_resolve(dn_string_literal("dn_shader_includes")),
+  };
+  dn_for_arr(default_include_paths, i) {
+    dn_path_t* path = (dn_path_t*)dn_fixed_array_reserve(&dn_gpu.search_paths, 1);
+    dn_string_copy_to(default_include_paths[i], *path, DN_MAX_PATH_LEN);
+  }
+
+  DN_LOG("Initializing default shaders");
+  dn_gpu_shader_descriptor_t default_shaders [] = {
+    {
+      .name = "shape",
+      .vertex_shader   = dn_string_to_cstr(dn_paths_resolve_format(dn_string_literal("dn_shader"), dn_string_literal("sdf/shape.vertex"))),
+      .fragment_shader = dn_string_to_cstr(dn_paths_resolve_format(dn_string_literal("dn_shader"), dn_string_literal("sdf/shape.fragment"))),
+      .kind = DN_GPU_SHADER_GRAPHICS
+    },
+    {
+        .name = "solid",
+        .vertex_shader   = dn_string_to_cstr(dn_paths_resolve_format(dn_string_literal("dn_shader"), dn_string_literal("solid/solid.vertex"))),
+        .fragment_shader = dn_string_to_cstr(dn_paths_resolve_format(dn_string_literal("dn_shader"), dn_string_literal("solid/solid.fragment"))),
+        .kind = DN_GPU_SHADER_GRAPHICS,
+    },
+    {
+        .name = "sprite",
+        .vertex_shader   = dn_string_to_cstr(dn_paths_resolve_format(dn_string_literal("dn_shader"), dn_string_literal("sprite/sprite.vertex"))),
+        .fragment_shader = dn_string_to_cstr(dn_paths_resolve_format(dn_string_literal("dn_shader"), dn_string_literal("sprite/sprite.fragment"))),
+        .kind = DN_GPU_SHADER_GRAPHICS,
+    },
+    {
+        .name = "text",
+        .vertex_shader   = dn_string_to_cstr(dn_paths_resolve_format(dn_string_literal("dn_shader"), dn_string_literal("text/text.vertex"))),
+        .fragment_shader = dn_string_to_cstr(dn_paths_resolve_format(dn_string_literal("dn_shader"), dn_string_literal("text/text.fragment"))),
+        .kind = DN_GPU_SHADER_GRAPHICS,
+    },
+  };
+  dn_for_arr(default_shaders, i) {
+    dn_gpu_shader_descriptor_t descriptor = default_shaders[i];
+    dn_gpu_shader_create(descriptor);
+  }
+
+  // Add user search paths and shaders
+  DN_LOG("Initializing default shader search paths");
+  dn_for(i, config.num_search_paths) {
+    dn_path_t* path = (dn_path_t*)dn_fixed_array_reserve(&dn_gpu.search_paths, 1);
+    dn_cstr_copy_to(config.search_paths[i], *path, DN_MAX_PATH_LEN);
+    DN_LOG("Added %s", *path);
+  }
+
+  DN_LOG("Initializing user shaders");
+  dn_for(i, config.num_shaders) {
+    DN_LOG("Added %s", config.shaders[i].name);
+    dn_gpu_shader_create(config.shaders[i]);
+  }
+
+  dn_for(i, config.num_render_targets) {
+    dn_gpu_render_target_create(config.render_targets[i]);
+  }
 }
 
 dn_gpu_command_buffer_t* dn_gpu_command_buffer_create(dn_gpu_command_buffer_descriptor_t descriptor) {
@@ -2765,7 +2904,7 @@ void dn_gpu_bind_render_state(dn_gpu_command_buffer_t* command_buffer, dn_gpu_re
 //////////////
 dn_gpu_uniform_t* dn_gpu_uniform_create(dn_gpu_uniform_descriptor_t descriptor) {
   dn_gpu_uniform_t* uniform = (dn_gpu_uniform_t*)dn_fixed_array_reserve(&dn_gpu.uniforms, 1);
-  dn_asset_copy_name(descriptor.name, uniform->name);
+  dn_cstr_copy_to(descriptor.name, uniform->name, DN_ASSET_NAME_LEN);
   uniform->kind = descriptor.kind;
   
   return uniform;
@@ -2776,7 +2915,7 @@ dn_gpu_uniform_t* dn_gpu_uniform_create(dn_gpu_uniform_descriptor_t descriptor) 
 /////////////////
 dn_gpu_buffer_t* dn_gpu_buffer_create(dn_gpu_buffer_descriptor_t descriptor) {
   dn_gpu_buffer_t* buffer = (dn_gpu_buffer_t*)dn_fixed_array_reserve(&dn_gpu.gpu_buffers, 1);
-  dn_asset_copy_name(descriptor.name, buffer->name);
+  dn_cstr_copy_to(descriptor.name, buffer->name, DN_ASSET_NAME_LEN);
   buffer->kind = descriptor.kind;
   buffer->usage = descriptor.usage;
   buffer->size = descriptor.capacity * descriptor.element_size;
@@ -2812,14 +2951,14 @@ void dn_gpu_buffer_sync_subdata(dn_gpu_buffer_t* buffer, void* data, u32 byte_si
 }
 
 void dn_gpu_buffer_zero(dn_gpu_buffer_t* buffer, u32 size) {
-	(u8*) data = (u8*)dn_allocator_alloc(&dn_allocators.bump, size);
+  u8* data = (u8*)dn_allocator_alloc(&dn_allocators.bump.allocator, size);
   dn_gpu_buffer_sync(buffer, data, size);
 }
 
 dn_gpu_backed_buffer_t dn_gpu_backed_buffer_create(dn_gpu_buffer_descriptor_t descriptor) {
   dn_gpu_backed_buffer_t backed_buffer;
   backed_buffer.gpu_buffer = dn_gpu_buffer_create(descriptor);
-  dn_fixed_array_init(&backed_buffer.buffer, descriptor.capacity, descriptor.element_size, &dn_allocators.standard);
+  dn_fixed_array_init(&backed_buffer.buffer, descriptor.capacity, descriptor.element_size, &dn_allocators.standard.allocator);
   return backed_buffer;
 }
 
@@ -2839,164 +2978,439 @@ void dn_gpu_backed_buffer_sync(dn_gpu_backed_buffer_t* buffer) {
   dn_gpu_buffer_sync(buffer->gpu_buffer, buffer->buffer.data, buffer->buffer.size * buffer->buffer.element_size);
 }
 
-
+////////////////
+// GPU SHADER //
+////////////////
 dn_gpu_shader_t* dn_gpu_shader_create(dn_gpu_shader_descriptor_t descriptor) {
-  DN_BROKEN();
-  return NULL;
+  switch (descriptor.kind) {
+    case DN_GPU_SHADER_GRAPHICS: dn_log("%s: DN_GPU_SHADER_GRAPHICS (%s) (%s)", __func__, descriptor.vertex_shader, descriptor.fragment_shader); break;
+    case DN_GPU_SHADER_COMPUTE: dn_log("%s: DN_GPU_SHADER_COMPUTE (%s)", __func__, descriptor.compute_shader); break;
+  }
+  
+  dn_gpu_shader_t* shader = (dn_gpu_shader_t*)dn_fixed_array_reserve(&dn_gpu.shaders, 1);
+  dn_gpu_shader_init(shader, descriptor);
+  dn_asset_registry_add(shader->name, shader);
+  
+  return shader;
 }
 
 dn_gpu_shader_t* dn_gpu_shader_find(const char* name) {
-  DN_BROKEN();
+  dn_fixed_array_for(dn_gpu.shaders, shader, dn_gpu_shader_t) {
+    if (dn_cstr_equal(shader->name, name)) return shader;
+  }
+
   return NULL;
+}
+
+
+void dn_gpu_shader_init(dn_gpu_shader_t* shader, dn_gpu_shader_descriptor_t descriptor) {
+  switch (descriptor.kind) {
+    case DN_GPU_SHADER_COMPUTE: {
+      shader->kind = DN_GPU_SHADER_COMPUTE;
+      dn_cstr_copy_to(descriptor.name, shader->name, DN_ASSET_NAME_LEN);
+      shader->compute.path = dn_cstr_copy(descriptor.compute_shader, &dn_allocators.standard.allocator);
+      char* source = dn_gpu_shader_preprocess(shader->compute.path);
+
+      u32 num_shaders = 1;
+      shader->compute.shader = glCreateShader(GL_COMPUTE_SHADER);
+      glShaderSource(shader->compute.shader, num_shaders, &source, NULL);
+      glCompileShader(shader->compute.shader);
+      dn_gpu_shader_check_compilation(shader->compute.shader, shader->compute.path);
+
+      shader->program = glCreateProgram();
+      glAttachShader(shader->program, shader->compute.shader);
+      glLinkProgram(shader->program);
+      dn_gpu_shader_check_linkage(shader->program, shader->compute.path);
+
+    } break;
+    case DN_GPU_SHADER_GRAPHICS: {
+      shader->kind = DN_GPU_SHADER_GRAPHICS;
+      dn_cstr_copy_to(descriptor.name, shader->name, DN_ASSET_NAME_LEN);
+      shader->graphics.vertex_path = dn_cstr_copy(descriptor.vertex_shader, &dn_allocators.standard.allocator);
+      shader->graphics.fragment_path = dn_cstr_copy(descriptor.fragment_shader, &dn_allocators.standard.allocator);
+
+      const char* paths[] = {
+        descriptor.vertex_shader,
+        descriptor.fragment_shader
+      };
+
+      shader->program = glCreateProgram();
+      
+      for (u32 index = 0; index < 2; index++) {
+        const char* file_path = paths[index];
+        char* source = dn_gpu_shader_preprocess(file_path);
+        if (!source) return;
+        
+        // Compile the shader
+        u32 shader_kind = (index == 0) ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER;
+        u32 shader_id = glCreateShader(shader_kind);
+        if (shader_kind == GL_VERTEX_SHADER) {
+          shader->graphics.vertex_shader = shader_id;
+        }
+        else if (shader_kind == GL_FRAGMENT_SHADER) {
+          shader->graphics.fragment_shader = shader_id;
+        }
+
+        u32 num_shaders = 1;
+        glShaderSource(shader_id, num_shaders, &source, NULL);
+        glCompileShader(shader_id);
+        dn_gpu_shader_check_compilation(shader_id, file_path);
+
+        glAttachShader(shader->program, shader_id);
+      }
+        
+      // Link into a shader program
+      glLinkProgram(shader->program);
+      dn_gpu_shader_check_linkage(shader->program, shader->graphics.vertex_path);
+      dn_gpu_set_resource_name(DN_GPU_RESOURCE_PROGRAM, shader->program, dn_cstr_len(shader->name), shader->name);
+    } break;
+  }
+}
+
+void dn_gpu_shader_reload(dn_gpu_shader_t* shader) {
+  glDeleteProgram(shader->program);
+
+  switch (shader->kind) {
+    case DN_GPU_SHADER_GRAPHICS: {
+      glDeleteShader(shader->graphics.vertex_shader);
+      glDeleteShader(shader->graphics.fragment_shader);
+      dn_gpu_shader_init(shader, (dn_gpu_shader_descriptor_t) {
+        .name = shader->name,
+        .vertex_shader = shader->graphics.vertex_path,
+        .fragment_shader = shader->graphics.fragment_path,
+        .compute_shader = NULL,
+        .kind = DN_GPU_SHADER_GRAPHICS,
+      });
+    } break;
+    case DN_GPU_SHADER_COMPUTE: {
+      glDeleteShader(shader->compute.shader);
+      dn_gpu_shader_init(shader, (dn_gpu_shader_descriptor_t) {
+        .name = shader->name,
+        .vertex_shader = NULL,
+        .fragment_shader = NULL,
+        .compute_shader = shader->compute.path,
+        .kind = DN_GPU_SHADER_COMPUTE,
+      });
+    } break;
+    default: {
+      DN_ASSERT(false);
+    }
+  }
+}
+
+dn_tstring_t dn_gpu_shader_preprocess(const char* file_path) {
+  const char* shader_file = dn_cstr_copy(file_path, &dn_allocators.bump.allocator);
+  u8* error = dn_allocator_alloc(&dn_allocators.bump.allocator, 256);
+  
+  dn_preprocessor_context_t context = {
+    .file_path = file_path,
+    .include_dirs = {
+      .data = (dn_path_t*)dn_fixed_array_at(&dn_gpu.search_paths, 0),
+      .count = dn_gpu.search_paths.size
+    }
+  };
+  dn_preprocess(&context);
+
+  if (!context.result) {
+    dn_log("shader preprocessor error; shader = %s, err = %s", shader_file, context.error);
+    return dn_cstr_copy("YOUR_SHADER_FAILED_TO_COMPILE", &dn_allocators.bump.allocator);
+  }
+  
+  return dn_cstr_copy(context.result, &dn_allocators.bump.allocator);
+}
+
+void dn_gpu_shader_check_compilation(u32 shader, const char* file_path) {
+  s32 success = 0;
+  
+  glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+  if (!success) {
+    char* compilation_status = (char*)dn_allocator_alloc(&dn_allocators.bump.allocator, 512);
+    glGetShaderInfoLog(shader, 512, NULL, compilation_status);
+    DN_LOG("%s: Compilation error; shader = %s, err = %s", file_path, compilation_status);
+  }
+}
+
+void dn_gpu_shader_check_linkage(u32 program, const char* file_path) {
+  s32 success = 0;
+  
+  glGetProgramiv(program, GL_LINK_STATUS, &success);
+  if (!success) {
+    char* compilation_status = (char*)dn_allocator_alloc(&dn_allocators.bump.allocator, 512);
+    glGetProgramInfoLog(program, 512, NULL, compilation_status);
+    DN_LOG("%s: Linker error; shader = %s, err = %s", file_path, compilation_status);
+  }
 }
 
 dn_gpu_render_target_t* dn_gpu_render_target_create(dn_gpu_render_target_descriptor_t descriptor) {
-  DN_BROKEN();
-  return NULL;
+  dn_gpu_render_target_t* target = (dn_gpu_render_target_t*)dn_fixed_array_reserve(&dn_gpu.targets, 1);
+  dn_cstr_copy_to(descriptor.name, target->name, DN_MAX_PATH_LEN);
+  target->size = descriptor.size;
+  
+  glGenFramebuffers(1, &target->handle);
+  glBindFramebuffer(GL_FRAMEBUFFER, target->handle);
+
+  // Generate the color buffer, allocate GPU memory for it, and attach it to the framebuffer
+  glGenTextures(1, &target->color_buffer);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, target->color_buffer);
+  
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, target->size.x, target->size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, target->color_buffer, 0);
+
+  // Clean up
+  glBindRenderbuffer(GL_RENDERBUFFER, 0);
+  glBindTexture(GL_TEXTURE_2D, 0);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+  dn_asset_registry_add(target->name, target);
+
+  return target;
 }
 
-dn_gpu_render_target_t* dn_gpu_acquire_swapchain() {
-  DN_BROKEN();
-  return NULL;
+void dn_gpu_destroy_target(dn_gpu_render_target_t* target) {
+  glDeleteTextures(1, &target->color_buffer);
+  glDeleteFramebuffers(1, &target->handle);
 }
 
 dn_gpu_render_target_t* dn_gpu_render_target_find(const char* name) {
-  DN_BROKEN();
+  for (u32 i = 0; i < dn_gpu.targets.size; i++) {
+    dn_gpu_render_target_t* target = (dn_gpu_render_target_t*)dn_fixed_array_at(&dn_gpu.targets, i);
+    if (!strncmp(target->name, name, DN_ASSET_NAME_LEN)) {
+        return target;
+    }
+  }
+
   return NULL;
 }
 
 void dn_gpu_render_target_bind(dn_gpu_render_target_t* target) {
-  DN_BROKEN();
+  if (!target) {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    return;
+  }
+  
+  glBindFramebuffer(GL_FRAMEBUFFER, target->handle);
+  glViewport(0, 0, target->size.x, target->size.y);
+}
+
+dn_gpu_render_target_t* dn_gpu_acquire_swapchain() {
+  return (dn_gpu_render_target_t*)dn_fixed_array_at(&dn_gpu.targets, 0);
 }
 
 void dn_gpu_render_target_clear(dn_gpu_render_target_t* target) {
-  DN_BROKEN();
+  DN_ASSERT(target);
+  
+  dn_gpu_render_target_bind(target);
+  glClearColor(0.f, 0.f, 0.f, 1.f);
+  glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void dn_gpu_render_target_blit(dn_gpu_render_target_t* source, dn_gpu_render_target_t* destination) {
-  DN_BROKEN();
-}
-
-void dn_gpu_memory_barrier(dn_gpu_memory_barrier_t barrier) {
-  DN_BROKEN();
-}
-
-void dn_gpu_dispatch_compute(dn_gpu_buffer_t* buffer, u32 size) {
-  DN_BROKEN();
+  DN_ASSERT(source);
+  DN_ASSERT(destination);
+  
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, source->handle);
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, destination->handle);
+  glBlitFramebuffer(0, 0, source->size.x, source->size.y, 0, 0, destination->size.x, destination->size.y,  GL_COLOR_BUFFER_BIT, GL_NEAREST);
+  glMemoryBarrier(GL_FRAMEBUFFER_BARRIER_BIT);
 }
 
 void dn_gpu_swap_buffers() {
-  DN_BROKEN();
+  glfwSwapBuffers(dn_app.window.handle);
 }
 
-void dn_gpu_error_clear() {
-  DN_BROKEN();
-}
-
-dn_tstring_t dn_gpu_error_read() {
-  DN_BROKEN();
-  return dn_zero_struct(dn_tstring_t);
-}
-
-void dn_gpu_error_log_one() {
-  DN_BROKEN();
-}
-
-void dn_gpu_error_log_all() {
-  DN_BROKEN();
-}
-
-void dn_gpu_set_resource_name(dn_gpu_resource_id_t id, u32 handle, u32 name_len, const char* name) {
-  DN_BROKEN();
-}
-
-void dn_gpu_shader_build_source(const char* file_path) {
-  DN_BROKEN();
-}
-
-void dn_gpu_shader_init(dn_gpu_shader_t* shader, dn_gpu_shader_descriptor_t descriptor) {
-  DN_BROKEN();
-}
-
-void dn_gpu_shader_init_graphics(dn_gpu_shader_t* shader, const char* name) {
-  DN_BROKEN();
-}
-
-void dn_gpu_shader_init_graphics_ex(dn_gpu_shader_t* shader, const char* name, const char* vertex_path, const char* fragment_path) {
-  DN_BROKEN();
-}
-
-void dn_gpu_shader_init_compute(dn_gpu_shader_t* shader, const char* name) {
-  DN_BROKEN();
-}
-
-void dn_gpu_shader_init_compute_ex(dn_gpu_shader_t* shader, const char* name, const char* compute_path) {
-  DN_BROKEN();
-}
-
-void dn_gpu_shader_reload(dn_gpu_shader_t* shader) {
-  DN_BROKEN();
-}
-
-u32 dn_gpu_vertex_layout_calculate_stride(dn_gpu_buffer_layout_t* layout) {
-  DN_BROKEN();
-  return 0;
-}
-
+/////////////////////
+// ENUM CONVERSION //
+/////////////////////
 u32 dn_gpu_draw_primitive_to_gl_draw_primitive(dn_gpu_draw_primitive_t primitive) {
-  DN_BROKEN();
-  return 0;
-}
+  switch (primitive) {
+    case DN_GPU_PRIMITIVE_TRIANGLES: return GL_TRIANGLES;
+  }
 
-dn_gpu_vertex_attr_info_t dn_gpu_vertex_attribute_info(dn_gpu_vertex_attribute_kind_t kind) {
-  DN_BROKEN();
-  return dn_zero_struct(dn_gpu_vertex_attr_info_t);
-}
-
-void* dn_gpu_u32_to_gl_void_pointer(u32 value) {
-  DN_BROKEN();
-  return NULL;
-}
-
-u32 dn_gpu_buffer_kind_to_gl_buffer_kind(dn_gpu_buffer_kind_t kind) {
-  DN_BROKEN();
-  return 0;
-}
-
-u32 dn_gpu_buffer_usage_to_gl_buffer_usage(dn_gpu_buffer_usage_t usage) {
-  DN_BROKEN();
-  return 0;
-}
-
-u32 dn_gpu_buffer_kind_to_gl_barrier(dn_gpu_buffer_kind_t kind) {
-  DN_BROKEN();
+  assert(false);
   return 0;
 }
 
 u32 dn_gpu_blend_func_to_gl_blend_func(dn_gpu_blend_func_t func) {
-  DN_BROKEN();
+  switch (func) {
+    case DN_GPU_BLEND_FUNC_NONE:             return 0; break;
+    case DN_GPU_BLEND_FUNC_ADD:              return GL_FUNC_ADD; break;
+    case DN_GPU_BLEND_FUNC_SUBTRACT:         return GL_FUNC_SUBTRACT; break;
+    case DN_GPU_BLEND_FUNC_REVERSE_SUBTRACT: return GL_FUNC_REVERSE_SUBTRACT; break;
+    case DN_GPU_BLEND_FUNC_MIN:              return GL_MIN; break;
+    case DN_GPU_BLEND_FUNC_MAX:              return GL_MAX; break;
+  };
+
+  DN_ASSERT(false);
   return 0;
 }
 
 u32 dn_gpu_blend_mode_to_gl_blend_mode(dn_gpu_blend_mode_t mode) {
-  DN_BROKEN();
+  switch (mode) {
+    case DN_GPU_BLEND_MODE_ZERO: return GL_ZERO; break;
+    case DN_GPU_BLEND_MODE_ONE: return GL_ONE; break;
+    case DN_GPU_BLEND_MODE_SRC_COLOR: return GL_SRC_COLOR; break;
+    case DN_GPU_BLEND_MODE_ONE_MINUS_SRC_COLOR: return GL_ONE_MINUS_SRC_COLOR; break;
+    case DN_GPU_BLEND_MODE_DST_COLOR: return GL_DST_COLOR; break;
+    case DN_GPU_BLEND_MODE_ONE_MINUS_DST_COLOR: return GL_ONE_MINUS_DST_COLOR; break;
+    case DN_GPU_BLEND_MODE_SRC_ALPHA: return GL_SRC_ALPHA; break;
+    case DN_GPU_BLEND_MODE_ONE_MINUS_SRC_ALPHA: return GL_ONE_MINUS_SRC_ALPHA; break;
+    case DN_GPU_BLEND_MODE_DST_ALPHA: return GL_DST_ALPHA; break;
+    case DN_GPU_BLEND_MODE_ONE_MINUS_DST_ALPHA: return GL_ONE_MINUS_DST_ALPHA; break;
+    case DN_GPU_BLEND_MODE_CONSTANT_COLOR: return GL_CONSTANT_COLOR; break;
+    case DN_GPU_BLEND_MODE_ONE_MINUS_CONSTANT_COLOR: return GL_ONE_MINUS_CONSTANT_COLOR; break;
+    case DN_GPU_BLEND_MODE_CONSTANT_ALPHA: return GL_CONSTANT_ALPHA; break;
+    case DN_GPU_BLEND_MODE_ONE_MINUS_CONSTANT_ALPHA: return GL_ONE_MINUS_CONSTANT_ALPHA; break;
+  }
+
+  DN_ASSERT(false);
   return 0;
 }
 
 u32 dn_gpu_resource_id_to_gl_id(dn_gpu_resource_id_t id) {
-  DN_BROKEN();
+  switch (id) {
+    case DN_GPU_RESOURCE_FRAMEBUFFER: return GL_FRAMEBUFFER; break;
+    case DN_GPU_RESOURCE_SHADER: return GL_SHADER; break;
+    case DN_GPU_RESOURCE_PROGRAM: return GL_PROGRAM; break;
+  }
+  
+  DN_ASSERT(false);
   return 0;
 }
 
 u32 dn_gpu_memory_barrier_to_gl_barrier(dn_gpu_memory_barrier_t barrier) {
-  DN_BROKEN();
+  switch (barrier) {
+    case DN_GPU_MEMORY_BARRIER_STORAGE: return GL_SHADER_STORAGE_BARRIER_BIT; break;
+    case DN_GPU_MEMORY_BARRIER_BUFFER_UPDATE: return GL_BUFFER_UPDATE_BARRIER_BIT; break;
+  }
+  
+  DN_ASSERT(false);
   return 0;
 }
 
-void dn_gpu_apply_uniform_buffer_binding(dn_gpu_command_buffer_t* command_buffer, dn_gpu_uniform_buffer_binding_t* binding) {
-  DN_BROKEN();
+u32 dn_gpu_buffer_kind_to_gl_buffer_kind(dn_gpu_buffer_kind_t kind) {
+  switch (kind) {
+    case DN_GPU_BUFFER_KIND_STORAGE: return GL_SHADER_STORAGE_BUFFER; break;
+    case DN_GPU_BUFFER_KIND_ARRAY: return GL_ARRAY_BUFFER; break;
+    case DN_GPU_BUFFER_KIND_UNIFORM: return GL_UNIFORM_BUFFER; break;
+  }
+
+  DN_ASSERT(false);
+  return 0;
 }
 
+u32 dn_gpu_buffer_usage_to_gl_buffer_usage(dn_gpu_buffer_usage_t usage) {
+  switch (usage) {
+    case DN_GPU_BUFFER_USAGE_STATIC: return GL_STATIC_DRAW; break;
+    case DN_GPU_BUFFER_USAGE_DYNAMIC: return GL_DYNAMIC_DRAW; break;
+    case DN_GPU_BUFFER_USAGE_STREAM: return GL_STREAM_DRAW; break;
+  }
+
+  DN_ASSERT(false);
+  return 0;
+}
+
+u32 dn_gpu_buffer_kind_to_gl_barrier(dn_gpu_buffer_kind_t kind) {
+  switch (kind) {
+    case DN_GPU_BUFFER_KIND_STORAGE: return GL_SHADER_STORAGE_BARRIER_BIT; break;
+    case DN_GPU_BUFFER_KIND_ARRAY: return GL_BUFFER_UPDATE_BARRIER_BIT; break;
+    case DN_GPU_BUFFER_KIND_UNIFORM: return GL_UNIFORM_BARRIER_BIT; break;
+  }
+
+  DN_ASSERT(false);
+  return 0;
+}
+
+dn_gpu_vertex_attr_info_t dn_gpu_vertex_attribute_info(dn_gpu_vertex_attribute_kind_t kind) {
+  switch (kind) {
+    case DN_GPU_VERTEX_ATTRIBUTE_FLOAT: {
+      return (dn_gpu_vertex_attr_info_t) {
+        .size = sizeof(GLfloat),
+        .value = GL_FLOAT,
+      };
+    } break;
+    case DN_GPU_VERTEX_ATTRIBUTE_U32: {
+      return (dn_gpu_vertex_attr_info_t) {
+        .size = sizeof(GLuint),
+        .value = GL_UNSIGNED_INT,
+      };
+    } break;
+  }
+
+  DN_ASSERT(false);
+  return dn_zero_struct(dn_gpu_vertex_attr_info_t);
+}
+
+void* dn_gpu_u32_to_gl_void_pointer(u32 value) {
+  return (void*)(uintptr_t)value;
+}
+
+u32 dn_gpu_vertex_layout_calculate_stride(dn_gpu_buffer_layout_t* layout) {
+  assert(layout);
+
+  u32 stride = 0;
+
+  for (u32 i = 0; i < layout->num_vertex_attributes; i++) {
+    dn_gpu_vertex_attribute_t attribute = layout->vertex_attributes[i];
+    dn_gpu_vertex_attr_info_t type_info = dn_gpu_vertex_attribute_info(attribute.kind);
+    stride += attribute.count * type_info.size;
+  }
+
+  return stride;
+}
+
+void dn_gpu_apply_uniform_buffer_binding(dn_gpu_command_buffer_t* command_buffer, dn_gpu_uniform_buffer_binding_t* binding) {
+  u32 program = command_buffer->pipeline->raster.shader->program;
+  u32 location = glGetUniformBlockIndex(program, binding->name);
+  glUniformBlockBinding(program, location, binding->binding_index); 
+  dn_gpu_buffer_bind_base(binding->buffer, binding->binding_index);
+}
+
+///////////////////
+// GPU DEBUGGING //
+///////////////////
+void dn_gpu_error_clear() {
+  while (glGetError() != GL_NO_ERROR) {}
+}
+
+dn_tstring_t dn_gpu_error_read() {
+  u32 error = glGetError();
+  if (error == GL_INVALID_ENUM) {
+    return dn_cstr_copy("GL_INVALID_ENUM", &dn_allocators.bump.allocator);
+  }
+  else if (error == GL_INVALID_OPERATION) {
+    return dn_cstr_copy("GL_INVALID_OPERATION", &dn_allocators.bump.allocator);
+  }
+  else if (error == GL_OUT_OF_MEMORY) {
+    return dn_cstr_copy("GL_OUT_OF_MEMORY", &dn_allocators.bump.allocator);
+  }
+  else if (error == GL_NO_ERROR) {
+    return dn_cstr_copy("GL_NO_ERROR", &dn_allocators.bump.allocator);
+  }
+
+  return NULL;
+}
+
+void dn_gpu_error_log_one() {
+  dn_log(dn_gpu_error_read());
+}
+
+void dn_gpu_error_log_all() {
+  while (true) {
+    dn_tstring_t error = dn_gpu_error_read();
+    if (!error) break;
+    if (!strcmp(error, "GL_NO_ERROR")) break;
+
+    dn_log(error);
+  }
+}
+
+void dn_gpu_set_resource_name(dn_gpu_resource_id_t id, u32 handle, u32 name_len, const char* name) {
+  glObjectLabel(dn_gpu_resource_id_to_gl_id(id), handle, name_len, name);
+}
 
 /////////
 // SDF //
@@ -3051,17 +3465,68 @@ void dn_sdf_grid(dn_sdf_renderer_t* renderer, u32 grid_width, u32 grid_size) {
 /////////////////////////
 // BACKGROUND IMPORTER //
 /////////////////////////
-void dn_asset_registry_init(dn_asset_config_t config) {
-  DN_BROKEN();
-}
+void dn_asset_registry_init(dn_asset_config_t user_config) {
+  DN_LOG_FN();
 
-dn_asset_data_t dn_asset_registry_find(const char* name) {
-  DN_BROKEN();
-  return NULL;
+  dn_asset_importer_t default_importers [] = {
+    {
+      .id = dn_type_name(dn_background_t),
+      .on_import = &dn_background_import,
+      .on_complete = &dn_background_complete
+    }
+  };
+
+  dn_asset_config_t configs [] = {
+    {
+      .importers = {
+        .data = default_importers,
+        .count = dn_arr_len(default_importers)
+      }
+    },
+    user_config
+  };
+   
+  dn_for_arr(configs, config_index) {
+    dn_asset_config_t* config = &configs[config_index];
+    dn_for(importer_index, config->importers.count) {
+      dn_asset_importer_t* importer = &config->importers.data[importer_index];
+
+      DN_LOG("Registered importer; id = %s, on_import = %d, on_complete = %d", 
+        importer->id, 
+        importer->on_import, importer->on_complete
+      );
+
+      gs_hash_table_insert(dn_app.asset_registry.importers, dn_hash_string(dn_string_cstr(importer->id)), *importer);
+    }
+  }  
+
+  dn_ring_buffer_init(&dn_app.loader.load_requests, 2048, sizeof(dn_asset_load_request_t));
+  dn_ring_buffer_init(&dn_app.loader.completion_queue, 2048, sizeof(dn_asset_load_request_t));
+  
+  // asset_loader.thread = std::thread(&AssetLoader::process_requests, &asset_loader);
+  // asset_loader.thread.detach();
 }
 
 void dn_asset_registry_add(const char* name, dn_asset_data_t data) {
-  DN_BROKEN();
+  DN_LOG("Registered asset; name = %s, data = %p", name, data);
+
+  dn_asset_t asset;
+  dn_cstr_copy_to(name, asset.name, DN_ASSET_NAME_LEN);
+  asset.data = data;
+
+  gs_hash_table_insert(dn_app.asset_registry.assets, dn_hash_string(dn_string_cstr(name)), asset);
+}
+
+dn_asset_data_t dn_asset_registry_find(const char* name) {
+    DN_ASSERT(name);
+
+    dn_hash_t hash = dn_hash_string(dn_string_cstr(name));
+    if (!gs_hash_table_exists(dn_app.asset_registry.assets, hash)) {
+      DN_LOG("Tried to find asset, but it was not registered; name = %.*s", name);
+      return NULL;
+    }
+  
+    return gs_hash_table_getp(dn_app.asset_registry.assets, hash);
 }
 
 void dn_asset_registry_update() {
@@ -3313,6 +3778,7 @@ dn_time_metric_t* dn_time_metrics_find(dn_string_t name) {
   dn_hash_t hash = dn_hash_string(name);
   if (!gs_hash_table_exists(dn_time_metrics.metrics, hash)) {
     dn_log("Tried to find time metric, but it was not registered; name = %.*s", __func__, name.len, name.data);
+    return NULL;
   }
 
   return gs_hash_table_getp(dn_time_metrics.metrics, hash);
@@ -4986,7 +5452,7 @@ bool dn_lua_script_file(dn_string_t file_path) {
   dn_lua_interpreter_t l = dn_lua.state;
   s32 initial_stack_size = lua_gettop(l);
 
-  dn_log_format_str(dn_string_literal("%s: scripting %.*s"), __func__, file_path.len, file_path.data);
+  DN_LOG(dn_string_literal("%.*s"), file_path.len, file_path.data);
 
   lua_pushcfunction(l, &dn_lua_format_file_load_error_l);
 
@@ -5339,7 +5805,7 @@ void dn_window_init(dn_window_config_t config) {
     glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
   }
 
-  dn_log("creating window: native_resolution = [%.0f, %.0f], content_area = [%.0f, %.0f], windowed = %d, border = %d, vsync = %d, refresh_rate = %d, monitor = %d",
+  DN_LOG("Creating window; native_resolution = [%.0f, %.0f], content_area = [%.0f, %.0f], windowed = %d, border = %d, vsync = %d, refresh_rate = %d, monitor = %d",
            dn_app.window.native_resolution.x, dn_app.window.native_resolution.y,
            dn_app.window.content_area.x, dn_app.window.content_area.y,
            config.flags & DN_WINDOW_FLAG_WINDOWED,
@@ -5790,6 +6256,76 @@ void dn_audio_resume(dn_audio_instance_handle_t handle) {
 
 void dn_audio_queue(dn_audio_instance_handle_t current, dn_audio_instance_handle_t next) {
   DN_BROKEN();
+}
+
+
+//////////////////
+// PREPROCESSOR //
+//////////////////
+void dn_preprocess(dn_preprocessor_context_t* context) {
+  context->result = NULL;
+
+  context->file = fopen(context->file_path, "rb");
+  if (!context->file) {
+    snprintf(context->error, 256, "Failed to open file for preprocessing; file = %s", context->file_path);
+    return;
+  }
+
+  fseek(context->file, 0, SEEK_END);
+  context->file_data.len = ftell(context->file);
+  context->file_data.data = (u8*)dn_allocator_alloc(&dn_allocators.bump.allocator, context->file_data.len + 1);
+  char* file_data = (char*)context->file_data.data;
+
+  fseek(context->file, 0, SEEK_SET);
+  fread(file_data, 1, context->file_data.len, context->file);
+  fclose(context->file);
+
+  char* temp = (char*)dn_allocator_alloc(&dn_allocators.bump.allocator, 4096);
+
+  char* str = (char*)context->file_data.data;
+  include_info *inc_list;
+  u32 num_includes = stb_include_find_includes(str, &inc_list);
+  size_t source_len = context->file_data.len;
+  size_t textlen=0, last=0;
+  for (u32 i = 0; i < num_includes; ++i) {
+    context->result = stb_include_append(context->result, &textlen, str+last, inc_list[i].offset - last);
+
+    if (inc_list[i].filename) {
+      char* included_file_data = NULL;
+      for (u32 dir_index = 0; dir_index < context->include_dirs.count; dir_index++) {
+        dn_string_builder_t builder = dn_tstring_builder();
+        dn_string_builder_append_cstr(&builder, context->include_dirs.data[dir_index]);
+        dn_string_builder_append_cstr(&builder, "/");
+        dn_string_builder_append_cstr(&builder, inc_list[i].filename);
+
+        const char* file_path = dn_string_builder_write_cstr(&builder);
+        FILE* file = fopen(file_path, "rb");
+        if (file) {
+          fclose(file);
+          dn_preprocessor_context_t subcontext = {
+            .file_path = file_path,
+            .include_dirs = context->include_dirs
+          };
+          dn_preprocess(&subcontext);
+          included_file_data = subcontext.result;
+          break;
+        }
+      }
+
+      if (!included_file_data) {
+        snprintf(context->error, 256, "Failed to find include; file = %s", inc_list[i].filename);
+        stb_include_free_includes(inc_list, num_includes);
+        return;
+      }
+
+      context->result = stb_include_append(context->result, &textlen, included_file_data, strlen(included_file_data));
+      free(included_file_data);
+    }
+    
+    last = inc_list[i].end;
+  }
+  context->result = stb_include_append(context->result, &textlen, str+last, source_len - last + 1); // append '\0'
+  stb_include_free_includes(inc_list, num_includes);
 }
 
 

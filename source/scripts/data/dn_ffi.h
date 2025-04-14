@@ -213,6 +213,7 @@ typedef struct {
   dn_os_directory_entry_t* data;
   u32 count;
 } dn_os_directory_entry_list_t;
+typedef void* dn_os_file_t;
  bool                         dn_os_does_path_exist(dn_string_t path);
  bool                         dn_os_is_regular_file(dn_string_t path);
  bool                         dn_os_is_directory(dn_string_t path);
@@ -726,8 +727,8 @@ typedef struct {
   struct { struct { dn_hash_t key; dn_asset_importer_t val; gs_hash_table_entry_state state; }* data; dn_hash_t tmp_key; dn_asset_importer_t tmp_val; size_t stride; size_t klpvl; size_t tmp_idx; }* importers;
 } dn_asset_registry_t;
  void            dn_asset_registry_init(dn_asset_config_t config);
- dn_asset_data_t dn_asset_registry_find(const char* name);
  void            dn_asset_registry_add(const char* name, dn_asset_data_t data);
+ dn_asset_data_t dn_asset_registry_find(const char* name);
 typedef enum {
   DN_BACKGROUND_COMPLETION_STATUS_UPDATE_CONFIG,
   DN_BACKGROUND_COMPLETION_STATUS_LOAD_TILES,
@@ -737,6 +738,21 @@ typedef struct {
   dn_background_completion_status_t status;
   dn_background_t* background;
 } dn_background_import_request_t;
+typedef struct {
+  
+  const char* file_path;
+  struct {
+    dn_path_t* data;
+    u32 count;
+  } include_dirs;
+  
+  char error [256];
+  char* result;
+  
+  dn_os_file_t file;
+  dn_string_t file_data;
+} dn_preprocessor_context_t;
+ void dn_preprocess(dn_preprocessor_context_t* context);
 typedef enum {
   DN_TEST_CONTEXT_FLAG_DEFAULT = 0,
   DN_TEST_CONTEXT_FLAG_LOG_FAILURE = 1 << 0,
@@ -1196,6 +1212,11 @@ typedef struct {
   f32 master_time;
 } dn_gpu_uniforms_t;
 typedef struct {
+  dn_gpu_buffer_t* buffer;
+  dn_gpu_uniform_buffer_binding_t binding;
+  dn_gpu_uniforms_t data;
+} dn_gpu_builtin_uniforms_t;
+typedef struct {
   const char* shader_path;
   dn_gpu_shader_descriptor_t* shaders;
   u32 num_shaders;
@@ -1205,19 +1226,15 @@ typedef struct {
   u32 num_render_targets;
 } dn_gpu_config_t;
 typedef struct {
-  dn_fixed_array_t command_buffers;
-  dn_fixed_array_t uniforms;
-  dn_fixed_array_t pipelines;
-  dn_fixed_array_t  gpu_buffers;
-  dn_fixed_array_t  targets;
-  dn_fixed_array_t shaders;
-  
+  dn_fixed_array_t     command_buffers;
+  dn_fixed_array_t            uniforms;
+  dn_fixed_array_t           pipelines;
+  dn_fixed_array_t             gpu_buffers;
+  dn_fixed_array_t      targets;
+  dn_fixed_array_t             shaders;
   dn_fixed_array_t search_paths;
-  struct {
-    dn_gpu_buffer_t* buffer;
-    dn_gpu_uniform_buffer_binding_t binding;
-    dn_gpu_uniforms_t data;
-  } builtin_uniforms;
+  
+  dn_gpu_builtin_uniforms_t builtin_uniforms;
 } dn_gpu_t;
 dn_gpu_t dn_gpu;
  void                      dn_gpu_init(dn_gpu_config_t config);
@@ -1257,7 +1274,7 @@ dn_gpu_t dn_gpu;
  void                      dn_gpu_dispatch_compute(dn_gpu_buffer_t* buffer, u32 size);
  void                      dn_gpu_swap_buffers();
  void                      dn_gpu_error_clear();
- dn_tstring_t              dn_gpu_error_read();
+ char*                     dn_gpu_error_read();
  void                      dn_gpu_error_log_one();
  void                      dn_gpu_error_log_all();
  void                      dn_gpu_set_resource_name(dn_gpu_resource_id_t id, u32 handle, u32 name_len, const char* name);
