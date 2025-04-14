@@ -580,6 +580,7 @@ DN_API dn_os_date_time_t            dn_os_get_date_time();
 DN_API f64                          dn_os_file_mod_time(dn_string_t path);
 DN_API void                         dn_os_normalize_path(dn_string_t path);
 DN_API dn_string_t                  dn_os_parent_path(dn_string_t path, dn_allocator_t* allocator);
+DN_API dn_string_t                  dn_os_path_extension(dn_string_t path);
 DN_API void                         dn_os_memory_copy(const void* source, void* dest, u32 num_bytes);
 DN_API bool                         dn_os_is_memory_equal(const void* a, const void* b, size_t len);
 DN_API void                         dn_os_fill_memory(void* buffer, u32 buffer_size, void* fill, u32 fill_size);
@@ -1853,9 +1854,19 @@ typedef struct {
 } dn_gpu_vertex_buffer_binding_t;
 
 typedef struct {
+  dn_gpu_vertex_buffer_binding_t bindings [8];
+  u32 count;
+} dn_gpu_vertex_buffer_binding_array_t;
+
+typedef struct {
   dn_gpu_buffer_t* buffer;
   u32 base;
 } dn_gpu_storage_buffer_binding_t;
+
+typedef struct {
+  dn_gpu_storage_buffer_binding_t bindings [8];
+  u32 count;
+} dn_gpu_storage_buffer_binding_array_t;
 
 typedef struct {
   dn_gpu_uniform_data_t data;
@@ -1864,31 +1875,26 @@ typedef struct {
 } dn_gpu_uniform_binding_t;
 
 typedef struct {
+  dn_gpu_uniform_binding_t bindings [8];
+  u32 count;
+} dn_gpu_uniform_binding_array_t;
+
+typedef struct {
   dn_asset_name_t name;
   dn_gpu_buffer_t* buffer;
   u32 binding_index;
 } dn_gpu_uniform_buffer_binding_t;
 
 typedef struct {
-  dn_align(16) struct {
-    dn_gpu_vertex_buffer_binding_t bindings [8];
-    u32 count;
-  } vertex;
+  dn_gpu_uniform_buffer_binding_t bindings [8];
+  u32 count;
+} dn_gpu_uniform_buffer_binding_array_t;
 
-  dn_align(16) struct {
-    dn_gpu_uniform_binding_t bindings [8];
-    u32 count;
-  } uniforms;
-
-  dn_align(16) struct {
-    dn_gpu_storage_buffer_binding_t bindings [8];
-    u32 count;
-  } storage;
-
-  dn_align(16) struct {
-    dn_gpu_uniform_buffer_binding_t bindings [8];
-    u32 count;
-  } uniform_buffers;
+typedef struct {
+  dn_align(16) dn_gpu_vertex_buffer_binding_array_t vertex;
+  dn_align(16) dn_gpu_uniform_binding_array_t uniforms;
+  dn_align(16) dn_gpu_storage_buffer_binding_array_t storage;
+  dn_align(16) dn_gpu_uniform_buffer_binding_array_t uniform_buffers;
 } dn_gpu_buffer_binding_t;
 
 //////////////////
@@ -2086,7 +2092,117 @@ DN_IMP u32                       dn_gpu_blend_func_to_gl_blend_func(dn_gpu_blend
 DN_IMP u32                       dn_gpu_blend_mode_to_gl_blend_mode(dn_gpu_blend_mode_t mode);
 DN_IMP u32                       dn_gpu_resource_id_to_gl_id(dn_gpu_resource_id_t id);
 DN_IMP u32                       dn_gpu_memory_barrier_to_gl_barrier(dn_gpu_memory_barrier_t barrier);
-DN_IMP void dn_gpu_apply_uniform_buffer_binding(dn_gpu_command_buffer_t* command_buffer, dn_gpu_uniform_buffer_binding_t* binding);
+DN_IMP void                      dn_gpu_apply_uniform_buffer_binding(dn_gpu_command_buffer_t* command_buffer, dn_gpu_uniform_buffer_binding_t* binding);
+
+
+// ███████╗██████╗ ███████╗
+// ██╔════╝██╔══██╗██╔════╝
+// ███████╗██║  ██║█████╗  
+// ╚════██║██║  ██║██╔══╝  
+// ███████║██████╔╝██║     
+// ╚══════╝╚═════╝ ╚═╝     
+///////////
+// ENUMS //
+///////////
+typedef enum {
+  DN_SDF_SHAPE_CIRCLE = 0,
+  DN_SDF_SHAPE_RING = 1,
+  DN_SDF_SHAPE_BOX = 2,
+  DN_SDF_SHAPE_ORIENTED_BOX = 3,
+  DN_SDF_SHAPE_COMBINE = 100,
+} dn_sdf_shape_t;
+
+typedef enum {
+  DN_SDF_COMBINE_OP_UNION = 0,
+  DN_SDF_COMBINE_OP_INTERSECTION = 1,
+  DN_SDF_COMBINE_OP_SUBTRACTION = 2,
+} dn_sdf_combine_op_t;
+
+typedef enum {
+  DN_SDF_SMOOTH_KERNEL_NONE = 0,
+  DN_SDF_SMOOTH_KERNEL_POLYNOMIAL_QUADRATIC = 1,
+} dn_sdf_smoothing_kernel_t;
+
+typedef enum {
+  DN_SDF_RENDERER_STATE_NONE,
+  DN_SDF_RENDERER_STATE_COMBINATION,
+} dn_sdf_renderer_state_t;
+
+
+/////////////////////
+// SDF BUFFER DATA //
+/////////////////////
+typedef struct {
+  dn_vector2_t position;
+  dn_vector2_t uv;
+} dn_sdf_vertex_t;
+
+typedef struct {
+  dn_sdf_shape_t shape;
+  u32 buffer_index;
+} dn_sdf_instance_t;
+
+typedef struct {
+  u32 num_sdfs;
+} dn_sdf_combine_header_t;
+
+typedef struct {
+  u32 buffer_index;
+  dn_sdf_shape_t shape;
+  dn_sdf_combine_op_t op;
+  dn_sdf_smoothing_kernel_t kernel;
+} dn_sdf_combine_entry_t;
+
+
+////////////////////
+// SDF SHAPE DATA //
+////////////////////
+typedef struct {
+  dn_vector3_t color;
+  dn_vector2_t position;
+  float rotation;
+  float edge_thickness;
+  dn_sdf_shape_t shape;
+} dn_sdf_header_t;
+
+typedef struct {
+  dn_sdf_header_t header;
+  float radius;
+} dn_sdf_circle_t;
+
+typedef struct {
+  dn_sdf_header_t header;
+  float inner_radius;
+  float outer_radius;
+} dn_sdf_ring_t;
+
+typedef struct {
+  dn_sdf_header_t header;
+  dn_vector2_t size;
+} dn_sdf_oriented_box_t;
+
+
+typedef struct {
+  dn_sdf_renderer_state_t state;
+  dn_gpu_backed_buffer_t vertices;
+  dn_gpu_backed_buffer_t instances;
+  dn_gpu_backed_buffer_t combinations;
+  dn_gpu_backed_buffer_t shape_data;
+  dn_gpu_buffer_binding_t bindings;
+  dn_gpu_pipeline_t* pipeline;
+} dn_sdf_renderer_t;
+
+DN_API dn_sdf_renderer_t        dn_sdf_renderer_create(u32 buffer_size);
+DN_API void                     dn_sdf_renderer_draw(dn_sdf_renderer_t* renderer, dn_gpu_command_buffer_t* command_buffer);
+DN_API void                     dn_sdf_renderer_push_instance(dn_sdf_renderer_t* renderer, dn_sdf_shape_t shape);
+DN_API void                     dn_sdf_renderer_push_header(dn_sdf_renderer_t* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness);
+DN_API dn_sdf_combine_header_t* dn_sdf_combination_begin(dn_sdf_renderer_t* renderer);
+DN_API void                     dn_sdf_combination_append(dn_sdf_renderer_t* renderer, dn_sdf_combine_header_t* header, dn_sdf_shape_t shape, dn_sdf_combine_op_t op, dn_sdf_smoothing_kernel_t kernel);
+DN_API void                     dn_sdf_combination_commit(dn_sdf_renderer_t* renderer);
+DN_API void                     dn_sdf_circle_ex(dn_sdf_renderer_t* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float radius);
+DN_API void                     dn_sdf_ring_ex(dn_sdf_renderer_t* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float inner_radius, float outer_radius);
+DN_API void                     dn_sdf_oriented_box_ex(dn_sdf_renderer_t* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float length, float thickness);
+DN_API void                     dn_sdf_grid(dn_sdf_renderer_t* renderer, u32 grid_width, u32 grid_size);
 
 
 // ███████╗████████╗███████╗ █████╗ ███╗   ███╗
@@ -2355,107 +2471,374 @@ void dn_gpu_init(dn_gpu_config_t config) {
 }
 
 dn_gpu_command_buffer_t* dn_gpu_command_buffer_create(dn_gpu_command_buffer_descriptor_t descriptor) {
-  DN_BROKEN();
-  return NULL;
+  dn_gpu_command_buffer_t* command_buffer = (dn_gpu_command_buffer_t*)dn_fixed_array_reserve(&dn_gpu.command_buffers, 1);
+  dn_fixed_array_init(&command_buffer->commands, descriptor.max_commands, sizeof(dn_gpu_command_t), &dn_allocators.standard.allocator);
+  glGenVertexArrays(1, &command_buffer->vao);
+  glBindVertexArray(command_buffer->vao);
+
+  return command_buffer;
 }
 
 void dn_gpu_command_buffer_draw(dn_gpu_command_buffer_t* command_buffer, dn_gpu_draw_call_t draw_call) {
-  DN_BROKEN();
+  dn_fixed_array_push(&command_buffer->commands, &(dn_gpu_command_t) {
+    .op = DN_GPU_COMMAND_OP_DRAW,
+    .draw = draw_call
+  }, 1);
 }
 
+
 void dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
-  DN_BROKEN();
+  dn_gpu_command_buffer_clear_cached_state(command_buffer);
+  glBindVertexArray(command_buffer->vao);
+
+  dn_fixed_array_for(command_buffer->commands, command, dn_gpu_command_t) {
+    dn_gpu_pipeline_t* pipeline = command_buffer->pipeline;
+
+    switch (command->op) {
+      case DN_GPU_COMMAND_OP_BEGIN_RENDER_PASS: {
+        switch (command->render_pass.color.load) {
+          case DN_GPU_LOAD_OP_CLEAR: {
+            dn_gpu_render_target_clear(command->render_pass.color.attachment);
+          }
+        }
+
+        dn_gpu_render_target_bind(command->render_pass.color.attachment);
+        command_buffer->render_pass = command->render_pass;
+      } break;
+
+      case DN_GPU_COMMAND_OP_END_RENDER_PASS: {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glDisable(GL_SCISSOR_TEST);
+      } break;
+
+      case DN_GPU_COMMAND_OP_BIND_PIPELINE: {
+        glUseProgram(command->pipeline->raster.shader->program);
+
+        if (command->pipeline->blend.fn == DN_GPU_BLEND_FUNC_NONE) {
+          glDisable(GL_BLEND);
+        }
+        else {
+          glEnable(GL_BLEND);
+          glBlendEquation(dn_gpu_blend_func_to_gl_blend_func(command->pipeline->blend.fn));
+          glBlendFunc(
+            dn_gpu_blend_mode_to_gl_blend_mode(command->pipeline->blend.source), 
+            dn_gpu_blend_mode_to_gl_blend_mode(command->pipeline->blend.destination)
+          );
+
+        }
+
+        command_buffer->pipeline = command->pipeline;
+      } break;
+
+      case DN_GPU_COMMAND_OP_BIND_BUFFERS: {
+        // VERTEX BUFFERS
+        dn_gpu_vertex_buffer_binding_array_t* vertex_buffers = &command->bindings.vertex;
+
+        DN_ASSERT(vertex_buffers->count <= command_buffer->pipeline->num_buffer_layouts);
+
+        u32 attribute_index = 0;
+        for (u32 buffer_index = 0; buffer_index < vertex_buffers->count; buffer_index++) {
+          dn_gpu_buffer_layout_t* buffer_layout = &command_buffer->pipeline->buffer_layouts[buffer_index];
+          dn_gpu_buffer_t* buffer = vertex_buffers->bindings[buffer_index].buffer;
+
+          dn_gpu_buffer_bind(buffer);
+
+          u32 stride = dn_gpu_vertex_layout_calculate_stride(buffer_layout);
+
+          u64 offset = 0;
+          for (u32 i = 0; i < buffer_layout->num_vertex_attributes; i++) {
+            glEnableVertexAttribArray(attribute_index);
+
+            dn_gpu_vertex_attribute_t attribute = buffer_layout->vertex_attributes[i];
+            
+            switch(attribute.kind) {
+              case DN_GPU_VERTEX_ATTRIBUTE_FLOAT: glVertexAttribPointer(attribute_index, attribute.count, GL_FLOAT,        GL_FALSE, stride, dn_gpu_u32_to_gl_void_pointer(offset)); break;
+              case DN_GPU_VERTEX_ATTRIBUTE_U32:   glVertexAttribIPointer(attribute_index, attribute.count, GL_UNSIGNED_INT,           stride, dn_gpu_u32_to_gl_void_pointer(offset)); break;
+              default: {
+                assert(false);
+              } break;
+            }
+
+            glVertexAttribDivisor(attribute_index, attribute.divisor);
+
+            dn_gpu_vertex_attr_info_t type_info = dn_gpu_vertex_attribute_info(attribute.kind);
+            offset += attribute.count * type_info.size;
+            attribute_index++;
+          }
+        }
+
+        // UNIFORMS
+        dn_gpu_uniform_binding_array_t* uniforms = &command->bindings.uniforms;
+        for (u32 i = 0; i < uniforms->count; i++) {
+          dn_gpu_uniform_binding_t* binding = &uniforms->bindings[i];
+          dn_gpu_uniform_t* uniform = binding->uniform;
+
+          s32 index = glGetUniformLocation(command_buffer->pipeline->raster.shader->program, uniform->name);
+
+          switch(uniform->kind) {
+            case DN_GPU_UNIFORM_MATRIX4: glUniformMatrix4fv(index, 1, GL_FALSE, (const float*)&binding->data.mat4); break;
+            case DN_GPU_UNIFORM_MATRIX3: glUniformMatrix3fv(index, 1, GL_FALSE, (const float*)&binding->data.mat3); break;
+            case DN_GPU_UNIFORM_MATRIX2: glUniformMatrix2fv(index, 1, GL_FALSE, (const float*)&binding->data.mat2); break;
+            case DN_GPU_UNIFORM_VECTOR4: glUniform4fv(index, 1, (const float*)&binding->data.vec4); break;
+            case DN_GPU_UNIFORM_VECTOR3: glUniform3fv(index, 1, (const float*)&binding->data.vec3); break;
+            case DN_GPU_UNIFORM_VECTOR2: glUniform2fv(index, 1, (const float*)&binding->data.vec2); break;
+            case DN_GPU_UNIFORM_F32:     glUniform1fv(index, 1, (const float*)&binding->data.f32); break;
+            case DN_GPU_UNIFORM_ENUM:    glUniform1iv(index, 1, (const s32*)&binding->data.i32); break;
+            case DN_GPU_UNIFORM_TEXTURE: glActiveTexture(GL_TEXTURE0 + binding->binding_index); glBindTexture(GL_TEXTURE_2D, binding->data.texture); break;
+          }
+        }
+
+        // UNIFORM BUFFERS
+        dn_gpu_uniform_buffer_binding_array_t* uniform_buffers = &command->bindings.uniform_buffers;
+        dn_for(i, uniform_buffers->count) {
+          dn_gpu_uniform_buffer_binding_t* binding = &uniform_buffers->bindings[i];
+          dn_gpu_apply_uniform_buffer_binding(command_buffer, binding);
+        }
+
+        // STORAGE BUFFERS
+        dn_gpu_storage_buffer_binding_array_t* storage = &command->bindings.storage;
+        for (u32 i = 0; i < storage->count; i++) {
+          dn_gpu_storage_buffer_binding_t* binding = &storage->bindings[i];
+
+          DN_ASSERT(binding->buffer->kind == DN_GPU_BUFFER_KIND_STORAGE);
+          glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding->base, binding->buffer->handle);
+        }
+
+        command_buffer->bindings = command->bindings;
+      } break;
+
+      case DN_GPU_COMMAND_OP_SET_SCISSOR: {
+        if (command->scissor.enabled != command_buffer->scissor.enabled) {
+          if (command->scissor.enabled) {
+            glEnable(GL_SCISSOR_TEST);
+            glScissor(
+              command->scissor.position.x, command->scissor.position.y, 
+              command->scissor.size.x, command->scissor.size.y);
+          }
+          else {
+            glDisable(GL_SCISSOR_TEST);
+          }
+        }
+
+        command_buffer->scissor = command->scissor;
+      } break;
+
+      case DN_GPU_COMMAND_OP_SET_WORLD_SPACE: {
+        command_buffer->render.world_space = command->render.world_space;
+      } break;
+      case DN_GPU_COMMAND_OP_SET_CAMERA: {
+        command_buffer->render.camera = command->render.camera;
+      } break;
+      case DN_GPU_COMMAND_OP_SET_LAYER: {
+        command_buffer->render.layer = command->render.layer;
+      } break;
+
+      case DN_GPU_COMMAND_OP_DRAW: {      
+        dn_gpu_render_target_t* target = command_buffer->render_pass.color.attachment;
+        dn_gpu.builtin_uniforms.data = (dn_gpu_uniforms_t) {
+          .view = command_buffer->render.world_space ? 
+            HMM_Translate(HMM_V3(-command_buffer->render.camera.x, -command_buffer->render.camera.y, 0.f)) :
+            HMM_M4D(1.0),
+          .projection = HMM_Orthographic_RH_NO(0, target->size.x, 0, target->size.y, DN_GPU_NEAR_PLANE, DN_GPU_FAR_PLANE),
+          //.projection = HMM_Orthographic_RH_NO(0, window.native_resolution.x, 0, window.native_resolution.y, DN_GPU_NEAR_PLANE, DN_GPU_FAR_PLANE),
+          .camera = command_buffer->render.camera,
+          .native_resolution = dn_app.window.native_resolution,
+          .output_resolution = target->size,
+          .master_time = dn_app.elapsed_time
+        };
+        dn_gpu_buffer_sync(dn_gpu.builtin_uniforms.buffer, &dn_gpu.builtin_uniforms.data, sizeof(dn_gpu_uniforms_t));
+        dn_gpu_apply_uniform_buffer_binding(command_buffer, &dn_gpu.builtin_uniforms.binding);
+        
+        u32 primitive = dn_gpu_draw_primitive_to_gl_draw_primitive(command_buffer->pipeline->raster.primitive);
+        switch (command->draw.mode) {
+          case DN_GPU_DRAW_MODE_ARRAYS: glDrawArrays(primitive, command->draw.vertex_offset, command->draw.num_vertices); break;
+          case DN_GPU_DRAW_MODE_INSTANCE: glDrawArraysInstanced(primitive, command->draw.vertex_offset, command->draw.num_vertices, command->draw.num_instances); break;
+        }
+      } break;
+    }
+  }
+
+  glBindVertexArray(0);
+  dn_gpu_command_buffer_clear_cached_state(command_buffer);
+  dn_fixed_array_clear(&command_buffer->commands);
+}
+
+void dn_gpu_command_buffer_clear_cached_state(dn_gpu_command_buffer_t* command_buffer) {
+  command_buffer->pipeline = NULL;
+  dn_os_zero_memory(&command_buffer->bindings, sizeof(dn_gpu_buffer_binding_t));
+  dn_os_zero_memory(&command_buffer->render_pass, sizeof(dn_gpu_render_pass_t));
+  dn_os_zero_memory(&command_buffer->render, sizeof(dn_gpu_renderer_state_t));
+  dn_os_zero_memory(&command_buffer->scissor, sizeof(dn_gpu_scissor_state_t));
+}
+
+//////////////
+// PIPELINE //
+//////////////
+dn_gpu_pipeline_t* dn_gpu_pipeline_create(dn_gpu_pipeline_descriptor_t descriptor) {
+  dn_gpu_pipeline_t* pipeline = (dn_gpu_pipeline_t*)dn_fixed_array_reserve(&dn_gpu.pipelines, 1);
+  pipeline->raster = descriptor.raster;
+  pipeline->blend = descriptor.blend;
+  dn_os_memory_copy(descriptor.buffer_layouts, pipeline->buffer_layouts, descriptor.num_buffer_layouts * sizeof(dn_gpu_buffer_layout_t));
+  pipeline->num_buffer_layouts = descriptor.num_buffer_layouts;
+
+  return pipeline;
 }
 
 void dn_gpu_bind_pipeline(dn_gpu_command_buffer_t* command_buffer, dn_gpu_pipeline_t* pipeline) {
-  DN_BROKEN();
+  dn_fixed_array_push(&command_buffer->commands, &(dn_gpu_command_t) {
+    .op = DN_GPU_COMMAND_OP_BIND_PIPELINE,
+    .pipeline = pipeline
+  }, 1);
 }
 
+
+/////////////
+// BINDING //
+/////////////
 void dn_gpu_begin_render_pass(dn_gpu_command_buffer_t* command_buffer, dn_gpu_render_pass_t render_pass) {
-  DN_BROKEN();
+  dn_fixed_array_push(&command_buffer->commands, &(dn_gpu_command_t) {
+    .op = DN_GPU_COMMAND_OP_BEGIN_RENDER_PASS,
+    .render_pass = render_pass
+  }, 1);
 }
 
 void dn_gpu_end_render_pass(dn_gpu_command_buffer_t* command_buffer) {
-  DN_BROKEN();
+  dn_fixed_array_push(&command_buffer->commands, &(dn_gpu_command_t) {
+    .op = DN_GPU_COMMAND_OP_END_RENDER_PASS,
+  }, 1);
 }
 
 void dn_gpu_apply_bindings(dn_gpu_command_buffer_t* command_buffer, dn_gpu_buffer_binding_t bindings) {
-  DN_BROKEN();
+  if (dn_os_is_memory_equal(&command_buffer->bindings, &bindings, sizeof(dn_gpu_buffer_binding_t))) return;
+
+  dn_fixed_array_push(&command_buffer->commands, &(dn_gpu_command_t) {
+    .op = DN_GPU_COMMAND_OP_BIND_BUFFERS,
+    .bindings = bindings
+  }, 1);
 }
 
-void dn_gpu_bind_render_state(dn_gpu_command_buffer_t* command_buffer, dn_gpu_renderer_state_t render) {
-  DN_BROKEN();
-}
-
+//////////////////
+// RENDER STATE //
+//////////////////
 void dn_gpu_set_layer(dn_gpu_command_buffer_t* command_buffer, u32 layer) {
-  DN_BROKEN();
+  if (command_buffer->render.layer == layer) return;
+
+  dn_fixed_array_push(&command_buffer->commands, &(dn_gpu_command_t) {
+    .op = DN_GPU_COMMAND_OP_SET_LAYER,
+    .render = {
+      .layer = layer
+    }
+  }, 1);
 }
 
 void dn_gpu_set_world_space(dn_gpu_command_buffer_t* command_buffer, bool world_space) {
-  DN_BROKEN();
+  if (command_buffer->render.world_space == world_space) return;
+
+  dn_fixed_array_push(&command_buffer->commands, &(dn_gpu_command_t) {
+    .op = DN_GPU_COMMAND_OP_SET_WORLD_SPACE,
+    .render = {
+      .world_space = world_space
+    }
+  }, 1);
 }
 
 void dn_gpu_set_camera(dn_gpu_command_buffer_t* command_buffer, dn_vector2_t camera) {
-  DN_BROKEN();
+  if (dn_os_is_memory_equal(&command_buffer->render.camera,  &camera, sizeof(dn_vector2_t))) return;
+
+  dn_fixed_array_push(&command_buffer->commands, &(dn_gpu_command_t) {
+    .op = DN_GPU_COMMAND_OP_SET_CAMERA,
+    .render = {
+      .camera = camera
+    }
+  }, 1);
 }
 
-dn_gpu_pipeline_t* dn_gpu_pipeline_create(dn_gpu_pipeline_descriptor_t descriptor) {
-  DN_BROKEN();
-  return NULL;
+void dn_gpu_bind_render_state(dn_gpu_command_buffer_t* command_buffer, dn_gpu_renderer_state_t render) {
+  dn_gpu_set_layer(command_buffer, render.layer);
+  dn_gpu_set_camera(command_buffer, render.camera);
+  dn_gpu_set_world_space(command_buffer, render.world_space);
 }
 
+//////////////
+// UNIFORMS //
+//////////////
 dn_gpu_uniform_t* dn_gpu_uniform_create(dn_gpu_uniform_descriptor_t descriptor) {
-  DN_BROKEN();
-  return NULL;
+  dn_gpu_uniform_t* uniform = (dn_gpu_uniform_t*)dn_fixed_array_reserve(&dn_gpu.uniforms, 1);
+  dn_asset_copy_name(descriptor.name, uniform->name);
+  uniform->kind = descriptor.kind;
+  
+  return uniform;
 }
 
+/////////////////
+// GPU BUFFERS //
+/////////////////
 dn_gpu_buffer_t* dn_gpu_buffer_create(dn_gpu_buffer_descriptor_t descriptor) {
-  DN_BROKEN();
-  return NULL;
+  dn_gpu_buffer_t* buffer = (dn_gpu_buffer_t*)dn_fixed_array_reserve(&dn_gpu.gpu_buffers, 1);
+  dn_asset_copy_name(descriptor.name, buffer->name);
+  buffer->kind = descriptor.kind;
+  buffer->usage = descriptor.usage;
+  buffer->size = descriptor.capacity * descriptor.element_size;
+  glGenBuffers(1, &buffer->handle);
+  
+  dn_gpu_buffer_sync(buffer, NULL, buffer->size);
+
+  return buffer;
+}
+
+void dn_gpu_memory_barrier(dn_gpu_memory_barrier_t barrier) {
+  glMemoryBarrier(dn_gpu_memory_barrier_to_gl_barrier(barrier));
 }
 
 void dn_gpu_buffer_bind(dn_gpu_buffer_t* buffer) {
-  DN_BROKEN();
+  glBindBuffer(dn_gpu_buffer_kind_to_gl_buffer_kind(buffer->kind), buffer->handle);
 }
 
 void dn_gpu_buffer_bind_base(dn_gpu_buffer_t* buffer, u32 base) {
-  DN_BROKEN();
+  glBindBufferBase(dn_gpu_buffer_kind_to_gl_buffer_kind(buffer->kind), base, buffer->handle);
 }
 
 void dn_gpu_buffer_sync(dn_gpu_buffer_t* buffer, void* data, u32 size) {
-  DN_BROKEN();
+  dn_gpu_buffer_bind(buffer);
+  glBufferData(dn_gpu_buffer_kind_to_gl_buffer_kind(buffer->kind), size, data, dn_gpu_buffer_usage_to_gl_buffer_usage(buffer->usage));
+  glMemoryBarrier(dn_gpu_buffer_kind_to_gl_barrier(buffer->kind));
 }
 
 void dn_gpu_buffer_sync_subdata(dn_gpu_buffer_t* buffer, void* data, u32 byte_size, u32 byte_offset) {
-  DN_BROKEN();
+  dn_gpu_buffer_bind(buffer);
+  glBufferSubData(dn_gpu_buffer_kind_to_gl_buffer_kind(buffer->kind), byte_offset, byte_size, data);
+  glMemoryBarrier(dn_gpu_buffer_kind_to_gl_barrier(buffer->kind));
 }
 
 void dn_gpu_buffer_zero(dn_gpu_buffer_t* buffer, u32 size) {
-  DN_BROKEN();
+	(u8*) data = (u8*)dn_allocator_alloc(&dn_allocators.bump, size);
+  dn_gpu_buffer_sync(buffer, data, size);
 }
 
 dn_gpu_backed_buffer_t dn_gpu_backed_buffer_create(dn_gpu_buffer_descriptor_t descriptor) {
-  DN_BROKEN();
-  return dn_zero_struct(dn_gpu_backed_buffer_t);
-}
-
-u32 dn_gpu_backed_buffer_size(dn_gpu_backed_buffer_t* buffer) {
-  DN_BROKEN();
-  return 0;
+  dn_gpu_backed_buffer_t backed_buffer;
+  backed_buffer.gpu_buffer = dn_gpu_buffer_create(descriptor);
+  dn_fixed_array_init(&backed_buffer.buffer, descriptor.capacity, descriptor.element_size, &dn_allocators.standard);
+  return backed_buffer;
 }
 
 void dn_gpu_backed_buffer_clear(dn_gpu_backed_buffer_t* buffer) {
-  DN_BROKEN();
+  buffer->buffer.size = 0;
+}
+
+u32 dn_gpu_backed_buffer_size(dn_gpu_backed_buffer_t* buffer) {
+  return buffer->buffer.size;
 }
 
 u8* dn_gpu_backed_buffer_push(dn_gpu_backed_buffer_t* buffer, void* data, u32 num_elements) {
-  DN_BROKEN();
-  return NULL;
+  return dn_fixed_array_push(&buffer->buffer, data, num_elements);
 }
 
 void dn_gpu_backed_buffer_sync(dn_gpu_backed_buffer_t* buffer) {
-  DN_BROKEN();
+  dn_gpu_buffer_sync(buffer->gpu_buffer, buffer->buffer.data, buffer->buffer.size * buffer->buffer.element_size);
 }
+
 
 dn_gpu_shader_t* dn_gpu_shader_create(dn_gpu_shader_descriptor_t descriptor) {
   DN_BROKEN();
@@ -2555,10 +2938,6 @@ void dn_gpu_shader_reload(dn_gpu_shader_t* shader) {
   DN_BROKEN();
 }
 
-void dn_gpu_command_buffer_clear_cached_state(dn_gpu_command_buffer_t* command_buffer) {
-  DN_BROKEN();
-}
-
 u32 dn_gpu_vertex_layout_calculate_stride(dn_gpu_buffer_layout_t* layout) {
   DN_BROKEN();
   return 0;
@@ -2619,10 +2998,73 @@ void dn_gpu_apply_uniform_buffer_binding(dn_gpu_command_buffer_t* command_buffer
 }
 
 
+/////////
+// SDF //
+/////////
+dn_sdf_renderer_t dn_sdf_renderer_create(u32 buffer_size) {
+  DN_BROKEN();
+  return dn_zero_struct(dn_sdf_renderer_t);
+}
+
+void dn_sdf_renderer_draw(dn_sdf_renderer_t* renderer, dn_gpu_command_buffer_t* command_buffer) {
+  DN_BROKEN();
+}
+
+void dn_sdf_renderer_push_instance(dn_sdf_renderer_t* renderer, dn_sdf_shape_t shape) {
+  DN_BROKEN();
+}
+
+void dn_sdf_renderer_push_header(dn_sdf_renderer_t* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness) {
+  DN_BROKEN();
+}
+
+dn_sdf_combine_header_t* dn_sdf_combination_begin(dn_sdf_renderer_t* renderer) {
+  DN_BROKEN();
+  return NULL;
+}
+
+void dn_sdf_combination_append(dn_sdf_renderer_t* renderer, dn_sdf_combine_header_t* header, dn_sdf_shape_t shape, dn_sdf_combine_op_t op, dn_sdf_smoothing_kernel_t kernel) {
+  DN_BROKEN();
+}
+
+void dn_sdf_combination_commit(dn_sdf_renderer_t* renderer) {
+  DN_BROKEN();
+}
+
+void dn_sdf_circle_ex(dn_sdf_renderer_t* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float radius) {
+  DN_BROKEN();
+}
+
+void dn_sdf_ring_ex(dn_sdf_renderer_t* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float inner_radius, float outer_radius) {
+  DN_BROKEN();
+}
+
+void dn_sdf_oriented_box_ex(dn_sdf_renderer_t* renderer, float px, float py, float r, float g, float b, float rotation, float edge_thickness, float length, float thickness) {
+  DN_BROKEN();
+}
+
+void dn_sdf_grid(dn_sdf_renderer_t* renderer, u32 grid_width, u32 grid_size) {
+  DN_BROKEN();
+}
+
+
 /////////////////////////
 // BACKGROUND IMPORTER //
 /////////////////////////
 void dn_asset_registry_init(dn_asset_config_t config) {
+  DN_BROKEN();
+}
+
+dn_asset_data_t dn_asset_registry_find(const char* name) {
+  DN_BROKEN();
+  return NULL;
+}
+
+void dn_asset_registry_add(const char* name, dn_asset_data_t data) {
+  DN_BROKEN();
+}
+
+void dn_asset_registry_update() {
   DN_BROKEN();
 }
 
@@ -2649,23 +3091,6 @@ void dn_background_import(dn_asset_import_request_t* request) {
 dn_asset_completion_status_t dn_background_complete(dn_asset_import_request_t* request) {
   DN_BROKEN();
   return DN_ASSET_COMPLETION_STATUS_DONE;
-}
-
-void dn_assets_init(dn_asset_config_t user_config) {
-  DN_BROKEN();
-}
-
-void dn_assets_add(const char* name, dn_asset_data_t data) {
-  DN_BROKEN();
-}
-
-dn_asset_data_t dn_assets_find(const char* name) {
-  DN_BROKEN();
-  return dn_zero_struct(dn_asset_data_t);
-}
-
-void dn_assets_update() {
-  DN_BROKEN();
 }
 
 void dn_asset_loader_process_requests() {
@@ -3767,6 +4192,28 @@ dn_string_t dn_os_parent_path(dn_string_t path, dn_allocator_t* allocator) {
   return dn_string_copy(path, allocator);
 }
 
+dn_string_t dn_os_path_extension(dn_string_t path) {
+  if (!dn_os_is_regular_file(path)) {
+    return dn_string_copy(dn_string_literal(""), &dn_allocators.bump.allocator);
+  }
+
+  u8* c = path.data + path.len;
+  while (true) {
+    if ((*c == '/') || (c == path.data)) {
+      return dn_string_copy(dn_string_literal(""), &dn_allocators.bump.allocator);
+    }
+
+    if (*c == '.') break;
+    c--;
+  }
+
+  dn_string_t extension = {
+    .data = c,
+    .len = (path.data + path.len) - (c)
+  };
+  return dn_string_copy(extension, &dn_allocators.bump.allocator);
+}
+
 dn_os_file_attr_t dn_os_winapi_attr_to_dn_attr(u32 attr) {
   u32 result = DN_OS_FILE_ATTR_NONE;
   if ( (attr & FILE_ATTRIBUTE_DIRECTORY)) result |= DN_OS_FILE_ATTR_DIRECTORY;
@@ -4138,7 +4585,7 @@ void dn_paths_init(dn_path_config_t config) {
   dn_paths_add_install_subpath(dn_string_literal("dn_log"), dn_string_literal("doublenickel.log"));
   dn_paths_add_engine_subpath(dn_string_literal("dn_bootstrap"), dn_string_literal("source/scripts/core/bootstrap.lua"));
   dn_paths_add_engine_subpath(dn_string_literal("dn_paths"), dn_string_literal("source/scripts/data/paths.lua"));
-  dn_paths_add_engine_subpath(dn_string_literal("dn_ffi_h"), dn_string_literal("source/scripts/data/dn.h"));
+  dn_paths_add_engine_subpath(dn_string_literal("dn_ffi_h"), dn_string_literal("source/scripts/data/dn_ffi.h"));
 }
 
 //////////
@@ -4531,6 +4978,11 @@ void dn_lua_pcall(dn_string_t fn) {
 }
 
 bool dn_lua_script_file(dn_string_t file_path) {
+  dn_string_t extension = dn_os_path_extension(file_path);
+  if (!dn_string_equal(extension, dn_string_literal(".lua"))) {
+    return false;
+  }
+
   dn_lua_interpreter_t l = dn_lua.state;
   s32 initial_stack_size = lua_gettop(l);
 
@@ -4850,7 +5302,8 @@ dn_window_config_t dn_window_config_default() {
       .x = 1920,
       .y = 1080
     },
-    .flags = (dn_window_flags_t)(DN_WINDOW_FLAG_BORDER | DN_WINDOW_FLAG_WINDOWED | DN_WINDOW_FLAG_VSYNC)
+    .flags = (dn_window_flags_t)(DN_WINDOW_FLAG_BORDER | DN_WINDOW_FLAG_WINDOWED | DN_WINDOW_FLAG_VSYNC),
+    .target_fps = 60
   };
 }
 

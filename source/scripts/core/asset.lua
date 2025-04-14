@@ -15,6 +15,6 @@ function doublenickel.asset.find(id)
     id = id:to_qualified_string()
   end
 
-  local asset = dn.assets_find(id)
+  local asset = dn.asset_registry_find(id)
   return ffi.cast(ctype, asset)
 end

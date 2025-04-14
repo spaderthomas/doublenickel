@@ -655,20 +655,6 @@ function Vector4:init(x, y, z, w)
   self.w = w or self.w
 end
 
-Vertex = doublenickel.class.metatype('Vertex')
-function Vertex:Quad(top, bottom, left, right)
-  local vertices = ffi.new('Vertex [6]')
-
-  vertices[0].position = Vector3:new(left, top)
-  vertices[1].position = Vector3:new(left, bottom)
-  vertices[2].position = Vector3:new(right, bottom)
-  vertices[3].position = Vector3:new(left, top)
-  vertices[4].position = Vector3:new(right, bottom)
-  vertices[5].position = Vector3:new(right, top)
-
-  return vertices
-end
-
 
 ---------------
 -- CPU BUFFER --
@@ -956,6 +942,7 @@ function WindowConfig:init(params)
   self.native_resolution = params.native_resolution or default.native_resolution
   self.flags = params.flags or default.flags
   self.display_mode = params.display_mode or default.display_mode
+  self.target_fps = params.target_fps or default.target_fps
 end
 
 AudioConfig = doublenickel.class.metatype('dn_audio_config_t')
@@ -1049,7 +1036,6 @@ function AppConfig:init(params)
   self.asset = params.asset or ffi.new('dn_asset_config_t')
   self.steam = params.steam or ffi.new('dn_steam_config_t')
   self.image = params.image or ffi.new('dn_image_config_t')
-  self.target_fps = params.target_fps or 60
 end
 
 
