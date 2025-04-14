@@ -25,12 +25,18 @@
 ]]
 
 -- Use ANSI color codes in the prompt by default.
-COLOR_GRAY = string.char(27) .. "[90m"
-COLOR_RED = string.char(27) .. "[91m"
-COLOR_BLUE = string.char(27) .. "[94m"
-COLOR_YELLOW = string.char(27) .. "[33m"
-COLOR_RESET = string.char(27) .. "[0m"
-GREEN_CARET = string.char(27) .. "[92m => " .. COLOR_RESET
+-- COLOR_GRAY = string.char(27) .. "[90m"
+-- COLOR_RED = string.char(27) .. "[91m"
+-- COLOR_BLUE = string.char(27) .. "[94m"
+-- COLOR_YELLOW = string.char(27) .. "[33m"
+-- COLOR_RESET = string.char(27) .. "[0m"
+-- GREEN_CARET = string.char(27) .. "[92m => " .. COLOR_RESET
+COLOR_GRAY = ''
+COLOR_RED = ''
+COLOR_BLUE = ''
+COLOR_YELLOW = ''
+COLOR_RESET = ''
+GREEN_CARET = ' -> '
 
 local function pretty(obj, max_depth)
   if max_depth == nil then max_depth = dbg.pretty_depth end

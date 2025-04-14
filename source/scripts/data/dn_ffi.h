@@ -833,6 +833,82 @@ typedef struct {
  dn_display_mode_t  dn_window_get_display_mode();
  void               dn_window_set_cursor_visible(bool visible);
  void               dn_window_set_size(int x, int y);
+typedef enum {
+	
+	
+	DN_COORD_UNIT_SCREEN = 0,
+	
+	
+	
+	
+	
+	
+	DN_COORD_UNIT_WINDOW = 1,
+	
+	DN_COORD_UNIT_GAME = 2,
+	
+	DN_COORD_UNIT_WORLD = 3,
+} dn_coord_t;
+typedef struct {
+	dn_vector2_t camera;
+	dn_vector2_t framebuffer_position;
+	dn_vector2_t framebuffer_size;
+} dn_coord_data_t;
+ dn_coord_data_t dn_coord_get();
+ void            dn_coord_set_camera(float x, float y);
+ void            dn_coord_set_framebuffer_position(float x, float y);
+ void            dn_coord_set_framebuffer_size(float x, float y);
+ dn_vector2_t    dn_coord_screen_to_window(float x, float y);
+ dn_vector2_t    dn_coord_screen_to_game(float x, float y);
+ dn_vector2_t    dn_coord_screen_to_world(float x, float y);
+ dn_vector2_t    dn_coord_window_to_screen(float x, float y);
+ dn_vector2_t    dn_coord_window_to_game(float x, float y);
+ dn_vector2_t    dn_coord_window_to_world(float x, float y);
+ dn_vector2_t    dn_coord_game_to_screen(float x, float y);
+ dn_vector2_t    dn_coord_game_to_window(float x, float y);
+ dn_vector2_t    dn_coord_game_to_world(float x, float y);
+ dn_vector2_t    dn_coord_world_to_screen(float x, float y);
+ dn_vector2_t    dn_coord_world_to_window(float x, float y);
+ dn_vector2_t    dn_coord_world_to_game(float x, float y);
+ dn_vector2_t    dn_coord_screen_to_window_mag(float x, float y);
+ dn_vector2_t    dn_coord_screen_to_game_mag(float x, float y);
+ dn_vector2_t    dn_coord_screen_to_world_mag(float x, float y);
+ dn_vector2_t    dn_coord_window_to_screen_mag(float x, float y);
+ dn_vector2_t    dn_coord_window_to_game_mag(float x, float y);
+ dn_vector2_t    dn_coord_window_to_world_mag(float x, float y);
+ dn_vector2_t    dn_coord_game_to_screen_mag(float x, float y);
+ dn_vector2_t    dn_coord_game_to_window_mag(float x, float y);
+ dn_vector2_t    dn_coord_game_to_world_mag(float x, float y);
+ dn_vector2_t    dn_coord_world_to_screen_mag(float x, float y);
+ dn_vector2_t    dn_coord_world_to_window_mag(float x, float y);
+ dn_vector2_t    dn_coord_world_to_game_mag(float x, float y);
+typedef enum {
+	DN_INPUT_DEVICE_MOUSE_AND_KEYBOARD = 0,
+	DN_INPUT_DEVICE_CONTROLLER = 1,
+} dn_input_device_t;
+typedef struct {
+	dn_vector2_t framebuffer_position;
+	dn_vector2_t framebuffer_size;
+	dn_vector2_t camera;
+	dn_vector2_t mouse;
+	dn_vector2_t mouse_delta;
+	dn_vector2_t scroll;
+	bool got_keyboard_input;
+	bool got_mouse_input;
+	bool is_down[348];
+	bool was_down[348];
+	char shift_map[128];
+} dn_input_t;
+ bool              dn_input_pressed(s32 key);
+ bool              dn_input_released(s32 key);
+ bool              dn_input_down(s32 key);
+ bool              dn_input_mod_down(s32 mod);
+ bool              dn_input_chord_pressed(s32 mod, s32 key);
+ dn_vector2_t      dn_input_scroll();
+ dn_vector2_t      dn_input_mouse(dn_coord_t unit);
+ dn_vector2_t      dn_input_mouse_delta(dn_coord_t unit);
+ u32               dn_input_shift_key(u32 key);
+ dn_input_device_t dn_input_get_device();
 typedef struct {
   dn_vector4_t light;
   dn_vector4_t medium_light;
@@ -1423,6 +1499,8 @@ typedef struct {
   dn_window_t window;
   dn_asset_loader_t loader;
   dn_asset_registry_t asset_registry;
+  dn_input_t input;
+  dn_coord_data_t coords;
   f32 target_fps;
   f32 dt;
   f32 elapsed_time;

@@ -185,6 +185,7 @@ typedef char dn_asset_name_t [DN_ASSET_NAME_LEN];
 #define DN_UNREACHABLE_MESSAGE(message) DN_ASSERT(false && (message))
 // #define DN_BROKEN() DN_ASSERT(false)
 #define DN_BROKEN() dn_log("DN_BROKEN(%s)", __func__)
+#define DN_BREAK() DebugBreak()
 
 #define dn_zero_initialize() { 0 }
 #define dn_zero_struct(t) (t){ 0 }
@@ -1519,6 +1520,116 @@ DN_IMP void               dn_window_shutdown();
 
 
 
+typedef enum {
+	// Exactly where you are on the monitor. In other words, a fraction of the output resolution
+	// in screen units of [0, 1]
+	DN_COORD_UNIT_SCREEN = 0,
+
+	// Where you are on the window of the screen displaying the game; the game is rendered
+	// to a framebuffer, which could be displayed as some fraction of the screen in any position.
+	// Window dn_coord_data take into account the position and size of that framebuffer. In the
+	// case where the game is running full screen, this is equivalent to Screen
+	//
+	// In other words, a fraction of the framebuffer resolution in screen units of [0, 1]
+	DN_COORD_UNIT_WINDOW = 1,
+
+	// Same as Window, except it's in the range of [0, native_resolution]
+	DN_COORD_UNIT_GAME = 2,
+
+	// Same as Game, except takes the camera into account
+	DN_COORD_UNIT_WORLD = 3,
+} dn_coord_t;
+
+typedef struct {
+	dn_vector2_t camera;
+	dn_vector2_t framebuffer_position;
+	dn_vector2_t framebuffer_size;
+} dn_coord_data_t;
+
+DN_API dn_coord_data_t dn_coord_get();
+DN_API void            dn_coord_set_camera(float x, float y);
+DN_API void            dn_coord_set_framebuffer_position(float x, float y);
+DN_API void            dn_coord_set_framebuffer_size(float x, float y);
+DN_API dn_vector2_t    dn_coord_screen_to_window(float x, float y);
+DN_API dn_vector2_t    dn_coord_screen_to_game(float x, float y);
+DN_API dn_vector2_t    dn_coord_screen_to_world(float x, float y);
+DN_API dn_vector2_t    dn_coord_window_to_screen(float x, float y);
+DN_API dn_vector2_t    dn_coord_window_to_game(float x, float y);
+DN_API dn_vector2_t    dn_coord_window_to_world(float x, float y);
+DN_API dn_vector2_t    dn_coord_game_to_screen(float x, float y);
+DN_API dn_vector2_t    dn_coord_game_to_window(float x, float y);
+DN_API dn_vector2_t    dn_coord_game_to_world(float x, float y);
+DN_API dn_vector2_t    dn_coord_world_to_screen(float x, float y);
+DN_API dn_vector2_t    dn_coord_world_to_window(float x, float y);
+DN_API dn_vector2_t    dn_coord_world_to_game(float x, float y);
+DN_API dn_vector2_t    dn_coord_screen_to_window_mag(float x, float y);
+DN_API dn_vector2_t    dn_coord_screen_to_game_mag(float x, float y);
+DN_API dn_vector2_t    dn_coord_screen_to_world_mag(float x, float y);
+DN_API dn_vector2_t    dn_coord_window_to_screen_mag(float x, float y);
+DN_API dn_vector2_t    dn_coord_window_to_game_mag(float x, float y);
+DN_API dn_vector2_t    dn_coord_window_to_world_mag(float x, float y);
+DN_API dn_vector2_t    dn_coord_game_to_screen_mag(float x, float y);
+DN_API dn_vector2_t    dn_coord_game_to_window_mag(float x, float y);
+DN_API dn_vector2_t    dn_coord_game_to_world_mag(float x, float y);
+DN_API dn_vector2_t    dn_coord_world_to_screen_mag(float x, float y);
+DN_API dn_vector2_t    dn_coord_world_to_window_mag(float x, float y);
+DN_API dn_vector2_t    dn_coord_world_to_game_mag(float x, float y);
+
+
+// ██╗███╗   ██╗██████╗ ██╗   ██╗████████╗
+// ██║████╗  ██║██╔══██╗██║   ██║╚══██╔══╝
+// ██║██╔██╗ ██║██████╔╝██║   ██║   ██║   
+// ██║██║╚██╗██║██╔═══╝ ██║   ██║   ██║   
+// ██║██║ ╚████║██║     ╚██████╔╝   ██║   
+// ╚═╝╚═╝  ╚═══╝╚═╝      ╚═════╝    ╚═╝   
+#define GLFW_KEY_CONTROL 349
+#define GLFW_KEY_SUPER 350
+#define GLFW_KEY_SHIFT 351
+#define GLFW_KEY_ALT 352
+
+#ifdef DN_BUILD_FFI
+#define GLFW_KEY_LAST 348
+#endif
+
+typedef enum {
+	DN_INPUT_DEVICE_MOUSE_AND_KEYBOARD = 0,
+	DN_INPUT_DEVICE_CONTROLLER = 1,
+} dn_input_device_t;
+
+typedef struct {
+	dn_vector2_t framebuffer_position;
+	dn_vector2_t framebuffer_size;
+	dn_vector2_t camera;
+	dn_vector2_t mouse;
+	dn_vector2_t mouse_delta;
+	dn_vector2_t scroll;
+	bool got_keyboard_input;
+	bool got_mouse_input;
+
+	bool is_down[GLFW_KEY_LAST];
+	bool was_down[GLFW_KEY_LAST];
+	char shift_map[128];
+} dn_input_t;
+
+DN_API bool              dn_input_pressed(s32 key);
+DN_API bool              dn_input_released(s32 key);
+DN_API bool              dn_input_down(s32 key);
+DN_API bool              dn_input_mod_down(s32 mod);
+DN_API bool              dn_input_chord_pressed(s32 mod, s32 key);
+DN_API dn_vector2_t      dn_input_scroll();
+DN_API dn_vector2_t      dn_input_mouse(dn_coord_t unit);
+DN_API dn_vector2_t      dn_input_mouse_delta(dn_coord_t unit);
+DN_API u32               dn_input_shift_key(u32 key);
+DN_API dn_input_device_t dn_input_get_device();
+DN_IMP void              dn_input_init();
+DN_IMP void              dn_input_update();       
+DN_IMP void              dn_input_callback_cursor(GLFWwindow* window, f64 xpos, f64 ypos);
+DN_IMP void              dn_input_callback_click(GLFWwindow* window, s32 button, s32 action, s32 mods);
+DN_IMP void              dn_input_callback_key(GLFWwindow* window, s32 key, s32 scancode, s32 action, s32 mods);
+DN_IMP void              dn_input_callback_scroll(GLFWwindow* window, f64 xoffset, f64 yoffset);
+DN_IMP void              dn_input_callback_error(s32 err, const char* msg);
+DN_IMP void              dn_input_callback_window_size(GLFWwindow* window, s32 width, s32 height);
+
 
 typedef struct {
   dn_vector4_t light;
@@ -2356,6 +2467,8 @@ typedef struct {
   dn_window_t window;
   dn_asset_loader_t loader;
   dn_asset_registry_t asset_registry;
+  dn_input_t input;
+  dn_coord_data_t coords;
 
   f32 target_fps;
   f32 dt;
@@ -2533,7 +2646,7 @@ void dn_gpu_init(dn_gpu_config_t config) {
   // dn_gpu.shader_monitor->add_directory(dn_paths_resolve("dn_shaders"));
 
 
-  DN_LOG("Initializing default uniform block");
+  DN_LOG_2("Initializing default uniform block");
   dn_gpu.builtin_uniforms.buffer = dn_gpu_buffer_create((dn_gpu_buffer_descriptor_t) {
     .name = "dn_uniform_buffer_default",
     .kind = DN_GPU_BUFFER_KIND_UNIFORM,
@@ -2548,7 +2661,7 @@ void dn_gpu_init(dn_gpu_config_t config) {
     .binding_index = 0
   };
 
-  DN_LOG("Initializing default shader include directories");
+  DN_LOG_2("Initializing default shader include directories");
   dn_string_t default_include_paths [] = {
     dn_paths_resolve(dn_string_literal("dn_shaders")),
     dn_paths_resolve(dn_string_literal("dn_shader_includes")),
@@ -2558,7 +2671,7 @@ void dn_gpu_init(dn_gpu_config_t config) {
     dn_string_copy_to(default_include_paths[i], *path, DN_MAX_PATH_LEN);
   }
 
-  DN_LOG("Initializing default shaders");
+  DN_LOG_2("Initializing default shaders");
   dn_gpu_shader_descriptor_t default_shaders [] = {
     {
       .name = "shape",
@@ -2591,14 +2704,14 @@ void dn_gpu_init(dn_gpu_config_t config) {
   }
 
   // Add user search paths and shaders
-  DN_LOG("Initializing default shader search paths");
+  DN_LOG_2("Initializing default shader search paths");
   dn_for(i, config.num_search_paths) {
     dn_path_t* path = (dn_path_t*)dn_fixed_array_reserve(&dn_gpu.search_paths, 1);
     dn_cstr_copy_to(config.search_paths[i], *path, DN_MAX_PATH_LEN);
     DN_LOG("Added %s", *path);
   }
 
-  DN_LOG("Initializing user shaders");
+  DN_LOG_2("Initializing user shaders");
   dn_for(i, config.num_shaders) {
     DN_LOG("Added %s", config.shaders[i].name);
     dn_gpu_shader_create(config.shaders[i]);
@@ -5382,8 +5495,8 @@ void dn_lua_init(dn_lua_config_t config) {
   s32 result = lua_pcall(dn_lua.state, 0, 0, 0);
   if (result) {
     const char* error = lua_tostring(dn_lua.state, -1);
-    dn_log("init_phase_0(): error = %s", error);
-    exit(0);
+    DN_LOG("error = %s", error);
+    DN_BREAK();
   }
   
   // PHASE 1:
@@ -5399,8 +5512,8 @@ void dn_lua_init(dn_lua_config_t config) {
   result = lua_pcall(dn_lua.state, 0, 0, 0);
   if (result) {
     const char* error = lua_tostring(dn_lua.state, -1);
-    dn_log("init_phase_1(): error = %s", error);
-    exit(0);
+    DN_LOG("error = %s", error);
+    DN_BREAK();
   }
 
   // PHASE 2:
@@ -5417,8 +5530,34 @@ void dn_lua_init(dn_lua_config_t config) {
   result = lua_pcall(dn_lua.state, 0, 0, 0);
   if (result) {
     const char* error = lua_tostring(dn_lua.state, -1);
-    dn_log("init_phase_2(): error = %s", error);
-    exit(0);
+    DN_LOG("error = %s", error);
+    DN_BREAK();
+  }
+
+  dn_for(it, defer_pop) {
+    lua_pop(dn_lua.state, 1);
+  }
+}
+
+void dn_lua_update() {
+  dn_lua_interpreter_t l = dn_lua.state;
+  u32 defer_pop = 0;
+  
+  lua_pushcfunction(l, &dn_lua_format_file_load_error_l);
+  defer_pop++;
+  
+  lua_getglobal(l, "doublenickel");
+  defer_pop++;
+  lua_pushstring(l, "update_game");
+  lua_gettable(l, -2);
+
+  lua_pushnumber(l, dn_app.dt);
+
+  u32 result = lua_pcall(dn_lua.state, 1, 0, -4);
+  if (result) {
+    const char* error = lua_tostring(dn_lua.state, -1);
+    DN_LOG("error = %s", error);
+    DN_BREAK();
   }
 
   dn_for(it, defer_pop) {
@@ -5452,7 +5591,7 @@ bool dn_lua_script_file(dn_string_t file_path) {
   dn_lua_interpreter_t l = dn_lua.state;
   s32 initial_stack_size = lua_gettop(l);
 
-  DN_LOG(dn_string_literal("%.*s"), file_path.len, file_path.data);
+  DN_LOG("%.*s", file_path.len, file_path.data);
 
   lua_pushcfunction(l, &dn_lua_format_file_load_error_l);
 
@@ -5724,30 +5863,419 @@ void dn_gl_error_callback(GLenum source, GLenum type, GLuint id,GLenum severity,
   );
 }
 
+dn_coord_data_t dn_coord_get() {
+	return dn_app.coords;
+}
+
+void dn_coord_set_camera(float x, float y) {
+	dn_app.coords.camera = (dn_vector2_t) { .x = x, .y = y };
+}
+
+void dn_coord_set_framebuffer_position(float x, float y) {
+	dn_app.coords.framebuffer_position = (dn_vector2_t) { .x = x, .y = y };
+}
+
+void dn_coord_set_framebuffer_size(float x, float y) {
+	dn_app.coords.framebuffer_size = (dn_vector2_t) { .x = x, .y = y };
+}
+
+dn_vector2_t dn_coord_screen_to_window(float x, float y) {
+	f32 framebuffer_bottom = dn_app.window.content_area.y - (dn_app.coords.framebuffer_position.y + dn_app.coords.framebuffer_size.y);
+	return (dn_vector2_t) { 
+		.x = ((x * dn_app.window.content_area.x) - dn_app.coords.framebuffer_position.x) / dn_app.coords.framebuffer_size.x,
+		.y = ((y * dn_app.window.content_area.y) - framebuffer_bottom) / dn_app.coords.framebuffer_size.y
+	};
+}
+
+dn_vector2_t dn_coord_screen_to_game(float x, float y) {
+	dn_vector2_t win = dn_coord_screen_to_window(x, y);
+	return dn_coord_window_to_game(win.x, win.y);
+}
+
+dn_vector2_t dn_coord_screen_to_world(float x, float y) {
+	dn_vector2_t win = dn_coord_screen_to_window(x, y);
+	dn_vector2_t game = dn_coord_window_to_game(win.x, win.y);
+	return dn_coord_game_to_world(game.x, game.y);
+}
+
+dn_vector2_t dn_coord_window_to_screen(float x, float y) {
+	return (dn_vector2_t) {
+		.x = ((x * dn_app.coords.framebuffer_size.x) + dn_app.coords.framebuffer_position.x) / dn_app.window.content_area.x,
+		.y = ((y * dn_app.coords.framebuffer_size.y) + dn_app.coords.framebuffer_position.y) / dn_app.window.content_area.y,
+	};
+}
+
+dn_vector2_t dn_coord_window_to_game(float x, float y) {
+	return (dn_vector2_t) {
+		.x = x * dn_app.window.native_resolution.x,
+		.y = y * dn_app.window.native_resolution.y
+	};
+}
+
+dn_vector2_t dn_coord_window_to_world(float x, float y) {
+	dn_vector2_t game = dn_coord_window_to_game(x, y);
+	return dn_coord_game_to_world(game.x, game.y);
+}
+
+dn_vector2_t dn_coord_game_to_screen(float x, float y) {
+	dn_vector2_t win = dn_coord_game_to_window(x, y);
+	return dn_coord_window_to_screen(win.x, win.y);
+}
+
+dn_vector2_t dn_coord_game_to_window(float x, float y) {
+	return (dn_vector2_t) {
+		.x = x / dn_app.window.native_resolution.x,
+		.y = y / dn_app.window.native_resolution.y,
+	};
+}
+
+dn_vector2_t dn_coord_game_to_world(float x, float y) {
+	return (dn_vector2_t) {
+		.x = x + dn_app.coords.camera.x,
+		.y = y + dn_app.coords.camera.y,
+	};
+}
+
+dn_vector2_t dn_coord_world_to_screen(float x, float y) {
+	dn_vector2_t game = dn_coord_world_to_game(x, y);
+	dn_vector2_t win = dn_coord_game_to_window(game.x, game.y);
+	return dn_coord_window_to_screen(win.x, win.y);
+}
+
+dn_vector2_t dn_coord_world_to_window(float x, float y) {
+	dn_vector2_t game = dn_coord_world_to_game(x, y);
+	return dn_coord_game_to_window(game.x, game.y);
+}
+
+dn_vector2_t dn_coord_world_to_game(float x, float y) {
+	return (dn_vector2_t) {
+		.x = x - dn_app.coords.camera.x,
+		.y = y - dn_app.coords.camera.y,
+	};
+}
+     
+dn_vector2_t dn_coord_screen_to_window_mag(float x, float y) {
+	return (dn_vector2_t) {
+		.x = x * dn_app.window.content_area.x / dn_app.coords.framebuffer_size.x,
+		.y = y * dn_app.window.content_area.y / dn_app.coords.framebuffer_size.y,
+	};
+}
+
+dn_vector2_t dn_coord_screen_to_game_mag(float x, float y) {
+	dn_vector2_t win = dn_coord_screen_to_window_mag(x, y);
+	return (dn_vector2_t) {
+		.x = win.x * dn_app.window.native_resolution.x,
+		.y = win.y * dn_app.window.native_resolution.y,
+	};
+}
+
+dn_vector2_t dn_coord_screen_to_world_mag(float x, float y) {
+	dn_vector2_t win = dn_coord_screen_to_window_mag(x, y);
+	dn_vector2_t game = dn_coord_window_to_game_mag(win.x, win.y);
+	return dn_coord_game_to_world_mag(game.x, game.y);
+}
+
+dn_vector2_t dn_coord_window_to_screen_mag(float x, float y) {
+	return (dn_vector2_t) {
+		.x = x * dn_app.coords.framebuffer_size.x / dn_app.window.content_area.x,
+		.y = y * dn_app.coords.framebuffer_size.y / dn_app.window.content_area.y,
+	};
+}
+
+dn_vector2_t dn_coord_window_to_game_mag(float x, float y) {
+	return (dn_vector2_t) {
+		.x = x * dn_app.coords.framebuffer_size.x,
+		.y = y * dn_app.coords.framebuffer_size.y,
+	};
+}
+
+dn_vector2_t dn_coord_window_to_world_mag(float x, float y) {
+	return (dn_vector2_t) {
+		.x = x * dn_app.coords.framebuffer_size.x,
+		.y = y * dn_app.coords.framebuffer_size.y,
+	};
+}
+
+dn_vector2_t dn_coord_game_to_screen_mag(float x, float y) {
+	dn_vector2_t w = dn_coord_game_to_window_mag(x, y);
+	return dn_coord_window_to_screen_mag(w.x, w.y);
+}
+
+dn_vector2_t dn_coord_game_to_window_mag(float x, float y) {
+	return (dn_vector2_t) {
+		.x = x / dn_app.coords.framebuffer_size.x,
+		.y = y / dn_app.coords.framebuffer_size.y,
+	};
+}
+
+dn_vector2_t dn_coord_game_to_world_mag(float x, float y) {
+	return (dn_vector2_t) {
+		.x = x,
+		.y = y
+	};
+}
+
+dn_vector2_t dn_coord_world_to_screen_mag(float x, float y) {
+	return dn_coord_game_to_screen_mag(x, y);
+}
+
+dn_vector2_t dn_coord_world_to_window_mag(float x, float y) {
+	return dn_coord_game_to_window_mag(x, y);
+}
+
+dn_vector2_t dn_coord_world_to_game_mag(float x, float y) {
+	return (dn_vector2_t) {
+		.x = x, 
+		.y = y
+	};
+}
+
 ///////////
 // INPUT //
 ///////////
-void dn_input_callback_cursor(GLFWwindow* glfw, double x, double y) {
+void dn_input_init() {
+	dn_os_zero_memory(dn_app.input.shift_map, sizeof(dn_app.input.shift_map));
+		
+	dn_app.input.shift_map[' ']  =  ' ';
+	dn_app.input.shift_map['\''] =  '"';
+	dn_app.input.shift_map[',']  =  '<';
+	dn_app.input.shift_map['-']  =  '_';
+	dn_app.input.shift_map['.']  =  '>';
+	dn_app.input.shift_map['/']  =  '?';
 
+	dn_app.input.shift_map['0']  =  ')';
+	dn_app.input.shift_map['1']  =  '!';
+	dn_app.input.shift_map['2']  =  '@';
+	dn_app.input.shift_map['3']  =  '#';
+	dn_app.input.shift_map['4']  =  '$';
+	dn_app.input.shift_map['5']  =  '%';
+	dn_app.input.shift_map['6']  =  '^';
+	dn_app.input.shift_map['7']  =  '&';
+	dn_app.input.shift_map['8']  =  '*';
+	dn_app.input.shift_map['9']  =  '(';
+
+	dn_app.input.shift_map[';']  =  ':';
+	dn_app.input.shift_map['=']  =  '+';
+	dn_app.input.shift_map['[']  =  '{';
+	dn_app.input.shift_map['\\'] =  '|';
+	dn_app.input.shift_map[']']  =  '}';
+	dn_app.input.shift_map['`']  =  '~';
+		
+	dn_app.input.shift_map['a']  =  'A';
+	dn_app.input.shift_map['b']  =  'B';
+	dn_app.input.shift_map['c']  =  'C';
+	dn_app.input.shift_map['d']  =  'D';
+	dn_app.input.shift_map['e']  =  'E';
+	dn_app.input.shift_map['f']  =  'F';
+	dn_app.input.shift_map['g']  =  'G';
+	dn_app.input.shift_map['h']  =  'H';
+	dn_app.input.shift_map['i']  =  'I';
+	dn_app.input.shift_map['j']  =  'J';
+	dn_app.input.shift_map['k']  =  'K';
+	dn_app.input.shift_map['l']  =  'L';
+	dn_app.input.shift_map['m']  =  'M';
+	dn_app.input.shift_map['n']  =  'N';
+	dn_app.input.shift_map['o']  =  'O';
+	dn_app.input.shift_map['p']  =  'P';
+	dn_app.input.shift_map['q']  =  'Q';
+	dn_app.input.shift_map['r']  =  'R';
+	dn_app.input.shift_map['s']  =  'S';
+	dn_app.input.shift_map['t']  =  'T';
+	dn_app.input.shift_map['u']  =  'U';
+	dn_app.input.shift_map['v']  =  'V';
+	dn_app.input.shift_map['w']  =  'W';
+	dn_app.input.shift_map['x']  =  'X';
+	dn_app.input.shift_map['y']  =  'Y';
+	dn_app.input.shift_map['z']  =  'Z';
+}
+
+void dn_input_update() {
+	// Reset between frames
+	dn_for(key, GLFW_KEY_LAST) {
+		dn_app.input.was_down[key] = dn_app.input.is_down[key];
+	}
+
+	dn_app.input.scroll.x = 0;
+	dn_app.input.scroll.y = 0;
+	dn_app.input.mouse_delta.x = 0;
+	dn_app.input.mouse_delta.y = 0;
+	dn_app.input.got_keyboard_input = false;
+	dn_app.input.got_mouse_input = false;
+
+	glfwPollEvents();
+}
+
+void dn_input_callback_cursor(GLFWwindow* glfw, double x, double y) {
+	dn_app.input.got_mouse_input = true;
+	
+	if (x < 0) x = 0;
+	if (y < 0) y = 0;
+
+	dn_vector2_t last_mouse = dn_app.input.mouse;
+
+	dn_app.input.mouse.x = x / dn_app.window.content_area.x;
+	dn_app.input.mouse.y = 1 - (y / dn_app.window.content_area.y);
+
+	// I'm not totally sure why this is the case, but these events need to be kind of debounced. That is,
+	// one call to glfwPollEvents() might call this callback more than one times (in practice, two, but
+	// who knows if that's a hard limit.
+	//
+	// In other words, we need to *accumulate* delta, and then at the beginning of the next frame the
+	// input manager will reset the delta before it polls events
+	dn_app.input.mouse_delta.x += dn_app.input.mouse.x - last_mouse.x;
+	dn_app.input.mouse_delta.y += dn_app.input.mouse.y - last_mouse.y;
 }
 
 void dn_input_callback_click(GLFWwindow* window, int button, int action, int mods) {
+	dn_app.input.got_mouse_input = true;
 
+	if (button == GLFW_MOUSE_BUTTON_LEFT) {
+		if (action == GLFW_PRESS) {
+			dn_app.input.is_down[GLFW_MOUSE_BUTTON_LEFT] = true;
+		}
+		if (action == GLFW_RELEASE) {
+			dn_app.input.is_down[GLFW_MOUSE_BUTTON_LEFT] = false;
+		}
+	}
+	if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+		if (action == GLFW_PRESS) {
+			dn_app.input.is_down[GLFW_MOUSE_BUTTON_RIGHT] = true;
+		}
+		if (action == GLFW_RELEASE) {
+			dn_app.input.is_down[GLFW_MOUSE_BUTTON_RIGHT] = false;
+		}
+	}
 }
-void dn_input_callback_scroll(GLFWwindow* window, double dx, double dy) {
 
+void dn_input_callback_scroll(GLFWwindow* window, double dx, double dy) {
+	dn_app.input.got_mouse_input = true;
+
+	dn_app.input.scroll.x = dx;
+	dn_app.input.scroll.y = dy;
 }
 
 void dn_input_callback_key(GLFWwindow* window, int key, int scancode, int action, int mods) {
-  dn_log("%c", key);
+	dn_app.input.got_keyboard_input = true;
+	
+	if (action == GLFW_PRESS) {
+			dn_app.input.is_down[key] = true;
+	}
+	if (action == GLFW_RELEASE) {
+			dn_app.input.is_down[key] = false;
+	}
 }
 
 void dn_input_callback_error(int err, const char* msg) {
-
+	DN_LOG("GLFW error: code = %d, message = %s", err, msg);
 }
 
 void dn_input_callback_window_size(GLFWwindow* window_handle, int width, int height) {
+	DN_LOG("width = %d, height = %d", width, height);
+	
+	dn_app.window.content_area.x = width;
+	dn_app.window.content_area.y = height;
+	glViewport(0, 0, width, height);
 
+	if (!dn_gpu.targets.size) {
+		return;
+	}
+	dn_gpu_render_target_t* swapchain = dn_gpu_acquire_swapchain();
+	swapchain->size = dn_app.window.content_area;
+}
+
+
+/////////////
+// LUA API //
+/////////////
+bool dn_input_pressed(int key) {
+	return dn_app.input.is_down[key] && !dn_app.input.was_down[key];
+}
+
+bool dn_input_released(int key) {
+	return !dn_app.input.is_down[key] && dn_app.input.was_down[key];
+}
+
+bool dn_input_down(int key) {
+	return dn_app.input.is_down[key];
+}
+
+bool dn_input_mod_down(int mod) {
+	bool down = false;
+	if (mod == GLFW_KEY_CONTROL) {
+		down |= dn_app.input.is_down[GLFW_KEY_RIGHT_CONTROL];
+		down |= dn_app.input.is_down[GLFW_KEY_LEFT_CONTROL];
+	}
+	if (mod == GLFW_KEY_SUPER) {
+		down |= dn_app.input.is_down[GLFW_KEY_LEFT_SUPER];
+		down |= dn_app.input.is_down[GLFW_KEY_RIGHT_SUPER];
+	}
+	if (mod == GLFW_KEY_SHIFT) {
+		down |= dn_app.input.is_down[GLFW_KEY_LEFT_SHIFT];
+		down |= dn_app.input.is_down[GLFW_KEY_RIGHT_SHIFT];
+	}
+	if (mod == GLFW_KEY_ALT) {
+		down |= dn_app.input.is_down[GLFW_KEY_LEFT_ALT];
+		down |= dn_app.input.is_down[GLFW_KEY_RIGHT_ALT];
+	}
+
+	return down;
+}
+
+bool dn_input_chord_pressed(int mod, int key) {
+	return dn_input_mod_down(mod) && dn_input_pressed(key);
+}
+
+dn_vector2_t dn_input_mouse(dn_coord_t unit) {
+	switch (unit) {
+		case DN_COORD_UNIT_SCREEN: return dn_app.input.mouse; break;
+		case DN_COORD_UNIT_WINDOW: return dn_coord_screen_to_window(dn_app.input.mouse.x, dn_app.input.mouse.y); break;
+		case DN_COORD_UNIT_GAME:   return dn_coord_screen_to_game(dn_app.input.mouse.x, dn_app.input.mouse.y); break;
+		case DN_COORD_UNIT_WORLD:  return dn_coord_screen_to_world(dn_app.input.mouse.x, dn_app.input.mouse.y); break;
+	}
+
+	DN_ASSERT(false);
+	return dn_zero_struct(dn_vector2_t);
+}
+
+dn_vector2_t dn_input_mouse_delta(dn_coord_t unit) {
+	switch (unit) {
+		case DN_COORD_UNIT_SCREEN: return dn_app.input.mouse_delta; break;
+		case DN_COORD_UNIT_WINDOW: return dn_coord_screen_to_window_mag(dn_app.input.mouse_delta.x, dn_app.input.mouse_delta.y); break;
+		case DN_COORD_UNIT_GAME:   return dn_coord_screen_to_game_mag(dn_app.input.mouse_delta.x, dn_app.input.mouse_delta.y); break;
+		case DN_COORD_UNIT_WORLD:  return dn_coord_screen_to_world_mag(dn_app.input.mouse_delta.x, dn_app.input.mouse_delta.y); break;
+	}
+
+	DN_ASSERT(false);
+	return dn_zero_struct(dn_vector2_t);
+}
+
+dn_vector2_t dn_input_scroll() {
+	return dn_app.input.scroll;
+}
+
+u32 dn_input_shift_key(u32 key) {
+	bool upper = key >= GLFW_KEY_A && key <= GLFW_KEY_Z;
+	bool shift = dn_input_mod_down(GLFW_KEY_SHIFT);
+
+	if (shift && upper) {
+    return key;
+	}
+	else if (shift && !upper) {
+		return dn_app.input.shift_map[key];
+	}
+	else if (!shift && upper) {
+		return key + 32;
+	}
+	else if (!shift && !upper) {
+		return key;
+	}
+
+	return key;
+}
+
+dn_input_device_t dn_input_get_device() {
+  DN_BROKEN();
+  return 0;
 }
 
 
@@ -6488,13 +7016,13 @@ bool dn_app_exceeded_frame_time() {
 int dn_main() {
   while(!dn_app_should_exit()) {
     dn_app_update();
-  //   dn_allocators_update();
+    dn_allocators_update();
   //   dn_file_monitors_update();
   //   dn_assets_update();
   //   dn_imgui_update();
   //   dn_input_update();
   //   update_actions();
-  //   dn_lua_update();
+    dn_lua_update();
   //   dn_time_metrics_update();
   }
 

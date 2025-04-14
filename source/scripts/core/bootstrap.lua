@@ -299,7 +299,7 @@ function doublenickel.init_phase_1()
   doublenickel.dialogue.init()
   -- doublenickel.audio.init()
   -- doublenickel.gui.init()
-  -- doublenickel.scene.init()
+  doublenickel.scene.init()
   doublenickel.asset.init()
 end
 

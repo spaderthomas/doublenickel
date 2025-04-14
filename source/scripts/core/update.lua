@@ -1,9 +1,10 @@
 function doublenickel.update_game(dt)
-  dn.time_metric_begin('update')
+  doublenickel.time_metric.begin('update')
   
   doublenickel.dt = dt
   doublenickel.elapsed_time = doublenickel.elapsed_time + dt
   doublenickel.frame = doublenickel.frame + 1
+  print(doublenickel.elapsed_time)
 
   doublenickel.input.update()
 
@@ -18,7 +19,7 @@ function doublenickel.update_game(dt)
 
   doublenickel.lifecycle.run_callback(doublenickel.lifecycle.callbacks.on_end_frame)
   
-  dn.time_metric_end('update')
+  doublenickel.time_metric.stop('update')
 
   doublenickel.gpu.render()
 end

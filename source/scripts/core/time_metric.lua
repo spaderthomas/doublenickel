@@ -13,6 +13,14 @@ function doublenickel.time_metric.add(name)
   dn.time_metrics_add(name)
 end
 
+function doublenickel.time_metric.begin(name)
+  dn.time_metric_begin(dn.String:new(name))
+end
+
+function doublenickel.time_metric.stop(name)
+  dn.time_metric_end(dn.String:new(name))
+end
+
 function doublenickel.time_metric.query(name)
 	local metrics = {
 		average = dn.time_metric_average(name),

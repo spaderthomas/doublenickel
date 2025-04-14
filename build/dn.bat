@@ -67,6 +67,12 @@ EXIT /B
 
   EXIT /B
 
+:DN_COPY_DLLS
+  for %%f in (%DN_DLLS%) do (
+    COPY "%%f" "%~1"
+  )
+  EXIT /B
+
 :::::::::::::::
 :: UTILITIES ::
 :::::::::::::::
@@ -102,32 +108,43 @@ EXIT /B
   CALL :DN_ECHO_COLOR %DN_FOREGROUND_YELLOW% DN_TARGET "%~1"
   EXIT /B
 
-:DN_INITIALIZE_VS_PROMPT
-  IF DEFINED VisualStudioVersion (EXIT /B)
-
-  SET DN_VS_YEAR="%~1"
-  IF %DN_VS_YEAR%=="" (SET "DN_VS_YEAR=2022")
-  SET DN_VS_VERSION="%~2"
-  IF %DN_VS_VERSION%=="" (SET "DN_VS_VERSION=Community")
-  SET DN_VS_PREFIX="%~3"
-  IF %DN_VS_PREFIX%=="" (SET "DN_VS_PREFIX=C:\Program Files")
-
-  SET DN_VSDEVCMD="%DN_VS_PREFIX%\Microsoft Visual Studio\%DN_VS_YEAR%\%DN_VS_VERSION%\Common7\Tools\VsDevCmd.bat"
-  SET DN_VSDEVCMD_FLAGS=/arch=amd64 /host_arch=amd64 /no_logo
-
-  CALL :DN_ECHO_INFO "Initializing Visual Studio command prompt with arguments: %DN_VSDEVCMD_FLAGS%"
-  CALL %DN_VSDEVCMD% %DN_VSDEVCMD_FLAGS%
+:DN_UNQUOTE
+  SET %~2=%~1:"=%
   EXIT /B
 
-:DN_COPY_DLLS
-  for %%f in (%DN_DLLS%) do (
-    COPY "%%f" "%~1"
-  )
-  EXIT /B
-
-:NORMALIZEPATH
+:DN_NORMALIZE_PATH
   SET RETVAL=%~f1
   IF NOT "%~2"=="" (
     SET "%~2=%RETVAL%"
   )
+  EXIT /B
+
+:DN_INITIALIZE_VS_PROMPT
+  IF DEFINED VisualStudioVersion (EXIT /B)
+
+  IF "%~1" == "" (
+    SET "DN_VS_YEAR=2022"
+  ) ELSE (
+    SET "DN_VS_YEAR=%~1"
+  )
+
+  IF "%~2" == "" (
+    SET "DN_VS_VERSION=Community"
+  ) ELSE (
+    SET "DN_VS_VERSION=%~2"
+  )
+
+  IF "%~3" == "" (
+    SET "DN_VS_PREFIX=C:\Program Files"
+  ) ELSE (
+    SET "DN_VS_PREFIX=%~3"
+  )
+
+  SET "DN_VSDEVCMD=%DN_VS_PREFIX%\Microsoft Visual Studio\%DN_VS_YEAR%\%DN_VS_VERSION%\Common7\Tools\VsDevCmd.bat"
+  SET "DN_VSDEVCMD_FLAGS=/arch=amd64 /host_arch=amd64 /no_logo"
+
+  CALL :DN_ECHO_INFO "Initializing Visual Studio command prompt"
+  CALL :DN_ECHO_INFO "%DN_VSDEVCMD% %DN_VSDEVCMD_FLAGS%"
+
+  CALL "%DN_VSDEVCMD%" %DN_VSDEVCMD_FLAGS%
   EXIT /B
