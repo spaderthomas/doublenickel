@@ -6,7 +6,7 @@ local do_once = {
 }
 
 function doublenickel.debug.assert(expression)
-  if not expression then dbg() end
+    if not expression then dbg() end
 end
 
 function doublenickel.debug.do_once(f, ...)

@@ -1,4 +1,4 @@
-function imgui.internal.load_imgui_lua_wrapper_verbatim_from_sonoro1234(lib, M)
+function imgui.internal.load_imgui_lua_wrapper_verbatim_from_sonoro1234(lib)
 -----------ImStr definition
 local ImStrv
 if pcall(function() local a = ffi.new("ImStrv")end) then

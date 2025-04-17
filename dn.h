@@ -22,7 +22,7 @@
   #include <assert.h>
   #include <float.h>
   #include <inttypes.h>
-  #include <stdatomic.h>
+  // #include <stdatomic.h>
   #include <stdint.h>
   // #include <sys/time.h> @fix
   #include <stdint.h>
@@ -74,8 +74,11 @@
   #include "sokol/sokol_audio.h"
   #include "sokol/sokol_log.h"
 
+  #define CIMGUI_USE_GLFW
+  #define CIMGUI_USE_OPENGL3
   #define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
   #include "cimgui/cimgui.h"
+  #include "cimgui/cimgui_impl.h"
 
   #include "gunslinger/gs.h"
 
@@ -211,7 +214,7 @@ typedef char dn_asset_name_t [DN_ASSET_NAME_LEN];
   #define DN_API __declspec(dllexport)
   #define DN_IMP
   #define dn_align(n) __declspec(align(n))
-  #define DN_ATOMIC _Atomic
+  #define DN_ATOMIC
 #else
   #define DN_API
   #define DN_IMP  @DN_FFI_CANARY
@@ -5698,7 +5701,38 @@ s32 dn_lua_format_file_load_error_l(dn_lua_interpreter_t l) {
 
 
 void dn_imgui_init() {
-  DN_BROKEN();
+  DN_LOG_FN();
+  dn_imgui = dn_zero_struct(dn_imgui_t);
+
+  igCreateContext(NULL);
+
+  ImGuiIO* io = igGetIO_Nil();
+  io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+  //io->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+  io->ConfigWindowsMoveFromTitleBarOnly = true;
+  igStyleColorsDark(NULL);
+
+  io->IniFilename = NULL;
+
+  ImGuiStyle* style = igGetStyle();
+  style->FrameRounding = 6;
+  style->WindowRounding = 6;
+  style->WindowBorderSize = 0;
+
+  dn_imgui_load_colors((dn_imgui_colors_t) {
+    .light        = { .r = 0.47f, .g = 0.47f, .b = 0.47f, .a = 255.0f },
+    .medium_light = { .r = 0.35f, .g = 0.35f, .b = 0.35f, .a = 255.0f },
+    .low_light    = { .r = 0.31f, .g = 0.31f, .b = 0.31f, .a = 255.0f },
+    .neutral      = { .r = 0.22f, .g = 0.22f, .b = 0.22f, .a = 255.0f },
+    .medium_dark  = { .r = 0.16f, .g = 0.16f, .b = 0.16f, .a = 255.0f },
+  });
+  
+  // Engine will pick this up on the first tick (before ImGui renders, so no flickering)
+  dn_imgui_load_layout("default");
+
+  DN_LOG_2("Initializing ImGui backend");
+  ImGui_ImplGlfw_InitForOpenGL(dn_app.window.handle, true);
+  ImGui_ImplOpenGL3_Init("#version 330");
 }
 
 void dn_imgui_update() {
@@ -6891,7 +6925,7 @@ void dn_app_configure(dn_app_config_t config) {
   dn_noise_init();
   dn_steam_init(config.steam);
 
-  // dn_imgui_init();
+  dn_imgui_init();
 
   // init_particles();
   // init_fluid();
@@ -7002,7 +7036,8 @@ dn_type_info_list_t dn_app_query_types() {
 }
 
 u32 dn_app_monotonic_id() {
-  return atomic_fetch_add(&dn_app.monotonic_id, 1);
+  // return atomic_fetch_add(&dn_app.monotonic_id, 1);
+  return 0;
 }
 
 bool dn_app_exceeded_frame_time() {

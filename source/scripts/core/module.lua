@@ -36,6 +36,7 @@ function doublenickel.module.write(file_path, data, pretty)
 end
 
 function doublenickel.module.read(file_path)
+  print(file_path)
   return dofile(file_path)
 end
 

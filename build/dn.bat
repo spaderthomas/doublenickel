@@ -11,18 +11,22 @@ SET "DN_SOURCE=%DN%\source"
       SET "DN_FFI_H=%DN_DATA%\dn_ffi.h"
 SET "DN_EXTERNAL=%DN%\external"
   SET "DN_INCLUDE=%DN_EXTERNAL%\include"
-    SET "DN_IMGUI=%DN_INCLUDE%\imgui"
+    SET "DN_IMGUI=%DN_INCLUDE%\cimgui"
     SET "DN_FREETYPE=%DN_INCLUDE%\freetype"
   SET "DN_LIB=%DN_EXTERNAL%\lib\debug"
-    SET "DN_LIB_LUA=luajit-2.1.0.3-windows-x64.lib"
-    SET "DN_LIB_FREETYPE=freetype-2.10.4-windows-x64.lib"
-    SET "DN_LIB_GLFW=glfw-3.3.8-windows-x64.lib"
-    SET "DN_LIB_GLAD=glad-0.1.36-windows-x64.lib"
-    SET "DN_LIB_CIMGUI=cimgui-1.91.9-windows-x64.lib"
-    SET "DN_LIB_STEAM=steam_api64.lib"
-    SET "DN_DLL_CIMGUI=%DN_LIB%\cimgui-1.91.9-windows-x64.dll"
+
+    SET "DN_LIB_GLFW=%DN_LIB%\glfw3.lib"
+    SET "DN_DLL_GLFW=%DN_LIB%\glfw3.dll"
+    SET "DN_PDB_GLFW=%DN_LIB%\glfw3.pdb"
+    SET "DN_LIB_CIMGUI=%DN_LIB%\cimgui.lib"
+    SET "DN_DLL_CIMGUI=%DN_LIB%\cimgui.dll"
+    SET "DN_PDB_CIMGUI=%DN_LIB%\cimgui.pdb"
+    SET "DN_LIB_LUA=%DN_LIB%\luajit-2.1.0.3-windows-x64.lib"
+    SET "DN_LIB_FREETYPE=%DN_LIB%\freetype-2.10.4-windows-x64.lib"
+    SET "DN_LIB_GLAD=%DN_LIB%\glad-0.1.36-windows-x64.lib"
+    SET "DN_LIB_STEAM=%DN_LIB%\steam_api64.lib"
     SET "DN_DLL_STEAM=%DN_LIB%\steam_api64.dll"
-    SET "DN_DLLS="%DN_DLL_CIMGUI%" "%DN_DLL_STEAM%""
+    SET "DN_DLLS="%DN_DLL_CIMGUI%" "%DN_DLL_GLFW%" "%DN_DLL_STEAM%""
 
 SET "DN_SWITCH_INCLUDE=/I%DN% /I%DN_INCLUDE% /I%DN_IMGUI% /I%DN_FREETYPE%"
 SET "DN_SWITCH_LIBS="%DN_LIB_FREETYPE%" "%DN_LIB_GLFW%" "%DN_LIB_GLAD%" "%DN_LIB_LUA%" "%DN_LIB_STEAM%" "%DN_LIB_CIMGUI%""
@@ -90,10 +94,14 @@ EXIT /B
 
 :DN_ECHO_RESULT
   IF %ERRORLEVEL% EQU 0 (
-    CALL :DN_ECHO_COLOR_NO_TAG %DN_BACKGROUND_GREEN% "OK!"
+    CALL :DN_ECHO_INFO "%DN_FOREGROUND_GREEN%OK!%DN_BACKGROUND_RESET%"
   ) ELSE (
-    CALL :DN_ECHO_COLOR_NO_TAG %DN_BACKGROUND_RED% "FAIL!"
+    CALL :DN_ECHO_INFO "%DN_FOREGROUND_RED%FAIL!%DN_BACKGROUND_RESET%"
   )
+  EXIT /B
+
+:DN_ECHO_ERROR
+  CALL :DN_ECHO_COLOR %DN_FOREGROUND_RED% DN_ERROR "%~1"
   EXIT /B
 
 :DN_ECHO_INFO
@@ -107,7 +115,7 @@ EXIT /B
 :DN_ECHO_TARGET
   CALL :DN_ECHO_COLOR %DN_FOREGROUND_YELLOW% DN_TARGET "%~1"
   EXIT /B
-
+  
 :DN_UNQUOTE
   SET %~2=%~1:"=%
   EXIT /B
@@ -117,6 +125,13 @@ EXIT /B
   IF NOT "%~2"=="" (
     SET "%~2=%RETVAL%"
   )
+  EXIT /B
+
+:DN_REPLACE_FILE
+  IF EXIST %1 (
+    DEL %1
+  )
+  COPY %2 %1
   EXIT /B
 
 :DN_INITIALIZE_VS_PROMPT

@@ -83,8 +83,11 @@ function doublenickel.editor.init()
 end
 
 function doublenickel.editor.update()
+  dn.trace('dn.editor.update')
+
   dn.gpu_begin_render_pass(self.config.command_buffer, self.config.render_pass)
-  for editor in doublenickel.iterator.values(doublenickel.editor.entities) do
+  for name, editor in doublenickel.iterator.pairs(doublenickel.editor.entities) do
+    dn.trace('dn.editor.update', name)
     editor:update()
     editor:draw()
   end

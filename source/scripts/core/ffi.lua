@@ -1049,6 +1049,22 @@ function dn.log(fmt, ...)
   return ffi.C.dn_log_str(dn.String:new(string.format(fmt, ...)))
 end
 
+function dn.trace(fn_name, fmt, ...)
+  local COLOR_RED = string.char(27) .. "[91m"
+  local COLOR_BLUE = string.char(27) .. "[94m"
+  local COLOR_YELLOW = string.char(27) .. "[33m"
+  local COLOR_RESET = string.char(27) .. "[0m"
+
+  if fmt then
+    local message = string.format(fmt, ...)
+    message = string.format('[%s%s%s] %s', COLOR_YELLOW, fn_name, COLOR_RESET, message)
+    dn.log(message)
+  else
+    local message = string.format('[%s%s%s]', COLOR_YELLOW, fn_name, COLOR_RESET)
+    dn.log(message)
+  end
+end
+
 function dn.time_metrics_add(name)
     return ffi.C.dn_time_metrics_add(dn.String:new(name))
 end
@@ -1117,4 +1133,9 @@ function doublenickel.ffi.push_fullscreen_quad()
   local uvs = nil
   local opacity = 1.0
   ffi.C.push_quad(0, n.y, n.x, n.y, uvs, opacity);
+end
+
+function dn.gpu_begin_render_pass(command_buffer, render_pass)
+  dn.trace('dn.gpu.begin_render_pass')
+  ffi.C.dn_gpu_begin_render_pass(command_buffer, render_pass)
 end

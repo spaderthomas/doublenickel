@@ -4,7 +4,6 @@ function doublenickel.update_game(dt)
   doublenickel.dt = dt
   doublenickel.elapsed_time = doublenickel.elapsed_time + dt
   doublenickel.frame = doublenickel.frame + 1
-  print(doublenickel.elapsed_time)
 
   doublenickel.input.update()
 

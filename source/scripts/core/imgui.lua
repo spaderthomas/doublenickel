@@ -20,6 +20,7 @@
 
 -- IMGUI_LAYER_1
 function imgui.internal.init_c_api()
+  imgui.internal.dll = ffi.load('cimgui-1.91.9-windows-x64.dll')
 	local header = doublenickel.module.read_from_named_path('cimgui_header')
 	ffi.cdef(header)
 end
@@ -27,10 +28,9 @@ end
 
 -- IMGUI_LAYER_2
 function imgui.internal.init_lua_api()
-  cimgui_dll = ffi.load('cimgui-1.91.9-windows-x64.dll')
 
   local function exists_in_ffi(fn_name)
-    local success, fn = pcall(function() return cimgui_dll[fn_name] end)
+    local success, fn = pcall(function() return imgui.internal.dll[fn_name] end)
     return success and type(fn) == "cdata"
   end
   
@@ -40,7 +40,7 @@ function imgui.internal.init_lua_api()
       return function() end
     end
   
-    return cimgui_dll[fn_name]
+    return imgui.internal.dll[fn_name]
   end
   
   -- The original code expects ImGui to be compiled into a library (...?), and so expects lib to be the result
@@ -53,69 +53,72 @@ function imgui.internal.init_lua_api()
   })
 
   -- This is the namespace that the engine will use to call ImGui functions
-  imgui.internal.load_imgui_lua_wrapper_verbatim_from_sonoro1234(lib, imgui)
+  bindings = imgui.internal.load_imgui_lua_wrapper_verbatim_from_sonoro1234(lib)
+  for fn_name, fn in pairs(bindings) do
+    imgui[fn_name] = fn
+  end
 end
 
 
 -- IMGUI_LAYER_3
 function imgui.internal.init_lua_api_overwrites()
 	function imgui.IsMouseClicked(button)
-		return ffi.C.igIsMouseClicked_Bool(button, false)
+		return imgui.internal.dll.igIsMouseClicked_Bool(button, false)
 	end
 
 	function imgui.Dummy(x, y)
-		return ffi.C.igDummy(imgui.ImVec2(x, y))
+		return imgui.internal.dll.igDummy(imgui.ImVec2(x, y))
 	end
 	
 	function imgui.SetCursorScreenPos(x, y)
-		return ffi.C.igSetCursorScreenPos(imgui.ImVec2(x, y))
+		return imgui.internal.dll.igSetCursorScreenPos(imgui.ImVec2(x, y))
 	end
 	
 	function imgui.PushStyleVar_2(var, x, y)
-		return ffi.C.igPushStyleVar_Vec2(var, imgui.ImVec2(x, y))
+		return imgui.internal.dll.igPushStyleVar_Vec2(var, imgui.ImVec2(x, y))
 	end
 
 	function imgui.SetNextWindowSize(x, y)
-		return ffi.C.igSetNextWindowSize(imgui.ImVec2(x, y), 0)
+		return imgui.internal.dll.igSetNextWindowSize(imgui.ImVec2(x, y), 0)
 	end
 
 	function imgui.SetNextWindowPos(x, y)
-		return ffi.C.igSetNextWindowPos(imgui.ImVec2(x, y), 0, imgui.ImVec2(0, 0))
+		return imgui.internal.dll.igSetNextWindowPos(imgui.ImVec2(x, y), 0, imgui.ImVec2(0, 0))
 	end
 
 	function imgui.GetItemRectSize()
 		local as_imvec = ffi.new("ImVec2")
-		ffi.C.igGetItemRectSize(as_imvec)
+		imgui.internal.dll.igGetItemRectSize(as_imvec)
 		return as_imvec.x, as_imvec.y
 	end
 	
 	function imgui.GetItemRectMin()
 		local as_imvec = ffi.new("ImVec2")
-		ffi.C.igGetItemRectMin(as_imvec)
+		imgui.internal.dll.igGetItemRectMin(as_imvec)
 		return as_imvec.x, as_imvec.y
 	end
 	
 	function imgui.GetCursorScreenPos()
 		local as_imvec = ffi.new("ImVec2")
-		ffi.C.igGetCursorScreenPos(as_imvec)
+		imgui.internal.dll.igGetCursorScreenPos(as_imvec)
 		return as_imvec.x, as_imvec.y
 	end
 	
 	function imgui.GetContentRegionAvail()
 		local as_imvec = ffi.new("ImVec2")
-		ffi.C.igGetContentRegionAvail(as_imvec)
+		imgui.internal.dll.igGetContentRegionAvail(as_imvec)
 		return as_imvec.x, as_imvec.y
 	end
 	
 	function imgui.GetWindowPos()
 		local as_imvec = ffi.new("ImVec2")
-		ffi.C.igGetWindowPos(as_imvec)
+		imgui.internal.dll.igGetWindowPos(as_imvec)
 		return as_imvec.x, as_imvec.y
 	end
 
 	function imgui.InvisibleButton(label, sx, sy, flags)
 		flags = flags or 0
-		return ffi.C.igInvisibleButton(label, ffi.new('ImVec2', sx, sy), flags)
+		return imgui.internal.dll.igInvisibleButton(label, ffi.new('ImVec2', sx, sy), flags)
 	end
 
 
@@ -152,7 +155,7 @@ function imgui.internal.init_lua_api_overwrites()
 
 	function imgui.Checkbox(label, t, k)
 		local value = ffi.new('bool [1]', t[k])
-		local changed = ffi.C.igCheckbox(label, value)
+		local changed = imgui.internal.dll.igCheckbox(label, value)
 	
 		t[k] = value[0]
 	
@@ -184,7 +187,7 @@ function imgui.internal.init_lua_api_overwrites()
 		flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiInputTextFlags_CallbackResize)
 		local callback = empty_resize_callback
 		local userdata = nil
-		local changed = ffi.C.igInputText(label, buffer, buffer_len, flags, callback, userdata)
+		local changed = imgui.internal.dll.igInputText(label, buffer, buffer_len, flags, callback, userdata)
 	
 		t[k] = ffi.string(buffer)
 		return changed
@@ -197,7 +200,7 @@ function imgui.internal.init_lua_api_overwrites()
 		step_fast = step_fast or 0
 		format = format or "%.3f"
 		flags = flags or 0
-		local changed = ffi.C.igInputFloat(label, value, step, step_fast, format, flags)
+		local changed = imgui.internal.dll.igInputFloat(label, value, step, step_fast, format, flags)
 	
 		t[k] = value[0]
 	
@@ -209,7 +212,7 @@ function imgui.internal.init_lua_api_overwrites()
 	
 		flags = flags or 0
 		local ref_col = nil
-		local changed = ffi.C.igColorPicker4(label, value, flags, ref_col)
+		local changed = imgui.internal.dll.igColorPicker4(label, value, flags, ref_col)
 	
 		t[k] = doublenickel.color(value)
 	
@@ -222,7 +225,7 @@ function imgui.internal.init_lua_api_overwrites()
 
 		flags = flags or 0
 		format = format or "%.3f"
-		local changed = ffi.C.igSliderFloat(label, value, vmin, vmax, format, flags)
+		local changed = imgui.internal.dll.igSliderFloat(label, value, vmin, vmax, format, flags)
 
 		t[k] = value[0]
 

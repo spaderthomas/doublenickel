@@ -28,6 +28,7 @@ function GameView:init(name, render_target, size_calculation, size, priority)
 end
 
 function GameView:update()
+  dn.trace('GameView:update', self.name)
   imgui.PushStyleVar_2(ffi.C.ImGuiStyleVar_WindowPadding, 0, 0)
   doublenickel.editor.begin_window(self.name)
 
@@ -57,8 +58,9 @@ function GameView:update()
 end
 
 
-
-
+-----------------------
+-- GAME VIEW MANAGER --
+-----------------------
 local GameViewManager = doublenickel.editor.define('GameViewManager')
 
 function GameViewManager:init()

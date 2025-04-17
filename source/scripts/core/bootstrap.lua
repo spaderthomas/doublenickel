@@ -315,7 +315,6 @@ function doublenickel.init_phase_2()
   doublenickel.editor.init()
   doublenickel.persistent.init()
 
-  doublenickel.dn_log('lifecycle.on_start_game')
   doublenickel.lifecycle.run_callback(doublenickel.lifecycle.callbacks.on_start_game)
 end
 
