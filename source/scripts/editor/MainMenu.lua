@@ -391,7 +391,7 @@ end
 function MainMenu:AssetReload()
 	if imgui.BeginMenu('Reload') then
 		if imgui.MenuItem('Animations') then
-			doublenickel.animation.load()
+			doublenickel.animation.init()
 		end
 
 		if imgui.MenuItem('Characters') then

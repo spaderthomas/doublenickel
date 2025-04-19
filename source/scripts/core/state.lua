@@ -1,5 +1,5 @@
 function doublenickel.state.init()
-  doublenickel.state.load_file('default')
+  -- doublenickel.state.load_file('default')
 end
 
 function doublenickel.state.load(state)

@@ -1,27 +1,4 @@
--- First, I'll define enums for most resources in the game. You can refer to things by string constants, but I much prefer
--- to use enums. There's nothing special about the names of the enums or their values.
-Shader = doublenickel.enum.define(
-  'Shader',
-  {
-    Sample = 0,
-    Shape = 1,
-    Sdf = 2,
-    SdfNormal = 3,
-    Solid = 5,
-    Sprite = 6,
-    Text = 7,
-    Blit = 9,
-  }
-)
-
-Font = doublenickel.enum.define(
-  'Font',
-  {
-    Tiny5 = 0,
-  }
-)
-
-
+-- Assets can be referred to by string or by enum 
 RenderTarget = doublenickel.enum.define(
   'RenderTarget',
   {
@@ -29,33 +6,21 @@ RenderTarget = doublenickel.enum.define(
   }
 )
 
-Buffer = doublenickel.enum.define(
-  'Buffer',
-  {
-    Lights = 0,
-  }
-)
-
--- Then, tell doublenickel what the app class will be for your program
+-- This is your application's entry point
 local App = doublenickel.define_app()
 
--- After all of the framework scripts have been loaded, this is the first user code to be called. The framework is not
--- initialized yet; there is no window, and therefore no GPU context, and therefore very few subsystems we can properly
--- initialize.
---
--- It's the job of the app to configure each framework subsystem, pointing it at directories it should find data and specifying
--- which resources to create. That's what we'll do in App:on_init_game()
+-- This is the first user code to be called. You provide parameters to initialize the framework's core subsystems. Mostly,
+-- this involves specifying paths and telling the framework what resources to create (e.g. shaders)
 function App:on_init_game()
-  self.native_resolution = doublenickel.vec2(320, 180)
-  self.output_resolution = doublenickel.vec2(1024, 576)
+  self.native_resolution = Vector2:new(1280, 960)
 
   -----------------------
   -- APP CONFIGURATION --
   -----------------------
-  
+  doublenickel.paths.load(dn.paths_resolve_format('dn_app_file', 'data/paths.lua'))
+
   -- The main configuration struct for the framework
-  local dn_config = AppConfig:new({
-    target_fps = 144,
+  dn.app_configure(AppConfig:new({
     -- WINDOW
     --
     -- This is the first time that dn.paths_resolve_*() shows up. This subsystem of doublenickel is how you should deal
@@ -67,36 +32,13 @@ function App:on_init_game()
     -- The framework will build the corresponding absolute paths, which you can then refer to by name.
     window = WindowConfig:new({
       title = 'Hello, DN!',
-      native_resolution = Vector2:new(320, 180),
+      native_resolution = self.native_resolution,
       flags = doublenickel.enum.bitwise_or(
-        doublenickel.enums.WindowFlags.Windowed,
-        doublenickel.enums.WindowFlags.Border
+        WindowFlags.Windowed,
+        WindowFlags.Border
       ),
       icon = dn.paths_resolve_format('dn_image', 'logo/icon.png'),
-    }),
-
-    -- AUDIO
-    --
-    -- Just provide a list of directories as Lua strings, and the framework will scan them for audio files and load 
-    -- them into memory.
-    audio = AudioConfig:new({
-      dirs = {
-        dn.paths_resolve('audio')
-      },
-    }),
-
-    -- FONT
-    --
-    -- Fonts are baked at startup, so if you'd like to use a font size, you need to declare it here.
-    font = FontConfig:new({
-      fonts = {
-        {
-          id = Font.Tiny5,
-          file_path = dn.paths_resolve_format('font', 'Tiny5-Regular.ttf'),
-          sizes = { 16, 24, 32 },
-          imgui = false
-        },
-      }
+      target_fps = 144,
     }),
 
     -- GPU
@@ -105,11 +47,6 @@ function App:on_init_game()
     -- isn't used to locate shaders (since, remember, everything is an absolute path). Rather, it's a directory for
     -- a file monitor to watch. When files change in this directory, your shaders will be hotloaded.
     gpu = GpuConfig:new({
-      shader_path = dn.paths_resolve('shaders'),
-      search_paths = {
-          dn.paths_resolve('shader_includes')
-      },
-      shaders = {},
       render_targets = {
         {
           name = RenderTarget.Native,
@@ -118,26 +55,18 @@ function App:on_init_game()
       }
     }),
 
-    -- STEAM
-    -- 
-    -- Steam support is mostly unported, but this is a placeholder.
-    steam = SteamConfig:new({
-      app_id = 480
+    layout = LayoutConfig:new({
+      file = dn.paths_resolve('layouts')
     }),
 
-    -- IMAGE
-    --
-    -- A list of directories from which images will be loaded and packed into texture atlases.
-    image = ImageConfig:new({
-      dirs = {
-        dn.paths_resolve('images')
-      },
-    }),
-  })
-
-  -- With our configuration done, we can call into C to initialize the framework. This is the thrust of initialization.
-  dn.app_configure(dn_config)
-
+    dialogue = {},
+    scenes = {},
+    state = {},
+    actions = {},
+    animations = {},
+    backgrounds = {},
+    characters = {},
+  }))
 
   -----------------------
   -- GPU CONFIGURATION --
@@ -149,13 +78,7 @@ function App:on_init_game()
   --
   -- This is entirely optional, inconsequential, and only works if you use enums instead of strings to identify resources.
   doublenickel.asset.register_cast(RenderTarget, 'dn_gpu_render_target_t')
-  doublenickel.asset.register_cast(Shader, 'dn_gpu_shader_t')
   
-  -- The framework provides a pre-configured SDF renderer for drawing primitives. It works immediate mode; it owns a CPU buffer,
-  -- which it syncs to the GPU every frame, and it builds a dn_gpu_pipeline_t with default shaders.
-  -- self.sdf_renderer = ffi.new('dn_sdf_renderer_t [1]');
-  -- self.sdf_renderer = dn.sdf_renderer_create(1024 * 1024)
-
   -- Every app needs a command buffer to write GPU commands into.
   self.command_buffer = dn.gpu_command_buffer_create(GpuCommandBufferDescriptor:new({
     max_commands = 1024
@@ -175,7 +98,7 @@ end
 function App:on_start_game()
   -- doublenickel opens your game in a framebuffer within an editor window. You can configure that editor window here.
   doublenickel.editor.configure(EditorConfig:new({
-    grid_enabled = false,
+    grid_enabled = true,
     grid_size = 12,
 
     -- There's a full featured dialogue editor, but if you don't plan to use it, hide it.

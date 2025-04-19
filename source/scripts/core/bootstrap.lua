@@ -247,7 +247,7 @@ function doublenickel.init_phase_0()
     )
   end
 
-  local app_paths = collect_paths(path_info.app_paths)
+  local app_paths = collect_paths(path_info.dn_app)
   for index, path in pairs(app_paths) do
     ffi.C.dn_paths_add_app_subpath(
       ffi.new('dn_string_t', #path.name, ffi.cast('u8*', path.name)),
@@ -292,9 +292,9 @@ function doublenickel.init_phase_1()
   doublenickel.input.init()
   doublenickel.gpu.init()
   doublenickel.state.init()
-  doublenickel.animation.load()
-  doublenickel.texture.load()
-  doublenickel.background.load()
+  doublenickel.animation.init()
+  doublenickel.texture.init()
+  doublenickel.background.init()
   doublenickel.dialogue.init()
   -- doublenickel.audio.init()
   -- doublenickel.gui.init()

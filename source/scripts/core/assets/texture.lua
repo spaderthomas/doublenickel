@@ -1,5 +1,5 @@
-function doublenickel.texture.load()
-  doublenickel.texture.data = doublenickel.module.read_from_named_path('texture_info')
+function doublenickel.texture.init()
+  -- doublenickel.texture.data = doublenickel.module.read_from_named_path('texture_info')
 end
 
 function doublenickel.texture.save()

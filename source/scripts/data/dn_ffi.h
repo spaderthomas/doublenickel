@@ -732,8 +732,8 @@ typedef struct {
   struct { struct { dn_hash_t key; dn_asset_importer_t val; gs_hash_table_entry_state state; }* data; dn_hash_t tmp_key; dn_asset_importer_t tmp_val; size_t stride; size_t klpvl; size_t tmp_idx; }* importers;
 } dn_asset_registry_t;
  void            dn_asset_registry_init(dn_asset_config_t config);
- void            dn_asset_registry_add(const char* name, dn_asset_data_t data);
- dn_asset_data_t dn_asset_registry_find(const char* name);
+ void            dn_asset_registry_add(dn_string_t name, dn_asset_data_t data);
+ dn_asset_data_t dn_asset_registry_find(dn_string_t name);
 typedef enum {
   DN_BACKGROUND_COMPLETION_STATUS_UPDATE_CONFIG,
   DN_BACKGROUND_COMPLETION_STATUS_LOAD_TILES,

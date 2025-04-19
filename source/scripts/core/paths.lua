@@ -34,8 +34,10 @@ local function collect_paths(paths, full_parent)
 	return collected_paths
 end
 
-function doublenickel.paths.init(path_info)
-	local file_path = dn.paths_resolve('path_info')
+function doublenickel.paths.init()
+end
+
+function doublenickel.paths.load(file_path)
 	local path_info = doublenickel.module.read(file_path)
 	self.paths = doublenickel.data_types.Array:new()
 
@@ -56,7 +58,6 @@ function doublenickel.paths.init(path_info)
 		path.named_parent = path.named_parent or 'dn_app'
 		dn.paths_add_subpath(path.name, path.named_parent, path.full_path)
 	end
-
 
 	self.paths:concatenate(install_paths)
 	self.paths:concatenate(write_paths)

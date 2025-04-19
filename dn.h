@@ -1361,8 +1361,8 @@ typedef struct {
 } dn_asset_registry_t;
 
 DN_API void            dn_asset_registry_init(dn_asset_config_t config);
-DN_API void            dn_asset_registry_add(const char* name, dn_asset_data_t data);
-DN_API dn_asset_data_t dn_asset_registry_find(const char* name);
+DN_API void            dn_asset_registry_add(dn_string_t name, dn_asset_data_t data);
+DN_API dn_asset_data_t dn_asset_registry_find(dn_string_t name);
 DN_IMP void            dn_asset_registry_update();
 
 /////////////////////////
@@ -3128,7 +3128,7 @@ dn_gpu_shader_t* dn_gpu_shader_create(dn_gpu_shader_descriptor_t descriptor) {
   
   dn_gpu_shader_t* shader = (dn_gpu_shader_t*)dn_fixed_array_reserve(&dn_gpu.shaders, 1);
   dn_gpu_shader_init(shader, descriptor);
-  dn_asset_registry_add(shader->name, shader);
+  dn_asset_registry_add(dn_string_cstr(shader->name), shader);
   
   return shader;
 }
@@ -3304,7 +3304,7 @@ dn_gpu_render_target_t* dn_gpu_render_target_create(dn_gpu_render_target_descrip
   glBindTexture(GL_TEXTURE_2D, 0);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-  dn_asset_registry_add(target->name, target);
+  dn_asset_registry_add(dn_string_cstr(target->name), target);
 
   return target;
 }
@@ -3824,22 +3824,22 @@ void dn_asset_registry_init(dn_asset_config_t user_config) {
   // asset_loader.thread.detach();
 }
 
-void dn_asset_registry_add(const char* name, dn_asset_data_t data) {
-  DN_LOG("Registered asset; name = %s, data = %p", name, data);
+void dn_asset_registry_add(dn_string_t name, dn_asset_data_t data) {
+  DN_LOG("Registered asset; name = %.*s, data = %p", name.len, name.data, data);
 
   dn_asset_t asset;
-  dn_cstr_copy_to(name, asset.name, DN_ASSET_NAME_LEN);
+  dn_string_copy_to(name, asset.name, DN_ASSET_NAME_LEN);
   asset.data = data;
 
-  gs_hash_table_insert(dn_app.asset_registry.assets, dn_hash_string(dn_string_cstr(name)), asset);
+  gs_hash_table_insert(dn_app.asset_registry.assets, dn_hash_string(name), asset);
 }
 
-dn_asset_data_t dn_asset_registry_find(const char* name) {
-    DN_ASSERT(name);
+dn_asset_data_t dn_asset_registry_find(dn_string_t name) {
+    DN_ASSERT(dn_string_valid(name));
 
-    dn_hash_t hash = dn_hash_string(dn_string_cstr(name));
+    dn_hash_t hash = dn_hash_string(name);
     if (!gs_hash_table_exists(dn_app.asset_registry.assets, hash)) {
-      DN_LOG("Tried to find asset, but it was not registered; name = %.*s", name);
+      DN_LOG("Tried to find asset, but it was not registered; name = %.*s", name.len, name.data);
       return NULL;
     }
   

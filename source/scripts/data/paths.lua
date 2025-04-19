@@ -54,11 +54,12 @@ return {
 				},
 				dn_editor = 'editor',
 				dn_entities = 'entities',
-				dn_libs = 'third_party',
+				dn_libs = 'external',
 			}
 		},
 	},
-	app_paths = {
+	dn_app = {
+    dn_app_file = '%s',
 		components = 'components',
 		core = 'core',
 		data = {
@@ -82,7 +83,6 @@ return {
 				background_info = 'backgrounds.lua',
 				character_info = 'characters.lua',
 				font_info = 'fonts.lua',
-				ffi_info = 'ffi.lua',
 				texture_info = 'textures.lua',
 			}
 		},

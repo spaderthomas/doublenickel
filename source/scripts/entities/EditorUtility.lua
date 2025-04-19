@@ -95,7 +95,8 @@ function EditorUtility:draw_grid()
   local edge_thickness = 0
 
   local sdf = doublenickel.editor.sdf
-  local render_target = doublenickel.asset.find(DnRenderTargets.Editor)
+  -- local render_target = doublenickel.asset.find(DnRenderTargets.Editor)
+  local render_target = { size = Vector2:new(1280, 960) }
   local size = render_target.size
   local camera = doublenickel.editor.find('EditorCamera')
   if doublenickel.tick then
