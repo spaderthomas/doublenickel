@@ -4,3 +4,6 @@
 [submodule "external/build/glfw"]
 	path = external/build/glfw
 	url = git@github.com:glfw/glfw.git
+[submodule "external/build/LuaJIT"]
+	path = external/build/LuaJIT
+	url = git@github.com:LuaJIT/LuaJIT.git
