@@ -74,7 +74,7 @@ function Camera:update_offset()
   final_offset.x = math.floor(final_offset.x)
   final_offset.y = math.floor(final_offset.y)
 
-  doublenickel.ffi.set_camera(final_offset:unpack())
+  dn.unported.set_camera(final_offset:unpack())
 end
 
 function Camera:update_interpolation()
@@ -102,7 +102,7 @@ function Camera:update_zoom()
     end
   end
 
-  --doublenickel.ffi.set_zoom(self.zoom)
+  --dn.unported.set_zoom(self.zoom)
 end
 
 function Camera:update_sway()
@@ -110,8 +110,8 @@ function Camera:update_sway()
     local t = self.perlin.speed * doublenickel.elapsed_time
     local amp_max = self.perlin.amplitude
     local amp_min = self.perlin.amplitude * -1
-    local nx = dn.noise_perlin_scaled(t, 0, amp_min, amp_max)
-    local ny = dn.noise_perlin_scaled(0, t, amp_min, amp_max)
+    local nx = dn.ffi.noise_perlin_scaled(t, 0, amp_min, amp_max)
+    local ny = dn.ffi.noise_perlin_scaled(0, t, amp_min, amp_max)
 
     self.perlin.interpolation:update()
     local blend = self.perlin.interpolation:get_value()

@@ -1,11 +1,11 @@
 
 SdfRenderer = doublenickel.class.metatype('dn_sdf_renderer_t', 'dn_sdf')
 function SdfRenderer:init(params)
-	self = doublenickel.ffi.sdf_renderer_create(params.buffer_size)
+	self = dn.unported.sdf_renderer_create(params.buffer_size)
 end
 
 function SdfRenderer:oriented_box(params)
-	dn.sdf_oriented_box_ex(
+	dn.ffi.sdf_oriented_box_ex(
 		self,
 		params.position.x, params.position.y,
 		params.color.r, params.color.g, params.color.b, 
@@ -20,7 +20,7 @@ function SdfRenderer:foo(params)
 end
 
 function SdfRenderer:circle(params)
-	dn.sdf_circle_ex(
+	dn.ffi.sdf_circle_ex(
 		self,
 		params.position.x, params.position.y,
 		params.color.r, params.color.g, params.color.b, 

@@ -52,8 +52,8 @@ function EditorUtility:draw_pallette()
 
   local grid_cell = doublenickel.vec2(0, 1)
 
-  doublenickel.ffi.set_world_space(true)
-  doublenickel.ffi.set_layer(self.layers.pallette)
+  dn.unported.set_world_space(true)
+  dn.unported.set_layer(self.layers.pallette)
 
   for category, color_names in pairs(doublenickel.colors.pallette) do
     for _, color_name in pairs(color_names) do
@@ -70,7 +70,7 @@ function EditorUtility:draw_pallette()
         text_color = doublenickel.colors.black
       end
 
-      local label = dn.prepare_text_ex(color_name,
+      local label = dn.ffi.prepare_text_ex(color_name,
         0, 0,
         'merriweather-bold-32',
         0,
@@ -80,8 +80,8 @@ function EditorUtility:draw_pallette()
       label.position.x = position.x + (self.style.grid.size / 2)
       label.position.y = position.y - (self.style.grid.size - label.height) / 2
 
-      doublenickel.ffi.draw_quad(position.x, position.y, self.style.grid.size * 8, self.style.grid.size, color:to_vec4())
-      doublenickel.ffi.draw_prepared_text(label)
+      dn.unported.draw_quad(position.x, position.y, self.style.grid.size * 8, self.style.grid.size, color:to_vec4())
+      dn.unported.draw_prepared_text(label)
     end
     grid_cell.y = grid_cell.y + 1
   end
@@ -94,6 +94,7 @@ function EditorUtility:draw_grid()
   local line_thickness = 8
   local edge_thickness = 0
 
+  -- doublenickel.editor.find
   local sdf = doublenickel.editor.sdf
   -- local render_target = doublenickel.asset.find(DnRenderTargets.Editor)
   local render_target = { size = Vector2:new(1280, 960) }
@@ -242,24 +243,24 @@ function EditorUtility:plot_function(f, xmin, xmax, step, scale, color)
   scale = scale or 1
   color = color or self.colors.plot
 
-  doublenickel.ffi.set_world_space(true)
-  doublenickel.ffi.set_layer(self.layers.plot)
+  dn.unported.set_world_space(true)
+  dn.unported.set_layer(self.layers.plot)
 
   for x = xmin, xmax, step do
-    -- doublenickel.ffi.draw_circle(x * scale, f(x) * scale, self.style.plot.point_size, color:to_vec4())
-    doublenickel.ffi.draw_circle_sdf(x * scale, f(x) * scale, self.style.plot.point_size, color:to_vec4(), 2)
+    -- dn.unported.draw_circle(x * scale, f(x) * scale, self.style.plot.point_size, color:to_vec4())
+    dn.unported.draw_circle_sdf(x * scale, f(x) * scale, self.style.plot.point_size, color:to_vec4(), 2)
   end
 
-  doublenickel.ffi.set_layer(self.layers.plot + 1)
+  dn.unported.set_layer(self.layers.plot + 1)
 
   local x = doublenickel.math.clamp(self.input:mouse().x / scale, xmin, xmax)
-  doublenickel.ffi.draw_text_ex(
+  dn.unported.draw_text_ex(
     string.format('%.3f -> %.3f', x, f(x)), 
     x * scale, f(x) * scale, 
     doublenickel.colors.white:to_vec4(), 
     'editor-16', 
     0)
-  doublenickel.ffi.draw_circle_sdf(x * scale, f(x) * scale, self.style.plot.point_size * 1.5, doublenickel.colors.cardinal:to_vec4(), 2)
+  dn.unported.draw_circle_sdf(x * scale, f(x) * scale, self.style.plot.point_size * 1.5, doublenickel.colors.cardinal:to_vec4(), 2)
 
 end
 
@@ -281,22 +282,22 @@ function EditorUtility:plot_derivative(f, df, xmin, xmax, scale, color)
   local scaled_delta = delta:scale(scale):normalize():scale(self.style.plot.derivative_length)
   
   -- Draw it
-  doublenickel.ffi.set_world_space(true)
-  doublenickel.ffi.set_layer(self.layers.plot + 1)
+  dn.unported.set_world_space(true)
+  dn.unported.set_layer(self.layers.plot + 1)
 
-  doublenickel.ffi.draw_circle(scaled_point.x, scaled_point.y, self.style.plot.point_size * 4, color:to_vec4())
-  doublenickel.ffi.draw_line(
+  dn.unported.draw_circle(scaled_point.x, scaled_point.y, self.style.plot.point_size * 4, color:to_vec4())
+  dn.unported.draw_line(
     scaled_point.x - scaled_delta.x, scaled_point.y - scaled_delta.y,
     scaled_point.x + scaled_delta.x, scaled_point.y + scaled_delta.y,
     self.style.plot.derivative_width, 
     color:to_vec4())
 
-  local label = dn.prepare_text_ex(
+  local label = dn.ffi.prepare_text_ex(
     string.format('%.3f', delta.y / delta.x),
     scaled_point.x, scaled_point.y,
     'merriweather-bold-48',
     0,
     doublenickel.colors.white:to_vec4(), 
     true)
-  doublenickel.ffi.draw_prepared_text(label)
+  dn.unported.draw_prepared_text(label)
 end

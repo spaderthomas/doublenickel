@@ -1,4 +1,4 @@
-function doublenickel.ffi.namespaced_metatype(namespace, struct_name)
+function dn.ffi.namespaced_metatype(namespace, struct_name)
   ffi.metatype(struct_name, {
     __index = function(struct_instance, fn_name)
       return ffi.C[namespace .. '_' .. fn_name]
@@ -6,7 +6,7 @@ function doublenickel.ffi.namespaced_metatype(namespace, struct_name)
   })
 end
 
-function doublenickel.ffi.namespace(prefix)
+function dn.ffi.namespace(prefix)
   setmetatable(namespace, {
     __index = function(__namespace, fn_name)
       return ffi.C[prefix .. '_' .. fn_name]
@@ -15,22 +15,9 @@ function doublenickel.ffi.namespace(prefix)
   return namespace
 end
 
-function doublenickel.ffi.init()
+function dn.ffi.init()
   setmetatable(
-    doublenickel.ffi,
-    {
-      __index = function(self, key)
-        local wrapper = rawget(self, key)
-        if wrapper then return wrapper end
-
-        local found, value = pcall(function() return ffi.C[key] end)
-        if found then return value end
-      end
-    }
-  )
-
-  setmetatable(
-    dn,
+    dn.ffi,
     {
       __index = function(self, fn_name)
         return ffi.C['dn_' .. fn_name]
@@ -38,15 +25,15 @@ function doublenickel.ffi.init()
     }
   )
 
-  local string_metatable = {
-    __index = {
-      to_interned = function(self)
-        if doublenickel.ffi.is_nil(self.data) then dbg() end
-        return ffi.string(self.data, self.len)
-      end,
+  setmetatable(
+    dn.unported,
+    {
+      __index = function(self, fn_name)
+        dn.ffi.log('dn.unported.%s', fn_name)
+        return function() end
+      end
     }
-  }
-  -- ffi.metatype('dn_string_t', string_metatable)
+  )
 
   CType = doublenickel.enum.define(
     'ctype',
@@ -70,28 +57,28 @@ function doublenickel.ffi.init()
   Sdf = doublenickel.enum.define(
     'Sdf',
     {
-      Circle = doublenickel.ffi.DN_SDF_SHAPE_CIRCLE,
-      Ring = doublenickel.ffi.DN_SDF_SHAPE_RING,
-      Box = doublenickel.ffi.DN_SDF_SHAPE_BOX,
-      OrientedBox = doublenickel.ffi.DN_SDF_SHAPE_ORIENTED_BOX,
-      Combine = doublenickel.ffi.DN_SDF_SHAPE_COMBINE
+      Circle = ffi.C.DN_SDF_SHAPE_CIRCLE,
+      Ring = ffi.C.DN_SDF_SHAPE_RING,
+      Box = ffi.C.DN_SDF_SHAPE_BOX,
+      OrientedBox = ffi.C.DN_SDF_SHAPE_ORIENTED_BOX,
+      Combine = ffi.C.DN_SDF_SHAPE_COMBINE
     }
   )
 
   SdfCombineOp = doublenickel.enum.define(
     'SdfCombineOp',
     {
-      Union = doublenickel.ffi.DN_SDF_COMBINE_OP_UNION,
-      Intersection = doublenickel.ffi.DN_SDF_COMBINE_OP_INTERSECTION,
-      Subtraction = doublenickel.ffi.DN_SDF_COMBINE_OP_SUBTRACTION,
+      Union = ffi.C.DN_SDF_COMBINE_OP_UNION,
+      Intersection = ffi.C.DN_SDF_COMBINE_OP_INTERSECTION,
+      Subtraction = ffi.C.DN_SDF_COMBINE_OP_SUBTRACTION,
     }
   )
 
   SdfSmoothingKernel = doublenickel.enum.define(
     'SdfSmoothingKernel',
     {
-      None = doublenickel.ffi.DN_SDF_SMOOTH_KERNEL_NONE,
-      PolynomialQuadratic = doublenickel.ffi.DN_SDF_SMOOTH_KERNEL_POLYNOMIAL_QUADRATIC,
+      None = ffi.C.DN_SDF_SMOOTH_KERNEL_NONE,
+      PolynomialQuadratic = ffi.C.DN_SDF_SMOOTH_KERNEL_POLYNOMIAL_QUADRATIC,
     }
   )
 
@@ -99,10 +86,10 @@ function doublenickel.ffi.init()
   CoordinateSystem = doublenickel.enum.define(
     'CoordinateSystem',
     {
-      World = doublenickel.ffi.DN_COORD_UNIT_WORLD,
-      Screen = doublenickel.ffi.DN_COORD_UNIT_SCREEN,
-      Window = doublenickel.ffi.DN_COORD_UNIT_WINDOW,
-      Game = doublenickel.ffi.DN_COORD_UNIT_GAME,
+      World = ffi.C.DN_COORD_UNIT_WORLD,
+      Screen = ffi.C.DN_COORD_UNIT_SCREEN,
+      Window = ffi.C.DN_COORD_UNIT_WINDOW,
+      Game = ffi.C.DN_COORD_UNIT_GAME,
     }
   )
 
@@ -114,74 +101,64 @@ function doublenickel.ffi.init()
     }
   )
 
-  ParticleKind = doublenickel.enum.define(
-    'ParticleKind',
-    {
-      Quad = doublenickel.ffi.ParticleKind_Quad,
-      Circle = doublenickel.ffi.ParticleKind_Circle,
-      Image = doublenickel.ffi.ParticleKind_Image,
-      Invalid = doublenickel.ffi.ParticleKind_Invalid,
-    }
-  )
-
   WindowFlags = doublenickel.enum.define(
     'WindowFlags',
     {
-      None = doublenickel.ffi.DN_WINDOW_FLAG_NONE,
-      Windowed = doublenickel.ffi.DN_WINDOW_FLAG_WINDOWED,
-      Border = doublenickel.ffi.DN_WINDOW_FLAG_BORDER,
-      Vsync = doublenickel.ffi.DN_WINDOW_FLAG_VSYNC,
+      None = ffi.C.DN_WINDOW_FLAG_NONE,
+      Windowed = ffi.C.DN_WINDOW_FLAG_WINDOWED,
+      Border = ffi.C.DN_WINDOW_FLAG_BORDER,
+      Vsync = ffi.C.DN_WINDOW_FLAG_VSYNC,
     }
   )
 
   GpuResourceId = doublenickel.enum.define(
     'GpuResourceId',
     {
-      Framebuffer = doublenickel.ffi.DN_GPU_RESOURCE_FRAMEBUFFER,
-      Shader = doublenickel.ffi.DN_GPU_RESOURCE_SHADER,
-      Program = doublenickel.ffi.DN_GPU_RESOURCE_PROGRAM,
+      Framebuffer = ffi.C.DN_GPU_RESOURCE_FRAMEBUFFER,
+      Shader = ffi.C.DN_GPU_RESOURCE_SHADER,
+      Program = ffi.C.DN_GPU_RESOURCE_PROGRAM,
     }
   )
 
   GpuShaderKind = doublenickel.enum.define(
     'GpuShaderKind',
     {
-      Graphics = doublenickel.ffi.DN_GPU_SHADER_GRAPHICS,
-      Compute = doublenickel.ffi.DN_GPU_SHADER_COMPUTE,
+      Graphics = ffi.C.DN_GPU_SHADER_GRAPHICS,
+      Compute = ffi.C.DN_GPU_SHADER_COMPUTE,
     }
   )
 
   GpuDrawMode = doublenickel.enum.define(
     'GpuDrawMode',
     {
-      Arrays = doublenickel.ffi.DN_GPU_DRAW_MODE_ARRAYS,
-      Instance = doublenickel.ffi.DN_GPU_DRAW_MODE_INSTANCE,
+      Arrays = ffi.C.DN_GPU_DRAW_MODE_ARRAYS,
+      Instance = ffi.C.DN_GPU_DRAW_MODE_INSTANCE,
     }
   )
 
   GpuDrawPrimitive = doublenickel.enum.define(
     'GpuDrawPrimitive',
     {
-      Triangles = doublenickel.ffi.DN_GPU_PRIMITIVE_TRIANGLES,
+      Triangles = ffi.C.DN_GPU_PRIMITIVE_TRIANGLES,
     }
   )
 
   GpuVertexAttributeKind = doublenickel.enum.define(
     'GpuVertexAttributeKind',
     {
-      Float = doublenickel.ffi.DN_GPU_VERTEX_ATTRIBUTE_FLOAT,
-      U32 = doublenickel.ffi.DN_GPU_VERTEX_ATTRIBUTE_U32,
+      Float = ffi.C.DN_GPU_VERTEX_ATTRIBUTE_FLOAT,
+      U32 = ffi.C.DN_GPU_VERTEX_ATTRIBUTE_U32,
     }
   )
 
   GpuBlendFunction = doublenickel.enum.define(
     'GpuBlendFunction',
     {
-      Add = doublenickel.ffi.DN_GPU_BLEND_FUNC_ADD,
-      Subtract = doublenickel.ffi.DN_GPU_BLEND_FUNC_SUBTRACT,
-      ReverseSubtract = doublenickel.ffi.DN_GPU_BLEND_FUNC_REVERSE_SUBTRACT,
-      Min = doublenickel.ffi.DN_GPU_BLEND_FUNC_MIN,
-      Max = doublenickel.ffi.DN_GPU_BLEND_FUNC_MAX,
+      Add = ffi.C.DN_GPU_BLEND_FUNC_ADD,
+      Subtract = ffi.C.DN_GPU_BLEND_FUNC_SUBTRACT,
+      ReverseSubtract = ffi.C.DN_GPU_BLEND_FUNC_REVERSE_SUBTRACT,
+      Min = ffi.C.DN_GPU_BLEND_FUNC_MIN,
+      Max = ffi.C.DN_GPU_BLEND_FUNC_MAX,
 
     }
   )
@@ -189,17 +166,17 @@ function doublenickel.ffi.init()
   GpuUniformKind = doublenickel.enum.define(
     'GpuUniformKind',
     {
-      None =    doublenickel.ffi.DN_GPU_UNIFORM_NONE,
-      Matrix4 = doublenickel.ffi.DN_GPU_UNIFORM_MATRIX4,
-      Matrix3 = doublenickel.ffi.DN_GPU_UNIFORM_MATRIX3,
-      Matrix2 = doublenickel.ffi.DN_GPU_UNIFORM_MATRIX2,
-      Vector4 = doublenickel.ffi.DN_GPU_UNIFORM_VECTOR4,
-      Vector3 = doublenickel.ffi.DN_GPU_UNIFORM_VECTOR3,
-      Vector2 = doublenickel.ffi.DN_GPU_UNIFORM_VECTOR2,
-      F32 =     doublenickel.ffi.DN_GPU_UNIFORM_F32,
-      I32 =     doublenickel.ffi.DN_GPU_UNIFORM_I32,
-      Texture = doublenickel.ffi.DN_GPU_UNIFORM_TEXTURE,
-      Enum =    doublenickel.ffi.DN_GPU_UNIFORM_ENUM,
+      None =    ffi.C.DN_GPU_UNIFORM_NONE,
+      Matrix4 = ffi.C.DN_GPU_UNIFORM_MATRIX4,
+      Matrix3 = ffi.C.DN_GPU_UNIFORM_MATRIX3,
+      Matrix2 = ffi.C.DN_GPU_UNIFORM_MATRIX2,
+      Vector4 = ffi.C.DN_GPU_UNIFORM_VECTOR4,
+      Vector3 = ffi.C.DN_GPU_UNIFORM_VECTOR3,
+      Vector2 = ffi.C.DN_GPU_UNIFORM_VECTOR2,
+      F32 =     ffi.C.DN_GPU_UNIFORM_F32,
+      I32 =     ffi.C.DN_GPU_UNIFORM_I32,
+      Texture = ffi.C.DN_GPU_UNIFORM_TEXTURE,
+      Enum =    ffi.C.DN_GPU_UNIFORM_ENUM,
     }
   )
 
@@ -207,41 +184,41 @@ function doublenickel.ffi.init()
   GpuBufferUsage = doublenickel.enum.define(
     'GpuBufferUsage',
     {
-      Static =  doublenickel.ffi.DN_GPU_BUFFER_USAGE_STATIC,
-      Dynamic = doublenickel.ffi.DN_GPU_BUFFER_USAGE_DYNAMIC,
-      Stream =  doublenickel.ffi.DN_GPU_BUFFER_USAGE_STREAM,
+      Static =  ffi.C.DN_GPU_BUFFER_USAGE_STATIC,
+      Dynamic = ffi.C.DN_GPU_BUFFER_USAGE_DYNAMIC,
+      Stream =  ffi.C.DN_GPU_BUFFER_USAGE_STREAM,
     }
   )
 
   GpuBufferKind = doublenickel.enum.define(
     'GpuBufferKind',
     {
-      Storage = doublenickel.ffi.DN_GPU_BUFFER_KIND_STORAGE,
-      Array = doublenickel.ffi.DN_GPU_BUFFER_KIND_ARRAY,
+      Storage = ffi.C.DN_GPU_BUFFER_KIND_STORAGE,
+      Array = ffi.C.DN_GPU_BUFFER_KIND_ARRAY,
     }
   )
 
   UniformKind = doublenickel.enum.define(
     'UniformKind',
     {
-      Matrix4        = doublenickel.ffi.DN_GPU_UNIFORM_MATRIX4,
-      Matrix3        = doublenickel.ffi.DN_GPU_UNIFORM_MATRIX3,
-      Matrix2        = doublenickel.ffi.DN_GPU_UNIFORM_MATRIX2,
-      Vector4        = doublenickel.ffi.DN_GPU_UNIFORM_VECTOR4,
-      Vector3        = doublenickel.ffi.DN_GPU_UNIFORM_VECTOR3,
-      Vector2        = doublenickel.ffi.DN_GPU_UNIFORM_VECTOR2,
-      F32            = doublenickel.ffi.DN_GPU_UNIFORM_F32,
-      I32            = doublenickel.ffi.DN_GPU_UNIFORM_I32,
-      Texture        = doublenickel.ffi.DN_GPU_UNIFORM_TEXTURE,
-      Enum = doublenickel.ffi.DN_GPU_UNIFORM_ENUM,
+      Matrix4        = ffi.C.DN_GPU_UNIFORM_MATRIX4,
+      Matrix3        = ffi.C.DN_GPU_UNIFORM_MATRIX3,
+      Matrix2        = ffi.C.DN_GPU_UNIFORM_MATRIX2,
+      Vector4        = ffi.C.DN_GPU_UNIFORM_VECTOR4,
+      Vector3        = ffi.C.DN_GPU_UNIFORM_VECTOR3,
+      Vector2        = ffi.C.DN_GPU_UNIFORM_VECTOR2,
+      F32            = ffi.C.DN_GPU_UNIFORM_F32,
+      I32            = ffi.C.DN_GPU_UNIFORM_I32,
+      Texture        = ffi.C.DN_GPU_UNIFORM_TEXTURE,
+      Enum = ffi.C.DN_GPU_UNIFORM_ENUM,
     }
   )
 
   GpuMemoryBarrier = doublenickel.enum.define(
     'GpuMemoryBarrier',
     {
-      ShaderStorage = doublenickel.ffi.DN_GPU_MEMORY_BARRIER_STORAGE,
-      BufferUpdate = doublenickel.ffi.DN_GPU_MEMORY_BARRIER_BUFFER_UPDATE,
+      ShaderStorage = ffi.C.DN_GPU_MEMORY_BARRIER_STORAGE,
+      BufferUpdate = ffi.C.DN_GPU_MEMORY_BARRIER_BUFFER_UPDATE,
     }
   )
 
@@ -261,8 +238,8 @@ function doublenickel.ffi.init()
   GpuLoadOp = doublenickel.enum.define(
     'GpuLoadOp',
     {
-      None = doublenickel.ffi.DN_GPU_LOAD_OP_NONE,
-      Clear = doublenickel.ffi.DN_GPU_LOAD_OP_CLEAR,
+      None = ffi.C.DN_GPU_LOAD_OP_NONE,
+      Clear = ffi.C.DN_GPU_LOAD_OP_CLEAR,
     }
   )
 
@@ -278,18 +255,18 @@ end
 -- ██╔══██╗██╔══╝  ██╔══╝  ██║     ██╔══╝  ██║        ██║   ██║██║   ██║██║╚██╗██║
 -- ██║  ██║███████╗██║     ███████╗███████╗╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║
 -- ╚═╝  ╚═╝╚══════╝╚═╝     ╚══════╝╚══════╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
-function doublenickel.ffi.is_nil(cdata)
+function dn.reflection.is_nil(cdata)
   return cdata == nil
 end
 
-function doublenickel.ffi.field_ptr(cdata, member)
-  local inner_type = doublenickel.ffi.inner_type(member)
-  local type_name = doublenickel.ffi.type_name(inner_type)
+function dn.reflection.field_ptr(cdata, member)
+  local inner_type = dn.reflection.inner_type(member)
+  local type_name = dn.reflection.type_name(inner_type)
   local byte_ptr = ffi.cast('u8*', cdata)
   return ffi.cast(type_name .. '*', byte_ptr + member.offset)
 end
 
-function doublenickel.ffi.type_name(inner_type)
+function dn.reflection.type_name(inner_type)
   local ctype = doublenickel.enums.ctype
 
   local type_name = inner_type.what
@@ -328,7 +305,7 @@ function doublenickel.ffi.type_name(inner_type)
   return type_name
 end
 
-function doublenickel.ffi.imgui_datatype(inner_type)
+function dn.reflection.imgui_datatype(inner_type)
   local ctype = doublenickel.enums.ctype
 
   local type_name = inner_type.what
@@ -365,14 +342,14 @@ function doublenickel.ffi.imgui_datatype(inner_type)
   return type_name
 end
 
-function doublenickel.ffi.imgui_datatypeof(cdata)
-  return doublenickel.ffi.imgui_datatype(doublenickel.ffi.inner_typeof(cdata))
+function dn.reflection.imgui_datatypeof(cdata)
+  return dn.reflection.imgui_datatype(dn.reflection.inner_typeof(cdata))
 end
 
-function doublenickel.ffi.pretty_type(type_info)
+function dn.reflection.pretty_type(type_info)
   local ctype = doublenickel.enums.ctype
 
-  local inner_type = doublenickel.ffi.inner_type(type_info)
+  local inner_type = dn.reflection.inner_type(type_info)
 
   -- p(type_info)
   local type_name = inner_type.what
@@ -422,32 +399,32 @@ function doublenickel.ffi.pretty_type(type_info)
 
 end
 
-function doublenickel.ffi.pretty_typeof(cdata)
-  return doublenickel.ffi.pretty_type(doublenickel.ffi.typeof(cdata))
+function dn.reflection.pretty_typeof(cdata)
+  return dn.reflection.pretty_type(dn.reflection.typeof(cdata))
 end
 
-function doublenickel.ffi.pretty_ptr(type_info)
-  return string.format('%s*', doublenickel.ffi.pretty_type(type_info))
+function dn.reflection.pretty_ptr(type_info)
+  return string.format('%s*', dn.reflection.pretty_type(type_info))
 end
 
-function doublenickel.ffi.pretty_ptrof(cdata)
-  return string.format('%s*', doublenickel.ffi.pretty_type(doublenickel.ffi.typeof(cdata)))
+function dn.reflection.pretty_ptrof(cdata)
+  return string.format('%s*', dn.reflection.pretty_type(dn.reflection.typeof(cdata)))
 end
 
-function doublenickel.ffi.address_of(cdata)
+function dn.reflection.address_of(cdata)
   -- Not for actual addressing; just for printing
   local s = tostring(cdata)
   local parts = s:split(':')
   return parts[2]:gsub(' ', '')
 end
 
-function doublenickel.ffi.is_composite_type(type_info)
+function dn.reflection.is_composite_type(type_info)
   return
     doublenickel.enums.ctype.struct:match(type_info.what) or
     doublenickel.enums.ctype.array:match(type_info.what)
 end
 
-function doublenickel.ffi.sorted_members(type_info)
+function dn.reflection.sorted_members(type_info)
   local members = {}
   for member in type_info:members() do
     table.insert(members, member)
@@ -457,8 +434,8 @@ function doublenickel.ffi.sorted_members(type_info)
     local A_FIRST = true
     local B_FIRST = false
 
-    local is_a_composite = doublenickel.ffi.is_composite_type(a)
-    local is_b_composite = doublenickel.ffi.is_composite_type(b)
+    local is_a_composite = dn.reflection.is_composite_type(a)
+    local is_b_composite = dn.reflection.is_composite_type(b)
 
     if is_a_composite and not is_b_composite then
       return A_FIRST
@@ -472,15 +449,15 @@ function doublenickel.ffi.sorted_members(type_info)
   return doublenickel.iterator.values(members)
 end
 
-function doublenickel.ffi.typeof(cdata)
+function dn.reflection.typeof(cdata)
   return reflect.typeof(cdata)
 end
 
-function doublenickel.ffi.inner_typeof(cdata)
-  return doublenickel.ffi.inner_type(reflect.typeof(cdata))
+function dn.reflection.inner_typeof(cdata)
+  return dn.reflection.inner_type(reflect.typeof(cdata))
 end
 
-function doublenickel.ffi.inner_type(type_info)
+function dn.reflection.inner_type(type_info)
   local ctype = doublenickel.enums.ctype
 
   if ctype.ref:match(type_info.what) then
@@ -488,7 +465,7 @@ function doublenickel.ffi.inner_type(type_info)
   elseif ctype.ptr:match(type_info.what) then
     type_info = type_info.element_type
   elseif ctype.field:match(type_info.what) then
-    type_info = doublenickel.ffi.inner_type(type_info.type)
+    type_info = dn.reflection.inner_type(type_info.type)
   elseif ctype.enum:match(type_info.what) then
     type_info = type_info.type
   end
@@ -496,11 +473,11 @@ function doublenickel.ffi.inner_type(type_info)
   return type_info
 end
 
-function doublenickel.ffi.is_opaque(cdata)
-  return doublenickel.ffi.inner_typeof(cdata).size == 'none'
+function dn.reflection.is_opaque(cdata)
+  return dn.reflection.inner_typeof(cdata).size == 'none'
 end
 
-function doublenickel.ffi.ptr_type(ctype)
+function dn.reflection.ptr_type(ctype)
   return string.format('%s *', ctype)
 end
 
@@ -516,13 +493,13 @@ end
 ------------
 -- STRING --
 ------------
-dn.String = doublenickel.class.metatype('dn_string_t')
-function dn.String:init(path)
+String = doublenickel.class.metatype('dn_string_t')
+function String:init(path)
   self.data = ffi.cast('u8*', path)
   self.len = #path
 end
 
-function dn.String:to_interned()
+function String:to_interned()
   return ffi.string(self.data, self.len)
 end
 
@@ -533,25 +510,25 @@ end
 dn_allocator_t = doublenickel.class.metatype('dn_allocator_t')
 
 function dn_allocator_t:find(name)
-  return dn.allocator_find(name)
+  return dn.ffi.allocator_find(name)
 end
 
 function dn_allocator_t:add(name)
-  return dn.allocator_add(self, name)
+  return dn.ffi.allocator_add(self, name)
 end
 
 function dn_allocator_t:alloc(size)
-  return dn.allocator_alloc(self, size)
+  return dn.ffi.allocator_alloc(self, size)
 end
 
 function dn_allocator_t:free(pointer)
-  return dn.allocator_free(self, pointer)
+  return dn.ffi.allocator_free(self, pointer)
 end
 
 function dn_allocator_t:alloc_array(ctype, n)
   return ffi.cast(
-    doublenickel.ffi.ptr_type(ctype), 
-    dn.allocator_alloc(self, ffi.sizeof(ctype) * n)
+    dn.reflection.ptr_type(ctype), 
+    dn.ffi.allocator_alloc(self, ffi.sizeof(ctype) * n)
   )
 end
 
@@ -713,7 +690,7 @@ end
 
 function BackedGpuBuffer:owned(ctype, capacity, gpu_buffer_descriptor)
   gpu_buffer_descriptor.size = ffi.sizeof(ctype) * capacity
-  return BackedGpuBuffer:new(ctype, capacity, doublenickel.ffi.gpu_buffer_create(gpu_buffer_descriptor))
+  return BackedGpuBuffer:new(ctype, capacity, dn.ffi.gpu_buffer_create(gpu_buffer_descriptor))
 end
 
 function BackedGpuBuffer:fast_clear()
@@ -729,7 +706,7 @@ function BackedGpuBuffer:size()
 end
 
 function BackedGpuBuffer:sync()
-  doublenickel.ffi.gpu_buffer_sync_subdata(
+  dn.ffi.gpu_buffer_sync_subdata(
     self.gpu_buffer:to_ctype(), self.cpu_buffer.data,
     ffi.sizeof(self.ctype) * self.cpu_buffer.size,
     0)
@@ -744,7 +721,7 @@ GpuBuffer = doublenickel.class.define('GpuBuffer')
 function GpuBuffer:init(ctype, capacity, gpu_buffer)
   self.ctype = ctype
   self.capacity = capacity
-  self.buffer = gpu_buffer or doublenickel.ffi.gpu_buffer_create(GpuBufferDescriptor:new({
+  self.buffer = gpu_buffer or dn.ffi.gpu_buffer_create(GpuBufferDescriptor:new({
     kind = GpuBufferKind.Storage,
     usage = GpuBufferUsage.Static,
     size = ffi.sizeof(ctype) * capacity
@@ -756,11 +733,11 @@ function GpuBuffer:to_ctype()
 end
 
 function GpuBuffer:zero()
-  doublenickel.ffi.gpu_buffer_zero(self.buffer, self.capacity * ffi.sizeof(self.ctype))
+  dn.ffi.gpu_buffer_zero(self.buffer, self.capacity * ffi.sizeof(self.ctype))
 end
 
 function GpuBuffer:bind_base(base)
-  doublenickel.ffi.gpu_buffer_bind_base(self.buffer, base)
+  dn.ffi.gpu_buffer_bind_base(self.buffer, base)
 end
 
 
@@ -824,7 +801,7 @@ end
 
 GpuBufferLayout = doublenickel.class.metatype('dn_gpu_buffer_layout_t')
 function GpuBufferLayout:init(params)
-  local allocator = dn.allocator_find('standard')
+  local allocator = dn.ffi.allocator_find('standard')
 
   self.num_vertex_attributes = #params.vertex_attributes
   self.vertex_attributes = allocator:alloc_array('dn_gpu_vertex_attribute_t', self.num_vertex_attributes)
@@ -841,7 +818,7 @@ end
 
 GpuPipelineDescriptor = doublenickel.class.metatype('dn_gpu_pipeline_descriptor_t')
 function GpuPipelineDescriptor:init(params)
-  local allocator = dn.allocator_find('standard')
+  local allocator = dn.ffi.allocator_find('standard')
 
   self.raster = dn_gpu_raster_state_t:new(params.raster)
 
@@ -859,7 +836,7 @@ function GpuRenderPass:init(params)
     self.color.attachment = doublenickel.asset.find(params.color.attachment)
     self.color.load = doublenickel.enum.load(params.color.load):to_number()
 
-    doublenickel.debug.assert(not doublenickel.ffi.is_nil(self.color.attachment))
+    doublenickel.debug.assert(not dn.reflection.is_nil(self.color.attachment))
   end
 end
 
@@ -903,7 +880,7 @@ end
 
 GpuBufferBinding = doublenickel.class.metatype('dn_gpu_buffer_binding_t')
 function GpuBufferBinding:init(params)
-  local allocator = dn.allocator_find('standard')
+  local allocator = dn.ffi.allocator_find('standard')
 
   if params.vertex then
     self.vertex.count = #params.vertex
@@ -937,8 +914,8 @@ end
 -- ██╔══╝  ██╔══╝  ██║    ██║███╗██║██╔══██╗██╔══██║██╔═══╝ ██╔═══╝ ██╔══╝  ██╔══██╗╚════██║
 -- ██║     ██║     ██║    ╚███╔███╔╝██║  ██║██║  ██║██║     ██║     ███████╗██║  ██║███████║
 -- ╚═╝     ╚═╝     ╚═╝     ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝     ╚══════╝╚═╝  ╚═╝╚══════╝
-function dn.log(fmt, ...)
-  return ffi.C.dn_log_str(dn.String:new(string.format(fmt, ...)))
+function dn.ffi.log(fmt, ...)
+  return ffi.C.dn_log_str(String:new(string.format(fmt, ...)))
 end
 
 local DN_COLOR_GRAY = string.char(27) .. "[90m"
@@ -947,113 +924,113 @@ local DN_COLOR_BLUE = string.char(27) .. "[94m"
 local DN_COLOR_YELLOW = string.char(27) .. "[33m"
 local DN_COLOR_RESET = string.char(27) .. "[0m"
 
-function dn.warn(tag, fmt, ...)
-  dn.log_colored(DN_COLOR_YELLOW, tag, fmt, ...)
+function dn.ffi.warn(tag, fmt, ...)
+  dn.ffi.log_colored(DN_COLOR_YELLOW, tag, fmt, ...)
 end
 
-function dn.trace(tag, fmt, ...)
+function dn.ffi.trace(tag, fmt, ...)
   if not trace_enabled then return end
-  dn.log_colored(DN_COLOR_GRAY, tag, fmt, ...)
+  dn.ffi.log_colored(DN_COLOR_GRAY, tag, fmt, ...)
 end
 
-function dn.log_colored(color, tag, fmt, ...)
+function dn.ffi.log_colored(color, tag, fmt, ...)
   if fmt then
     local message = string.format(fmt, ...)
     message = string.format('[%s%s%s] %s', color, tag, DN_COLOR_RESET, message)
-    dn.log(message)
+    dn.ffi.log(message)
   else
     local message = string.format('[%s%s%s]', color, tag, DN_COLOR_RESET)
-    dn.log(message)
+    dn.ffi.log(message)
   end
 end
 
-function dn.time_metrics_add(name)
-    return ffi.C.dn_time_metrics_add(dn.String:new(name))
+function dn.ffi.time_metrics_add(name)
+    return ffi.C.dn_time_metrics_add(String:new(name))
 end
 
-function dn.paths_resolve(name)
-  return ffi.C.dn_paths_resolve(dn.String:new(name)):to_interned()
+function dn.ffi.paths_resolve(name)
+  return ffi.C.dn_paths_resolve(String:new(name)):to_interned()
 end
 
-function dn.paths_resolve_format(name, file_name)
-  return ffi.C.dn_paths_resolve_format(dn.String:new(name), dn.String:new(file_name)):to_interned()
+function dn.ffi.paths_resolve_format(name, file_name)
+  return ffi.C.dn_paths_resolve_format(String:new(name), String:new(file_name)):to_interned()
 end
 
-function dn.paths_add_subpath(name, parent_name, relative_path)
-  return ffi.C.dn_paths_add_subpath(dn.String:new(name), dn.String:new(parent_name), dn.String:new(relative_path))
+function dn.ffi.paths_add_subpath(name, parent_name, relative_path)
+  return ffi.C.dn_paths_add_subpath(String:new(name), String:new(parent_name), String:new(relative_path))
 end
 
-function dn.os_scan_directory(path)
-  return ffi.C.dn_os_scan_directory(dn.String:new(path))
+function dn.ffi.os_scan_directory(path)
+  return ffi.C.dn_os_scan_directory(String:new(path))
 end
 
-function dn.os_scan_directory_recursive(path)
-  return ffi.C.dn_os_scan_directory_recursive(dn.String:new(path))
+function dn.ffi.os_scan_directory_recursive(path)
+  return ffi.C.dn_os_scan_directory_recursive(String:new(path))
 end
 
-function dn.os_does_path_exist(path)
-  return ffi.C.dn_os_does_path_exist(dn.String:new(path))
+function dn.ffi.os_does_path_exist(path)
+  return ffi.C.dn_os_does_path_exist(String:new(path))
 end
 
-function dn.os_is_regular_file(path)
-  return ffi.C.dn_os_is_regular_file(dn.String:new(path))
+function dn.ffi.os_is_regular_file(path)
+  return ffi.C.dn_os_is_regular_file(String:new(path))
 end
 
-function dn.os_is_directory(path)
-  return ffi.C.dn_os_is_directory(dn.String:new(path))
+function dn.ffi.os_is_directory(path)
+  return ffi.C.dn_os_is_directory(String:new(path))
 end
 
-function dn.os_create_directory(path)
-  return ffi.C.dn_os_create_directory(dn.String:new(path))
+function dn.ffi.os_create_directory(path)
+  return ffi.C.dn_os_create_directory(String:new(path))
 end
 
-function dn.os_remove_directory(path)
-  return ffi.C.dn_os_remove_directory(dn.String:new(path))
+function dn.ffi.os_remove_directory(path)
+  return ffi.C.dn_os_remove_directory(String:new(path))
 end
 
-function dn.os_create_file(path)
-  return ffi.C.dn_os_create_file(dn.String:new(path))
+function dn.ffi.os_create_file(path)
+  return ffi.C.dn_os_create_file(String:new(path))
 end
 
-function dn.os_remove_file(path)
-  return ffi.C.dn_os_remove_file(dn.String:new(path))
+function dn.ffi.os_remove_file(path)
+  return ffi.C.dn_os_remove_file(String:new(path))
 end
 
-function dn.os_file_mod_time(path)
-  return ffi.C.dn_os_file_mod_time(dn.String:new(path))
+function dn.ffi.os_file_mod_time(path)
+  return ffi.C.dn_os_file_mod_time(String:new(path))
 end
 
-function dn.window_get_display_mode()
+function dn.ffi.window_get_display_mode()
   return doublenickel.enums.DisplayMode(ffi.C.dn_window_get_display_mode())
 end
 
-function dn.imgui_load_layout(name)
-  ffi.C.dn_imgui_load_layout(dn.String:new(name))
+function dn.ffi.imgui_load_layout(name)
+  ffi.C.dn_imgui_load_layout(String:new(name))
 end
 
-function dn.imgui_save_layout(name)
-  ffi.C.dn_imgui_save_layout(dn.String:new(name))
+function dn.ffi.imgui_save_layout(name)
+  ffi.C.dn_imgui_save_layout(String:new(name))
 end
 
-function dn.app_configure(config)
+function dn.ffi.app_configure(config)
   config:apply()
 end
 
-function dn.asset_registry_find(name)
-  return ffi.C.dn_asset_registry_find(dn.String:new(name))
+function dn.ffi.asset_registry_find(name)
+  return ffi.C.dn_asset_registry_find(String:new(name))
 end
 
-function doublenickel.ffi.set_camera()
+function dn.ffi.set_camera()
 end
 
-function doublenickel.ffi.push_fullscreen_quad()
+function dn.ffi.push_fullscreen_quad()
   local n = ffi.C.dn_window_get_native_resolution()
   local uvs = nil
   local opacity = 1.0
   ffi.C.push_quad(0, n.y, n.x, n.y, uvs, opacity);
 end
 
-function dn.gpu_begin_render_pass(command_buffer, render_pass)
-  dn.trace('dn.gpu.begin_render_pass')
+function dn.ffi.gpu_begin_render_pass(command_buffer, render_pass)
+  dn.ffi.trace('dn.ffi.gpu.begin_render_pass')
   ffi.C.dn_gpu_begin_render_pass(command_buffer, render_pass)
 end

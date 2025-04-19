@@ -59,7 +59,7 @@ function App:on_init_game()
     target_fps = 144,
     -- WINDOW
     --
-    -- This is the first time that dn.paths_resolve_*() shows up. This subsystem of doublenickel is how you should deal
+    -- This is the first time that dn.ffi.paths_resolve_*() shows up. This subsystem of doublenickel is how you should deal
     -- with all paths in your game. It builds absolute paths to resources at runtime. It can also handle format strings,
     -- for e.g. a specific audio file in the well-known audio directory.
     --
@@ -73,7 +73,7 @@ function App:on_init_game()
         doublenickel.enums.WindowFlags.Windowed,
         doublenickel.enums.WindowFlags.Border
       ),
-      icon = dn.paths_resolve_format('dn_image', 'logo/icon.png'),
+      icon = dn.ffi.paths_resolve_format('dn_image', 'logo/icon.png'),
     }),
 
     -- AUDIO
@@ -82,7 +82,7 @@ function App:on_init_game()
     -- them into memory.
     audio = AudioConfig:new({
       dirs = {
-        dn.paths_resolve('audio')
+        dn.ffi.paths_resolve('audio')
       },
     }),
 
@@ -93,7 +93,7 @@ function App:on_init_game()
       fonts = {
         {
           id = Font.Tiny5,
-          file_path = dn.paths_resolve_format('font', 'Tiny5-Regular.ttf'),
+          file_path = dn.ffi.paths_resolve_format('font', 'Tiny5-Regular.ttf'),
           sizes = { 16, 24, 32 },
           imgui = false
         },
@@ -106,16 +106,16 @@ function App:on_init_game()
     -- isn't used to locate shaders (since, remember, everything is an absolute path). Rather, it's a directory for
     -- a file monitor to watch. When files change in this directory, your shaders will be hotloaded.
     gpu = GpuConfig:new({
-      shader_path = dn.paths_resolve('shaders'),
+      shader_path = dn.ffi.paths_resolve('shaders'),
       search_paths = {
-          dn.paths_resolve('shader_includes')
+          dn.ffi.paths_resolve('shader_includes')
       },
       shaders = {
         {
           name = Shader.Sample,
           kind = GpuShaderKind.Graphics,
-          vertex_shader = dn.paths_resolve_format('shader', 'shader.vertex'),
-          fragment_shader = dn.paths_resolve_format('shader', 'shader.fragment'),
+          vertex_shader = dn.ffi.paths_resolve_format('shader', 'shader.vertex'),
+          fragment_shader = dn.ffi.paths_resolve_format('shader', 'shader.fragment'),
         }
       },
       render_targets = {
@@ -142,13 +142,13 @@ function App:on_init_game()
     -- A list of directories from which images will be loaded and packed into texture atlases.
     image = ImageConfig:new({
       dirs = {
-        dn.paths_resolve('images')
+        dn.ffi.paths_resolve('images')
       },
     }),
   })
 
   -- With our configuration done, we can call into C to initialize the framework. This is the thrust of initialization.
-  dn.app_configure(dn_config)
+  dn.ffi.app_configure(dn_config)
 
 
   -----------------------
@@ -166,10 +166,10 @@ function App:on_init_game()
   -- The framework provides a pre-configured SDF renderer for drawing primitives. It works immediate mode; it owns a CPU buffer,
   -- which it syncs to the GPU every frame, and it builds a dn_gpu_pipeline_t with default shaders.
   self.sdf_renderer = ffi.new('dn_sdf_renderer_t [1]');
-  self.sdf_renderer = dn.sdf_renderer_create(1024 * 1024)
+  self.sdf_renderer = dn.ffi.sdf_renderer_create(1024 * 1024)
 
   -- Every app needs a command buffer to write GPU commands into.
-  self.command_buffer = dn.gpu_command_buffer_create(GpuCommandBufferDescriptor:new({
+  self.command_buffer = dn.ffi.gpu_command_buffer_create(GpuCommandBufferDescriptor:new({
     max_commands = 1024
   }))
 
@@ -225,14 +225,14 @@ end
 --
 -- This is where I do post processing and compositing.
 function App:on_scene_rendered()
-  -- dn.gpu_begin_render_pass(self.command_buffer, self.render_pass)
-  -- dn.gpu_set_world_space(self.command_buffer, true)
-  -- dn.gpu_set_camera(self.command_buffer, doublenickel.editor.find('EditorCamera').offset:to_ctype())
-  -- dn.sdf_renderer_draw(self.sdf_renderer, self.command_buffer)
-  -- dn.gpu_end_render_pass(self.command_buffer)
-  -- dn.gpu_command_buffer_submit(self.command_buffer)
+  -- dn.ffi.gpu_begin_render_pass(self.command_buffer, self.render_pass)
+  -- dn.ffi.gpu_set_world_space(self.command_buffer, true)
+  -- dn.ffi.gpu_set_camera(self.command_buffer, doublenickel.editor.find('EditorCamera').offset:to_ctype())
+  -- dn.ffi.sdf_renderer_draw(self.sdf_renderer, self.command_buffer)
+  -- dn.ffi.gpu_end_render_pass(self.command_buffer)
+  -- dn.ffi.gpu_command_buffer_submit(self.command_buffer)
 
-  -- dn.gpu_render_target_blit(
+  -- dn.ffi.gpu_render_target_blit(
   --   doublenickel.asset.find(RenderTarget.Native),
   --   doublenickel.asset.find(RenderTarget.Upscaled)
   -- )

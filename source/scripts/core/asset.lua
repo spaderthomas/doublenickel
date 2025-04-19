@@ -5,7 +5,7 @@ function doublenickel.asset.init()
 end
 
 function doublenickel.asset.register_cast(enum, ctype)
-  self.casts[enum.name] = doublenickel.ffi.ptr_type(ctype)
+  self.casts[enum.name] = dn.reflection.ptr_type(ctype)
 end
 
 function doublenickel.asset.find(id)
@@ -15,6 +15,6 @@ function doublenickel.asset.find(id)
     id = id:to_qualified_string()
   end
 
-  local asset = dn.asset_registry_find(id)
+  local asset = dn.ffi.asset_registry_find(id)
   return ffi.cast(ctype, asset)
 end

@@ -144,15 +144,15 @@ function StructEditor:init(name, struct, color)
 	}
 
 	
-	local type_info = doublenickel.ffi.inner_typeof(self.struct)
+	local type_info = dn.reflection.inner_typeof(self.struct)
 	for member_info in type_info:members() do
 		self.columns.field_name = math.max(self.columns.field_name, imgui.CalcTextSize(member_info.name).x)
 	end
 
 	self.columns.field_type = imgui.CalcTextSize('i32*').x
 	for member_info in type_info:members() do
-		local inner_type = doublenickel.ffi.inner_type(member_info)
-		local pretty_type = doublenickel.ffi.pretty_ptr(inner_type)
+		local inner_type = dn.reflection.inner_type(member_info)
+		local pretty_type = dn.reflection.pretty_ptr(inner_type)
 		self.columns.field_type = math.max(
 			self.columns.field_type, 
 			imgui.CalcTextSize(pretty_type).x)
@@ -164,12 +164,12 @@ function StructEditor:init(name, struct, color)
 end
 
 function StructEditor:draw()
-	local label = string.format('%s##%s', self.name, doublenickel.ffi.address_of(self.struct))
+	local label = string.format('%s##%s', self.name, dn.reflection.address_of(self.struct))
 
-	local type_info = doublenickel.ffi.inner_typeof(self.struct) -- For ref types
+	local type_info = dn.reflection.inner_typeof(self.struct) -- For ref types
 
 	if imgui.TreeNode(label) then
-		for member_info in doublenickel.ffi.sorted_members(type_info) do
+		for member_info in dn.reflection.sorted_members(type_info) do
 			self:member(self.struct, member_info)
 		end
 
@@ -204,13 +204,13 @@ function StructEditor:member(struct, member_info)
 
 	elseif ctype.enum:match(inner_type.what) then
 		-- p(struct[member_info.name])
-		self:enum(member_info.name, doublenickel.ffi.field_ptr(struct, member_info), struct[member_info.name], inner_type)
+		self:enum(member_info.name, dn.reflection.field_ptr(struct, member_info), struct[member_info.name], inner_type)
 
 	elseif ctype.int:match(inner_type.what) and inner_type.bool then
-		self:bool(member_info.name, doublenickel.ffi.field_ptr(struct, member_info))
+		self:bool(member_info.name, dn.reflection.field_ptr(struct, member_info))
 
 	elseif ctype.int:match(inner_type.what) then
-		self:int(member_info.name, doublenickel.ffi.field_ptr(struct, member_info))
+		self:int(member_info.name, dn.reflection.field_ptr(struct, member_info))
 
 	elseif ctype.struct:match(inner_type.what) then
 		StructEditor:new(member_info.name, struct[member_info.name], self.color):draw()
@@ -248,30 +248,30 @@ end
 
 function StructEditor:Float(field_name, ptr)
 	self:name_column(field_name)
-	self:type_column(doublenickel.ffi.pretty_typeof(ptr))
+	self:type_column(dn.reflection.pretty_typeof(ptr))
 
 	self:use_widget_column()
 
 	imgui.PushItemWidth(-1)
-	local label = string.format('##%s:%s', doublenickel.ffi.address_of(ptr), field_name)
-	imgui.InputScalar(label, doublenickel.ffi.imgui_datatypeof(ptr), ptr, nil, nil, '%.3f', 0)
+	local label = string.format('##%s:%s', dn.reflection.address_of(ptr), field_name)
+	imgui.InputScalar(label, dn.reflection.imgui_datatypeof(ptr), ptr, nil, nil, '%.3f', 0)
 	imgui.PopItemWidth()
 	imgui.Columns()
 end
 
 function StructEditor:CFloatMember(struct, member_info)
-	return self:Float(member_info.name, doublenickel.ffi.field_ptr(struct, member_info))
+	return self:Float(member_info.name, dn.reflection.field_ptr(struct, member_info))
 end
 
 
 function StructEditor:int(field_name, ptr)
 	self:name_column(field_name)
-	self:type_column(doublenickel.ffi.pretty_typeof(ptr))
+	self:type_column(dn.reflection.pretty_typeof(ptr))
 
 	self:use_widget_column()
 	imgui.PushItemWidth(-1)
-	local label = string.format('##%s:%s', doublenickel.ffi.address_of(ptr), field_name)
-	imgui.InputScalar(label, doublenickel.ffi.imgui_datatypeof(ptr), ptr, nil, nil, '%.3f', 0)
+	local label = string.format('##%s:%s', dn.reflection.address_of(ptr), field_name)
+	imgui.InputScalar(label, dn.reflection.imgui_datatypeof(ptr), ptr, nil, nil, '%.3f', 0)
 
 	-- ffi.C.igInputInt(label, ptr, 0, 0, 0)
 	imgui.PopItemWidth()
@@ -280,11 +280,11 @@ end
 
 function StructEditor:bool(field_name, ptr)
 	self:name_column(field_name)
-	self:type_column(doublenickel.ffi.pretty_typeof(ptr))
+	self:type_column(dn.reflection.pretty_typeof(ptr))
 
 	self:use_widget_column()
 	imgui.PushItemWidth(-1)
-	local label = string.format('##%s:%s', doublenickel.ffi.address_of(ptr), field_name)
+	local label = string.format('##%s:%s', dn.reflection.address_of(ptr), field_name)
 	ffi.C.igCheckbox(label, ptr)
 
 	-- ffi.C.igInputInt(label, ptr, 0, 0, 0)
@@ -295,13 +295,13 @@ end
 
 function StructEditor:pointer(field_name, ptr)
 	self:name_column(field_name)
-	self:type_column(doublenickel.ffi.pretty_ptrof(ptr))
+	self:type_column(dn.reflection.pretty_ptrof(ptr))
 
 	self:use_widget_column()
-	if doublenickel.ffi.is_opaque(ptr) then
+	if dn.reflection.is_opaque(ptr) then
 		imgui.Text('OPAQUE')
 	else
-		imgui.Text(doublenickel.ffi.address_of(ptr))
+		imgui.Text(dn.reflection.address_of(ptr))
 	end
 	imgui.Columns()
 end
@@ -309,16 +309,16 @@ end
 
 
 function StructEditor:enum(field_name, ptr, current_value, enum_type)
-	-- p(doublenickel.ffi.typeof(ptr))
+	-- p(dn.reflection.typeof(ptr))
 	local current_enum_info = enum_type:value(current_value)
 
 	self:name_column(field_name)
-	self:type_column(doublenickel.ffi.pretty_type(enum_type))
+	self:type_column(dn.reflection.pretty_type(enum_type))
 
 
 	self:use_widget_column()
 	imgui.PushItemWidth(-1)
-	local label = string.format('##%s:%s', doublenickel.ffi.address_of(ptr), field_name)
+	local label = string.format('##%s:%s', dn.reflection.address_of(ptr), field_name)
 	if imgui.BeginCombo(label, current_enum_info.name) then
 		for enum in enum_type:values() do
 			if imgui.Selectable(enum.name, enum.value == ptr) then
@@ -340,9 +340,9 @@ end
 
 
 function imgui.extensions.CArray(name, array)
-	local label = string.format('%s##%s', name, doublenickel.ffi.address_of(array))
+	local label = string.format('%s##%s', name, dn.reflection.address_of(array))
 	if imgui.TreeNode(label) then
-		local inner_type = doublenickel.ffi.inner_typeof(array)
+		local inner_type = dn.reflection.inner_typeof(array)
 		local element_type = inner_type.element_type
 
 		local num_elements = inner_type.size / inner_type.element_type.size
@@ -363,7 +363,7 @@ end
 function imgui.extensions.CType(name, value)
 	local ctype = doublenickel.enums.ctype
 
-	local inner_type = doublenickel.ffi.inner_typeof(value)
+	local inner_type = dn.reflection.inner_typeof(value)
 	if ctype.struct:match(inner_type.what) then
 		imgui.extensions.CStruct(name, value)
 	elseif ctype.array:match(inner_type.what) then

@@ -48,14 +48,14 @@ function LagrangianFluidSystem:stop(params)
 end
 
 function LagrangianFluidSystem:enable()
-  self.handle = doublenickel.ffi.lf_create(self.num_particles)
+  self.handle = dn.unported.lf_create(self.num_particles)
   self:sync()
-  doublenickel.ffi.lf_init(self.handle)
-  --doublenickel.ffi.lf_inspect(self.handle)
+  dn.unported.lf_init(self.handle)
+  --dn.unported.lf_inspect(self.handle)
 end
 
 function LagrangianFluidSystem:disable()
-  doublenickel.ffi.lf_destroy(self.handle)
+  dn.unported.lf_destroy(self.handle)
   self.handle = nil
 end
 
@@ -63,24 +63,24 @@ function LagrangianFluidSystem:update()
   if not self.handle then return end
 
   self:sync()
-  --doublenickel.ffi.lf_inspect(self.handle)
+  --dn.unported.lf_inspect(self.handle)
 end
 
 function LagrangianFluidSystem:sync()
-  doublenickel.ffi.lf_set_velocity(self.handle, self.velocity.x, self.velocity.y)
+  dn.unported.lf_set_velocity(self.handle, self.velocity.x, self.velocity.y)
 
-  doublenickel.ffi.lf_set_volume(
+  dn.unported.lf_set_volume(
     self.handle,
     self.bounding_volume.a.x, self.bounding_volume.a.y,
     self.bounding_volume.b.x, self.bounding_volume.b.y,
     self.bounding_volume.radius)
 
-  doublenickel.ffi.lf_set_smoothing_radius(self.handle, self.fluid.smoothing_radius)
-  doublenickel.ffi.lf_set_particle_mass(self.handle, self.fluid.particle_mass);
-  doublenickel.ffi.lf_set_viscosity(self.handle, self.fluid.viscosity);
-  doublenickel.ffi.lf_set_pressure(self.handle, self.fluid.pressure);
-  doublenickel.ffi.lf_set_gravity(self.handle, self.fluid.gravity);
-  doublenickel.ffi.lf_set_timestep(self.handle, self.fluid.dt);
+  dn.unported.lf_set_smoothing_radius(self.handle, self.fluid.smoothing_radius)
+  dn.unported.lf_set_particle_mass(self.handle, self.fluid.particle_mass);
+  dn.unported.lf_set_viscosity(self.handle, self.fluid.viscosity);
+  dn.unported.lf_set_pressure(self.handle, self.fluid.pressure);
+  dn.unported.lf_set_gravity(self.handle, self.fluid.gravity);
+  dn.unported.lf_set_timestep(self.handle, self.fluid.dt);
 end
 
 function LagrangianFluidSystem:draw()
@@ -89,14 +89,14 @@ function LagrangianFluidSystem:draw()
 
   local color = self.colors.bounding_volume:alpha(.2):premultiply():to_vec4()
 
-  doublenickel.ffi.set_world_space(true)()
-  doublenickel.ffi.set_layer(self.layers.bounding_volume)
+  dn.unported.set_world_space(true)()
+  dn.unported.set_layer(self.layers.bounding_volume)
 
-  doublenickel.ffi.draw_circle(self.bounding_volume.a.x, self.bounding_volume.a.y, self.bounding_volume.radius, color)
-  doublenickel.ffi.draw_circle(self.bounding_volume.b.x, self.bounding_volume.b.y, self.bounding_volume.radius, color)
+  dn.unported.draw_circle(self.bounding_volume.a.x, self.bounding_volume.a.y, self.bounding_volume.radius, color)
+  dn.unported.draw_circle(self.bounding_volume.b.x, self.bounding_volume.b.y, self.bounding_volume.radius, color)
 
   local distance = self.bounding_volume.b:subtract(self.pa)
-  doublenickel.ffi.draw_line(
+  dn.unported.draw_line(
     ffi.new('dn_vector2_t', self.bounding_volume.a.x, self.bounding_volume.a.y),
     ffi.new('dn_vector2_t', self.bounding_volume.b.x, self.bounding_volume.b.y),
     self.bounding_volume.radius * 2,

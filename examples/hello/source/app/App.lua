@@ -17,13 +17,13 @@ function App:on_init_game()
   -----------------------
   -- APP CONFIGURATION --
   -----------------------
-  doublenickel.paths.load(dn.paths_resolve_format('dn_app_file', 'data/paths.lua'))
+  doublenickel.paths.load(dn.ffi.paths_resolve_format('dn_app_file', 'data/paths.lua'))
 
   -- The main configuration struct for the framework
-  dn.app_configure(AppConfig:new({
+  dn.ffi.app_configure(AppConfig:new({
     -- WINDOW
     --
-    -- This is the first time that dn.paths_resolve_*() shows up. This subsystem of doublenickel is how you should deal
+    -- This is the first time that dn.ffi.paths_resolve_*() shows up. This subsystem of doublenickel is how you should deal
     -- with all paths in your game. It builds absolute paths to resources at runtime. It can also handle format strings,
     -- for e.g. a specific audio file in the well-known audio directory.
     --
@@ -37,7 +37,7 @@ function App:on_init_game()
         WindowFlags.Windowed,
         WindowFlags.Border
       ),
-      icon = dn.paths_resolve_format('dn_image', 'logo/icon.png'),
+      icon = dn.ffi.paths_resolve_format('dn_image', 'logo/icon.png'),
       target_fps = 144,
     }),
 
@@ -56,7 +56,7 @@ function App:on_init_game()
     }),
 
     layout = LayoutConfig:new({
-      file = dn.paths_resolve('layouts')
+      file = dn.ffi.paths_resolve('layouts')
     }),
 
     dialogue = {},
@@ -80,7 +80,7 @@ function App:on_init_game()
   doublenickel.asset.register_cast(RenderTarget, 'dn_gpu_render_target_t')
   
   -- Every app needs a command buffer to write GPU commands into.
-  self.command_buffer = dn.gpu_command_buffer_create(GpuCommandBufferDescriptor:new({
+  self.command_buffer = dn.ffi.gpu_command_buffer_create(GpuCommandBufferDescriptor:new({
     max_commands = 1024
   }))
 
@@ -130,14 +130,14 @@ end
 --
 -- This is where I do post processing and compositing.
 function App:on_scene_rendered()
-  -- dn.gpu_begin_render_pass(self.command_buffer, self.render_pass)
-  -- dn.gpu_set_world_space(self.command_buffer, true)
-  -- dn.gpu_set_camera(self.command_buffer, doublenickel.editor.find('EditorCamera').offset:to_ctype())
-  -- dn.sdf_renderer_draw(self.sdf_renderer, self.command_buffer)
-  -- dn.gpu_end_render_pass(self.command_buffer)
-  -- dn.gpu_command_buffer_submit(self.command_buffer)
+  -- dn.ffi.gpu_begin_render_pass(self.command_buffer, self.render_pass)
+  -- dn.ffi.gpu_set_world_space(self.command_buffer, true)
+  -- dn.ffi.gpu_set_camera(self.command_buffer, doublenickel.editor.find('EditorCamera').offset:to_ctype())
+  -- dn.ffi.sdf_renderer_draw(self.sdf_renderer, self.command_buffer)
+  -- dn.ffi.gpu_end_render_pass(self.command_buffer)
+  -- dn.ffi.gpu_command_buffer_submit(self.command_buffer)
 
-  -- dn.gpu_render_target_blit(
+  -- dn.ffi.gpu_render_target_blit(
   --   doublenickel.asset.find(RenderTarget.Native),
   --   doublenickel.asset.find(RenderTarget.Upscaled)
   -- )

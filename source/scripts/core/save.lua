@@ -1,11 +1,11 @@
 function doublenickel.save.init()
   doublenickel.dn_log('doublenickel.save.init')
-  local directory = dn.paths_resolve('saves')
+  local directory = dn.ffi.paths_resolve('saves')
   -- log.info('Initializing save directory; directory = %s', directory)
   doublenickel.dn_log('Initializing save directory; directory = %s', directory)
 
-  dn.os_create_directory(dn.paths_resolve('saves'))
-  dn.os_create_directory(dn.paths_resolve('screenshots'))
+  dn.ffi.os_create_directory(dn.ffi.paths_resolve('saves'))
+  dn.ffi.os_create_directory(dn.ffi.paths_resolve('screenshots'))
 end
 
 function doublenickel.save.create()
@@ -17,7 +17,7 @@ function doublenickel.save.create()
     scene = doublenickel.current_scene,
   }
 
-  local file_path = dn.paths_resolve_format('save', save_name)
+  local file_path = dn.ffi.paths_resolve_format('save', save_name)
   doublenickel.module.write(file_path, save, doublenickel.module.WriteOptions.Pretty)
 
   doublenickel.dn_log(string.format('Created save file; file_path = %s', file_path))
@@ -25,7 +25,7 @@ end
 
 function doublenickel.save.read(file_name)
   file_name = doublenickel.strip_extension(file_name)
-  local file_path = dn.paths_resolve_format('save', file_name)
+  local file_path = dn.ffi.paths_resolve_format('save', file_name)
   return doublenickel.module.read(file_path)
 end
 
@@ -39,9 +39,9 @@ function doublenickel.save.list()
 end
 
 function doublenickel.save.count()
-  local save_dir = dn.paths_resolve('saves')
-  -- local entries = dn.os_scan_directory(save_dir)
-  local entries = dn.os_scan_directory(save_dir)
+  local save_dir = dn.ffi.paths_resolve('saves')
+  -- local entries = dn.ffi.os_scan_directory(save_dir)
+  local entries = dn.ffi.os_scan_directory(save_dir)
   return entries.count
 end
 
@@ -96,7 +96,7 @@ function doublenickel.scene.update()
 end
 
 function doublenickel.scene.read(file_name)
-  local file_path = dn.paths_resolve_format('scene', file_name)
+  local file_path = dn.ffi.paths_resolve_format('scene', file_name)
   return doublenickel.module.read(file_path)
 end
 
@@ -107,7 +107,7 @@ function doublenickel.scene.write(scene, file_name)
     serialized_entities[entity.uuid] = serialized_entity
   end
 
-  local file_path = dn.paths_resolve_format('scene', file_name)
+  local file_path = dn.ffi.paths_resolve_format('scene', file_name)
   doublenickel.module.write(file_path, serialized_entities, doublenickel.module.WriteOptions.Pretty)
 end
 

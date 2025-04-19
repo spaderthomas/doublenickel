@@ -12,7 +12,7 @@ function doublenickel.window.init()
   doublenickel.dn_log('doublenickel.window.init')
   self.state = self.states.Idle
 
-  self.display_mode = dn.window_get_display_mode()
+  self.display_mode = dn.ffi.window_get_display_mode()
   self.interpolation = {
     window_size = doublenickel.interpolation.EaseInOut2:new({ time = 1, exponent = 3 })
   }
@@ -23,11 +23,11 @@ function doublenickel.window.update()
 
   elseif self.state == self.states.Interpolate then
     local window_size = self.interpolation.window_size:get_value()
-    doublenickel.ffi.set_window_size(window_size.x, window_size.y)
+    dn.unported.set_window_size(window_size.x, window_size.y)
 
     self.interpolation.window_size:update()
     if self.interpolation.window_size:is_done() then
-      dn.window_set_display_mode(self.display_mode)
+      dn.ffi.window_set_display_mode(self.display_mode)
       self.state = self.states.Idle
     end
   end
@@ -36,8 +36,8 @@ end
 function doublenickel.window.animate_display_mode(display_mode)
   local was_full_screen = self.display_mode == doublenickel.enums.DisplayMode.Fullscreen
   local is_full_screen = display_mode == doublenickel.enums.DisplayMode.Fullscreen
-  if was_full_screen or is_full_screen or dn.steam_is_deck() then
-    dn.window_set_display_mode(display_mode)
+  if was_full_screen or is_full_screen or dn.ffi.steam_is_deck() then
+    dn.ffi.window_set_display_mode(display_mode)
     self.display_mode = display_mode
     self.state = self.states.Idle
     return
@@ -46,7 +46,7 @@ function doublenickel.window.animate_display_mode(display_mode)
   self.display_mode = display_mode
 
 
-  local current_size = dn.window_get_content_area()
+  local current_size = dn.ffi.window_get_content_area()
   current_size = doublenickel.vec2(current_size.x, current_size.y)
   local target_size = doublenickel.vec2()
 
@@ -78,18 +78,18 @@ end
 
 
 function doublenickel.window.get_game_area_size()
-  local data = dn.coord_get()
+  local data = dn.ffi.coord_get()
   return doublenickel.vec2(data.framebuffer_size.x, data.framebuffer_size.y)
 end
 
 function doublenickel.window.set_game_area_size(size)
-  dn.coord_set_framebuffer_size(size.x, size.y)
+  dn.ffi.coord_set_framebuffer_size(size.x, size.y)
 end
 
 function doublenickel.window.set_game_area_position(position)
-  dn.coord_set_framebuffer_position(position.x, position.y)
+  dn.ffi.coord_set_framebuffer_position(position.x, position.y)
 end
 
 function doublenickel.window.dn_window_get_native_resolution()
-	return doublenickel.vec2(dn.window_get_native_resolution())
+	return doublenickel.vec2(dn.ffi.window_get_native_resolution())
 end

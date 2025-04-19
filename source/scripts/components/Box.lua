@@ -68,9 +68,9 @@ function ColliderBox:show(color)
   if self.dbg_color then color = self.dbg_color end
 
 
-  if self.base.world_space then doublenickel.ffi.set_world_space(true)() end
-  if not self.base.world_space then doublenickel.ffi.end_world_space(true)() end
-  doublenickel.ffi.draw_quad_l(self.position, self.dimension, color)
+  if self.base.world_space then dn.unported.set_world_space(true)() end
+  if not self.base.world_space then dn.unported.end_world_space(true)() end
+  dn.unported.draw_quad_l(self.position, self.dimension, color)
 end
 
 function ColliderBox:is_point_inside(point)

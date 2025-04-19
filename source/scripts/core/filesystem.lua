@@ -24,7 +24,7 @@ end
 
 function doublenickel.filesystem.iterate_directory(path)
   local function iterator()
-    local entry_list = dn.os_scan_directory(path)
+    local entry_list = dn.ffi.os_scan_directory(path)
     for entry in doublenickel.iterator.carray(entry_list.data, entry_list.count) do
       coroutine.yield(entry)
     end
@@ -43,6 +43,6 @@ function doublenickel.filesystem.collect_directory(path)
 end
 
 function doublenickel.filesystem.collect_named_directory(name)
-  local path = dn.paths_resolve(name)
+  local path = dn.ffi.paths_resolve(name)
   return doublenickel.filesystem.collect_directory(path)
 end

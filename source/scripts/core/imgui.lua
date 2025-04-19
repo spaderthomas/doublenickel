@@ -182,10 +182,10 @@ function imgui.internal.init_lua_api_overwrites()
 		local value = t[k]
 		local len = #value
 
-		local allocator = dn.allocator_find('bump')
+		local allocator = dn.ffi.allocator_find('bump')
 		local buffer_len = len + max_chars_per_frame
 		local buffer = allocator:alloc(buffer_len)
-		dn.cstr_copy_to_n(value, len, buffer, buffer_len)
+		dn.ffi.cstr_copy_to_n(value, len, buffer, buffer_len)
 	
 		flags = flags or 0
 		flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiInputTextFlags_CallbackResize)

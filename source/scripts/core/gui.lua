@@ -98,7 +98,7 @@ local function make_text(text, font, color, wrap, precise)
   item.color = color or doublenickel.colors.white
   item.wrap = wrap or 0
   item.precise = ternary(precise, true, false)
-  item.prepared = dn.prepare_text_ex(item.text, 0, 0, item.font, item.wrap, item.color:to_vec4(), item.precise)
+  item.prepared = dn.ffi.prepare_text_ex(item.text, 0, 0, item.font, item.wrap, item.color:to_vec4(), item.precise)
 
   if item.precise then
     item.size = doublenickel.vec2(item.prepared.width, item.prepared.height)
@@ -1079,32 +1079,32 @@ end
 -- INTERNAL: MAIN --
 --------------------
 function Gui:render()
-  doublenickel.ffi.set_world_space(false)
+  dn.unported.set_world_space(false)
   for index, item in self.draw_list:iterate() do
-    doublenickel.ffi.set_layer(self.layer + index)
+    dn.unported.set_layer(self.layer + index)
     self:draw_item(item)
   end
 end
 
 function Gui:draw_item(item)
   if item.kind == GuiItem.kinds.quad then
-    doublenickel.ffi.draw_quad_l(item.position, item.size, item.color)
+    dn.unported.draw_quad_l(item.position, item.size, item.color)
   elseif item.kind == GuiItem.kinds.line then
-    doublenickel.ffi.draw_line(item.a.x, item.a.y, item.b.x, item.b.y, item.thickness, item.color)
+    dn.unported.draw_line(item.a.x, item.a.y, item.b.x, item.b.y, item.thickness, item.color)
   elseif item.kind == GuiItem.kinds.circle then
     doublenickel.draw_circle_l(item.position, item.radius, item.color)
   elseif item.kind == GuiItem.kinds.image then
-    doublenickel.ffi.draw_image_l(item.image, item.position, item)
-    --doublenickel.ffi.draw_quad_l(item.position, item.size, doublenickel.colors.red_light_trans)
+    dn.unported.draw_image_l(item.image, item.position, item)
+    --dn.unported.draw_quad_l(item.position, item.size, doublenickel.colors.red_light_trans)
   elseif item.kind == GuiItem.kinds.text then
     local highlight_color = doublenickel.color(1.00, 0.00, 0.00, 0.50)
 
     local draw_bounding_box = false
     if draw_bounding_box then
       if item.precise then
-        doublenickel.ffi.draw_quad_l(item.position, doublenickel.vec2(item.prepared.width, item.prepared.height), highlight_color)
+        dn.unported.draw_quad_l(item.position, doublenickel.vec2(item.prepared.width, item.prepared.height), highlight_color)
       else
-        doublenickel.ffi.draw_quad_l(item.position, doublenickel.vec2(item.prepared.width, item.prepared.height_imprecise),
+        dn.unported.draw_quad_l(item.position, doublenickel.vec2(item.prepared.width, item.prepared.height_imprecise),
           highlight_color)
       end
     end
@@ -1112,14 +1112,14 @@ function Gui:draw_item(item)
     item.prepared.color = doublenickel.color_to_vec4(item.color)
     item.prepared.position.x = item.position.x
     item.prepared.position.y = item.position.y
-    doublenickel.ffi.draw_prepared_text(item.prepared)
+    dn.unported.draw_prepared_text(item.prepared)
   elseif item.kind == GuiItem.kinds.scissor then
     self.scissor:push(item)
     self:apply_scissor(item)
   elseif item.kind == GuiItem.kinds.end_scissor then
     self.scissor:pop()
     if self.scissor:is_empty() then
-      doublenickel.ffi.end_scissor()
+      dn.unported.end_scissor()
     else
       local scissor = self.scissor:peek()
       self:apply_scissor(scissor)
@@ -1163,7 +1163,7 @@ function Gui:apply_scissor(item)
   item.position = item.region.position:copy()
   item.size = item.region.size:copy()
   item.position.y = item.position.y - item.size.y
-  doublenickel.ffi.begin_scissor(item.position.x, item.position.y, item.size.x, item.size.y)
+  dn.unported.begin_scissor(item.position.x, item.position.y, item.size.x, item.size.y)
 end
 
 function Gui:item_mouse_state(item)
@@ -1451,7 +1451,7 @@ local function update_animations()
       --    each frame. This is """"slow""" but dead simple in every possible way. (Also it's not slow)
       for index, item in animation.hide_data.draw_list:iterate() do
         if item.kind == GuiItem.kinds.text then
-          item.prepared = dn.prepare_text_ex(item.text, 0, 0, item.font, item.wrap,
+          item.prepared = dn.ffi.prepare_text_ex(item.text, 0, 0, item.font, item.wrap,
             doublenickel.color_to_vec4(item.color), item.precise)
         end
       end
@@ -1465,9 +1465,9 @@ local function update_animations()
       -- this is copy and pasted from Gui:render() (except applying the offset)
       local layout = doublenickel.gui.Gui:new()
 
-      doublenickel.ffi.end_world_space(true)()
+      dn.unported.end_world_space(true)()
       for index, item in animation.hide_data.draw_list:iterate() do
-        doublenickel.ffi.set_layer(doublenickel.layers.ui + index)
+        dn.unported.set_layer(doublenickel.layers.ui + index)
 
         item:add_offset(offset)
         layout:draw_item(item)

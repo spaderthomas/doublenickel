@@ -7,7 +7,7 @@ end
 
 function EditorCamera:update()
   if doublenickel.tick then return end
-  doublenickel.ffi.set_camera(self.offset:floor():unpack())
+  dn.unported.set_camera(self.offset:floor():unpack())
 end
 
 function EditorCamera:set(position)

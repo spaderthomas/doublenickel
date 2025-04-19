@@ -27,34 +27,34 @@ function EulerianFluidSystem:stop(params)
 end
 
 function EulerianFluidSystem:enable()
-  self.handle = doublenickel.ffi.ef_create(self.grid_size)
-  doublenickel.ffi.ef_init(self.handle)
-  doublenickel.ffi.ef_set_render_size(self.handle, self.render_size)
+  self.handle = dn.unported.ef_create(self.grid_size)
+  dn.unported.ef_init(self.handle)
+  dn.unported.ef_set_render_size(self.handle, self.render_size)
 
   for i = 0, self.grid_size - 1, 1 do
     for j = 0, self.grid_size - 1, 1 do
-      doublenickel.ffi.ef_set_velocity(self.handle, i, j, 1.0, 1.0)
+      dn.unported.ef_set_velocity(self.handle, i, j, 1.0, 1.0)
     end
   end
 end
 
 function EulerianFluidSystem:disable()
   if not self.handle then return end
-  doublenickel.ffi.ef_destroy(self.handle)
+  dn.unported.ef_destroy(self.handle)
   self.handle = nil
 end
 
 function EulerianFluidSystem:update()
   if not self.handle then return end
 
-  doublenickel.ffi.set_active_shader('fluid_eulerian')
-  doublenickel.ffi.set_draw_mode(doublenickel.enums.DrawMode.Triangles)
-  doublenickel.ffi.set_world_space(true)
-  doublenickel.ffi.set_layer(10000)
-  doublenickel.ffi.ef_bind(self.handle)
-  doublenickel.ffi.push_quad(0, self.render_size, self.render_size, self.render_size, nil, 1.0)
+  dn.unported.set_active_shader('fluid_eulerian')
+  dn.unported.set_draw_mode(doublenickel.enums.DrawMode.Triangles)
+  dn.unported.set_world_space(true)
+  dn.unported.set_layer(10000)
+  dn.unported.ef_bind(self.handle)
+  dn.unported.push_quad(0, self.render_size, self.render_size, self.render_size, nil, 1.0)
 
-  doublenickel.ffi.ef_set_density_source(self.handle, 1, 1, 100.0)
-  --doublenickel.ffi.ef_set_density_source(self.handle, 10, 10, 100.0)
-  --doublenickel.ffi.ef_set_density_source(self.handle, 50, 50, 1000.0)
+  dn.unported.ef_set_density_source(self.handle, 1, 1, 100.0)
+  --dn.unported.ef_set_density_source(self.handle, 10, 10, 100.0)
+  --dn.unported.ef_set_density_source(self.handle, 50, 50, 1000.0)
 end

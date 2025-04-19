@@ -83,8 +83,8 @@ end
 function EngineStats:playground()
   if self.window then
     self.window:update()
-    local x = dn.window_get_content_area()
-    doublenickel.ffi.set_window_size(self.window:get_value(), x.y)
+    local x = dn.ffi.window_get_content_area()
+    dn.unported.set_window_size(self.window:get_value(), x.y)
 
     if self.window:is_done() then
       if self.window.once then
@@ -132,7 +132,7 @@ function EngineStats:engine_viewer()
   if imgui.TreeNode('Window') then
     local main_view = doublenickel.editor.find('GameViewManager'):find_main_view()
     imgui.extensions.TableField('Main View', main_view.name)
-    imgui.extensions.Vec2('Content Area', dn.window_get_content_area(), '%d') 
+    imgui.extensions.Vec2('Content Area', dn.ffi.window_get_content_area(), '%d') 
     imgui.extensions.Vec2('Native Resolution', doublenickel.window.dn_window_get_native_resolution(), '%d')
     imgui.extensions.Vec2('Game View', doublenickel.window.get_game_area_size(), '%d')
     imgui.TreePop()
@@ -156,7 +156,7 @@ function EngineStats:engine_viewer()
     imgui.Checkbox('Display Cursor', self, 'display_cursor')
 
     if self.display_cursor then
-      local world = doublenickel.vec2(dn.input_mouse(ffi.C.DN_COORD_UNIT_WORLD))
+      local world = doublenickel.vec2(dn.ffi.input_mouse(ffi.C.DN_COORD_UNIT_WORLD))
       doublenickel.draw_circle_l(world, 5, doublenickel.colors.red)
     end
 
@@ -173,10 +173,10 @@ function EngineStats:engine_viewer()
 
 
     if imgui.TreeNode('Mouse') then
-      imgui.extensions.Vec2('Screen', dn.input_mouse(ffi.C.DN_COORD_UNIT_SCREEN), '%.3f')
-      imgui.extensions.Vec2('Window', dn.input_mouse(ffi.C.DN_COORD_UNIT_WINDOW), '%.3f')
-      imgui.extensions.Vec2('Game  ', dn.input_mouse(ffi.C.DN_COORD_UNIT_GAME), '%d')
-      imgui.extensions.Vec2('World ', dn.input_mouse(ffi.C.DN_COORD_UNIT_WORLD), '%d')
+      imgui.extensions.Vec2('Screen', dn.ffi.input_mouse(ffi.C.DN_COORD_UNIT_SCREEN), '%.3f')
+      imgui.extensions.Vec2('Window', dn.ffi.input_mouse(ffi.C.DN_COORD_UNIT_WINDOW), '%.3f')
+      imgui.extensions.Vec2('Game  ', dn.ffi.input_mouse(ffi.C.DN_COORD_UNIT_GAME), '%d')
+      imgui.extensions.Vec2('World ', dn.ffi.input_mouse(ffi.C.DN_COORD_UNIT_WORLD), '%d')
 
       imgui.TreePop()
     end
@@ -186,7 +186,7 @@ function EngineStats:engine_viewer()
 
   if imgui.TreeNode('Actions') then
     imgui.Text(string.format('Active Action Set: %s', doublenickel.action.get_active_set()))
-    imgui.Text(string.format('Action Set Cooldown: %d', doublenickel.ffi.get_action_set_cooldown()))
+    imgui.Text(string.format('Action Set Cooldown: %d', dn.unported.get_action_set_cooldown()))
 
     local color_active = doublenickel.color32(0, 200, 0, 255)
     local color_inactive = doublenickel.color32(200, 0, 0, 255)
@@ -195,7 +195,7 @@ function EngineStats:engine_viewer()
     local actions = action_data and action_data.actions or {}
     if imgui.TreeNode('Action State') then
       for _, action in pairs(action_data) do
-        local active = doublenickel.ffi.was_digital_pressed(action)
+        local active = dn.unported.was_digital_pressed(action)
         local color = active and color_active or color_inactive
         imgui.PushStyleColor(ffi.C.ImGuiCol_Text, color)
         imgui.Text(action)
@@ -318,8 +318,8 @@ function EngineStats:engine_viewer()
 
   if imgui.TreeNode('Particles') then
     if imgui.Button('Stop All') then
-      doublenickel.ffi.stop_all_particles()
-      doublenickel.ffi.lf_destroy_all()
+      dn.unported.stop_all_particles()
+      dn.unported.lf_destroy_all()
     end
 
     local particle_systems = doublenickel.find_entities('ParticleSystem')
@@ -369,7 +369,7 @@ function EngineStats:engine_viewer()
 
   if imgui.TreeNode('Utility') then
     if imgui.Button('Show Text Input') then
-      dn.steam_open_text_input()
+      dn.ffi.steam_open_text_input()
     end
 
     if imgui.Button('Window') then
@@ -388,7 +388,7 @@ function EngineStats:calculate_framerate()
     local metrics = doublenickel.time_metric.query_all()
     table.merge(metrics, self.metrics)
 
-    self.metrics.target_fps = dn.engine_get_target_fps()
+    self.metrics.target_fps = dn.ffi.engine_get_target_fps()
     self.metrics.actual_fps = math.floor(1000.0 / self.metrics.frame.average)
   end
 end

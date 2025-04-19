@@ -5,7 +5,7 @@ end
 
 function ExitGame:enter(graph)
   if doublenickel.is_packaged_build then
-    doublenickel.ffi.set_exit_game()
+    dn.unported.set_exit_game()
   end
   return dialogue_state.processing
 end

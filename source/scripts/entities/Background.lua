@@ -61,10 +61,10 @@ function Background:draw(dt)
     opacity = self.opacity or 1
   }
 
-  doublenickel.ffi.set_world_space(true)
-  doublenickel.ffi.set_layer(self.layer or doublenickel.layers.background)
+  dn.unported.set_world_space(true)
+  dn.unported.set_layer(self.layer or doublenickel.layers.background)
   for index, tile in pairs(data.tiles) do
-    doublenickel.ffi.draw_image_l(tile, self.point.position, options)
+    dn.unported.draw_image_l(tile, self.point.position, options)
     self.point:advance()
   end
 end

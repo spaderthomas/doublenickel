@@ -1,8 +1,8 @@
 Hello = doublenickel.entity.define('Hello')
 function Hello:init()
-  dn.log('Hello:init()')
+  dn.ffi.log('Hello:init()')
 end
 
 function Hello:update()
-  dn.log('Hello:update()')
+  dn.ffi.log('Hello:update()')
 end

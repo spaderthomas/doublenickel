@@ -102,7 +102,7 @@ function doublenickel.enum.define(enum_name, values)
 end
 
 function doublenickel.enum.define_from_ctype(ctype)
-	local type_info = doublenickel.ffi.typeof(ctype)
+	local type_info = dn.reflection.typeof(ctype)
 
 	local prefix = string.format('%s_', ctype)
 	local values = {}

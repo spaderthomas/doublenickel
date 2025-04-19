@@ -286,7 +286,7 @@ function TextEditor:handle_alpha(c)
 
   self.is_input_dirty = true
   local unshifted_byte = string.byte(c);
-  local shifted_byte = dn.input_shift_key(unshifted_byte)
+  local shifted_byte = dn.ffi.input_shift_key(unshifted_byte)
   local c = string.char(shifted_byte)
   -- The point defines where the next character will go. For example, if the point is at 1, then
   -- the next character inserted will be at index 1.

@@ -19,10 +19,10 @@ end
 
 function CameraBounds:draw()
   if self.debug then
-    doublenickel.ffi.set_world_space(true)()
-    doublenickel.ffi.set_layer(1000)
+    dn.unported.set_world_space(true)()
+    dn.unported.set_layer(1000)
 
-    doublenickel.ffi.draw_quad_l(self.position, self.size, doublenickel.colors.green_light_trans)
+    dn.unported.draw_quad_l(self.position, self.size, doublenickel.colors.green_light_trans)
   end
 end
 

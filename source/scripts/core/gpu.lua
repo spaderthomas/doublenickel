@@ -13,11 +13,11 @@ function doublenickel.gpu.render()
   doublenickel.lifecycle.run_callback(doublenickel.lifecycle.callbacks.on_render_scene)
   doublenickel.lifecycle.run_callback(doublenickel.lifecycle.callbacks.on_scene_rendered)
 
-  local swapchain = dn.gpu_acquire_swapchain()
-  dn.gpu_render_target_bind(swapchain)
-  dn.gpu_render_target_clear(swapchain)
+  local swapchain = dn.ffi.gpu_acquire_swapchain()
+  dn.ffi.gpu_render_target_bind(swapchain)
+  dn.ffi.gpu_render_target_clear(swapchain)
   doublenickel.app:on_swapchain_ready()
-  dn.gpu_swap_buffers()
+  dn.ffi.gpu_swap_buffers()
 
   doublenickel.time_metric.stop('render')
 end

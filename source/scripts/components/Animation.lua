@@ -96,10 +96,10 @@ function Animation:draw()
     size.x, size.y = doublenickel.sprite_size(image)
   end
 
-  doublenickel.ffi.set_layer(self.layer)
-  doublenickel.ffi.set_world_space(true)
+  dn.unported.set_layer(self.layer)
+  dn.unported.set_world_space(true)
 
-  doublenickel.ffi.draw_image_ex(image, position.x, position.y, size.x, size.y, self.opacity)
+  dn.unported.draw_image_ex(image, position.x, position.y, size.x, size.y, self.opacity)
 end
 
 --

@@ -22,7 +22,7 @@ function doublenickel.input.pressed(key, channel)
 		return false
 	end
 
-	return dn.input_pressed(key)
+	return dn.ffi.input_pressed(key)
 end
 
 function doublenickel.input.released(key, channel)
@@ -30,7 +30,7 @@ function doublenickel.input.released(key, channel)
 		return false
 	end
 
-	return dn.input_released(key)
+	return dn.ffi.input_released(key)
 end
 
 function doublenickel.input.down(key, channel)
@@ -38,7 +38,7 @@ function doublenickel.input.down(key, channel)
 		return false
 	end
 
-	return dn.input_down(key)
+	return dn.ffi.input_down(key)
 end
 
 function doublenickel.input.mod_down(key, channel)
@@ -46,7 +46,7 @@ function doublenickel.input.mod_down(key, channel)
 		return false
 	end
 
-	return dn.input_mod_down(key)
+	return dn.ffi.input_mod_down(key)
 end
 
 function doublenickel.input.chord_pressed(mod, key, channel)
@@ -54,21 +54,21 @@ function doublenickel.input.chord_pressed(mod, key, channel)
 		return false
 	end
 
-	return dn.input_chord_pressed(mod, key)
+	return dn.ffi.input_chord_pressed(mod, key)
 end
 
 function doublenickel.input.scroll()
-	return dn.input_scroll()
+	return dn.ffi.input_scroll()
 end
 
 function doublenickel.input.mouse(coordinate)
 	coordinate = coordinate or CoordinateSystem.World
-	return dn.input_mouse(coordinate:to_number())
+	return dn.ffi.input_mouse(coordinate:to_number())
 end
 
 function doublenickel.input.mouse_delta(coordinate)
 	coordinate = coordinate or CoordinateSystem.World
-	return dn.input_mouse_delta(coordinate:to_number())
+	return dn.ffi.input_mouse_delta(coordinate:to_number())
 end
 
 
@@ -147,7 +147,7 @@ function doublenickel.input.is_context_active(context)
 end
 
 function doublenickel.input.get_input_device()
-	return InputDevice:new(dn.input_get_device())
+	return InputDevice:new(dn.ffi.input_get_device())
 end
 
 function doublenickel.input.is_controller_mode()
@@ -160,15 +160,15 @@ end
 
 -- @refactor: This is action specific. Maybe it's OK here...?
 function doublenickel.input.is_digital_active(name)
-	return doublenickel.ffi.is_digital_active(name)
+	return dn.unported.is_digital_active(name)
 end
 
 function doublenickel.input.was_digital_active(name)
-	return doublenickel.ffi.was_digital_active(name)
+	return dn.unported.was_digital_active(name)
 end
 
 function doublenickel.input.was_digital_pressed(name)
-	return doublenickel.ffi.was_digital_pressed(name)
+	return dn.unported.was_digital_pressed(name)
 end
 
 ContextualInput = doublenickel.class.define('ContextualInput')
@@ -180,7 +180,7 @@ end
 
 function ContextualInput:pressed(key)
 	if doublenickel.input.is_context_active(self.context) then
-		return dn.input_pressed(key)
+		return dn.ffi.input_pressed(key)
 	end
 
 	return false
@@ -188,7 +188,7 @@ end
 
 function ContextualInput:released(key)
 	if doublenickel.input.is_context_active(self.context) then
-		return dn.input_released(key)
+		return dn.ffi.input_released(key)
 	end
 
 	return false
@@ -196,7 +196,7 @@ end
 
 function ContextualInput:down(key)
 	if doublenickel.input.is_context_active(self.context) then
-		return dn.input_down(key)
+		return dn.ffi.input_down(key)
 	end
 
 	return false
@@ -204,7 +204,7 @@ end
 
 function ContextualInput:mod_down(key)
 	if doublenickel.input.is_context_active(self.context) then
-		return dn.input_mod_down(key)
+		return dn.ffi.input_mod_down(key)
 	end
 
 	return false
@@ -212,7 +212,7 @@ end
 
 function ContextualInput:chord_pressed(mod, key)
 	if doublenickel.input.is_context_active(self.context) then
-		return dn.input_chord_pressed(mod, key)
+		return dn.ffi.input_chord_pressed(mod, key)
 	end
 
 	return false
@@ -220,7 +220,7 @@ end
 
 function ContextualInput:scroll()
 	if doublenickel.input.is_context_active(self.context) then
-		return doublenickel.vec2(dn.input_scroll())
+		return doublenickel.vec2(dn.ffi.input_scroll())
 	end
 
 	return doublenickel.vec2()
@@ -228,12 +228,12 @@ end
 
 function ContextualInput:mouse(coordinate)
 	coordinate = coordinate or self.coordinate
-	return doublenickel.vec2(dn.input_mouse(coordinate:to_number()))
+	return doublenickel.vec2(dn.ffi.input_mouse(coordinate:to_number()))
 end
 
 function ContextualInput:mouse_delta(coordinate)
 	coordinate = coordinate or self.coordinate
-	return dn.input_mouse_delta(coordinate:to_number())
+	return dn.ffi.input_mouse_delta(coordinate:to_number())
 end
 
 function ContextualInput:left_click()

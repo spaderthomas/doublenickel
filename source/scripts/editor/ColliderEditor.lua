@@ -144,17 +144,17 @@ end
 function CircleEditor:draw_resize_hover()
 	local circle = self.resize.collider.impl
 
-	-- doublenickel.ffi.set_world_space(true)
-	-- doublenickel.ffi.set_layer(doublenickel.editor.layers.collider_overlay)
-	-- doublenickel.ffi.draw_ring_sdf(circle.position.x, circle.position.y, circle.radius, circle.radius + self.resize.select_epsilon, doublenickel.colors.spring_green:alpha(self.resize.hover_alpha):to_vec4(), 1)
+	-- dn.unported.set_world_space(true)
+	-- dn.unported.set_layer(doublenickel.editor.layers.collider_overlay)
+	-- dn.unported.draw_ring_sdf(circle.position.x, circle.position.y, circle.radius, circle.radius + self.resize.select_epsilon, doublenickel.colors.spring_green:alpha(self.resize.hover_alpha):to_vec4(), 1)
 end
 
 function CircleEditor:draw_resize_preview()
 	local circle = self.resize.collider.impl
 
-	-- doublenickel.ffi.set_world_space(true)
-	-- doublenickel.ffi.set_layer(doublenickel.editor.layers.collider_overlay)
-	-- doublenickel.ffi.draw_circle_sdf(circle.position.x, circle.position.y, self.resize.new_radius, doublenickel.colors.spring_green:alpha(self.resize.preview_alpha):to_vec4(), 1)
+	-- dn.unported.set_world_space(true)
+	-- dn.unported.set_layer(doublenickel.editor.layers.collider_overlay)
+	-- dn.unported.draw_circle_sdf(circle.position.x, circle.position.y, self.resize.new_radius, doublenickel.colors.spring_green:alpha(self.resize.preview_alpha):to_vec4(), 1)
 end
 
 function CircleEditor:iterate_colliders()
@@ -378,20 +378,20 @@ end
 function BoxEditor:draw_resize_preview()
 	local preview_alpha = self.resize.interpolation.preview_alpha:get_value()
 
-	-- doublenickel.ffi.set_world_space(true)
-	-- doublenickel.ffi.set_layer(doublenickel.editor.layers.collider_overlay)
+	-- dn.unported.set_world_space(true)
+	-- dn.unported.set_layer(doublenickel.editor.layers.collider_overlay)
 
 	-- local p = self.resize.collider:get_position()
-	-- doublenickel.ffi.draw_quad(p.x, p.y, self.resize.new_size.x, self.resize.new_size.y, doublenickel.colors.spring_green:alpha(preview_alpha):to_vec4())
+	-- dn.unported.draw_quad(p.x, p.y, self.resize.new_size.x, self.resize.new_size.y, doublenickel.colors.spring_green:alpha(preview_alpha):to_vec4())
 end
 
 function BoxEditor:draw_corners()
 	local hover_alpha = self.resize.interpolation.hover:get_value()
 
-	-- doublenickel.ffi.set_world_space(true)
-	-- doublenickel.ffi.set_layer(doublenickel.editor.layers.collider_overlay)
+	-- dn.unported.set_world_space(true)
+	-- dn.unported.set_layer(doublenickel.editor.layers.collider_overlay)
 	-- for _, corner in pairs(self.resize.corners) do
-		-- doublenickel.ffi.draw_circle_sdf(corner.x, corner.y, self.resize.corner_radius, doublenickel.colors.spring_green:alpha(hover_alpha):to_vec4(), 1)
+		-- dn.unported.draw_circle_sdf(corner.x, corner.y, self.resize.corner_radius, doublenickel.colors.spring_green:alpha(hover_alpha):to_vec4(), 1)
 	-- end
 end
 

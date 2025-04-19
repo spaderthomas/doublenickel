@@ -10,23 +10,23 @@ end
 
 function doublenickel.time_metric.add(name)
   self.metrics:add(name)
-  dn.time_metrics_add(name)
+  dn.ffi.time_metrics_add(name)
 end
 
 function doublenickel.time_metric.begin(name)
-  dn.time_metric_begin(dn.String:new(name))
+  dn.ffi.time_metric_begin(String:new(name))
 end
 
 function doublenickel.time_metric.stop(name)
-  dn.time_metric_end(dn.String:new(name))
+  dn.ffi.time_metric_end(String:new(name))
 end
 
 function doublenickel.time_metric.query(name)
 	local metrics = {
-		average = dn.time_metric_average(name),
-		last = dn.time_metric_last(name),
-		largest = dn.time_metric_largest(name),
-		smallest = dn.time_metric_smallest(name)
+		average = dn.ffi.time_metric_average(name),
+		last = dn.ffi.time_metric_last(name),
+		largest = dn.ffi.time_metric_largest(name),
+		smallest = dn.ffi.time_metric_smallest(name)
 	}
 
   for key, value in pairs(metrics) do

@@ -46,12 +46,12 @@ function App:on_init_game()
         doublenickel.enums.WindowFlags.Windowed,
         doublenickel.enums.WindowFlags.Border
       ),
-      icon = dn.paths_resolve_format('dn_image', 'logo/icon.png'),
+      icon = dn.ffi.paths_resolve_format('dn_image', 'logo/icon.png'),
     }),
     gpu = GpuConfig:new({
-      shader_path = dn.paths_resolve('shaders'),
+      shader_path = dn.ffi.paths_resolve('shaders'),
       search_paths = {
-          dn.paths_resolve('shader_includes')
+          dn.ffi.paths_resolve('shader_includes')
       },
       shaders = {
       },
@@ -68,15 +68,15 @@ function App:on_init_game()
     }),
   })
 
-  dn.app_configure(dn_config)
+  dn.ffi.app_configure(dn_config)
 
   doublenickel.asset.register_cast(RenderTarget, 'dn_gpu_render_target_t')
   doublenickel.asset.register_cast(Shader, 'dn_gpu_shader_t')
   
   self.sdf = ffi.new('dn_sdf_renderer_t [1]');
-  self.sdf = dn.sdf_renderer_create(1024 * 1024)
+  self.sdf = dn.ffi.sdf_renderer_create(1024 * 1024)
 
-  self.command_buffer = dn.gpu_command_buffer_create(GpuCommandBufferDescriptor:new({
+  self.command_buffer = dn.ffi.gpu_command_buffer_create(GpuCommandBufferDescriptor:new({
     max_commands = 1024
   }))
 
@@ -112,14 +112,14 @@ function App:on_start_game()
 end
 
 function App:on_scene_rendered()
-  dn.gpu_begin_render_pass(self.command_buffer, self.render_pass)
-  dn.gpu_set_world_space(self.command_buffer, true)
-  dn.gpu_set_camera(self.command_buffer, doublenickel.editor.find('EditorCamera').offset:to_ctype())
-  dn.sdf_renderer_draw(self.sdf, self.command_buffer)
-  dn.gpu_end_render_pass(self.command_buffer)
-  dn.gpu_command_buffer_submit(self.command_buffer)
+  dn.ffi.gpu_begin_render_pass(self.command_buffer, self.render_pass)
+  dn.ffi.gpu_set_world_space(self.command_buffer, true)
+  dn.ffi.gpu_set_camera(self.command_buffer, doublenickel.editor.find('EditorCamera').offset:to_ctype())
+  dn.ffi.sdf_renderer_draw(self.sdf, self.command_buffer)
+  dn.ffi.gpu_end_render_pass(self.command_buffer)
+  dn.ffi.gpu_command_buffer_submit(self.command_buffer)
 
-  dn.gpu_render_target_blit(
+  dn.ffi.gpu_render_target_blit(
     doublenickel.asset.find(RenderTarget.Native),
     doublenickel.asset.find(RenderTarget.Upscaled)
   )

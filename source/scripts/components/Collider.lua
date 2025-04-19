@@ -88,9 +88,9 @@ function Collider:is_world_space() return self.world_space end
 
 function Collider:set_draw_space()
 	if self:is_world_space() then
-		doublenickel.ffi.set_world_space(true)()
+		dn.unported.set_world_space(true)()
 	else
-		doublenickel.ffi.end_world_space(true)()
+		dn.unported.end_world_space(true)()
 	end
 end
 

@@ -46,6 +46,6 @@ function PointLight:to_ctype()
 end
  
 function PointLight:draw()
-  -- self.angle = doublenickel.ffi.perlin(doublenickel.elapsed_time / 2, self.id, .4, .7)
+  -- self.angle = dn.unported.perlin(doublenickel.elapsed_time / 2, self.id, .4, .7)
   self.angle = doublenickel.math.ranged_sin(doublenickel.elapsed_time * 2, .4, .7)
 end

@@ -120,7 +120,7 @@ local function format_stack_frame_info(info)
   local namewhat = (info.namewhat == "" and "chunk at" or info.namewhat)
   local name = (info.name and "'" .. COLOR_BLUE .. info.name .. COLOR_RESET .. "'" or format_loc(source, info.linedefined))
 
-  local install_dir = dn.paths_resolve('dn_install')
+  local install_dir = dn.ffi.paths_resolve('dn_install')
 
   local formatted = format_loc(source, info.currentline) .. " in " .. namewhat .. " " .. name
   formatted = formatted:gsub(install_dir, '')

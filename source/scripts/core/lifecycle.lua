@@ -30,7 +30,7 @@ doublenickel.lifecycle.update_callbacks = doublenickel.enum.define(
 
 
 function doublenickel.lifecycle.run_callback(callback_id)
-  dn.trace('dn.lifecycle.run_callback', callback_id.to_string())
+  dn.ffi.trace('dn.ffi.lifecycle.run_callback', callback_id.to_string())
 
   local function run_callback(objects)
     for _, object in pairs(objects) do

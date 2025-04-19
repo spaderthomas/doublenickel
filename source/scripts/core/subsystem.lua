@@ -1,7 +1,7 @@
 local module = doublenickel.subsystem
 
 function doublenickel.subsystem.init()
-  dn.log('doublenickel.subsystem.init')
+  dn.ffi.log('doublenickel.subsystem.init')
   module.subsystems = {}
   for name, class in pairs(doublenickel.subsystem.types) do
     module.subsystems[name] = class:new()

@@ -73,7 +73,7 @@ function ColliderPoints:show(color)
     local next_point = self.points:at(index + 1)
     if not next_point then next_point = self.points:at(1) end
 
-    doublenickel.ffi.draw_line(point.x, point.y, next_point.x, next_point.y, 5, color)
+    dn.unported.draw_line(point.x, point.y, next_point.x, next_point.y, 5, color)
   end
 end
 

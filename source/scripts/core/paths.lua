@@ -44,19 +44,19 @@ function doublenickel.paths.load(file_path)
 	local install_paths = collect_paths(path_info.install_paths)
 	for path in install_paths:iterate_values() do
 		path.named_parent = path.named_parent or 'dn_install'
-		dn.paths_add_subpath(path.name, path.named_parent, path.full_path)
+		dn.ffi.paths_add_subpath(path.name, path.named_parent, path.full_path)
 	end
 
 	local write_paths = collect_paths(path_info.write_paths)
 	for path in write_paths:iterate_values() do
 		path.named_parent = path.named_parent or 'dn_write'
-		dn.paths_add_subpath(path.name, path.named_parent, path.full_path)
+		dn.ffi.paths_add_subpath(path.name, path.named_parent, path.full_path)
 	end
 
 	local app_paths = collect_paths(path_info.app_paths)
 	for path in app_paths:iterate_values() do
 		path.named_parent = path.named_parent or 'dn_app'
-		dn.paths_add_subpath(path.name, path.named_parent, path.full_path)
+		dn.ffi.paths_add_subpath(path.name, path.named_parent, path.full_path)
 	end
 
 	self.paths:concatenate(install_paths)
@@ -65,7 +65,7 @@ function doublenickel.paths.load(file_path)
 end
 
 function doublenickel.paths.iterate()
-	local named_paths = dn.paths_find_all()
+	local named_paths = dn.ffi.paths_find_all()
 	local i = -1
 
 	local function iterator()

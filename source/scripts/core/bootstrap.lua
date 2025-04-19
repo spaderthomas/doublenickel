@@ -8,7 +8,7 @@ function doublenickel.handle_error()
 
   -- The stack trace contains absolute paths, which are just hard to read. Also, if the path is long, it is
   -- shortened with "...". Remove the absolute part of the path, including the "..."
-  local install_dir = dn.paths_resolve('dn_install')
+  local install_dir = dn.ffi.paths_resolve('dn_install')
   local escaped_install = install_dir:gsub('%.', '%%.')
   local last_path_element = install_dir:match("([^/]+)$")
   local pattern = '%.%.%.(.*)/' .. last_path_element
@@ -21,7 +21,7 @@ function doublenickel.handle_error()
   stack_trace = stack_trace:gsub(pattern, '')
 
   local trace_message = string.format('stack trace:\n%s', stack_trace)
-  dn.log(trace_message)
+  dn.ffi.log(trace_message)
 
   doublenickel.debug.open_debugger(1)
 end
@@ -166,6 +166,9 @@ function doublenickel.init_phase_0()
 
   doublenickel.ffi = {}
   dn = {}
+  dn.ffi = {}
+  dn.unported = {}
+  dn.reflection = {}
 
 
   -- Bootstrap the FFI, so that we can resolve paths
@@ -173,7 +176,7 @@ function doublenickel.init_phase_0()
   local file_path = ffi.string(ffi.C.dn_paths_resolve_bootstrap('dn_ffi_h'))
   local dn_ffi_h, err = io.open(file_path)
   if not dn_ffi_h then
-    print(string.format('Failed to load dn.h from %s', file_path))
+    print(string.format('Failed to load dn.ffi.h from %s', file_path))
     print(err)
     return
   end
@@ -285,7 +288,7 @@ end
 
 function doublenickel.init_phase_1()
   doublenickel.enum.init()
-  doublenickel.ffi.init()
+  dn.ffi.init()
   doublenickel.paths.init()
   doublenickel.math.init()
   doublenickel.time_metric.init()
