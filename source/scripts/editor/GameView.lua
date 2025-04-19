@@ -22,13 +22,12 @@ function GameView:init(name, render_target, size_calculation, size, priority)
   self.render_target = render_target
   self.size_calculation = size_calculation
   self.size = size:copy()
-  self.priority = priority
+  self.priority = priority or GameViewPriority.Main
 
   self.position = doublenickel.vec2()
 end
 
 function GameView:update()
-  dn.trace('GameView:update', self.name)
   imgui.PushStyleVar_2(ffi.C.ImGuiStyleVar_WindowPadding, 0, 0)
   doublenickel.editor.begin_window(self.name)
 

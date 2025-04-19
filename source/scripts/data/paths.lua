@@ -27,6 +27,12 @@ return {
 						dn_shader = '%s',
 					}
 				},
+        dn_layouts = {
+					path = 'layouts',
+					children = {
+						dn_layout = '%s.ini'
+					}
+				},
 			}
 		},
 		dn_scripts = {
@@ -53,14 +59,11 @@ return {
 		},
 	},
 	app_paths = {
-		app_entry_point = 'App.lua',
 		components = 'components',
 		core = 'core',
 		data = {
 			path = 'data',
 			children = {
-				layouts = 'layouts',
-				layout = 'layouts/%s.ini',
 				dialogues = {
 					path = 'dialogue',
 					children = {

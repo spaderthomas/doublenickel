@@ -193,11 +193,10 @@ function doublenickel.init_phase_0()
     
     if ffi_size ~= type_info.size then
       type_mismatch = true
-      print(string.format(
+      assert(false, string.format(
         'Found type mismatch; type = %s, ffi_size = %d, compiled_size = %d',
         ffi.string(type_info.name),
-        ffi_size, type_info.size)
-      )
+        ffi_size, type_info.size))
     end
   end
   if type_mismatch then 

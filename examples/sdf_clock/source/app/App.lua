@@ -225,17 +225,17 @@ end
 --
 -- This is where I do post processing and compositing.
 function App:on_scene_rendered()
-  dn.gpu_begin_render_pass(self.command_buffer, self.render_pass)
-  dn.gpu_set_world_space(self.command_buffer, true)
-  dn.gpu_set_camera(self.command_buffer, doublenickel.editor.find('EditorCamera').offset:to_ctype())
-  dn.sdf_renderer_draw(self.sdf_renderer, self.command_buffer)
-  dn.gpu_end_render_pass(self.command_buffer)
-  dn.gpu_command_buffer_submit(self.command_buffer)
+  -- dn.gpu_begin_render_pass(self.command_buffer, self.render_pass)
+  -- dn.gpu_set_world_space(self.command_buffer, true)
+  -- dn.gpu_set_camera(self.command_buffer, doublenickel.editor.find('EditorCamera').offset:to_ctype())
+  -- dn.sdf_renderer_draw(self.sdf_renderer, self.command_buffer)
+  -- dn.gpu_end_render_pass(self.command_buffer)
+  -- dn.gpu_command_buffer_submit(self.command_buffer)
 
-  dn.gpu_render_target_blit(
-    doublenickel.asset.find(RenderTarget.Native),
-    doublenickel.asset.find(RenderTarget.Upscaled)
-  )
+  -- dn.gpu_render_target_blit(
+  --   doublenickel.asset.find(RenderTarget.Native),
+  --   doublenickel.asset.find(RenderTarget.Upscaled)
+  -- )
 end
 
 -- Finally, once the framework has the swapchain ready, you can draw to it. In an editor build, everything is rendered

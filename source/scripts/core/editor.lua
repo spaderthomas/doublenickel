@@ -13,9 +13,11 @@ function EditorConfig:init(params)
   self.layout = params.layout or 'default'
 
   if params.render_pass then
+    dn.trace('dn.editor.configure', 'Configuring editor to use the app\'s render pass and command buffer')
     self.render_pass = params.render_pass
     self.command_buffer = params.command_buffer
   else
+    dn.trace('dn.editor.configure', 'Creating the editor to use its own render pass and command buffer')
     dn.gpu_render_target_create(GpuRenderTargetDescriptor:new({
       name = DnRenderTargets.Editor,
       size = Vector2:new(1024, 576)
@@ -87,13 +89,15 @@ function doublenickel.editor.update()
 
   dn.gpu_begin_render_pass(self.config.command_buffer, self.config.render_pass)
   for name, editor in doublenickel.iterator.pairs(doublenickel.editor.entities) do
-    dn.trace('dn.editor.update', name)
+    dn.trace('dn.editor.update_entity', name)
     editor:update()
     editor:draw()
   end
 
-  dn.gpu_set_world_space(self.config.command_buffer, true)
+  dn.trace('dn.editor.update', 'Rendering the editor')
+
   local camera = self.find('EditorCamera').offset:to_ctype()
+  dn.gpu_set_world_space(self.config.command_buffer, true)
   dn.gpu_set_camera(self.config.command_buffer, camera)
   dn.coord_set_camera(camera.x, camera.y)
   dn.sdf_renderer_draw(self.sdf, self.config.command_buffer)
@@ -102,9 +106,11 @@ function doublenickel.editor.update()
 end
 
 function doublenickel.editor.configure(config)
+  dn.trace('dn.editor.configure')
+
   self.config = config
 
-  self.sdf = ffi.new('dn_sdf_renderer_t [1]');
+  -- self.sdf = ffi.new('dn_sdf_renderer_t [1]');
   self.sdf = dn.sdf_renderer_create(1024 * 1024)
 
   doublenickel.editor.find('EditorUtility').enabled.grid = config.grid_enabled

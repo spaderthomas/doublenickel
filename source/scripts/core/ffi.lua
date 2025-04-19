@@ -1049,18 +1049,28 @@ function dn.log(fmt, ...)
   return ffi.C.dn_log_str(dn.String:new(string.format(fmt, ...)))
 end
 
-function dn.trace(fn_name, fmt, ...)
-  local COLOR_RED = string.char(27) .. "[91m"
-  local COLOR_BLUE = string.char(27) .. "[94m"
-  local COLOR_YELLOW = string.char(27) .. "[33m"
-  local COLOR_RESET = string.char(27) .. "[0m"
+local COLOR_GRAY = string.char(27) .. "[90m"
+local COLOR_RED = string.char(27) .. "[91m"
+local COLOR_BLUE = string.char(27) .. "[94m"
+local COLOR_YELLOW = string.char(27) .. "[33m"
+local COLOR_RESET = string.char(27) .. "[0m"
 
+function dn.warn(tag, fmt, ...)
+  dn.log_colored(COLOR_YELLOW, tag, fmt, ...)
+end
+
+function dn.trace(tag, fmt, ...)
+  -- if not trace_enabled then return end
+  dn.log_colored(COLOR_GRAY, tag, fmt, ...)
+end
+
+function dn.log_colored(color, tag, fmt, ...)
   if fmt then
     local message = string.format(fmt, ...)
-    message = string.format('[%s%s%s] %s', COLOR_YELLOW, fn_name, COLOR_RESET, message)
+    message = string.format('[%s%s%s] %s', color, tag, COLOR_RESET, message)
     dn.log(message)
   else
-    local message = string.format('[%s%s%s]', COLOR_YELLOW, fn_name, COLOR_RESET)
+    local message = string.format('[%s%s%s]', color, tag, COLOR_RESET)
     dn.log(message)
   end
 end
@@ -1123,6 +1133,14 @@ end
 
 function dn.window_get_display_mode()
   return doublenickel.enums.DisplayMode(ffi.C.dn_window_get_display_mode())
+end
+
+function dn.imgui_load_layout(name)
+  ffi.C.dn_imgui_load_layout(dn.String:new(name))
+end
+
+function dn.imgui_save_layout(name)
+  ffi.C.dn_imgui_save_layout(dn.String:new(name))
 end
 
 function doublenickel.ffi.set_camera()

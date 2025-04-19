@@ -20,7 +20,7 @@
 
 -- IMGUI_LAYER_1
 function imgui.internal.init_c_api()
-  imgui.internal.dll = ffi.load('cimgui-1.91.9-windows-x64.dll')
+  imgui.internal.dll = ffi.load('cimgui.dll')
 	local header = doublenickel.module.read_from_named_path('cimgui_header')
 	ffi.cdef(header)
 end
@@ -123,7 +123,11 @@ function imgui.internal.init_lua_api_overwrites()
 
 
 	function imgui.PushFont(font_name, size)
-		ffi.C.dn_imgui_push_font(font_name, size)
+		-- ffi.C.dn_imgui_push_font(font_name, size)
+	end
+
+  function imgui.PopFont()
+		-- ffi.C.dn_imgui_push_font(font_name, size)
 	end
 
 	function imgui.image(image, sx, sy)
@@ -181,7 +185,7 @@ function imgui.internal.init_lua_api_overwrites()
 		local allocator = dn.allocator_find('bump')
 		local buffer_len = len + max_chars_per_frame
 		local buffer = allocator:alloc(buffer_len)
-		dn.cstr_copy_n(value, len, buffer, buffer_len)
+		dn.cstr_copy_to_n(value, len, buffer, buffer_len)
 	
 		flags = flags or 0
 		flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiInputTextFlags_CallbackResize)

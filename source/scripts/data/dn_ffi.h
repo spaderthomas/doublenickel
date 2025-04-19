@@ -16,13 +16,13 @@ typedef uint64_t u64;
 typedef float f32;
 typedef double f64;
 typedef u64 dn_hash_t;
+typedef u32 dn_error_t;
 typedef char dn_asset_name_t [64];
   
   typedef void* dn_win32_handle_t;
   typedef u32 dn_win32_dword_t;
   typedef void* dn_win32_find_data_t;
   typedef void* dn_win32_critical_section_t;
-  
   
   
   
@@ -384,9 +384,14 @@ typedef enum {
   DN_LOG_FLAG_FILE = 2,
   DN_LOG_FLAG_DEFAULT = 3,
 } dn_log_flags_t;
+typedef enum {
+  DN_LOG_LEVEL_INFO = 1,
+  DN_LOG_LEVEL_TRACE = 2,
+} dn_log_level_t;
 typedef struct {
   char message_buffer [4096];
   char preamble_buffer [512];
+  u32 level;
 } dn_log_t;
 dn_log_t dn_logger;
  void dn_log(const char* fmt, ...);
@@ -921,16 +926,16 @@ typedef struct {
   dn_imgui_colors_t colors;
 } dn_imgui_t;
 dn_imgui_t dn_imgui;
- void    dn_imgui_push_font(const char* font_name, u32 size);
- void    dn_imgui_image(const char* image, float sx, float sy);
- void    dn_imgui_file_browser_open();
- void    dn_imgui_file_browser_close();
- void    dn_imgui_file_browser_set_work_dir(const char* directory);
- bool    dn_imgui_file_browser_is_file_selected();
+ void         dn_imgui_push_font(const char* font_name, u32 size);
+ void         dn_imgui_image(const char* image, float sx, float sy);
+ void         dn_imgui_file_browser_open();
+ void         dn_imgui_file_browser_close();
+ void         dn_imgui_file_browser_set_work_dir(const char* directory);
+ bool         dn_imgui_file_browser_is_file_selected();
  dn_tstring_t dn_imgui_file_browser_get_selected_file();
- void    dn_imgui_load_layout(const char* file_name);
- void    dn_imgui_save_layout(const char* file_name);
- void    dn_imgui_load_colors(dn_imgui_colors_t colors);
+ void         dn_imgui_load_layout(dn_string_t file_name);
+ void         dn_imgui_save_layout(dn_string_t file_name);
+ void         dn_imgui_load_colors(dn_imgui_colors_t colors);
   typedef void* dn_lua_interpreter_t;
 typedef struct {
   dn_string_t scripts;
@@ -1200,10 +1205,10 @@ typedef struct {
   u32 count;
 } dn_gpu_uniform_buffer_binding_array_t;
 typedef struct {
-   dn_gpu_vertex_buffer_binding_array_t vertex;
-   dn_gpu_uniform_binding_array_t uniforms;
-   dn_gpu_storage_buffer_binding_array_t storage;
-   dn_gpu_uniform_buffer_binding_array_t uniform_buffers;
+  __declspec(align(16)) dn_gpu_vertex_buffer_binding_array_t vertex;
+  __declspec(align(16)) dn_gpu_uniform_binding_array_t uniforms;
+  __declspec(align(16)) dn_gpu_storage_buffer_binding_array_t storage;
+  __declspec(align(16)) dn_gpu_uniform_buffer_binding_array_t uniform_buffers;
 } dn_gpu_buffer_binding_t;
 typedef struct {
   dn_gpu_blend_func_t fn;

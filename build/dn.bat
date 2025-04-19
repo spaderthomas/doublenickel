@@ -11,25 +11,34 @@ SET "DN_SOURCE=%DN%\source"
       SET "DN_FFI_H=%DN_DATA%\dn_ffi.h"
 SET "DN_EXTERNAL=%DN%\external"
   SET "DN_INCLUDE=%DN_EXTERNAL%\include"
-    SET "DN_IMGUI=%DN_INCLUDE%\cimgui"
-    SET "DN_FREETYPE=%DN_INCLUDE%\freetype"
+    SET "DN_INCLUDE_IMGUI=%DN_INCLUDE%\cimgui"
+    SET "DN_INCLUDE_FREETYPE=%DN_INCLUDE%\freetype"
+    SET "DN_INCLUDE_LUAJIT=%DN_INCLUDE%\lua"
   SET "DN_LIB=%DN_EXTERNAL%\lib\debug"
-
     SET "DN_LIB_GLFW=%DN_LIB%\glfw3.lib"
     SET "DN_DLL_GLFW=%DN_LIB%\glfw3.dll"
     SET "DN_PDB_GLFW=%DN_LIB%\glfw3.pdb"
+
     SET "DN_LIB_CIMGUI=%DN_LIB%\cimgui.lib"
     SET "DN_DLL_CIMGUI=%DN_LIB%\cimgui.dll"
     SET "DN_PDB_CIMGUI=%DN_LIB%\cimgui.pdb"
-    SET "DN_LIB_LUA=%DN_LIB%\luajit-2.1.0.3-windows-x64.lib"
+
+    SET "DN_LIB_LUAJIT=%DN_LIB%\lua51.lib"
+    SET "DN_DLL_LUAJIT=%DN_LIB%\lua51.dll"
+    SET "DN_PDB_LUAJIT=%DN_LIB%\lua51.pdb"
+
     SET "DN_LIB_FREETYPE=%DN_LIB%\freetype-2.10.4-windows-x64.lib"
+
     SET "DN_LIB_GLAD=%DN_LIB%\glad-0.1.36-windows-x64.lib"
+
     SET "DN_LIB_STEAM=%DN_LIB%\steam_api64.lib"
     SET "DN_DLL_STEAM=%DN_LIB%\steam_api64.dll"
-    SET "DN_DLLS="%DN_DLL_CIMGUI%" "%DN_DLL_GLFW%" "%DN_DLL_STEAM%""
 
-SET "DN_SWITCH_INCLUDE=/I%DN% /I%DN_INCLUDE% /I%DN_IMGUI% /I%DN_FREETYPE%"
-SET "DN_SWITCH_LIBS="%DN_LIB_FREETYPE%" "%DN_LIB_GLFW%" "%DN_LIB_GLAD%" "%DN_LIB_LUA%" "%DN_LIB_STEAM%" "%DN_LIB_CIMGUI%""
+    SET "DN_DLLS="%DN_DLL_CIMGUI%" "%DN_DLL_GLFW%" "%DN_DLL_STEAM%" "%DN_DLL_LUAJIT%""
+    SET "DN_PDBS="%DN_PDB_CIMGUI%" "%DN_PDB_GLFW%" "%DN_PDB_LUAJIT%""
+
+SET "DN_SWITCH_INCLUDE=/I%DN% /I%DN_INCLUDE% /I%DN_INCLUDE_IMGUI% /I%DN_INCLUDE_FREETYPE%"
+SET "DN_SWITCH_LIBS="%DN_LIB_FREETYPE%" "%DN_LIB_GLFW%" "%DN_LIB_GLAD%" "%DN_LIB_LUAJIT%" "%DN_LIB_STEAM%" "%DN_LIB_CIMGUI%""
 
 SET "DN_FOREGROUND_BLACK=[30m"
 SET "DN_FOREGROUND_RED=[31m"
@@ -49,6 +58,7 @@ SET "DN_BACKGROUND_CYAN=[46m"
 SET "DN_BACKGROUND_WHITE=[47m"
 SET "DN_FOREGROUND_RESET=[0m"
 
+SET "DN_REDIRECT_OUTPUT=>NUL 2>&1"
 EXIT /B
 
 :::::::::::::
@@ -68,12 +78,26 @@ EXIT /B
   MOVE /Y %DN_FFI_H_TMP% %DN_FFI_H%
   FINDSTR /R /V /B /C:"@DN_FFI_CANARY" %DN_FFI_H% > %DN_FFI_H_TMP%
   MOVE /Y %DN_FFI_H_TMP% %DN_FFI_H%
+  CALL :DN_ECHO_INFO "Successfully rebuilt %DN_FFI_H%"
+
 
   EXIT /B
 
 :DN_COPY_DLLS
-  for %%f in (%DN_DLLS%) do (
-    COPY "%%f" "%~1"
+  CALL :DN_ECHO_INFO "Copying external DLLs to build directory..."
+
+  FOR %%F IN (%DN_DLLS%) DO (
+    CALL :DN_ECHO_INFO "Copying %%~F to %~1"
+    COPY "%%F" "%~1"
+  )
+
+  EXIT /B
+
+:DN_COPY_PDBS
+  CALL :DN_ECHO_INFO "Copying external PDBs to build directory..."
+  FOR %%F IN (%DN_PDBS%) DO (
+    CALL :DN_ECHO_INFO "Copying %%~F to %~1"
+    COPY "%%F" "%~1"
   )
   EXIT /B
 
@@ -128,38 +152,36 @@ EXIT /B
   EXIT /B
 
 :DN_REPLACE_FILE
+  IF NOT EXIST %2 (
+    CALL :DN_ECHO_ERROR "DN_REPLACE_FILE: Source file %2 does not exist"
+    EXIT /B
+  )
+
   IF EXIST %1 (
     DEL %1
   )
+
+  CALL :DN_ECHO_INFO "Replacing %1 with %2"
   COPY %2 %1
   EXIT /B
 
 :DN_INITIALIZE_VS_PROMPT
-  IF DEFINED VisualStudioVersion (EXIT /B)
+  IF DEFINED VisualStudioVersion ( EXIT /B )
 
-  IF "%~1" == "" (
-    SET "DN_VS_YEAR=2022"
-  ) ELSE (
-    SET "DN_VS_YEAR=%~1"
+  SET "DN_VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
+  SET "DN_VSWHERE_FLAGS=-latest -products * -requires Microsoft.Component.MSBuild -property installationPath"
+
+  FOR /f "usebackq tokens=*" %%P IN (`"%DN_VSWHERE%" %DN_VSWHERE_FLAGS%`) do (
+    ECHO %%P
+    set "DN_VS_PREFIX=%%P"
   )
 
-  IF "%~2" == "" (
-    SET "DN_VS_VERSION=Community"
-  ) ELSE (
-    SET "DN_VS_VERSION=%~2"
-  )
-
-  IF "%~3" == "" (
-    SET "DN_VS_PREFIX=C:\Program Files"
-  ) ELSE (
-    SET "DN_VS_PREFIX=%~3"
-  )
-
-  SET "DN_VSDEVCMD=%DN_VS_PREFIX%\Microsoft Visual Studio\%DN_VS_YEAR%\%DN_VS_VERSION%\Common7\Tools\VsDevCmd.bat"
+  SET "DN_VSDEVCMD=%DN_VS_PREFIX%\Common7\Tools\VsDevCmd.bat"
   SET "DN_VSDEVCMD_FLAGS=/arch=amd64 /host_arch=amd64 /no_logo"
 
   CALL :DN_ECHO_INFO "Initializing Visual Studio command prompt"
   CALL :DN_ECHO_INFO "%DN_VSDEVCMD% %DN_VSDEVCMD_FLAGS%"
 
   CALL "%DN_VSDEVCMD%" %DN_VSDEVCMD_FLAGS%
+  
   EXIT /B
