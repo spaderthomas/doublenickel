@@ -184,6 +184,7 @@ typedef char dn_asset_name_t [DN_ASSET_NAME_LEN];
 
 #define DN_ASSERT(condition) assert(condition)
 #define DN_SOFT_ASSERT(condition) DN_ASSERT(condition) // For things you want to crash in development, but fix before release (as opposed to assers which are left in release builds and, say, logged)
+#define DN_ASSERT_MSG(cond, message) do { if (!cond) { DN_LOG_2(message); DN_ASSERT(cond); } } while(false);
 #define DN_UNTESTED() DN_ASSERT(false)
 #define DN_UNREACHABLE() DN_ASSERT(false)
 #define DN_UNREACHABLE_MESSAGE(message) DN_ASSERT(false && (message))
@@ -2772,6 +2773,10 @@ void dn_gpu_command_buffer_submit(dn_gpu_command_buffer_t* command_buffer) {
         switch (command->render_pass.color.load) {
           case DN_GPU_LOAD_OP_CLEAR: {
             dn_gpu_render_target_clear(command->render_pass.color.attachment);
+            break;
+          }
+          default: {
+            break;
           }
         }
 
@@ -3838,7 +3843,8 @@ dn_asset_data_t dn_asset_registry_find(const char* name) {
       return NULL;
     }
   
-    return gs_hash_table_getp(dn_app.asset_registry.assets, hash);
+    dn_asset_t* asset = gs_hash_table_getp(dn_app.asset_registry.assets, hash);
+    return asset->data;
 }
 
 void dn_asset_registry_update() {
