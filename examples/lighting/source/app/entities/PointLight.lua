@@ -1,4 +1,4 @@
-local PointLight = doublenickel.entity.define('PointLight')
+local PointLight = dn.entity.define('PointLight')
 
 PointLight.components = {
   'Collider'
@@ -26,7 +26,7 @@ PointLight:set_field_metadatas({
 
 
 function PointLight:init(params)
-  self.color = doublenickel.color(params.color)
+  self.color = dn.color(params.color)
   self.radial_falloff = params.radial_falloff or 0.5
   self.angular_falloff = params.angular_falloff or 0.5
   self.intensity = params.intensity or 0.5
@@ -34,7 +34,7 @@ function PointLight:init(params)
   self.angle = params.angle or 0.0
   
   local collider = self:find_component('Collider')
-  collider:set_shape(doublenickel.enums.ColliderShape.Circle)
+  collider:set_shape(dn.enums.ColliderShape.Circle)
   collider.impl:set_radius(12)
 end
 
@@ -46,6 +46,6 @@ function PointLight:to_ctype()
 end
  
 function PointLight:draw()
-  -- self.angle = dn.unported.perlin(doublenickel.elapsed_time / 2, self.id, .4, .7)
-  self.angle = doublenickel.math.ranged_sin(doublenickel.elapsed_time * 2, .4, .7)
+  -- self.angle = dn.unported.perlin(dn.elapsed_time / 2, self.id, .4, .7)
+  self.angle = dn.math.ranged_sin(dn.elapsed_time * 2, .4, .7)
 end

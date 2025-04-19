@@ -1,4 +1,4 @@
-local Random = doublenickel.node('Random')
+local Random = dn.node('Random')
 
 function Random:init()
   self.children_chosen = {}

@@ -1,4 +1,4 @@
-Debug = doublenickel.entity.define('Debug')
+Debug = dn.entity.define('Debug')
 
 Debug.components = {
   'Render'

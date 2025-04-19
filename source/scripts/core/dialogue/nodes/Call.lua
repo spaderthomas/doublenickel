@@ -1,4 +1,4 @@
-local Call = doublenickel.node('Call')
+local Call = dn.node('Call')
 
 function Call:init()
   -- What node should I jump to?
@@ -17,8 +17,8 @@ function Call:has_target_dialogue()
 end
 
 function Call:advance(graph)
-  local controller = doublenickel.dialogue.controller
-  local stack = doublenickel.dialogue.stack
+  local controller = dn.dialogue.controller
+  local stack = dn.dialogue.stack
 
   -- When we finally encounter a Return node, it should go to this node's child (which
   -- exists in the currently loaded dialogue)
@@ -34,11 +34,11 @@ function Call:advance(graph)
     -- Ask the controller to load the target dialogue, then return the
     -- target node within as the current node
     controller:change_dialogue(self.target_dialogue)
-    local node = doublenickel.dialogue.find_node(controller.nodes, self.target)
+    local node = dn.dialogue.find_node(controller.nodes, self.target)
     return node
   else
     -- We've already got the graph, so find the node in it
-    local node = doublenickel.dialogue.find_node(graph, self.target)
+    local node = dn.dialogue.find_node(graph, self.target)
     return node
   end
 end

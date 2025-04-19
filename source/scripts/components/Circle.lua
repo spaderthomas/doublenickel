@@ -1,10 +1,10 @@
-ColliderCircle = doublenickel.component.define('ColliderCircle')
+ColliderCircle = dn.component.define('ColliderCircle')
 
 function ColliderCircle:init(params)
   params = params or {}
 
-  local position = params.position or doublenickel.vec2(0, 0)
-  self.position = doublenickel.vec2(position)
+  local position = params.position or dn.vec2(0, 0)
+  self.position = dn.vec2(position)
 
   self.radius = params.radius or 100
 end
@@ -28,11 +28,11 @@ function ColliderCircle:get_width()
 end
 
 function ColliderCircle:get_center()
-  return doublenickel.vec2(self.position)
+  return dn.vec2(self.position)
 end
 
 function ColliderCircle:get_position()
-  return doublenickel.vec2(self.position)
+  return dn.vec2(self.position)
 end
 
 function ColliderCircle:get_xmin()
@@ -62,8 +62,8 @@ function ColliderCircle:set_position(position)
 end
 
 function ColliderCircle:show(color)
-  color = color or doublenickel.colors.red
-  doublenickel.editor.sdf:circle({
+  color = color or dn.colors.red
+  dn.editor.sdf:circle({
     position = self.position,
     color = color,
     rotation = 0,
@@ -71,7 +71,7 @@ function ColliderCircle:show(color)
     radius = self.radius
   })
   --dn.unported.draw_quad(self.position.x, self.position.y, self.radius, self.radius, color)
-  -- dn.unported.draw_circle_sdf(self.position.x, self.position.y, self.radius, doublenickel.color_to_vec4(color), 1)
+  -- dn.unported.draw_circle_sdf(self.position.x, self.position.y, self.radius, dn.color_to_vec4(color), 1)
 end
 
 function ColliderCircle:is_point_inside(point)
@@ -121,8 +121,8 @@ function ColliderCircle:project(axis)
 end
 
 function ColliderCircle:center_image(image)
-  local sx, sy = doublenickel.sprite_size(image)
-  local position = doublenickel.vec2()
+  local sx, sy = dn.sprite_size(image)
+  local position = dn.vec2()
   position.x = self.position.x - sx / 2
   position.y = self.position.y + sy / 2
   return position

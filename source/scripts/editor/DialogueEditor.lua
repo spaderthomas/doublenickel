@@ -1,4 +1,4 @@
-local DialogueEditor = doublenickel.editor.define('DialogueEditor')
+local DialogueEditor = dn.editor.define('DialogueEditor')
 
 function DialogueEditor:init(params)
 	self.data = {}
@@ -10,7 +10,7 @@ function DialogueEditor:init(params)
 
 	local node_editor_params = {
 		name = 'Dialogue Editor',
-		node_kinds = doublenickel.dialogue.sorted_node_kinds,
+		node_kinds = dn.dialogue.sorted_node_kinds,
 		nodes = self.nodes,
 		gnodes = self.gnodes,
 		on_node_add = function(i, name) return self:on_node_add(i, name) end,
@@ -49,7 +49,7 @@ function DialogueEditor:init(params)
 	self.time = 0
 	self.glow = 0
 
-  self.input = ContextualInput:new(doublenickel.enums.InputContext.Editor)
+  self.input = ContextualInput:new(dn.enums.InputContext.Editor)
 
 	self.ids = {
 		state_picker_value = '##state_picker_value',
@@ -67,24 +67,24 @@ function DialogueEditor:init(params)
 	}
 
 	self.colors = {
-		branch_true = doublenickel.colors.light_green:copy(),
-		branch_false = doublenickel.colors.cardinal:copy(),
-		index_label = doublenickel.colors.white:copy(),
-		default = doublenickel.colors.charcoal:copy(),
-		highlighted = doublenickel.colors.cool_gray:copy(),
-		entry_point = doublenickel.colors.cadet_gray:copy(),
-		find_result = doublenickel.colors.celadon:copy(),
-		invalid = doublenickel.colors.cardinal:copy(),
+		branch_true = dn.colors.light_green:copy(),
+		branch_false = dn.colors.cardinal:copy(),
+		index_label = dn.colors.white:copy(),
+		default = dn.colors.charcoal:copy(),
+		highlighted = dn.colors.cool_gray:copy(),
+		entry_point = dn.colors.cadet_gray:copy(),
+		find_result = dn.colors.celadon:copy(),
+		invalid = dn.colors.cardinal:copy(),
 		nodes = {
-			[doublenickel.dialogue.node_kind.End] = doublenickel.colors.orange:copy(),
-			[doublenickel.dialogue.node_kind.Set] = doublenickel.colors.tyrian_purple:copy(),
-			[doublenickel.dialogue.node_kind.ChoiceList] = doublenickel.colors.zomp:copy(),
-			[doublenickel.dialogue.node_kind.Label] = doublenickel.colors.indian_red:copy(),
-			[doublenickel.dialogue.node_kind.Call] = doublenickel.colors.prussian_blue:copy(),
-			[doublenickel.dialogue.node_kind.Jump] = doublenickel.colors.prussian_blue:copy(),
-			[doublenickel.dialogue.node_kind.Return] = doublenickel.colors.prussian_blue:copy(),
-			[doublenickel.dialogue.node_kind.DevMarker] = doublenickel.colors.cadet_gray:copy(),
-			[doublenickel.dialogue.node_kind.DevNote] = doublenickel.colors.cadet_gray:copy(),
+			[dn.dialogue.node_kind.End] = dn.colors.orange:copy(),
+			[dn.dialogue.node_kind.Set] = dn.colors.tyrian_purple:copy(),
+			[dn.dialogue.node_kind.ChoiceList] = dn.colors.zomp:copy(),
+			[dn.dialogue.node_kind.Label] = dn.colors.indian_red:copy(),
+			[dn.dialogue.node_kind.Call] = dn.colors.prussian_blue:copy(),
+			[dn.dialogue.node_kind.Jump] = dn.colors.prussian_blue:copy(),
+			[dn.dialogue.node_kind.Return] = dn.colors.prussian_blue:copy(),
+			[dn.dialogue.node_kind.DevMarker] = dn.colors.cadet_gray:copy(),
+			[dn.dialogue.node_kind.DevNote] = dn.colors.cadet_gray:copy(),
 		}
 	}
 
@@ -124,8 +124,8 @@ function DialogueEditor:update(dt)
 end
 
 function DialogueEditor:update_timers()
-	self.time = self.time + doublenickel.dt
-	self.glow = self.glow + doublenickel.dt
+	self.time = self.time + dn.dt
+	self.glow = self.glow + dn.dt
 end
 
 function DialogueEditor:load_queued_scene()
@@ -136,17 +136,17 @@ function DialogueEditor:load_queued_scene()
 end
 
 DialogueEditor.node_creation_hotkeys = {
-	[glfw.keys.T] = doublenickel.dialogue.node_kind.Text,
-	[glfw.keys.L] = doublenickel.dialogue.node_kind.ChoiceList,
-	[glfw.keys.C] = doublenickel.dialogue.node_kind.Choice,
-	[glfw.keys.J] = doublenickel.dialogue.node_kind.Jump,
-	[glfw.keys.S] = doublenickel.dialogue.node_kind.Set,
-	[glfw.keys.N] = doublenickel.dialogue.node_kind.Continue,
-	[glfw.keys.D] = doublenickel.dialogue.node_kind.DevNote,
+	[glfw.keys.T] = dn.dialogue.node_kind.Text,
+	[glfw.keys.L] = dn.dialogue.node_kind.ChoiceList,
+	[glfw.keys.C] = dn.dialogue.node_kind.Choice,
+	[glfw.keys.J] = dn.dialogue.node_kind.Jump,
+	[glfw.keys.S] = dn.dialogue.node_kind.Set,
+	[glfw.keys.N] = dn.dialogue.node_kind.Continue,
+	[glfw.keys.D] = dn.dialogue.node_kind.DevNote,
 }
 
 function DialogueEditor:check_hotkeys()
-	if not doublenickel.editor.is_window_focused(self.node_editor.name) then return end
+	if not dn.editor.is_window_focused(self.node_editor.name) then return end
 
 	for hotkey, node_kind in pairs(self.node_creation_hotkeys) do
 		if self.input:chord_pressed(glfw.keys.ALT, hotkey) then
@@ -157,13 +157,13 @@ function DialogueEditor:check_hotkeys()
 end
 
 function DialogueEditor:draw_sidebar()
-	doublenickel.editor.begin_window('Dialogue Node')
+	dn.editor.begin_window('Dialogue Node')
 
 	-- Selected node detail view
 	self:update_text_editor()
 	self:selected_detail_view()
 
-	doublenickel.editor.end_window('Node Info')
+	dn.editor.end_window('Node Info')
 end
 
 function DialogueEditor:selected_detail_view()
@@ -174,8 +174,8 @@ function DialogueEditor:selected_detail_view()
 			self:mark_graph_dirty()
 		end
 
-		if selected.kind == doublenickel.dialogue.node_kind.Choice then
-			doublenickel.editor.begin_window('Node Info')
+		if selected.kind == dn.dialogue.node_kind.Choice then
+			dn.editor.begin_window('Node Info')
 
 			local change, op = imgui.extensions.AlignedBranchCombinator(selected.unlock.combinator, self.selected_editor)
 			if change then
@@ -187,11 +187,11 @@ function DialogueEditor:selected_detail_view()
 				imgui.TreePop()
 			end
 
-			doublenickel.editor.end_window()
+			dn.editor.end_window()
 		end
 
 		-- Set/Increment nodes: A dropdown with all the state fields in the game
-		if selected.kind == doublenickel.dialogue.node_kind.Set or selected.kind == doublenickel.dialogue.node_kind.Increment then
+		if selected.kind == dn.dialogue.node_kind.Set or selected.kind == dn.dialogue.node_kind.Increment then
 			imgui.Dummy(0, 10)
 			local change, state = self.state_picker:update(0)
 
@@ -199,11 +199,11 @@ function DialogueEditor:selected_detail_view()
 				selected.variable = state
 
 				-- When a new field is selected, give a sane default value
-				if doublenickel.state.is_number(state) then
+				if dn.state.is_number(state) then
 					selected.value = 0
-				elseif doublenickel.state.is_boolean(state) then
+				elseif dn.state.is_boolean(state) then
 					selected.value = true
-				elseif doublenickel.state.is_string(state) then
+				elseif dn.state.is_string(state) then
 					selected.value = ''
 				end
 			end
@@ -211,12 +211,12 @@ function DialogueEditor:selected_detail_view()
 
 		-- Branch nodes: A dropdown with all state fields, but they are in
 		-- rows where you can composite different flags to AND together
-		if selected.kind == doublenickel.dialogue.node_kind.ActiveSkillCheck then
+		if selected.kind == dn.dialogue.node_kind.ActiveSkillCheck then
 			imgui.Dummy(0, 20)
 			imgui.extensions.Rolls(selected.branches)
 		end
 
-		if selected.kind == doublenickel.dialogue.node_kind.Branch then
+		if selected.kind == dn.dialogue.node_kind.Branch then
 			imgui.Dummy(0, 10)
 			imgui.Separator()
 			imgui.Dummy(0, 10)
@@ -329,7 +329,7 @@ function DialogueEditor:update_search()
 end
 
 function DialogueEditor:draw_search()
-	doublenickel.editor.begin_window('Dialogue Search')
+	dn.editor.begin_window('Dialogue Search')
 
 	imgui.PushTextWrapPos(0)
 	imgui.Text(
@@ -364,7 +364,7 @@ function DialogueEditor:draw_search()
 
 	imgui.extensions.Table(self.search_result)
 
-	doublenickel.editor.end_window()
+	dn.editor.end_window()
 end
 
 function DialogueEditor:update_graph_validation()
@@ -378,9 +378,9 @@ function DialogueEditor:draw_graph_validation()
 	local good_color = self.colors.branch_true:to_u32()
 	local bad_color = self.colors.branch_false:to_u32()
 
-	doublenickel.editor.begin_window('Dialogue Info')
+	dn.editor.begin_window('Dialogue Info')
 
-	local metrics = doublenickel.dialogue.find_metric(self.loaded) or { nodes = 0, words = 0 }
+	local metrics = dn.dialogue.find_metric(self.loaded) or { nodes = 0, words = 0 }
 	local scene = string.format(
 		'%s (%d nodes, %d words)',
 		self:full_path(),
@@ -431,7 +431,7 @@ function DialogueEditor:draw_graph_validation()
 							}
 						})
 
-					local btn_color = doublenickel.color32(200, 0, 0, 255)
+					local btn_color = dn.color32(200, 0, 0, 255)
 					local btn_label = 'Take Me There' .. '##' .. address
 					imgui.PushStyleColor(ffi.C.ImGuiCol_Button, btn_color)
 					if imgui.Button(btn_label) then
@@ -448,12 +448,12 @@ function DialogueEditor:draw_graph_validation()
 		imgui.TreePop()
 	end
 
-	doublenickel.editor.end_window()
+	dn.editor.end_window()
 end
 
 function DialogueEditor:update_text_editor()
 	-- Bind selected node's text to what's in the editor
-	local text_editor = doublenickel.find_entity_editor('TextEditor')
+	local text_editor = dn.find_entity_editor('TextEditor')
 
 	local selected = self.node_editor:get_selected_node()
 	if selected then
@@ -472,7 +472,7 @@ end
 -- SAVING AND LOADING --
 ------------------------
 function DialogueEditor:load(name_or_path)
-	local file_name = doublenickel.extract_filename(name_or_path)
+	local file_name = dn.extract_filename(name_or_path)
 	if #file_name == 0 then
 		log.warn('DialogueEditor:load(): Tried to pass empty string as dialogue name')
 		return
@@ -481,7 +481,7 @@ function DialogueEditor:load(name_or_path)
 	self.loaded = file_name
 
 	-- Load dialogue and GUI data from disk
-	self.data = doublenickel.dialogue.load(file_name)
+	self.data = dn.dialogue.load(file_name)
 	self.nodes = self.data.nodes
 	if not self.nodes then
 		self.nodes = {}
@@ -489,18 +489,18 @@ function DialogueEditor:load(name_or_path)
 	end
 
 	local file_path = dn.ffi.paths_resolve_format('dialogue_metadata', file_name)
-	self.gnodes = doublenickel.module.read(file_path)
+	self.gnodes = dn.module.read(file_path)
 	for id, gnode in pairs(self.gnodes) do
-		gnode.position = doublenickel.vec2(gnode.position)
-		gnode.size = doublenickel.vec2(gnode.size)
-		gnode.pixel_size = doublenickel.vec2(gnode.pixel_size)
+		gnode.position = dn.vec2(gnode.position)
+		gnode.size = dn.vec2(gnode.size)
+		gnode.pixel_size = dn.vec2(gnode.pixel_size)
 	end
 
 	if not self.gnodes then
 		self.nodes = {}
 		self.gnodes = {}
 
-		doublenickel.dn_log('no gui layout for dialogue, path = ' .. layout_path)
+		dn.ffi.log('no gui layout for dialogue, path = ' .. layout_path)
 		return
 	end
 
@@ -510,7 +510,7 @@ function DialogueEditor:load(name_or_path)
 	-- And point the metadata editor at the new dialogue
 	self.metadata_editor = imgui.extensions.TableEditor(self.data.metadata)
 
-	local text_editor = doublenickel.find_entity_editor('TextEditor')
+	local text_editor = dn.find_entity_editor('TextEditor')
 	text_editor:set_text('')
 
 	self.is_graph_dirty = false
@@ -540,7 +540,7 @@ end
 
 function DialogueEditor:save_impl(dialogue_name)
 	-- Save the dialogue itself
-	doublenickel.dialogue.save(dialogue_name, self.data, self.pretty_save)
+	dn.dialogue.save(dialogue_name, self.data, self.pretty_save)
 
 	-- Save out the layout data. We store extra stuff that doesn't need to be serialized in the
 	-- gnodes -- the only thing we need to store is position (even size is recalculated depending
@@ -553,10 +553,10 @@ function DialogueEditor:save_impl(dialogue_name)
 	end
 
 	local file_path = dn.ffi.paths_resolve_format('dialogue_metadata', dialogue_name)
-	doublenickel.module.write(file_path, gnodes, doublenickel.module.WriteOptions.Compact)
+	dn.module.write(file_path, gnodes, dn.module.WriteOptions.Compact)
 
 	-- Bookkeeping: Update the word count and mark the graph as clean
-	doublenickel.dialogue.update_single_metrics(dialogue_name)
+	dn.dialogue.update_single_metrics(dialogue_name)
 	self.is_graph_dirty = false
 end
 
@@ -630,13 +630,13 @@ function DialogueEditor:update_popups()
 
 		imgui.SameLine()
 
-		local bad_color = doublenickel.color32(150, 0, 0, 255)
+		local bad_color = dn.color32(150, 0, 0, 255)
 		imgui.PushStyleColor(ffi.C.ImGuiCol_Button, bad_color)
 		if imgui.Button('Save Anyway', imgui.ImVec2(120, 0)) then
 			-- If we were doing Save As, grab the dialogue name from that input text.
 			-- Otherwise, use the currently loaded file
 			local file = self.loaded
-			local menu = doublenickel.find_entity_editor('MainMenu')
+			local menu = dn.find_entity_editor('MainMenu')
 			if menu.failed_save_as then
 				file = menu.failed_save_as
 				menu:reset_save_as()
@@ -655,23 +655,23 @@ end
 function DialogueEditor:does_node_use_state(node, state)
 	if not state then return false end
 
-	if node.kind == doublenickel.dialogue.node_kind.Branch then
+	if node.kind == dn.dialogue.node_kind.Branch then
 		for index, branch in pairs(node.branches) do
 			if string.find(string.lower(branch.variable), string.lower(state)) then
 				return true
 			end
 		end
-	elseif node.kind == doublenickel.dialogue.node_kind.Choice then
+	elseif node.kind == dn.dialogue.node_kind.Choice then
 		for index, branch in pairs(node.unlock.branches) do
 			if string.find(string.lower(branch.variable), string.lower(state)) then
 				return true
 			end
 		end
-	elseif node.kind == doublenickel.dialogue.node_kind.Set then
+	elseif node.kind == dn.dialogue.node_kind.Set then
 		if string.find(string.lower(node.variable), string.lower(state)) then
 			return true
 		end
-	elseif node.kind == doublenickel.dialogue.node_kind.Increment then
+	elseif node.kind == dn.dialogue.node_kind.Increment then
 		if string.find(string.lower(node.variable), string.lower(state)) then
 			return true
 		end
@@ -683,11 +683,11 @@ end
 function DialogueEditor:does_node_use_label(node, label)
 	if not label then return false end
 
-	if node.kind == doublenickel.dialogue.node_kind.Label then
+	if node.kind == dn.dialogue.node_kind.Label then
 		return string.find(string.lower(node.label), string.lower(label))
-	elseif node.kind == doublenickel.dialogue.node_kind.Jump then
+	elseif node.kind == dn.dialogue.node_kind.Jump then
 		return string.find(string.lower(node.target), string.lower(label))
-	elseif node.kind == doublenickel.dialogue.node_kind.Call then
+	elseif node.kind == dn.dialogue.node_kind.Call then
 		return string.find(string.lower(node.target), string.lower(label))
 	end
 
@@ -732,15 +732,15 @@ function DialogueEditor:on_node_select(id)
 	local node = self.nodes[id]
 
 	-- Do a few bookkeeping things depending on the node type
-	if node.kind == doublenickel.dialogue.node_kind.Text then
+	if node.kind == dn.dialogue.node_kind.Text then
 		self.last_who = node.who
-	elseif node.kind == doublenickel.dialogue.node_kind.Choice then
+	elseif node.kind == dn.dialogue.node_kind.Choice then
 		self.condition_list:set_branches(node.unlock.branches)
-	elseif node.kind == doublenickel.dialogue.node_kind.Set then
+	elseif node.kind == dn.dialogue.node_kind.Set then
 		self.state_picker.state = node.variable
-	elseif node.kind == doublenickel.dialogue.node_kind.Increment then
+	elseif node.kind == dn.dialogue.node_kind.Increment then
 		self.state_picker.state = node.variable
-	elseif node.kind == doublenickel.dialogue.node_kind.Branch then
+	elseif node.kind == dn.dialogue.node_kind.Branch then
 		self.condition_list:set_branches(node:get_branches())
 	elseif node.kind == 'ChoiceList' then
 		self.last_choice_list = node.uuid
@@ -753,21 +753,21 @@ function DialogueEditor:on_node_select(id)
 	editor_params.imgui_ignore.children = true
 	editor_params.imgui_ignore.is_entry_point = true
 
-	if node.kind == doublenickel.dialogue.node_kind.Text then
+	if node.kind == dn.dialogue.node_kind.Text then
 		editor_params.imgui_ignore.input = true
-	elseif node.kind == doublenickel.dialogue.node_kind.Choice then
+	elseif node.kind == dn.dialogue.node_kind.Choice then
 		editor_params.imgui_ignore.shown = true
-	elseif node.kind == doublenickel.dialogue.node_kind.ChoiceList then
+	elseif node.kind == dn.dialogue.node_kind.ChoiceList then
 		editor_params.imgui_ignore.buttons = true
 		editor_params.imgui_ignore.indices = true
-	elseif node.kind == doublenickel.dialogue.node_kind.Set then
+	elseif node.kind == dn.dialogue.node_kind.Set then
 		editor_params.imgui_ignore.variable = true
-	elseif node.kind == doublenickel.dialogue.node_kind.Increment then
+	elseif node.kind == dn.dialogue.node_kind.Increment then
 		editor_params.imgui_ignore.variable = true
-	elseif node.kind == doublenickel.dialogue.node_kind.Wait then
+	elseif node.kind == dn.dialogue.node_kind.Wait then
 		editor_params.imgui_ignore.accumulated = true
 		editor_params.imgui_ignore.active = true
-	elseif node.kind == doublenickel.dialogue.node_kind.Branch then
+	elseif node.kind == dn.dialogue.node_kind.Branch then
 		editor_params.imgui_ignore.branches = true
 		editor_params.imgui_ignore.combinator = true
 	end
@@ -776,7 +776,7 @@ function DialogueEditor:on_node_select(id)
 	self.selected_editor = imgui.extensions.TableEditor(node, editor_params)
 
 	-- Set up the text editor
-	local text_editor = doublenickel.find_entity_editor('TextEditor')
+	local text_editor = dn.find_entity_editor('TextEditor')
 	text_editor:set_text(node.text)
 end
 
@@ -795,15 +795,15 @@ function DialogueEditor:on_node_color(id)
 
 	for i, err_node in pairs(self.validation_errors) do
 		if err_node.node == node.uuid then
-			local alpha = doublenickel.math.ranged_sin(doublenickel.elapsed_time * 8, .5, 1)
+			local alpha = dn.math.ranged_sin(dn.elapsed_time * 8, .5, 1)
 			color = self.colors.invalid:alpha(alpha)
 		end
 	end
 
-	local is_active = doublenickel.dialogue.controller:is_node_active(node.uuid)
+	local is_active = dn.dialogue.controller:is_node_active(node.uuid)
 	local is_find_result = self.search_result[node.uuid] or self:does_node_use_label(node, self.find_label)
 	if is_find_result or is_active then
-		local alpha = doublenickel.math.ranged_sin(doublenickel.elapsed_time * 8, 0, 1)
+		local alpha = dn.math.ranged_sin(dn.elapsed_time * 8, 0, 1)
 		color = self.colors.find_result:alpha(alpha)
 	end
 
@@ -819,27 +819,27 @@ end
 
 function DialogueEditor:on_node_links(output_id, input_id)
 	self.colors = {
-		branch_true = doublenickel.colors.spring_green:copy(),
-		branch_false = doublenickel.colors.cardinal:copy(),
-		default = doublenickel.colors.charcoal:copy(),
-		highlighted = doublenickel.colors.cool_gray:copy(),
-		entry_point = doublenickel.colors.cadet_gray:copy(),
-		find_result = doublenickel.colors.celadon:copy(),
-		invalid = doublenickel.colors.cardinal:copy(),
+		branch_true = dn.colors.spring_green:copy(),
+		branch_false = dn.colors.cardinal:copy(),
+		default = dn.colors.charcoal:copy(),
+		highlighted = dn.colors.cool_gray:copy(),
+		entry_point = dn.colors.cadet_gray:copy(),
+		find_result = dn.colors.celadon:copy(),
+		invalid = dn.colors.cardinal:copy(),
 		child_index = {
-			label = doublenickel.colors.white:copy(),
-			background = doublenickel.colors.gunmetal:copy(),
+			label = dn.colors.white:copy(),
+			background = dn.colors.gunmetal:copy(),
 		},
 		nodes = {
-			[doublenickel.dialogue.node_kind.End] = doublenickel.colors.orange:copy(),
-			[doublenickel.dialogue.node_kind.Set] = doublenickel.colors.tyrian_purple:copy(),
-			[doublenickel.dialogue.node_kind.ChoiceList] = doublenickel.colors.zomp:copy(),
-			[doublenickel.dialogue.node_kind.Label] = doublenickel.colors.indian_red:copy(),
-			[doublenickel.dialogue.node_kind.Call] = doublenickel.colors.prussian_blue:copy(),
-			[doublenickel.dialogue.node_kind.Jump] = doublenickel.colors.prussian_blue:copy(),
-			[doublenickel.dialogue.node_kind.Return] = doublenickel.colors.prussian_blue:copy(),
-			[doublenickel.dialogue.node_kind.DevMarker] = doublenickel.colors.cadet_gray:copy(),
-			[doublenickel.dialogue.node_kind.DevNote] = doublenickel.colors.cadet_gray:copy(),
+			[dn.dialogue.node_kind.End] = dn.colors.orange:copy(),
+			[dn.dialogue.node_kind.Set] = dn.colors.tyrian_purple:copy(),
+			[dn.dialogue.node_kind.ChoiceList] = dn.colors.zomp:copy(),
+			[dn.dialogue.node_kind.Label] = dn.colors.indian_red:copy(),
+			[dn.dialogue.node_kind.Call] = dn.colors.prussian_blue:copy(),
+			[dn.dialogue.node_kind.Jump] = dn.colors.prussian_blue:copy(),
+			[dn.dialogue.node_kind.Return] = dn.colors.prussian_blue:copy(),
+			[dn.dialogue.node_kind.DevMarker] = dn.colors.cadet_gray:copy(),
+			[dn.dialogue.node_kind.DevNote] = dn.colors.cadet_gray:copy(),
 		}
 	}
 
@@ -859,7 +859,7 @@ function DialogueEditor:on_node_links(output_id, input_id)
 
 	if node:is_bifurcate() then
 		-- For branch nodes, the children get a green or red dot
-		local extents = doublenickel.vec2(5, 5):scale(self.node_editor.zoom)
+		local extents = dn.vec2(5, 5):scale(self.node_editor.zoom)
 		local min = middle:subtract(extents)
 		local max = middle:add(extents)
 		local color = ternary(child_index == 1, self.colors.branch_true, self.colors.branch_false)
@@ -869,14 +869,14 @@ function DialogueEditor:on_node_links(output_id, input_id)
 		-- Otherwise, we want to give the child  a number matching its index.
 
 		-- First, draw a filled in circle halfway between the slots
-		local index_glyph_offset = doublenickel.vec2(10, 5)
+		local index_glyph_offset = dn.vec2(10, 5)
 		local min = middle:subtract(index_glyph_offset)
-		local extents = doublenickel.vec2(20, 20):scale(self.node_editor.zoom)
+		local extents = dn.vec2(20, 20):scale(self.node_editor.zoom)
 		local max = min:add(extents)
 		imgui.GetWindowDrawList():AddRectFilled(imgui.ImVec2(min.x, min.y), imgui.ImVec2(max.x, max.y), self.colors.child_index.background:to_u32(), 50)
 
 		-- Then, put some text in the middle of the circle
-		local text_offset = doublenickel.vec2(8, 2) -- Experimental
+		local text_offset = dn.vec2(8, 2) -- Experimental
 		local text_pos = min:add(text_offset)
 		imgui.SetCursorScreenPos(text_pos:unpack())
 
@@ -892,15 +892,15 @@ function DialogueEditor:on_node_draw(id)
 	local node = self.nodes[id]
 	local display_name = ternary(node.who, node.who, node.kind)
 
-	doublenickel.editor.push_font(EditorFonts.Bold)
+	dn.editor.push_font(EditorFonts.Bold)
 	imgui.Text(display_name)
 	imgui.PopFont()
 
-	doublenickel.editor.push_font(EditorFonts.Regular)
+	dn.editor.push_font(EditorFonts.Regular)
 	imgui.Text(node:short_text())
 	imgui.PopFont()
 
-	if node.kind == doublenickel.dialogue.node_kind.DevMarker then
+	if node.kind == dn.dialogue.node_kind.DevMarker then
 		imgui.PopFont()
 	end
 end
@@ -935,7 +935,7 @@ function DialogueEditor:on_node_context(id)
 		end
 	end
 
-	if node.kind == doublenickel.dialogue.node_kind.Return then
+	if node.kind == dn.dialogue.node_kind.Return then
 		if imgui.MenuItem('Jump to marker') then
 			local target = find_node(node.return_to, self.nodes)
 			if not target then return end -- This should never happen; validation should check missing node
@@ -944,7 +944,7 @@ function DialogueEditor:on_node_context(id)
 		end
 	end
 
-	if node.kind == doublenickel.dialogue.node_kind.Switch then
+	if node.kind == dn.dialogue.node_kind.Switch then
 		if imgui.MenuItem('Open dialogue') then
 			self.queued_to_load = node.next_dialogue
 		end
@@ -960,7 +960,7 @@ function DialogueEditor:on_node_disconnect(parent_id, child_id)
 end
 
 function DialogueEditor:on_node_add(kind)
-	local node = doublenickel.create_node(kind)
+	local node = dn.create_node(kind)
 	self.nodes[node.uuid] = node
 	self:mark_graph_dirty()
 

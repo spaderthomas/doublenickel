@@ -1,4 +1,4 @@
-Timer = doublenickel.class.define('Timer')
+Timer = dn.class.define('Timer')
 
 function Timer:init(time)
   self:begin(time)
@@ -10,7 +10,7 @@ function Timer:begin(t)
 end
 
 function Timer:update(dt)
-  dt = dt or doublenickel.dt
+  dt = dt or dn.dt
   self.accumulated = self.accumulated + dt
   self.last_frame = self.this_frame
   self.this_frame = self:is_expired()

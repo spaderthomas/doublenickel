@@ -1,4 +1,4 @@
-function doublenickel.uuid()
+function dn.uuid()
   local random = math.random
   local template = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
   local sub = function(c)
@@ -8,7 +8,7 @@ function doublenickel.uuid()
   return string.gsub(template, '[xy]', sub)
 end
 
-function doublenickel.uuid_imgui()
+function dn.uuid_imgui()
   local random = math.random
   local template = '##xxxxxxxx-xxxx-4xxx-yxxx'
   local sub = function(c)

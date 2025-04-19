@@ -1,4 +1,4 @@
-local Branch = doublenickel.node('Branch')
+local Branch = dn.node('Branch')
 
 Branch.editor_fields = {
   'branches',
@@ -8,7 +8,7 @@ Branch.editor_fields = {
 
 function Branch:init()
   self.branches = {}
-  self.combinator = doublenickel.branch_combinators.op_and
+  self.combinator = dn.branch_combinators.op_and
   self.description = ''
 end
 

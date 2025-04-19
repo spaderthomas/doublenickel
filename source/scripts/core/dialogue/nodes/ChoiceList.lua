@@ -1,4 +1,4 @@
-local ChoiceList = doublenickel.node('ChoiceList')
+local ChoiceList = dn.node('ChoiceList')
 
 ChoiceList.editor_fields = {
   'label',
@@ -9,14 +9,14 @@ ChoiceList.imgui_ignore = {
 }
 
 ChoiceList.colors = {
-  unselected = doublenickel.color(1.00, 0.00, 0.00, 1.00),
-  selected = doublenickel.color(1.00, 0.10, 0.00, 0.50),
-  hovered = doublenickel.color(1.00, 1.00, 1.00, 1.00),
+  unselected = dn.color(1.00, 0.00, 0.00, 1.00),
+  selected = dn.color(1.00, 0.10, 0.00, 0.50),
+  hovered = dn.color(1.00, 1.00, 1.00, 1.00),
 }
 
 function ChoiceList:init()
   self.label = ''
-  self.history = doublenickel.dialogue.history
+  self.history = dn.dialogue.history
   self.indices = {}
 end
 
@@ -43,7 +43,7 @@ function ChoiceList:process()
     self.history:add_node(node)
 
     if not node.mute then
-      doublenickel.audio.play('ui_humver-003.wav')
+      dn.audio.play('ui_humver-003.wav')
     end
 
     return dialogue_state.advancing

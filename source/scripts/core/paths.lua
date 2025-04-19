@@ -1,7 +1,7 @@
-local self = doublenickel.paths
+local self = dn.paths
 
-local NamedPath = doublenickel.class.define('NamedPath')
-doublenickel.paths.NamedPath = NamedPath
+local NamedPath = dn.class.define('NamedPath')
+dn.paths.NamedPath = NamedPath
 
 function NamedPath:init(name, path, named_parent)
 	self.name = name or ''
@@ -10,7 +10,7 @@ function NamedPath:init(name, path, named_parent)
 end
 
 local function collect_paths(paths, full_parent)
-	local collected_paths = doublenickel.data_types.Array:new()
+	local collected_paths = dn.data_types.Array:new()
 	if not paths then return collected_paths end
 
 	for name, data in pairs(paths) do
@@ -34,12 +34,12 @@ local function collect_paths(paths, full_parent)
 	return collected_paths
 end
 
-function doublenickel.paths.init()
+function dn.paths.init()
 end
 
-function doublenickel.paths.load(file_path)
-	local path_info = doublenickel.module.read(file_path)
-	self.paths = doublenickel.data_types.Array:new()
+function dn.paths.load(file_path)
+	local path_info = dn.module.read(file_path)
+	self.paths = dn.data_types.Array:new()
 
 	local install_paths = collect_paths(path_info.install_paths)
 	for path in install_paths:iterate_values() do
@@ -64,7 +64,7 @@ function doublenickel.paths.load(file_path)
 	self.paths:concatenate(app_paths)
 end
 
-function doublenickel.paths.iterate()
+function dn.paths.iterate()
 	local named_paths = dn.ffi.paths_find_all()
 	local i = -1
 
@@ -79,7 +79,7 @@ function doublenickel.paths.iterate()
 	return iterator
 end
 
-function doublenickel.paths.iterate_no_format()
+function dn.paths.iterate_no_format()
 	local index = 0
 
 	local function iterator()

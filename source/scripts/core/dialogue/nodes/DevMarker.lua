@@ -1,4 +1,4 @@
-local DevMarker = doublenickel.node('DevMarker')
+local DevMarker = dn.node('DevMarker')
 DevMarker.editor_fields = {
   'text',
 }

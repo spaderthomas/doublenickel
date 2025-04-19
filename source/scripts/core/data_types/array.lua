@@ -1,10 +1,10 @@
-doublenickel.array = {}
+dn.array = {}
 
-function doublenickel.array.add(array, item)
+function dn.array.add(array, item)
   array[#array + 1] = item
 end
 
-function doublenickel.array.remove(array, index)
+function dn.array.remove(array, index)
   for i = index, #array, 1 do
     array[i] = array[i + 1]
   end
@@ -32,9 +32,9 @@ function delete(array, value)
   end
 end
 
-Array = doublenickel.class.define('Array')
-doublenickel.data_types.array = Array
-doublenickel.data_types.Array = Array
+Array = dn.class.define('Array')
+dn.data_types.array = Array
+dn.data_types.Array = Array
 
 function Array:init()
   self.data = {}
@@ -149,15 +149,4 @@ end
 
 function Array:__tostring()
   return print_table(self.data)
-end
-
-local function test_array()
-  local a = doublenickel.data_types.array:new()
-  a:add(69)
-  a:add(420)
-  a:add(9001)
-  a:insert(100, 7)
-  for index, item in a:iterate() do
-    print(index, item)
-  end
 end

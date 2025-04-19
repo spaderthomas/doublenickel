@@ -5,7 +5,7 @@ local vec2_mixin = {
     return self
   end,
   add = function(self, other)
-    return doublenickel.vec2(self.x + other.x, self.y + other.y)
+    return dn.vec2(self.x + other.x, self.y + other.y)
   end,
   update = function(self, other)
     self.x = self.x + other.x
@@ -14,48 +14,48 @@ local vec2_mixin = {
   end,
   subtract = function(self, other)
     if type(other) == 'table' then
-      return doublenickel.vec2(self.x - other.x, self.y - other.y)
+      return dn.vec2(self.x - other.x, self.y - other.y)
     elseif type(other) == 'number' then
-      return doublenickel.vec2(self.x - other, self.y - other)
+      return dn.vec2(self.x - other, self.y - other)
     end
   end,
   scale = function(self, scalar)
-    return doublenickel.vec2(self.x * scalar, self.y * scalar)
+    return dn.vec2(self.x * scalar, self.y * scalar)
   end,
   truncate = function(self, digits)
-    return doublenickel.vec2(truncate(self.x, digits), truncate(self.y, digits))
+    return dn.vec2(truncate(self.x, digits), truncate(self.y, digits))
   end,
   abs = function(self)
-    return doublenickel.vec2(math.abs(self.x), math.abs(self.y))
+    return dn.vec2(math.abs(self.x), math.abs(self.y))
   end,
   equals = function(self, other, eps)
-    eps = eps or doublenickel.deq_epsilon
+    eps = eps or dn.deq_epsilon
     return double_eq(self.x, other.x, eps) and double_eq(self.y, other.y, eps)
   end,
   clampl = function(self, scalar)
-    return doublenickel.vec2(math.max(scalar, self.x), math.max(scalar, self.y))
+    return dn.vec2(math.max(scalar, self.x), math.max(scalar, self.y))
   end,
   clamp = function(self, low, high)
-    return doublenickel.vec2(
-      doublenickel.math.clamp(self.x, low.x, high.x),
-      doublenickel.math.clamp(self.y, low.y, high.y))
+    return dn.vec2(
+      dn.math.clamp(self.x, low.x, high.x),
+      dn.math.clamp(self.y, low.y, high.y))
   end,
   pairwise_mult = function(self, other)
-    return doublenickel.vec2(self.x * other.x, self.y * other.y)
+    return dn.vec2(self.x * other.x, self.y * other.y)
   end,
   distance = function(self, other)
     local d = self:subtract(other)
     return math.sqrt(d.x * d.x + d.y * d.y)
   end,
   normal = function(self)
-    return doublenickel.vec2(self.y, self.x * -1)
+    return dn.vec2(self.y, self.x * -1)
   end,
   normalize = function(self)
     local length = math.sqrt(self.x * self.x + self.y * self.y)
     if length > 0 then
-      return doublenickel.vec2(self.x / length, self.y / length)
+      return dn.vec2(self.x / length, self.y / length)
     else
-      return doublenickel.vec2(self) -- Always return a copy
+      return dn.vec2(self) -- Always return a copy
     end
   end,
   dot = function(self, other)
@@ -65,10 +65,10 @@ local vec2_mixin = {
     return math.sqrt(self.x * self.x + self.y * self.y)
   end,
   floor = function(self)
-    return doublenickel.vec2(math.floor(self.x), math.floor(self.y))
+    return dn.vec2(math.floor(self.x), math.floor(self.y))
   end,
   ceil = function(self)
-    return doublenickel.vec2(math.ceil(self.x), math.ceil(self.y))
+    return dn.vec2(math.ceil(self.x), math.ceil(self.y))
   end,
 
   ----------------
@@ -82,17 +82,17 @@ local vec2_mixin = {
     self.y = other.y
   end,
   copy = function(self)
-    return doublenickel.vec2(self)
+    return dn.vec2(self)
   end,
   to_ctype = function(self)
     return ffi.new('dn_vector2_t', self.x, self.y)
   end
 }
 
-doublenickel.vec2_impl = doublenickel.class.define('vec2_impl')
-doublenickel.vec2_impl:include(vec2_mixin)
-doublenickel.vec2 = function(x, y)
-  local vec = doublenickel.vec2_impl:new()
+dn.vec2_impl = dn.class.define('vec2_impl')
+dn.vec2_impl:include(vec2_mixin)
+dn.vec2 = function(x, y)
+  local vec = dn.vec2_impl:new()
 
   if type(x) == 'table' or type(x) == 'cdata' then
     vec.x = x.x

@@ -1,4 +1,4 @@
-local Position = doublenickel.component.define('Position')
+local Position = dn.component.define('Position')
 
 Position.editor_fields = {
   'x',

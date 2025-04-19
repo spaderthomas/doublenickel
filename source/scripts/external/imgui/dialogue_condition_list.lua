@@ -1,7 +1,7 @@
 --------------------
 -- CONDITION LIST --
 --------------------
-imgui.extensions.DialogueConditionList = doublenickel.class.define('ImguiDialogueConditionList')
+imgui.extensions.DialogueConditionList = dn.class.define('ImguiDialogueConditionList')
 
 function imgui.extensions.DialogueConditionList:init()
 	self.branches = nil
@@ -53,7 +53,7 @@ function imgui.extensions.DialogueConditionList:update()
 
 		-- X buttons before each line, to delete the entry.
 		local branch_to_delete
-		local color = doublenickel.color32(150, 0, 0, 255)
+		local color = dn.color32(150, 0, 0, 255)
 		local label = string.format('X##%d', ib)
 
 		imgui.PushStyleColor(ffi.C.ImGuiCol_Button, color)
@@ -76,11 +76,11 @@ function imgui.extensions.DialogueConditionList:update()
 			branch.variable = state
 
 			-- When a new field is selected, give a sane default value
-			if doublenickel.state.is_number(state) then
+			if dn.state.is_number(state) then
 				branch.value = 0
-			elseif doublenickel.state.is_boolean(state) then
+			elseif dn.state.is_boolean(state) then
 				branch.value = true
-			elseif doublenickel.state.is_string(state) then
+			elseif dn.state.is_string(state) then
 				branch.value = ''
 			end
 		end
@@ -91,9 +91,9 @@ function imgui.extensions.DialogueConditionList:update()
 		local current_op = branch.op
 	
 		imgui.PushItemWidth(175)
-		if imgui.BeginCombo(self.ids.branch_op, doublenickel.branch_op_names[current_op]) then
+		if imgui.BeginCombo(self.ids.branch_op, dn.branch_op_names[current_op]) then
 			for _, op_id in pairs(valid_ops) do
-				local op_display_name = doublenickel.branch_op_names[op_id]
+				local op_display_name = dn.branch_op_names[op_id]
 				local op_selected = op_id == current_op
 	
 				if imgui.Selectable(op_display_name, op_selected) then
@@ -110,14 +110,14 @@ function imgui.extensions.DialogueConditionList:update()
 
 		-- An appropriate InputXXX, depending on the type of the value
 		local label = string.format('%s:%s:%s', '##state_picker', table_address(branch), branch.variable)
-		local var = index_string(doublenickel.state.data, branch.variable)
+		local var = index_string(dn.state.data, branch.variable)
 		if is_number(var) then
 			imgui.PushItemWidth(100)
 			imgui.InputFloat(label, branch, 'value')
 			imgui.PopItemWidth()
 		elseif is_bool(var) then
 			imgui.Checkbox(label, branch, 'value')
-		elseif doublenickel.state.is_string(branch.variable) then
+		elseif dn.state.is_string(branch.variable) then
 			imgui.PushItemWidth(100)
 			imgui.InputText(label, branch, 'value')
 			imgui.PopItemWidth()

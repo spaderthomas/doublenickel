@@ -1,4 +1,4 @@
-local DevNote = doublenickel.node('DevNote')
+local DevNote = dn.node('DevNote')
 DevNote.editor_fields = {
   'text',
   'must_be_fixed'

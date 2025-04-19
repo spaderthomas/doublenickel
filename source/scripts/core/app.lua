@@ -1,12 +1,12 @@
-function doublenickel.define_app()
-  local class = doublenickel.subsystem.define('App')
+function dn.define_app()
+  local class = dn.subsystem.define('App')
   return class
 end
 
 ----------------------
 -- C CONFIGURATIONS --
 ----------------------
-WindowConfig = doublenickel.class.metatype('dn_window_config_t')
+WindowConfig = dn.class.metatype('dn_window_config_t')
 function WindowConfig:init(params)
   local default = dn.ffi.window_config_default();
   self.title = String:new(params.title) or default.title
@@ -17,7 +17,7 @@ function WindowConfig:init(params)
   self.target_fps = params.target_fps or default.target_fps
 end
 
-AudioConfig = doublenickel.class.metatype('dn_audio_config_t')
+AudioConfig = dn.class.metatype('dn_audio_config_t')
 function AudioConfig:init(params)
   local allocator = dn.ffi.allocator_find('bump')
 
@@ -28,9 +28,9 @@ function AudioConfig:init(params)
   end
 end
 
-FontDescriptor = doublenickel.class.metatype('dn_font_descriptor_t')
+FontDescriptor = dn.class.metatype('dn_font_descriptor_t')
 function FontDescriptor:init(params)
-  if doublenickel.enum.is_enum(params.id) then
+  if dn.enum.is_enum(params.id) then
     self.id = params.id:to_qualified_string()
   else
     self.id = params.id
@@ -39,7 +39,7 @@ function FontDescriptor:init(params)
   self.file_path = params.file_path
 
   self.sizes = {0}
-  for i in doublenickel.iterator.keys(params.sizes) do
+  for i in dn.iterator.keys(params.sizes) do
     self.sizes[i - 1] = params.sizes[i]
   end
   self.flags = 0
@@ -47,7 +47,7 @@ function FontDescriptor:init(params)
   if params.imgui         then self.flags = bit.bor(self.flags, ffi.C.DN_FONT_FLAG_IMGUI) end
 end
 
-FontConfig = doublenickel.class.metatype('dn_font_config_t')
+FontConfig = dn.class.metatype('dn_font_config_t')
 function FontConfig:init(params)
   local allocator = dn.ffi.allocator_find('bump')
 
@@ -58,7 +58,7 @@ function FontConfig:init(params)
   end
 end
 
-GpuConfig = doublenickel.class.metatype('dn_gpu_config_t')
+GpuConfig = dn.class.metatype('dn_gpu_config_t')
 function GpuConfig:init(params)
   local allocator = dn.ffi.allocator_find('bump')
 
@@ -83,12 +83,12 @@ function GpuConfig:init(params)
   end
 end
 
-SteamConfig = doublenickel.class.metatype('dn_steam_config_t')
+SteamConfig = dn.class.metatype('dn_steam_config_t')
 function SteamConfig:init(params)
   self.app_id = params.app_id
 end
 
-ImageConfig = doublenickel.class.metatype('dn_image_config_t')
+ImageConfig = dn.class.metatype('dn_image_config_t')
 function ImageConfig:init(params)
   local allocator = dn.ffi.allocator_find('bump')
 
@@ -99,7 +99,7 @@ function ImageConfig:init(params)
   end
 end
 
-FrameworkConfig = doublenickel.class.metatype('dn_app_config_t')
+FrameworkConfig = dn.class.metatype('dn_app_config_t')
 function FrameworkConfig:init(params)
   self.window = params.window or dn.ffi.window_config_default()
   self.audio = params.audio or dn.ffi.audio_config_default()
@@ -114,14 +114,14 @@ end
 -- LUA CONFIGURATION --
 -----------------------
 
-LayoutConfig = doublenickel.class.define('LayoutConfig')
+LayoutConfig = dn.class.define('LayoutConfig')
 function LayoutConfig:init(params)
   params = params or {}
   self.directory = params.directory
 end
 
 
-AppConfig = doublenickel.class.define('AppConfig')
+AppConfig = dn.class.define('AppConfig')
 function AppConfig:init(params)
   self.framework = FrameworkConfig:new(params)
   self.layout = LayoutConfig:new(params.layout)

@@ -1,4 +1,4 @@
-Wall = doublenickel.entity.define('Wall')
+Wall = dn.entity.define('Wall')
 
 Wall.components = {
   'Collider',

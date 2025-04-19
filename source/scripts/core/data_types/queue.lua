@@ -1,8 +1,8 @@
-Queue = doublenickel.class.define('Queue')
-doublenickel.data_types.queue = Queue
+Queue = dn.class.define('Queue')
+dn.data_types.queue = Queue
 
 function Queue:init(capacity)
-  self.array = doublenickel.data_types.array:new()
+  self.array = dn.data_types.array:new()
   self.capacity = capacity
 end
 

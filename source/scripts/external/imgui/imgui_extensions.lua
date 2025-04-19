@@ -16,8 +16,8 @@ local function find_sorted_keys(t)
 		local va = t[ka]
 		local vb = t[kb]
 
-		local ma = doublenickel.editor.get_field_metadata(doublenickel.class.get(t), ka)
-		local mb = doublenickel.editor.get_field_metadata(doublenickel.class.get(t), kb)
+		local ma = dn.editor.get_field_metadata(dn.class.get(t), ka)
+		local mb = dn.editor.get_field_metadata(dn.class.get(t), kb)
 
 		local A_FIRST = true
 		local B_FIRST = false
@@ -31,8 +31,8 @@ local function find_sorted_keys(t)
 		end
 
 		-- 1. Tables always come before non-tables
-		local is_va_table = type(va) == 'table' and not doublenickel.enum.is_enum(va)
-		local is_vb_table = type(vb) == 'table' and not doublenickel.enum.is_enum(vb)
+		local is_va_table = type(va) == 'table' and not dn.enum.is_enum(va)
+		local is_vb_table = type(vb) == 'table' and not dn.enum.is_enum(vb)
 		if is_va_table and not is_vb_table then
 			return A_FIRST
 		elseif not is_va_table and is_vb_table then
@@ -89,7 +89,7 @@ imgui.extensions.TableField = function(key, value, padding)
 	end
 end
 
-TableOptions = doublenickel.class.define('TableOptions')
+TableOptions = dn.class.define('TableOptions')
 function TableOptions:init()
 	self.ignore_functions = false
 	self.ignored_fields = {}
@@ -104,7 +104,7 @@ imgui.extensions.Table = function(t, options)
 
 	for index, k in pairs(sorted_keys) do
 		local value = t[k]
-		if doublenickel.editor.is_ignoring_field(t, k) then goto continue end
+		if dn.editor.is_ignoring_field(t, k) then goto continue end
 		if options.ignored_fields[k] then goto continue end
 		if options.ignore_functions and type(value) == 'function' then goto continue end
 
@@ -125,15 +125,15 @@ imgui.extensions.TableMenuItem = function(name, t)
 end
 
 
-StructEditor = doublenickel.class.define('StructEditor')
+StructEditor = dn.class.define('StructEditor')
 
 function StructEditor:init(name, struct, color)
 	self.name = name
 	self.struct = struct
-	self.color = doublenickel.colors.red:copy()
+	self.color = dn.colors.red:copy()
 
 	self.colors = {
-		type_column = doublenickel.colors.cadet_gray:copy()
+		type_column = dn.colors.cadet_gray:copy()
 	}
 
 	self.padding = 12
@@ -158,7 +158,7 @@ function StructEditor:init(name, struct, color)
 			imgui.CalcTextSize(pretty_type).x)
 	end
 
-	for column_name in doublenickel.iterator.keys(self.columns) do
+	for column_name in dn.iterator.keys(self.columns) do
 		self.columns[column_name] = self.columns[column_name] + self.padding
 	end
 end
@@ -195,7 +195,7 @@ end
 
 
 function StructEditor:member(struct, member_info)
-	local ctype = doublenickel.enums.ctype
+	local ctype = dn.enums.ctype
 
 	local inner_type = member_info.type
 
@@ -224,7 +224,7 @@ end
 
 function StructEditor:name_column(field_name)
 	self:use_name_column()
-	imgui.PushStyleColor(ffi.C.ImGuiCol_Text, doublenickel.editor.colors.scalar:to_u32())
+	imgui.PushStyleColor(ffi.C.ImGuiCol_Text, dn.editor.colors.scalar:to_u32())
 	imgui.Text(field_name)
 	imgui.PopStyleColor()
 end
@@ -361,7 +361,7 @@ function imgui.extensions.CStruct(name, struct)
 end
 
 function imgui.extensions.CType(name, value)
-	local ctype = doublenickel.enums.ctype
+	local ctype = dn.enums.ctype
 
 	local inner_type = dn.reflection.inner_typeof(value)
 	if ctype.struct:match(inner_type.what) then
@@ -386,9 +386,9 @@ imgui.extensions.TableEditor = function(editing, params)
 		enter_returns_true = params.enter_returns_true or false,
 		on_end = params.on_end or nil,
 		is_table_editor = true,
-		key_id = doublenickel.uuid_imgui(),
-		value_id = doublenickel.uuid_imgui(),
-		type_id = doublenickel.uuid_imgui(),
+		key_id = dn.uuid_imgui(),
+		value_id = dn.uuid_imgui(),
+		type_id = dn.uuid_imgui(),
 		selected_type = 'string',
 		editing = editing,
 		children = {},
@@ -475,7 +475,7 @@ imgui.internal.draw_table_editor = function(editor)
 	for _, key in ipairs(sorted_keys) do
 	
 		local value = editor.editing[key]
-		local metadata = doublenickel.editor.get_field_metadata(doublenickel.class.get(editor.editing), key)
+		local metadata = dn.editor.get_field_metadata(dn.class.get(editor.editing), key)
 
 		-- Skip the variable if it's in the imgui_ignore for either the editor, or the table being edited
 		local display = true
@@ -484,14 +484,14 @@ imgui.internal.draw_table_editor = function(editor)
 			display = display and (not editor.editing.imgui_ignore[key])
 		end
 
-		if key == '__enum' then p(editor.editing[doublenickel.editor.sentinel].ignore) end
-		if doublenickel.editor.is_ignoring_field(editor.editing, key) then
+		if key == '__enum' then p(editor.editing[dn.editor.sentinel].ignore) end
+		if dn.editor.is_ignoring_field(editor.editing, key) then
 			display = false
 		end
 
 		-- Likewise, don't display imgui_ignore
 		if key == 'imgui_ignore' then display = false end
-		if key == doublenickel.editor.sentinel then display = false end
+		if key == dn.editor.sentinel then display = false end
 
 		-- Assign a UNIQUE label to this entry
 		local label = string.format('##%s', hash_table_entry(editor.editing, tostring(key)))
@@ -510,7 +510,7 @@ imgui.internal.draw_table_editor = function(editor)
 			imgui.extensions.TableField(key, value, padding)
 		elseif display and not metadata.read_only then
 			-- local variable_name_color = imgui.internal.table_editor_depth_color(editor.depth)
-			local variable_name_color = doublenickel.editor.colors.scalar
+			local variable_name_color = dn.editor.colors.scalar
 
 			-- Strings
 			if type(value) == 'string' then
@@ -586,7 +586,7 @@ imgui.internal.draw_table_editor = function(editor)
 				end
 			elseif type(value) == 'thread' then
 				-- Colors (at this point, we know it's a table)
-			elseif doublenickel.is_color_like(value) then
+			elseif dn.is_color_like(value) then
 				local picker_flags = 0
 
 				if imgui.TreeNode(display_key .. label) then
@@ -603,7 +603,7 @@ imgui.internal.draw_table_editor = function(editor)
 					imgui.Text('self referential')
 					imgui.PopItemWidth()
 				end
-			elseif doublenickel.enum.is_enum(value) then
+			elseif dn.enum.is_enum(value) then
 				imgui.extensions.VariableName(display_key, variable_name_color)
 				if imgui.IsItemClicked(1) then
 					open_item_context_menu = true;
@@ -614,7 +614,7 @@ imgui.internal.draw_table_editor = function(editor)
 				imgui.PushItemWidth(-1)
 
 				if imgui.BeginCombo(label, value:to_string()) then
-					local enum_data = doublenickel.enum_data[value.__enum]
+					local enum_data = dn.enum_data[value.__enum]
 					local enums = {}
 					for name, _ in pairs(enum_data) do
 						table.insert(enums, name)
@@ -705,7 +705,7 @@ imgui.internal.draw_table_editor = function(editor)
 	if editor.on_done then editor.on_done() end
 
 	for _, field in pairs(fields_changed) do
-		doublenickel.editor.run_editor_callback(editor.editing, 'on_change_field', field)
+		dn.editor.run_editor_callback(editor.editing, 'on_change_field', field)
 	end
 
 	return field_added, field_changed
@@ -779,7 +779,7 @@ end
 
 function imgui.internal.calc_alignment(keys)
 	local max_key_size = 0
-	for key in doublenickel.iterator.values(keys) do
+	for key in dn.iterator.values(keys) do
 		local display_key = tostring(key)
 		local key_size = imgui.CalcTextSize(display_key)
 		max_key_size = math.max(max_key_size, key_size.x)
@@ -798,8 +798,8 @@ end
 
 imgui.internal.table_editor_depth_color = function(depth)
 	local colors = {
-		doublenickel.colors.celadon:copy(),
-		doublenickel.colors.cool_gray:copy(),
+		dn.colors.celadon:copy(),
+		dn.colors.cool_gray:copy(),
 	}
 	return colors[(depth % 2) + 1]
 end
@@ -814,9 +814,9 @@ imgui.internal.propagate_table_editor_params = function(editor)
 end
 
 imgui.internal.clear_table_editor = function(editor)
-	editor.key_id = doublenickel.uuid_imgui()
-	editor.value_id = doublenickel.uuid_imgui()
-	editor.type_id = doublenickel.uuid_imgui()
+	editor.key_id = dn.uuid_imgui()
+	editor.value_id = dn.uuid_imgui()
+	editor.type_id = dn.uuid_imgui()
 	editor.children = {}
 end
 
@@ -824,7 +824,7 @@ end
 -- WIDGETS
 --
 imgui.extensions.VariableName = function(name)
-	imgui.PushStyleColor(ffi.C.ImGuiCol_Text, doublenickel.editor.colors.scalar:to_u32())
+	imgui.PushStyleColor(ffi.C.ImGuiCol_Text, dn.editor.colors.scalar:to_u32())
 	imgui.Text(tostring(name))
 	imgui.PopStyleColor()
 	if imgui.IsItemHovered() then
@@ -832,7 +832,7 @@ imgui.extensions.VariableName = function(name)
 		x, y = imgui.GetItemRectMin();
 		px, py = 5, 3
 
-		imgui.GetWindowDrawList():AddRectFilled(imgui.ImVec2(x - px, y - py), imgui.ImVec2(x + sx + px, y + sy + py), doublenickel.editor.colors.scalar:to_u32())
+		imgui.GetWindowDrawList():AddRectFilled(imgui.ImVec2(x - px, y - py), imgui.ImVec2(x + sx + px, y + sy + py), dn.editor.colors.scalar:to_u32())
 	end
 end
 
@@ -853,13 +853,13 @@ imgui.extensions.WhitespaceSeparator = function(whitespace)
 end
 
 imgui.extensions.CursorBubble = function(extents, color)
-	extents       = extents or doublenickel.vec2(15, 15)
-	color         = color or doublenickel.color32(0, 255, 128, 255)
+	extents       = extents or dn.vec2(15, 15)
+	color         = color or dn.color32(0, 255, 128, 255)
 
 	-- Draw a bubble around the cursor, which separates the nodes
-	local color   = doublenickel.color32(0, 255, 128, 255)
-	local extents = doublenickel.vec2(15, 15)
-	local middle  = doublenickel.vec2(imgui.GetMousePos(0))
+	local color   = dn.color32(0, 255, 128, 255)
+	local extents = dn.vec2(15, 15)
+	local middle  = dn.vec2(imgui.GetMousePos(0))
 	local min     = middle:subtract(extents:scale(.5))
 	local max     = middle:add(extents)
 	imgui.GetWindowDrawList():AddRectFilled(

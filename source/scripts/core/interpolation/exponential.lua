@@ -1,5 +1,5 @@
-local Exponential = doublenickel.class.define('Exponential')
-doublenickel.interpolation.Exponential = Exponential
+local Exponential = dn.class.define('Exponential')
+dn.interpolation.Exponential = Exponential
 
 function Exponential:init(params)
   params = params or {}
@@ -13,7 +13,7 @@ function Exponential:init(params)
 end
 
 function Exponential:update(dt)
-  dt = dt or doublenickel.dt
+  dt = dt or dn.dt
   dt = dt / self.speed
   self.accumulated = math.min(self.accumulated + dt, self.time)
   return self:is_done()

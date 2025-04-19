@@ -1,10 +1,10 @@
-Shader = doublenickel.enum.define(
+Shader = dn.enum.define(
   'Shader',
   {
   }
 )
 
-RenderTarget = doublenickel.enum.define(
+RenderTarget = dn.enum.define(
   'RenderTarget',
   {
     Native = 0,
@@ -12,7 +12,7 @@ RenderTarget = doublenickel.enum.define(
   }
 )
 
-Buffer = doublenickel.enum.define(
+Buffer = dn.enum.define(
   'Buffer',
   {
     Lights = 0,
@@ -31,20 +31,20 @@ Buffer = doublenickel.enum.define(
 
 ]===]
 
-local App = doublenickel.define_app()
+local App = dn.define_app()
 
 function App:on_init_game()
-  self.native_resolution = doublenickel.vec2(320, 180)
-  self.output_resolution = doublenickel.vec2(1024, 576)
+  self.native_resolution = dn.vec2(320, 180)
+  self.output_resolution = dn.vec2(1024, 576)
 
   local dn_config = AppConfig:new({
     target_fps = 144,
     window = WindowConfig:new({
       title = 'Lighting',
       native_resolution = Vector2:new(320, 180),
-      flags = doublenickel.enum.bitwise_or(
-        doublenickel.enums.WindowFlags.Windowed,
-        doublenickel.enums.WindowFlags.Border
+      flags = dn.enum.bitwise_or(
+        dn.enums.WindowFlags.Windowed,
+        dn.enums.WindowFlags.Border
       ),
       icon = dn.ffi.paths_resolve_format('dn_image', 'logo/icon.png'),
     }),
@@ -70,8 +70,8 @@ function App:on_init_game()
 
   dn.ffi.app_configure(dn_config)
 
-  doublenickel.asset.register_cast(RenderTarget, 'dn_gpu_render_target_t')
-  doublenickel.asset.register_cast(Shader, 'dn_gpu_shader_t')
+  dn.asset.register_cast(RenderTarget, 'dn_gpu_render_target_t')
+  dn.asset.register_cast(Shader, 'dn_gpu_shader_t')
   
   self.sdf = ffi.new('dn_sdf_renderer_t [1]');
   self.sdf = dn.ffi.sdf_renderer_create(1024 * 1024)
@@ -90,7 +90,7 @@ function App:on_init_game()
 end
 
 function App:on_start_game()
-  doublenickel.editor.configure(EditorConfig:new({
+  dn.editor.configure(EditorConfig:new({
     grid_enabled = true,
     grid_size = 24,
     hide_dialogue_editor = true,
@@ -98,13 +98,13 @@ function App:on_start_game()
       GameView:new(
         'Native View',
         RenderTarget.Native,
-        doublenickel.enums.GameViewSize.ExactSize, self.native_resolution,
-        doublenickel.enums.GameViewPriority.Main),
+        dn.enums.GameViewSize.ExactSize, self.native_resolution,
+        dn.enums.GameViewPriority.Main),
       GameView:new(
         'Upscaled View',
         RenderTarget.Upscaled,
-        doublenickel.enums.GameViewSize.ExactSize, self.output_resolution,
-        doublenickel.enums.GameViewPriority.Standard)
+        dn.enums.GameViewSize.ExactSize, self.output_resolution,
+        dn.enums.GameViewPriority.Standard)
     },
     scene = 'default',
     layout = 'default',
@@ -114,14 +114,14 @@ end
 function App:on_scene_rendered()
   dn.ffi.gpu_begin_render_pass(self.command_buffer, self.render_pass)
   dn.ffi.gpu_set_world_space(self.command_buffer, true)
-  dn.ffi.gpu_set_camera(self.command_buffer, doublenickel.editor.find('EditorCamera').offset:to_ctype())
+  dn.ffi.gpu_set_camera(self.command_buffer, dn.editor.find('EditorCamera').offset:to_ctype())
   dn.ffi.sdf_renderer_draw(self.sdf, self.command_buffer)
   dn.ffi.gpu_end_render_pass(self.command_buffer)
   dn.ffi.gpu_command_buffer_submit(self.command_buffer)
 
   dn.ffi.gpu_render_target_blit(
-    doublenickel.asset.find(RenderTarget.Native),
-    doublenickel.asset.find(RenderTarget.Upscaled)
+    dn.asset.find(RenderTarget.Native),
+    dn.asset.find(RenderTarget.Upscaled)
   )
 end
 

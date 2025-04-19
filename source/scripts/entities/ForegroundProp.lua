@@ -1,4 +1,4 @@
-ForegroundProp = doublenickel.entity.define('ForegroundProp')
+ForegroundProp = dn.entity.define('ForegroundProp')
 
 ForegroundProp.components = {
   'Animation',

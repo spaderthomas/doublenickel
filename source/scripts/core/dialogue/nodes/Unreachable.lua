@@ -1,4 +1,4 @@
-local Unreachable = doublenickel.node('Unreachable')
+local Unreachable = dn.node('Unreachable')
 
 function Unreachable:init()
 end

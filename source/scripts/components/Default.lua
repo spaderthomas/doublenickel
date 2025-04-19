@@ -1,4 +1,4 @@
-local Default = doublenickel.component.define('Default')
+local Default = dn.component.define('Default')
 
 Default.editor_fields = {}
 

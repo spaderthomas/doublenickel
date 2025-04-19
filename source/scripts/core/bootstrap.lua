@@ -1,7 +1,7 @@
 ffi = require('ffi')
 bit = require('bit')
 
-function doublenickel.handle_error()
+function dn.handle_error()
   local stack_trace = debug.traceback()
   stack_trace = stack_trace:gsub('stack traceback:\n', '')
   stack_trace = stack_trace:gsub('\t', '  ')
@@ -23,149 +23,147 @@ function doublenickel.handle_error()
   local trace_message = string.format('stack trace:\n%s', stack_trace)
   dn.ffi.log(trace_message)
 
-  doublenickel.debug.open_debugger(1)
+  dn.debug.open_debugger(1)
 end
 
-function doublenickel.init_phase_0()
-  doublenickel.types = {}
-  doublenickel.class = {}
-  doublenickel.lifecycle = {}
+function dn.init_phase_0()
+  dn.types = {}
+  dn.class = {}
+  dn.lifecycle = {}
 
-  doublenickel.entity = {}
-  doublenickel.entity.entities = {}
-  doublenickel.entity.created_entities = {}
-  doublenickel.entity.destroyed_entities = {}
-  doublenickel.entity.persistent_entities = {}
-  doublenickel.entity.types = {}
-  doublenickel.entity.next_id = 1
-  doublenickel.persistent = {}
+  dn.entity = {}
+  dn.entity.entities = {}
+  dn.entity.created_entities = {}
+  dn.entity.destroyed_entities = {}
+  dn.entity.persistent_entities = {}
+  dn.entity.types = {}
+  dn.entity.next_id = 1
+  dn.persistent = {}
 
-  doublenickel.component = {}
-  doublenickel.component.types = {}
+  dn.component = {}
+  dn.component.types = {}
 
-  doublenickel.internal = {}
-  doublenickel.internal.enum_metatable = {}
+  dn.internal = {}
+  dn.internal.enum_metatable = {}
 
-  doublenickel.debug = {}
+  dn.debug = {}
 
-  doublenickel.constants = {}
-  doublenickel.enum = {}
-  doublenickel.enums = {}
-  doublenickel.enum_data = {}
+  dn.constants = {}
+  dn.enum = {}
+  dn.enums = {}
+  dn.enum_data = {}
 
-  doublenickel.editor = {}
-  doublenickel.editor.types = {}
-  doublenickel.editor.sentinel = '__editor'
+  dn.editor = {}
+  dn.editor.types = {}
+  dn.editor.sentinel = '__editor'
 
-  doublenickel.save = {}
+  dn.save = {}
 
-  doublenickel.state = {}
-  doublenickel.state.data = {}
+  dn.state = {}
+  dn.state.data = {}
 
-  doublenickel.path_constants = {}
+  dn.path_constants = {}
 
-  doublenickel.quests = {}
+  dn.quests = {}
 
-  doublenickel.scene = {}
-  doublenickel.scene.save_data = {}
-  doublenickel.current_scene = nil
-  doublenickel.queued_scene = nil
+  dn.scene = {}
+  dn.scene.save_data = {}
+  dn.current_scene = nil
+  dn.queued_scene = nil
 
-  doublenickel.callback = {}
-  doublenickel.callback.data = {}
+  dn.callback = {}
+  dn.callback.data = {}
 
-  doublenickel.data_types = {}
+  dn.data_types = {}
 
-  doublenickel.dialogue = {}
-  doublenickel.dialogue.node_type = {}
-  doublenickel.dialogue.node_kind = {}
-  doublenickel.dialogue.sorted_node_kinds = {}
-  doublenickel.dialogue.metrics = {
+  dn.dialogue = {}
+  dn.dialogue.node_type = {}
+  dn.dialogue.node_kind = {}
+  dn.dialogue.sorted_node_kinds = {}
+  dn.dialogue.metrics = {
     words = 0,
     nodes = 0,
     dialogues = {}
   }
-  doublenickel.dialogue.cache = {}
-  doublenickel.dialogue.characters = {}
+  dn.dialogue.cache = {}
+  dn.dialogue.characters = {}
 
-  doublenickel.audio = {}
+  dn.audio = {}
 
-  doublenickel.animation = {}
-  doublenickel.animation.data = {}
+  dn.animation = {}
+  dn.animation.data = {}
 
-  doublenickel.texture = {}
-  doublenickel.texture.data = {}
+  dn.texture = {}
+  dn.texture.data = {}
 
-  doublenickel.background = {}
-  doublenickel.background.data = {}
+  dn.background = {}
+  dn.background.data = {}
 
-  doublenickel.input = {}
-  doublenickel.input.data = {}
+  dn.input = {}
+  dn.input.data = {}
 
-  doublenickel.physics = {}
-  doublenickel.physics.requests = {}
-  doublenickel.physics.debug = false
+  dn.physics = {}
+  dn.physics.requests = {}
+  dn.physics.debug = false
 
-  doublenickel.interaction = {}
-  doublenickel.interaction.callbacks = {}
-  doublenickel.interaction.check_flag = false
+  dn.interaction = {}
+  dn.interaction.callbacks = {}
+  dn.interaction.check_flag = false
 
-  doublenickel.interpolation = {}
+  dn.interpolation = {}
 
-  doublenickel.gui = {}
-  doublenickel.gui.animation = {}
-  doublenickel.gui.scroll = {}
-  doublenickel.gui.drag = {}
-  doublenickel.gui.menu = {}
+  dn.gui = {}
+  dn.gui.animation = {}
+  dn.gui.scroll = {}
+  dn.gui.drag = {}
+  dn.gui.menu = {}
 
-  doublenickel.window = {}
+  dn.window = {}
 
-  doublenickel.action = {}
-  doublenickel.action.event_kind = {}
+  dn.action = {}
+  dn.action.event_kind = {}
 
-  doublenickel.analytics = {}
+  dn.analytics = {}
 
-  doublenickel.fonts = {}
+  dn.fonts = {}
 
-  doublenickel.module = {}
+  dn.module = {}
 
-  doublenickel.paths = {}
+  dn.paths = {}
 
-  doublenickel.shaders = {}
+  dn.shaders = {}
 
-  doublenickel.gpu = {}
+  dn.gpu = {}
 
-  doublenickel.app = {}
+  dn.app = {}
 
-  doublenickel.iterator = {}
+  dn.iterator = {}
 
-  doublenickel.time_metric = {}
+  dn.time_metric = {}
 
-  doublenickel.subsystem = {}
-  doublenickel.subsystem.types = {}
+  dn.subsystem = {}
+  dn.subsystem.types = {}
 
-  doublenickel.math = {}
+  dn.math = {}
 
-  doublenickel.filesystem = {}
+  dn.filesystem = {}
 
-  doublenickel.asset = {}
+  dn.asset = {}
 
-  doublenickel.draw = {}
-  doublenickel.draw.internal = {}
+  dn.draw = {}
+  dn.draw.internal = {}
 
-  doublenickel.dt = 0
-  doublenickel.elapsed_time = 0
-  doublenickel.frame = 0
+  dn.dt = 0
+  dn.elapsed_time = 0
+  dn.frame = 0
 
-  doublenickel.tick = doublenickel.is_packaged_build
-  doublenickel.next_tick = doublenickel.tick
+  dn.tick = dn.is_packaged_build
+  dn.next_tick = dn.tick
 
   imgui = {}
   imgui.extensions = {}
   imgui.internal = {}
 
-  doublenickel.ffi = {}
-  dn = {}
   dn.ffi = {}
   dn.unported = {}
   dn.reflection = {}
@@ -286,40 +284,36 @@ function doublenickel.init_phase_0()
 
 end
 
-function doublenickel.init_phase_1()
-  doublenickel.enum.init()
+function dn.init_phase_1()
+  dn.enum.init()
   dn.ffi.init()
-  doublenickel.paths.init()
-  doublenickel.math.init()
-  doublenickel.time_metric.init()
-  doublenickel.input.init()
-  doublenickel.gpu.init()
-  doublenickel.state.init()
-  doublenickel.animation.init()
-  doublenickel.texture.init()
-  doublenickel.background.init()
-  doublenickel.dialogue.init()
-  -- doublenickel.audio.init()
-  -- doublenickel.gui.init()
-  doublenickel.scene.init()
-  doublenickel.asset.init()
+  dn.paths.init()
+  dn.math.init()
+  dn.time_metric.init()
+  dn.input.init()
+  dn.gpu.init()
+  dn.state.init()
+  dn.animation.init()
+  dn.texture.init()
+  dn.background.init()
+  dn.dialogue.init()
+  -- dn.audio.init()
+  -- dn.gui.init()
+  dn.scene.init()
+  dn.asset.init()
 end
 
-function doublenickel.init_phase_2()
-  doublenickel.subsystem.init()
-  doublenickel.app = doublenickel.subsystem.find('App')
+function dn.init_phase_2()
+  dn.subsystem.init()
+  dn.app = dn.subsystem.find('App')
 
-  doublenickel.dn_log('App:on_init_game')
-  doublenickel.app:on_init_game()
+  dn.ffi.log('App:on_init_game')
+  dn.app:on_init_game()
 
-  doublenickel.window.init()
-  -- doublenickel.save.init()
-  doublenickel.editor.init()
-  doublenickel.persistent.init()
+  dn.window.init()
+  -- dn.save.init()
+  dn.editor.init()
+  dn.persistent.init()
 
-  doublenickel.lifecycle.run_callback(doublenickel.lifecycle.callbacks.on_start_game)
-end
-
-function doublenickel.dn_log(...)
-  print(string.format(...))
+  dn.lifecycle.run_callback(dn.lifecycle.callbacks.on_start_game)
 end

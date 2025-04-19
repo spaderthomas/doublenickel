@@ -1,8 +1,8 @@
-function doublenickel.extract_filename(path)
+function dn.extract_filename(path)
   return path:match("([^/\\]+)$")
 end
 
-function doublenickel.is_extension(path, extension)
+function dn.is_extension(path, extension)
   local ext_len = string.len(extension)
   local path_len = string.len(path)
   if ext_len > path_len then return false end
@@ -11,21 +11,21 @@ function doublenickel.is_extension(path, extension)
   return last == extension
 end
 
-function doublenickel.has_extension(path)
+function dn.has_extension(path)
   return string.find(path, '%.')
 end
 
-function doublenickel.strip_extension(path)
-  local extension = doublenickel.has_extension(path)
+function dn.strip_extension(path)
+  local extension = dn.has_extension(path)
   if not extension then return path end
 
   return path:sub(1, extension - 1)
 end
 
-function doublenickel.filesystem.iterate_directory(path)
+function dn.filesystem.iterate_directory(path)
   local function iterator()
     local entry_list = dn.ffi.os_scan_directory(path)
-    for entry in doublenickel.iterator.carray(entry_list.data, entry_list.count) do
+    for entry in dn.iterator.carray(entry_list.data, entry_list.count) do
       coroutine.yield(entry)
     end
   end
@@ -33,16 +33,16 @@ function doublenickel.filesystem.iterate_directory(path)
   return coroutine.wrap(iterator)
 end
 
-function doublenickel.filesystem.collect_directory(path)
+function dn.filesystem.collect_directory(path)
   local files = {}
-  for entry in doublenickel.filesystem.iterate_directory(path) do
+  for entry in dn.filesystem.iterate_directory(path) do
     table.insert(files, entry.file_name)
   end
 
   return files
 end
 
-function doublenickel.filesystem.collect_named_directory(name)
+function dn.filesystem.collect_named_directory(name)
   local path = dn.ffi.paths_resolve(name)
-  return doublenickel.filesystem.collect_directory(path)
+  return dn.filesystem.collect_directory(path)
 end

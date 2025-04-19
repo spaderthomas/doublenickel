@@ -1,10 +1,10 @@
-local ExitGame = doublenickel.node('ExitGame')
+local ExitGame = dn.node('ExitGame')
 
 function ExitGame:init()
 end
 
 function ExitGame:enter(graph)
-  if doublenickel.is_packaged_build then
+  if dn.is_packaged_build then
     dn.unported.set_exit_game()
   end
   return dialogue_state.processing

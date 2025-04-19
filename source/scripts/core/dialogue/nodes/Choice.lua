@@ -1,4 +1,4 @@
-local Choice = doublenickel.node('Choice')
+local Choice = dn.node('Choice')
 
 Choice.editor_fields = {
   'text',
@@ -24,12 +24,12 @@ function Choice:init()
   self.mute = false
 
   self.unlock = {}
-  self.unlock.combinator = doublenickel.branch_combinators.op_and
+  self.unlock.combinator = dn.branch_combinators.op_and
   self.unlock.branches = {}
 
   self.input = ContextualInput:new()
 
-  self.history = doublenickel.dialogue.history
+  self.history = dn.dialogue.history
 end
 
 ----------------
@@ -74,7 +74,7 @@ function Choice:short_text()
 end
 
 function Choice:get_combinator()
-  return doublenickel.branch_combinators.op_and
+  return dn.branch_combinators.op_and
 end
 
 function Choice:has_unlock_condition()

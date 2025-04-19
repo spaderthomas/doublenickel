@@ -1,7 +1,7 @@
-DialogueStack = doublenickel.class.define('DialogueStack')
+DialogueStack = dn.class.define('DialogueStack')
 
 function DialogueStack:init(params)
-  self.stack = doublenickel.data_types.stack:new()
+  self.stack = dn.data_types.stack:new()
   self.graph = {}
 end
 
@@ -10,7 +10,7 @@ function DialogueStack:set_graph(graph)
 end
 
 function DialogueStack:push(node_uuid, target_dialogue)
-  local controller = doublenickel.dialogue.controller
+  local controller = dn.dialogue.controller
   local item = {
     node_uuid = node_uuid,
     dialogue = target_dialogue or controller.current_dialogue

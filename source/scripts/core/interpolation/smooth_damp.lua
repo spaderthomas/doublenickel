@@ -1,5 +1,5 @@
-local SmoothDamp = doublenickel.class.define('SmoothDamp')
-doublenickel.interpolation.SmoothDamp = SmoothDamp
+local SmoothDamp = dn.class.define('SmoothDamp')
+dn.interpolation.SmoothDamp = SmoothDamp
 
 function SmoothDamp:init(params)
   params = params or {}
@@ -56,14 +56,14 @@ function SmoothDamp:set_velocity(velocity)
   self.velocity = velocity
 end
 
-local SmoothDamp2 = doublenickel.class.define('SmoothDamp2')
-doublenickel.interpolation.SmoothDamp2 = SmoothDamp2
+local SmoothDamp2 = dn.class.define('SmoothDamp2')
+dn.interpolation.SmoothDamp2 = SmoothDamp2
 
 function SmoothDamp2:init(params)
   params = params or {}
 
-  self.start = doublenickel.vec2(params.start) or doublenickel.vec2()
-  self.target = doublenickel.vec2(params.target) or doublenickel.vec2()
+  self.start = dn.vec2(params.start) or dn.vec2()
+  self.target = dn.vec2(params.target) or dn.vec2()
   self.velocity = params.velocity or .1
   self.epsilon = params.epsilon or .01
 
@@ -85,7 +85,7 @@ function SmoothDamp2:update()
 end
 
 function SmoothDamp2:reset()
-  self.current = doublenickel.vec2(self.start)
+  self.current = dn.vec2(self.start)
 end
 
 function SmoothDamp2:reverse()

@@ -1,4 +1,4 @@
-History = doublenickel.class.define('History')
+History = dn.class.define('History')
 
 function History:init()
   self.unread_items = {}

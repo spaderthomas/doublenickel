@@ -1,6 +1,6 @@
-function doublenickel.entity.allocate_id()
-  local id = doublenickel.entity.next_id
-  doublenickel.entity.next_id = doublenickel.entity.next_id + 1
+function dn.entity.allocate_id()
+  local id = dn.entity.next_id
+  dn.entity.next_id = dn.entity.next_id + 1
   return id
 end
 
@@ -9,10 +9,10 @@ function add_component(entity, name, data)
   -- class itself (i.e. entity:add_component(name, data))
   data = data or {}
 
-  local component = doublenickel.component.types[name]:new(data)
+  local component = dn.component.types[name]:new(data)
   component.name = name
-  component.id = doublenickel.entity.allocate_id()
-  component.uuid = data.uuid or doublenickel.uuid()
+  component.id = dn.entity.allocate_id()
+  component.uuid = data.uuid or dn.uuid()
   component.__internal = {
     entity = entity,
   }
@@ -32,11 +32,11 @@ end
 ------------------
 -- ENTITY CLASS --
 ------------------
-function doublenickel.entity.define(name)
-  local class = doublenickel.class.define(name)
+function dn.entity.define(name)
+  local class = dn.class.define(name)
   class:include({
     get_name = function(self) return self.name end,
-    serialize = function(self) return doublenickel.serialize_entity(self) end,
+    serialize = function(self) return dn.serialize_entity(self) end,
     add_component = function(self, component_name, data)
       local component = add_component(self, component_name, data)
   
@@ -51,44 +51,44 @@ function doublenickel.entity.define(name)
     hide = function(self) self.__internal.hidden = true end,
     show = function(self) self.__internal.hidden = false end,
     is_hidden = function(self) return self.__internal.hidden end,
-    iterate_components = function(self) return doublenickel.iterator.values(self.components) end      
+    iterate_components = function(self) return dn.iterator.values(self.components) end      
   })
   class:include_update()
   class:set_field_metadata('id', FieldMetadata.Presets.ReadOnly)
   class:set_field_metadata('uuid', FieldMetadata.Presets.ReadOnly)
 
-  doublenickel.entity.types[name] = class
+  dn.entity.types[name] = class
 
-  doublenickel.entity.sorted_types = {}
-  for type_name, _ in pairs(doublenickel.entity.types) do
-    table.insert(doublenickel.entity.sorted_types, type_name)
+  dn.entity.sorted_types = {}
+  for type_name, _ in pairs(dn.entity.types) do
+    table.insert(dn.entity.sorted_types, type_name)
   end
-  table.sort(doublenickel.entity.sorted_types)
+  table.sort(dn.entity.sorted_types)
 
   return class
 end
 
 
-function doublenickel.entity.iterate(name)
+function dn.entity.iterate(name)
   if name then
-    return doublenickel.iterator.values(doublenickel.entity.entities, function (_, entity)
+    return dn.iterator.values(dn.entity.entities, function (_, entity)
       return entity.name == name
     end)
   else
-    return doublenickel.iterator.values(doublenickel.entity.entities)
+    return dn.iterator.values(dn.entity.entities)
   end
 end
 
-function doublenickel.entity.iterate_persistent()
-  return doublenickel.iterator.values(doublenickel.entity.persistent_entities)
+function dn.entity.iterate_persistent()
+  return dn.iterator.values(dn.entity.persistent_entities)
 end
 
 
-function doublenickel.entity.iterate_staged()
-  return doublenickel.iterator.values(doublenickel.entity.created_entities)
+function dn.entity.iterate_staged()
+  return dn.iterator.values(dn.entity.created_entities)
 end
 
-function doublenickel.entity.run_update_callback(entity, callback)
+function dn.entity.run_update_callback(entity, callback)
   local fn = entity[callback:to_string()]
   fn(entity)
 
@@ -100,21 +100,21 @@ end
 
 
 
-function doublenickel.entity.create_anonymous(name, data)
+function dn.entity.create_anonymous(name, data)
   data = data or {}
   data.components = data.components or {}
 
-  EntityType = doublenickel.entity.types[name]
+  EntityType = dn.entity.types[name]
   if not EntityType then
     log.warn(string.format("could not find entity type: type = %s", name))
   end
 
   local entity = EntityType:allocate()
 
-  local id = doublenickel.entity.allocate_id()
+  local id = dn.entity.allocate_id()
   entity.id = id
   entity.name = name
-  entity.uuid = data.uuid or doublenickel.uuid()
+  entity.uuid = data.uuid or dn.uuid()
   entity.tag = data.tag or ''
   entity.__internal = data.__internal or {
     hidden = false
@@ -140,55 +140,55 @@ function doublenickel.entity.create_anonymous(name, data)
   return entity
 end
 
-function doublenickel.entity.create(name, data)
-  local entity = doublenickel.entity.create_anonymous(name, data)
-  doublenickel.entity.created_entities[entity.id] = entity
+function dn.entity.create(name, data)
+  local entity = dn.entity.create_anonymous(name, data)
+  dn.entity.created_entities[entity.id] = entity
   return entity
 end
 
-function doublenickel.entity.destroy(id)
-  doublenickel.entity.destroyed_entities[id] = true
+function dn.entity.destroy(id)
+  dn.entity.destroyed_entities[id] = true
 end
 
-function doublenickel.entity.copy(entity)
-	local copied_entity = doublenickel.serialize_entity(entity)
+function dn.entity.copy(entity)
+	local copied_entity = dn.serialize_entity(entity)
 
 	if #copied_entity.tag > 0 then
 	  copied_entity.tag = string.format('%s_Copy', copied_entity.tag)
 	end
 
-	copied_entity.uuid = doublenickel.uuid()
-	for component in doublenickel.iterator.values(copied_entity.components) do
-	  component.uuid = doublenickel.uuid()
+	copied_entity.uuid = dn.uuid()
+	for component in dn.iterator.values(copied_entity.components) do
+	  component.uuid = dn.uuid()
 	end
 
-  return doublenickel.entity.create(copied_entity.name, copied_entity)
+  return dn.entity.create(copied_entity.name, copied_entity)
 end
 
-function doublenickel.entity.save(entity)
+function dn.entity.save(entity)
   if not entity.save_fields then return end
 
   if entity.on_save_game then entity:on_save_game() end
-  return doublenickel.serialize_entity(entity)
+  return dn.serialize_entity(entity)
 end
 
-function doublenickel.entity.load(entity, serialized_entity)
-  doublenickel.deserialize_entity(entity, serialized_entity)
+function dn.entity.load(entity, serialized_entity)
+  dn.deserialize_entity(entity, serialized_entity)
   if entity.on_load_game then entity:on_load_game() end
 end
 
-function doublenickel.entity.clear_add_queue()
-  doublenickel.entity.created_entities = {}
+function dn.entity.clear_add_queue()
+  dn.entity.created_entities = {}
 end
 
-function doublenickel.entity.find(name)
-  for entity in doublenickel.entity.iterate() do
+function dn.entity.find(name)
+  for entity in dn.entity.iterate() do
     if entity.name == name then
       return entity
       end
   end
 
-  for entity in doublenickel.entity.iterate_persistent() do
+  for entity in dn.entity.iterate_persistent() do
     if entity.name == name then
       return entity
       end
@@ -199,28 +199,28 @@ end
 --------------------
 -- ENTITY UPDATES --
 --------------------
-function doublenickel.entity.process_destruction()
-  for id, _ in pairs(doublenickel.entity.destroyed_entities) do
-    local entity = doublenickel.entity.entities[id]
-    doublenickel.entity.run_update_callback(entity, doublenickel.lifecycle.update_callbacks.deinit)
-    doublenickel.entity.entities[id] = nil
+function dn.entity.process_destruction()
+  for id, _ in pairs(dn.entity.destroyed_entities) do
+    local entity = dn.entity.entities[id]
+    dn.entity.run_update_callback(entity, dn.lifecycle.update_callbacks.deinit)
+    dn.entity.entities[id] = nil
   end
 
-  table.clear(doublenickel.entity.destroyed_entities)
+  table.clear(dn.entity.destroyed_entities)
 end
 
-function doublenickel.entity.process_addition()
+function dn.entity.process_addition()
   while true do
-    if table.empty(doublenickel.entity.created_entities) then
+    if table.empty(dn.entity.created_entities) then
       break
     end
   
-    for id, entity in pairs(doublenickel.entity.created_entities) do
-      doublenickel.entity.entities[id] = entity
+    for id, entity in pairs(dn.entity.created_entities) do
+      dn.entity.entities[id] = entity
     end
 
-    local added = table.shallow_copy(doublenickel.entity.created_entities)
-    table.clear(doublenickel.entity.created_entities)
+    local added = table.shallow_copy(dn.entity.created_entities)
+    table.clear(dn.entity.created_entities)
 
     for _, entity in pairs(added) do
       if entity.late_init then entity:late_init() end
@@ -229,29 +229,29 @@ function doublenickel.entity.process_addition()
   end
 end
 
-function doublenickel.entity.update()
-  doublenickel.entity.process_destruction()
-  doublenickel.entity.process_addition()
+function dn.entity.update()
+  dn.entity.process_destruction()
+  dn.entity.process_addition()
   
-  if doublenickel.tick then
-    for entity in doublenickel.entity.iterate() do
-      doublenickel.entity.run_update_callback(entity, doublenickel.lifecycle.update_callbacks.update)
+  if dn.tick then
+    for entity in dn.entity.iterate() do
+      dn.entity.run_update_callback(entity, dn.lifecycle.update_callbacks.update)
     end
 
-    for entity in doublenickel.entity.iterate_persistent() do
-      doublenickel.entity.run_update_callback(entity, doublenickel.lifecycle.update_callbacks.update)
+    for entity in dn.entity.iterate_persistent() do
+      dn.entity.run_update_callback(entity, dn.lifecycle.update_callbacks.update)
     end
 
-    doublenickel.physics.update()
-    doublenickel.interaction.update()
+    dn.physics.update()
+    dn.interaction.update()
   end
 
-  for entity in doublenickel.entity.iterate() do
-    doublenickel.entity.run_update_callback(entity, doublenickel.lifecycle.update_callbacks.draw)
+  for entity in dn.entity.iterate() do
+    dn.entity.run_update_callback(entity, dn.lifecycle.update_callbacks.draw)
   end
 
-  for entity in doublenickel.entity.iterate_persistent() do
-    doublenickel.entity.run_update_callback(entity, doublenickel.lifecycle.update_callbacks.draw)
+  for entity in dn.entity.iterate_persistent() do
+    dn.entity.run_update_callback(entity, dn.lifecycle.update_callbacks.draw)
   end
 end
 
@@ -262,13 +262,13 @@ end
 
 
 -- bad old stuff >:(
-function doublenickel.find_active_entities()
-  local entities = table.shallow_copy(doublenickel.entity.entities)
+function dn.find_active_entities()
+  local entities = table.shallow_copy(dn.entity.entities)
   return entities
 end
 
-function doublenickel.find_entity_impl(entities, name, id, tag, uuid)
-  local entities = entities or doublenickel.entity.entities
+function dn.find_entity_impl(entities, name, id, tag, uuid)
+  local entities = entities or dn.entity.entities
   local check_entity = function(entity)
     if name and entity.name == name then return true end
     if id and entity.id == id then return true end
@@ -278,13 +278,13 @@ function doublenickel.find_entity_impl(entities, name, id, tag, uuid)
   end
 
   for id, entity in pairs(entities) do
-    if doublenickel.entity.destroyed_entities[id] then goto continue end
+    if dn.entity.destroyed_entities[id] then goto continue end
     if check_entity(entity) then return entity end
     ::continue::
   end
 
-  for id, entity in pairs(doublenickel.entity.created_entities) do
-    if doublenickel.entity.destroyed_entities[id] then goto continue end
+  for id, entity in pairs(dn.entity.created_entities) do
+    if dn.entity.destroyed_entities[id] then goto continue end
     if check_entity(entity) then return entity end
     ::continue::
   end
@@ -292,26 +292,26 @@ function doublenickel.find_entity_impl(entities, name, id, tag, uuid)
   return nil
 end
 
-function doublenickel.find_entity(name)
-  return doublenickel.find_entity_impl(doublenickel.find_active_entities(), name, nil, nil, nil)
+function dn.find_entity(name)
+  return dn.find_entity_impl(dn.find_active_entities(), name, nil, nil, nil)
 end
 
-function doublenickel.find_entity_by_id(id)
-  return doublenickel.find_entity_impl(doublenickel.find_active_entities(), nil, id, nil, nil)
+function dn.find_entity_by_id(id)
+  return dn.find_entity_impl(dn.find_active_entities(), nil, id, nil, nil)
 end
 
-function doublenickel.find_entity_by_tag(tag)
-  return doublenickel.find_entity_impl(doublenickel.find_active_entities(), nil, nil, tag, nil)
+function dn.find_entity_by_tag(tag)
+  return dn.find_entity_impl(dn.find_active_entities(), nil, nil, tag, nil)
 end
 
-function doublenickel.find_entity_by_uuid(uuid)
-  return doublenickel.find_entity_impl(doublenickel.find_active_entities(), nil, nil, nil, uuid)
+function dn.find_entity_by_uuid(uuid)
+  return dn.find_entity_impl(dn.find_active_entities(), nil, nil, nil, uuid)
 end
 
-function doublenickel.iterate_entities(name)
+function dn.iterate_entities(name)
   local function iterator()
-    for id, entity in pairs(doublenickel.find_active_entities()) do
-      if not doublenickel.entity.destroyed_entities[id] then
+    for id, entity in pairs(dn.find_active_entities()) do
+      if not dn.entity.destroyed_entities[id] then
         if not name or entity.name == name then
           coroutine.yield(entity)
         end
@@ -322,35 +322,35 @@ function doublenickel.iterate_entities(name)
   return coroutine.wrap(iterator)
 end
 
-function doublenickel.find_entities(name)
+function dn.find_entities(name)
   local found = {}
-  for entity in doublenickel.iterate_entities(name) do
+  for entity in dn.iterate_entities(name) do
     table.insert(found, entity)
   end
 
   return found
 end
 
-function doublenickel.find_entity_staged(name)
-  return doublenickel.find_entity_impl(doublenickel.entity.created_entities, name, nil, nil, nil)
+function dn.find_entity_staged(name)
+  return dn.find_entity_impl(dn.entity.created_entities, name, nil, nil, nil)
 end
 
-function doublenickel.find_entity_by_id_staged(id)
-  return doublenickel.find_entity_impl(doublenickel.entity.created_entities, nil, id, nil, nil)
+function dn.find_entity_by_id_staged(id)
+  return dn.find_entity_impl(dn.entity.created_entities, nil, id, nil, nil)
 end
 
-function doublenickel.find_entity_by_tag_staged(tag)
-  return doublenickel.find_entity_impl(doublenickel.entity.created_entities, nil, nil, tag, nil)
+function dn.find_entity_by_tag_staged(tag)
+  return dn.find_entity_impl(dn.entity.created_entities, nil, nil, tag, nil)
 end
 
-function doublenickel.find_entity_by_uuid_staged(uuid)
-  return doublenickel.find_entity_impl(doublenickel.entity.created_entities, nil, nil, nil, uuid)
+function dn.find_entity_by_uuid_staged(uuid)
+  return dn.find_entity_impl(dn.entity.created_entities, nil, nil, nil, uuid)
 end
 
-function doublenickel.iterate_entities_staged(name)
+function dn.iterate_entities_staged(name)
   local function iterator()
-    for id, entity in pairs(doublenickel.entity.created_entities) do
-      if not doublenickel.entity.destroyed_entities[id] then
+    for id, entity in pairs(dn.entity.created_entities) do
+      if not dn.entity.destroyed_entities[id] then
         if not name or entity.name == name then
           coroutine.yield(entity)
         end
@@ -361,37 +361,37 @@ function doublenickel.iterate_entities_staged(name)
   return coroutine.wrap(iterator)
 end
 
-function doublenickel.find_entities_staged(name)
+function dn.find_entities_staged(name)
   local found = {}
-  for entity in doublenickel.iterate_entities_staged(name) do
+  for entity in dn.iterate_entities_staged(name) do
     table.insert(found, entity)
   end
 
   return found
 end
 
-function doublenickel.find_entity_editor(name)
-  for index, entity in pairs(doublenickel.editor.entities) do
+function dn.find_entity_editor(name)
+  for index, entity in pairs(dn.editor.entities) do
     if entity:is_instance_of(name) then return entity end
   end
 end
 
-function doublenickel.find_entity_by_id_editor(id)
-  return doublenickel.find_entity_impl(doublenickel.editor.entities, nil, id, nil, nil)
+function dn.find_entity_by_id_editor(id)
+  return dn.find_entity_impl(dn.editor.entities, nil, id, nil, nil)
 end
 
-function doublenickel.find_entity_by_tag_editor(tag)
-  return doublenickel.find_entity_impl(doublenickel.editor.entities, nil, nil, tag, nil)
+function dn.find_entity_by_tag_editor(tag)
+  return dn.find_entity_impl(dn.editor.entities, nil, nil, tag, nil)
 end
 
-function doublenickel.find_entity_by_uuid_editor(uuid)
-  return doublenickel.find_entity_impl(doublenickel.editor.entities, nil, nil, nil, uuid)
+function dn.find_entity_by_uuid_editor(uuid)
+  return dn.find_entity_impl(dn.editor.entities, nil, nil, nil, uuid)
 end
 
-function doublenickel.find_all_components(name)
+function dn.find_all_components(name)
   local components = {}
 
-  for id, entity in pairs(doublenickel.entity.entities) do
+  for id, entity in pairs(dn.entity.entities) do
     local component = entity:find_component(name)
     if component then table.insert(components, component) end
   end

@@ -1,4 +1,4 @@
-function doublenickel.is_instance_of(self, class)
+function dn.is_instance_of(self, class)
   if type(class) == 'table' then
     class = class.name
   end
@@ -7,43 +7,43 @@ function doublenickel.is_instance_of(self, class)
   return mt.__type == class
 end
 
-function doublenickel.class.define(name)
-  doublenickel.types[name] = {
+function dn.class.define(name)
+  dn.types[name] = {
     name = name,
     -- Static methods manipulate the class itself, like SomeClass:new()
     __static = {
       include = function(__class, mixin)
         for method_name, method in pairs(mixin) do
-          doublenickel.types[name].__instance[method_name] = method
+          dn.types[name].__instance[method_name] = method
         end
       end,
 
       include_lifecycle = function(__class, enum)
-        doublenickel.types[name].__static:include_enum(doublenickel.enums.LifecycleCallback)
+        dn.types[name].__static:include_enum(dn.enums.LifecycleCallback)
       end,
 
       include_update = function(__class, enum)
-        doublenickel.types[name].__static:include_enum(doublenickel.enums.UpdateCallback)
+        dn.types[name].__static:include_enum(dn.enums.UpdateCallback)
       end,
 
       include_enum = function(__class, enum)
         for as_enum, as_string, as_number in enum:iterate() do
-          doublenickel.types[name].__instance[as_string] = function() end
+          dn.types[name].__instance[as_string] = function() end
         end
       end,
 
       include_fields = function(__class, fields)
         for field_name, field in pairs(fields) do
-          doublenickel.types[name].__fields[field_name] = field
+          dn.types[name].__fields[field_name] = field
         end
       end,
 
       set_field_metadata = function(__class, field, metadata)
-        doublenickel.editor.set_field_metadata(doublenickel.types[name], field, metadata)
+        dn.editor.set_field_metadata(dn.types[name], field, metadata)
       end,
 
       set_field_metadatas = function(__class, metadatas)
-        doublenickel.editor.set_field_metadatas(doublenickel.types[name], metadatas)
+        dn.editor.set_field_metadatas(dn.types[name], metadatas)
       end,
 
       set_metamethod = function(__class, metamethod, fn)
@@ -51,14 +51,14 @@ function doublenickel.class.define(name)
         -- would render the instance unusable. We can hack it in, though, by calling the internal
         -- __index before we try whatever the user gave us
         if metamethod == '__index' then
-          doublenickel.types[name].__metamethods[metamethod] = function(__instance, key)
-            return doublenickel.types[name].__metamethods.__default_index(__instance, key) or fn(__instance, key)
+          dn.types[name].__metamethods[metamethod] = function(__instance, key)
+            return dn.types[name].__metamethods.__default_index(__instance, key) or fn(__instance, key)
           end
         else
-          doublenickel.types[name].__metamethods[metamethod] = fn
+          dn.types[name].__metamethods[metamethod] = fn
         end
         -- if metamethod_n
-        -- doublenickel.editor.set_field_metadatas(doublenickel.types[name], metadatas)
+        -- dn.editor.set_field_metadatas(dn.types[name], metadatas)
       end,
 
 
@@ -67,17 +67,17 @@ function doublenickel.class.define(name)
 
       allocate = function(__class, ...)
         local instance = {}
-        for field_name, field in pairs(doublenickel.types[name].__fields) do
+        for field_name, field in pairs(dn.types[name].__fields) do
           instance[field_name] = field
         end
 
-        setmetatable(instance, doublenickel.types[name].__metamethods)
+        setmetatable(instance, dn.types[name].__metamethods)
     
         -- setmetatable(instance, {
         --   __index = function(__instance, key)
         --     -- If some key isn't found on the instance, check the class' instance methods
         --     -- Look up the class in the global type table, so that it's not stale when hotloaded
-        --     return doublenickel.types[name].__instance[key]
+        --     return dn.types[name].__instance[key]
         --   end,
         --   __type = name
         -- })
@@ -86,13 +86,13 @@ function doublenickel.class.define(name)
       end,
 
       new = function(__class, ...)
-        local instance = doublenickel.types[name].__static.allocate(__class)
-        return doublenickel.types[name].__static.construct(__class, instance, ...)
+        local instance = dn.types[name].__static.allocate(__class)
+        return dn.types[name].__static.construct(__class, instance, ...)
       end,
 
       construct = function(__class, instance, ...)
-        if doublenickel.types[name].__instance.init then
-          doublenickel.types[name].__instance.init(instance, ...)
+        if dn.types[name].__instance.init then
+          dn.types[name].__instance.init(instance, ...)
         end
     
         return instance
@@ -119,10 +119,10 @@ function doublenickel.class.define(name)
     -- This metatable is applied to an instance when it is allocated
     __metamethods = {
       __index = function(__instance, key)
-        return rawget(doublenickel.types[name].__instance, key)
+        return rawget(dn.types[name].__instance, key)
       end,
       __default_index = function(__instance, key)
-        return rawget(doublenickel.types[name].__instance, key)
+        return rawget(dn.types[name].__instance, key)
       end,
       __type = name
     },
@@ -135,27 +135,27 @@ function doublenickel.class.define(name)
   }
 
   -- This is the metatable for the class itself
-  setmetatable(doublenickel.types[name], {
+  setmetatable(dn.types[name], {
     __index = function(_, key)
-      return rawget(doublenickel.types[name].__static, key) or rawget(doublenickel.types[name].__instance, key)
+      return rawget(dn.types[name].__static, key) or rawget(dn.types[name].__instance, key)
     end,
     __newindex = function(__class, member_name, member)
-      doublenickel.types[name].__instance[member_name] = member
+      dn.types[name].__instance[member_name] = member
     end,
     __type = name
   })
 
-  return doublenickel.types[name]
+  return dn.types[name]
 end
 
-function doublenickel.class.metatype(ctype, namespace)
+function dn.class.metatype(ctype, namespace)
   -- Because LuaJIT (bafflingly and ostensibly for some optimization) makes metatypes immutable, we create the metatype once
   -- with a layer of indirection that looks up metamethods rather than calling them directly. Ultimately, we'd like all of the
   -- LuaJIT metatype's metamethods to point to the Lua class that we make
-  if not doublenickel.types[ctype] then
+  if not dn.types[ctype] then
     local metatype_indirection = {
       __index = function(t, k)
-        local from_class = getmetatable(doublenickel.types[ctype]).__index(t, k)
+        local from_class = getmetatable(dn.types[ctype]).__index(t, k)
         if from_class then return from_class end
         if namespace then
           local namespaced_fn = ffi.C[namespace .. '_' .. k]
@@ -174,7 +174,7 @@ function doublenickel.class.metatype(ctype, namespace)
   -- This does mean that our metatypes can't have extra fields on them. There's no reason this isn't possible; it would just
   -- take more metatable wrangling than I feel like doing right now (i.e. store everything besides the ctype in a table, look
   -- up fields in that table if not found on the ctype -- annoying!)
-  local type = doublenickel.class.define(ctype)
+  local type = dn.class.define(ctype)
   type.__static.allocate = function()
     return ffi.new(ctype)
   end
@@ -183,16 +183,16 @@ function doublenickel.class.metatype(ctype, namespace)
 end
 
 
-function doublenickel.class.find(name)
-  return doublenickel.types[name]
+function dn.class.find(name)
+  return dn.types[name]
 end
 
-function doublenickel.class.get(t)
-  if t.class then return doublenickel.class.find(t:class()) end
+function dn.class.get(t)
+  if t.class then return dn.class.find(t:class()) end
 end
 
 
-function doublenickel.add_class_metamethod(class, name, fn)
+function dn.add_class_metamethod(class, name, fn)
   local metatable = getmetatable(class)
   metatable[name] = fn
   setmetatable(class, metatable)

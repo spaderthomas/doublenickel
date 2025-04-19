@@ -1,15 +1,15 @@
 ----------------
 -- PUBLIC API --
 ----------------
-function doublenickel.physics.move(eid, delta)
+function dn.physics.move(eid, delta)
 	local request = {
 		eid = eid,
 		delta = delta
 	}
-	table.insert(doublenickel.physics.requests, request)
+	table.insert(dn.physics.requests, request)
 end
 
-function doublenickel.physics.is_point_inside(point, position, size)
+function dn.physics.is_point_inside(point, position, size)
 	-- Not really a physics function, but I don't know where else to put it
 	local right = point.x > position.x
 	local left = point.x < position.x + size.x
@@ -23,15 +23,15 @@ end
 ----------------
 -- ALGORITHMS --
 ----------------
-function doublenickel.physics.sat(ca, cb)
+function dn.physics.sat(ca, cb)
 	local collision = true
-	local penetration = doublenickel.vec2()
+	local penetration = dn.vec2()
 
 	local axes = {}
 	table.append(axes, ca:find_sat_axes(cb))
 	table.append(axes, cb:find_sat_axes(ca))
 
-	local min_overlap = doublenickel.really_large_number
+	local min_overlap = dn.really_large_number
 	for index, axis in pairs(axes) do
 		local min_a, max_a = ca:project(axis)
 		local min_b, max_b = cb:project(axis)
@@ -67,18 +67,18 @@ end
 ------------
 -- UPDATE --
 ------------
-function doublenickel.physics.update(dt)
-	local colliders = doublenickel.find_all_components('Collider')
+function dn.physics.update(dt)
+	local colliders = dn.find_all_components('Collider')
 
 	-- Reset the hit flag for all colliders
 	for _, collider in pairs(colliders) do
 		collider.hit = false
 	end
 
-	for index, request in pairs(doublenickel.physics.requests) do
+	for index, request in pairs(dn.physics.requests) do
 		-- If something was deleted between the time of the request and the processing,
 		-- just ignore this request
-		local entity = doublenickel.find_entity_by_id(request.eid)
+		local entity = dn.find_entity_by_id(request.eid)
 		if not entity then goto skip_request end
 
 		local collider = entity:find_component('Collider')
@@ -90,15 +90,15 @@ function doublenickel.physics.update(dt)
 		-- Then check for collisions, and resolve if necessary
 		for _, other in pairs(colliders) do
 			local skip_collider = false
-			skip_collider = doublenickel.physics.debug or skip_collider
+			skip_collider = dn.physics.debug or skip_collider
 			skip_collider = collider.uuid == other.uuid or skip_collider
-			skip_collider = other.kind == doublenickel.enums.ColliderKind.Bypass or skip_collider
+			skip_collider = other.kind == dn.enums.ColliderKind.Bypass or skip_collider
 			if skip_collider then goto skip_collider end
 
 			local skip_resolution = false
-			skip_resolution = other.kind == doublenickel.enums.ColliderKind.Trigger or skip_resolution
+			skip_resolution = other.kind == dn.enums.ColliderKind.Trigger or skip_resolution
 
-			local collision, penetration = doublenickel.physics.sat(collider, other)
+			local collision, penetration = dn.physics.sat(collider, other)
 			if collision then
 				if not skip_resolution then
 					collider:move(penetration)
@@ -117,5 +117,5 @@ function doublenickel.physics.update(dt)
 		::skip_request::
 	end
 
-	doublenickel.physics.requests = {}
+	dn.physics.requests = {}
 end

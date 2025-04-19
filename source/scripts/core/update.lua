@@ -1,24 +1,24 @@
-function doublenickel.update_game(dt)
-  doublenickel.time_metric.begin('update')
+function dn.update_game(dt)
+  dn.time_metric.begin('update')
   
-  doublenickel.dt = dt
-  doublenickel.elapsed_time = doublenickel.elapsed_time + dt
-  doublenickel.frame = doublenickel.frame + 1
+  dn.dt = dt
+  dn.elapsed_time = dn.elapsed_time + dt
+  dn.frame = dn.frame + 1
 
-  doublenickel.input.update()
+  dn.input.update()
 
-  doublenickel.lifecycle.run_callback(doublenickel.lifecycle.callbacks.on_begin_frame)
+  dn.lifecycle.run_callback(dn.lifecycle.callbacks.on_begin_frame)
 
-  doublenickel.editor.update()
-  -- doublenickel.scene.update()
-  -- doublenickel.entity.update()
-  -- doublenickel.subsystem.update()
-  -- doublenickel.gui.update()
-  -- doublenickel.audio.update()
+  dn.editor.update()
+  -- dn.scene.update()
+  -- dn.entity.update()
+  -- dn.subsystem.update()
+  -- dn.gui.update()
+  -- dn.audio.update()
 
-  doublenickel.lifecycle.run_callback(doublenickel.lifecycle.callbacks.on_end_frame)
+  dn.lifecycle.run_callback(dn.lifecycle.callbacks.on_end_frame)
   
-  doublenickel.time_metric.stop('update')
+  dn.time_metric.stop('update')
 
-  doublenickel.gpu.render()
+  dn.gpu.render()
 end

@@ -1,4 +1,4 @@
-Render = doublenickel.component.define('Render')
+Render = dn.component.define('Render')
 
 Render.editor_fields = {
   'render_pass'

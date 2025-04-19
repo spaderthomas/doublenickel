@@ -1,5 +1,5 @@
-local ConstantSpeed = doublenickel.class.define('ConstantSpeed')
-doublenickel.interpolation.ConstantSpeed = ConstantSpeed
+local ConstantSpeed = dn.class.define('ConstantSpeed')
+dn.interpolation.ConstantSpeed = ConstantSpeed
 
 function ConstantSpeed:init(params)
   params = params or {}
@@ -12,7 +12,7 @@ function ConstantSpeed:init(params)
 end
 
 function ConstantSpeed:update(dt)
-  dt = dt or doublenickel.dt
+  dt = dt or dn.dt
   local delta = self.velocity * dt
   self.accumulated = self.accumulated + delta
 
@@ -53,14 +53,14 @@ function ConstantSpeed:set_target(target)
   self:reset()
 end
 
-local ConstantSpeed2 = doublenickel.class.define('ConstantSpeed2')
-doublenickel.interpolation.ConstantSpeed2 = ConstantSpeed2
+local ConstantSpeed2 = dn.class.define('ConstantSpeed2')
+dn.interpolation.ConstantSpeed2 = ConstantSpeed2
 
 function ConstantSpeed2:init(params)
   params = params or {}
 
-  self.start = params.start or doublenickel.vec2()
-  self.target = params.target or doublenickel.vec2()
+  self.start = params.start or dn.vec2()
+  self.target = params.target or dn.vec2()
   self.velocity = params.velocity or 10
 
   self.x = ConstantSpeed:new({
@@ -77,7 +77,7 @@ function ConstantSpeed2:init(params)
 end
 
 function ConstantSpeed2:update(dt)
-  dt = dt or doublenickel.dt
+  dt = dt or dn.dt
   self.x:update(dt)
   self.y:update(dt)
   return self:is_done()
@@ -93,7 +93,7 @@ function ConstantSpeed2:is_done()
 end
 
 function ConstantSpeed2:get_value()
-  return doublenickel.vec2(self.x:get_value(), self.y:get_value())
+  return dn.vec2(self.x:get_value(), self.y:get_value())
 end
 
 function ConstantSpeed2:set_start(start)

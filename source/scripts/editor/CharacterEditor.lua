@@ -1,18 +1,18 @@
-Character = doublenickel.class.define('Character')
+Character = dn.class.define('Character')
 
 function Character:init(params)
   params = params or {}
 
   self.name = params.name                           or 'jerry_garcia'
   self.display_name = params.display_name           or 'Jerry Garcia'
-  self.color = doublenickel.color(params.color)         or doublenickel.colors.red:copy()
-  self.body_color = doublenickel.color(params.color)    or doublenickel.colors.white:copy()
+  self.color = dn.color(params.color)         or dn.colors.red:copy()
+  self.body_color = dn.color(params.color)    or dn.colors.white:copy()
   self.font = params.font                           or 'game'
   self.portrait = params.portrait                   or ''
   self.omit_display_name = params.omit_display_name or false
 end
 
-CharacterEditor = doublenickel.editor.define('CharacterEditor')
+CharacterEditor = dn.editor.define('CharacterEditor')
 
 CharacterEditor.popup_kind = {
   edit = 'Edit Character##character_editor'
@@ -27,7 +27,7 @@ function CharacterEditor:init()
   }
   self.popups = Popups:new(popups)
 
-  self.portrait_size = doublenickel.vec2(160, 160)
+  self.portrait_size = dn.vec2(160, 160)
   self.character = {}
   self.table_editor = {}
   self:setup_create_character()
@@ -46,7 +46,7 @@ function CharacterEditor:setup_create_character()
 end
 
 function CharacterEditor:edit_character(name)
-  local character_data = doublenickel.dialogue.characters[name]
+  local character_data = dn.dialogue.characters[name]
   self.character = Character:new(character_data)
   self.table_editor = imgui.extensions.TableEditor(self.character)
   self.popups:open_popup(self.popup_kind.edit)
@@ -56,13 +56,13 @@ end
 -- POPUPS --
 ------------
 function CharacterEditor:edit_character_popup()
-  local popup_size = doublenickel.vec2(600, 800)
-	doublenickel.editor.center_next_window(popup_size)
+  local popup_size = dn.vec2(600, 800)
+	dn.editor.center_next_window(popup_size)
 
   local flags = 0
-  flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiWindowFlags_NoMove)
-  flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiWindowFlags_NoResize)
-  flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiWindowFlags_NoCollapse)
+  flags = bitwise(dn.op_or, flags, ffi.C.ImGuiWindowFlags_NoMove)
+  flags = bitwise(dn.op_or, flags, ffi.C.ImGuiWindowFlags_NoResize)
+  flags = bitwise(dn.op_or, flags, ffi.C.ImGuiWindowFlags_NoCollapse)
 
 
   if imgui.BeginPopupModal(self.popup_kind.edit, nil, flags) then
@@ -89,9 +89,9 @@ function CharacterEditor:invalid_popup()
   imgui.SetNextWindowSize(sx, sy)
 
   local flags = 0
-  flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiWindowFlags_NoMove)
-  flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiWindowFlags_NoResize)
-  flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiWindowFlags_NoCollapse)
+  flags = bitwise(dn.op_or, flags, ffi.C.ImGuiWindowFlags_NoMove)
+  flags = bitwise(dn.op_or, flags, ffi.C.ImGuiWindowFlags_NoResize)
+  flags = bitwise(dn.op_or, flags, ffi.C.ImGuiWindowFlags_NoCollapse)
 
   if imgui.BeginPopupModal('Invalid Character!', nil, flags) then
     if self.character.name == '' then
@@ -160,8 +160,8 @@ function CharacterEditor:draw_buttons()
       done = true
 
       -- Pull any data out of editor and into table and add it to the list.
-      doublenickel.dialogue.characters[self.character.name] = deep_copy_any(self.character)
-      doublenickel.module.write_to_named_path('character_info', doublenickel.dialogue.characters, doublenickel.module.WriteOptions.Pretty)
+      dn.dialogue.characters[self.character.name] = deep_copy_any(self.character)
+      dn.module.write_to_named_path('character_info', dn.dialogue.characters, dn.module.WriteOptions.Pretty)
     end
   end
 

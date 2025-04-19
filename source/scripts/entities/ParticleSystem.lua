@@ -1,7 +1,7 @@
 ---------------------
 -- PARTICLE SYSTEM --
 ---------------------
-ParticleSystem = doublenickel.entity.define('ParticleSystem')
+ParticleSystem = dn.entity.define('ParticleSystem')
 
 ParticleSystem.components = {
   'Collider'
@@ -43,13 +43,13 @@ ParticleSystem.save_fields = {
 
 function ParticleSystem:init(params)
   -- PARAMETERS
-  self.color = params.color or doublenickel.colors.red_light_trans
-  self.layer = params.layer or doublenickel.layers.default_particle
+  self.color = params.color or dn.colors.red_light_trans
+  self.layer = params.layer or dn.layers.default_particle
 
   self.position_mode = params.position_mode or dn.unported.ParticlePositionMode_Bottom
-  self.velocity_base = doublenickel.vec2(params.velocity_base)
-  self.velocity_max = doublenickel.vec2(params.velocity_max or doublenickel.vec2(4, 4))
-  self.velocity_jitter = doublenickel.vec2(params.velocity_jitter)
+  self.velocity_base = dn.vec2(params.velocity_base)
+  self.velocity_max = dn.vec2(params.velocity_max or dn.vec2(4, 4))
+  self.velocity_jitter = dn.vec2(params.velocity_jitter)
   self.jitter_base_velocity = ternary(params.jitter_base_velocity, true, false)
   self.jitter_max_velocity = ternary(params.jitter_max_velocity, true, false)
 
@@ -66,27 +66,27 @@ function ParticleSystem:init(params)
 
   self.lifetime = params.lifetime or 4
 
-  self.particles = doublenickel.data_types.array:new()
+  self.particles = dn.data_types.array:new()
   self.spawn_rate = params.spawn_rate or 20
   self.spawn_accumulated = 0
-  self.despawn = doublenickel.data_types.array:new()
+  self.despawn = dn.data_types.array:new()
   self.warmup = params.warmup or 0
   self.start_disabled = ternary(params.start_disabled, true, false)
 
-  self:set_particle_kind(doublenickel.enum.load(params.particle_kind) or doublenickel.enums.ParticleKind.Quad,
+  self:set_particle_kind(dn.enum.load(params.particle_kind) or dn.enums.ParticleKind.Quad,
     params.particle_data)
 
-  self.gravity_source = params.gravity_source or doublenickel.vec2()
+  self.gravity_source = params.gravity_source or dn.vec2()
   self.gravity_intensity = params.gravity_intensity or 1
   self.gravity_enabled = ternary(params.gravity_enabled, true, false)
 
   self.collider = self:find_component('Collider')
-  self.collider.kind = doublenickel.enums.ColliderKind.Bypass
+  self.collider.kind = dn.enums.ColliderKind.Bypass
 
   -- RUNTIME
   self.emit = not self.start_disabled
   self.interpolation = {
-    emission = doublenickel.interpolation.Lerp:new({
+    emission = dn.interpolation.Lerp:new({
       time = 2
     })
   }
@@ -104,7 +104,7 @@ function ParticleSystem:init(params)
     on_change_field = function(field) self:on_change_field(field) end,
     on_draw_colliders = function() self:on_draw_colliders() end
   }
-  doublenickel.editor.set_editor_callbacks(self, editor_callbacks)
+  dn.editor.set_editor_callbacks(self, editor_callbacks)
 end
 
 function ParticleSystem:deinit()
@@ -142,7 +142,7 @@ function ParticleSystem:draw()
 end
 
 function ParticleSystem:sync()
-  doublenickel.editor.ignore_field(self, 'handle')
+  dn.editor.ignore_field(self, 'handle')
   if not self.handle then return end
 
   dn.unported.set_particle_warmup(self.handle, self.warmup)
@@ -174,11 +174,11 @@ function ParticleSystem:sync()
   dn.unported.set_particle_gravity_enabled(self.handle, self.gravity_enabled)
 
   dn.unported.set_particle_kind(self.handle, self.particle_kind:to_number())
-  if self.particle_kind == doublenickel.enums.ParticleKind.Quad then
+  if self.particle_kind == dn.enums.ParticleKind.Quad then
     dn.unported.set_particle_size(self.handle, self.particle_data.size.x, self.particle_data.size.y)
-  elseif self.particle_kind == doublenickel.enums.ParticleKind.Circle then
+  elseif self.particle_kind == dn.enums.ParticleKind.Circle then
     dn.unported.set_particle_radius(self.handle, self.particle_data.radius)
-  elseif self.particle_kind == doublenickel.enums.ParticleKind.Image then
+  elseif self.particle_kind == dn.enums.ParticleKind.Image then
     dn.unported.set_particle_sprite(self.handle, self.particle_data.sprite)
     dn.unported.set_particle_size(self.handle, self.particle_data.size.x, self.particle_data.size.y)
   end
@@ -249,7 +249,7 @@ end
 function ParticleSystem:on_draw_colliders()
   if self.gravity_enabled then
     dn.unported.set_world_space(true)()
-    doublenickel.draw_circle_l(self.gravity_source, math.abs(self.gravity_intensity) + 10, doublenickel.colors.white_trans)
+    dn.draw_circle_l(self.gravity_source, math.abs(self.gravity_intensity) + 10, dn.colors.white_trans)
   end
 end
 
@@ -277,18 +277,18 @@ end
 
 function ParticleSystem:on_change_particle_kind(data)
   data = data or {}
-  if self.particle_kind == doublenickel.enums.ParticleKind.Quad then
+  if self.particle_kind == dn.enums.ParticleKind.Quad then
     self.particle_data = {
-      size = data.size and doublenickel.vec2(data.size) or doublenickel.vec2(10, 10)
+      size = data.size and dn.vec2(data.size) or dn.vec2(10, 10)
     }
-  elseif self.particle_kind == doublenickel.enums.ParticleKind.Circle then
+  elseif self.particle_kind == dn.enums.ParticleKind.Circle then
     self.particle_data = {
       radius = data.radius or 10
     }
-  elseif self.particle_kind == doublenickel.enums.ParticleKind.Image then
+  elseif self.particle_kind == dn.enums.ParticleKind.Image then
     self.particle_data = {
       sprite = data.sprite or 'debug.png',
-      size = data.size and doublenickel.vec2(data.size) or doublenickel.vec2(10, 10)
+      size = data.size and dn.vec2(data.size) or dn.vec2(10, 10)
     }
   end
 end

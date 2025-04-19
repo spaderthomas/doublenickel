@@ -3,20 +3,20 @@
 -----------------
 -- Use this to wrap up all the textures and other configurations a button might need into one
 -- struct for use with any GUI button APIs
-local ButtonInfo = doublenickel.class.define('ButtonInfo')
-doublenickel.gui.ButtonInfo = ButtonInfo
+local ButtonInfo = dn.class.define('ButtonInfo')
+dn.gui.ButtonInfo = ButtonInfo
 function ButtonInfo:init(regular, hovered, held, text_inactive, text_active)
-  self.regular = regular or doublenickel.colors.clear
-  self.hovered = hovered or doublenickel.colors.red
-  self.held = held or doublenickel.colors.blue
-  self.text_active = text_active or doublenickel.colors.white
-  self.text_inactive = text_inactive or doublenickel.colors.white
+  self.regular = regular or dn.colors.clear
+  self.hovered = hovered or dn.colors.red
+  self.held = held or dn.colors.blue
+  self.text_active = text_active or dn.colors.white
+  self.text_inactive = text_inactive or dn.colors.white
 end
 
 -----------------------
 -- PRIVATE UTILITIES --
 -----------------------
-local GuiItem = doublenickel.class.define('GuiItem')
+local GuiItem = dn.class.define('GuiItem')
 
 GuiItem.kinds = {
   quad = 'quad',
@@ -30,9 +30,9 @@ GuiItem.kinds = {
 
 function GuiItem:init(kind)
   self.kind = kind or self.kinds.quad
-  self.size = doublenickel.vec2(100, 100)
+  self.size = dn.vec2(100, 100)
 
-  self.color = doublenickel.colors.white
+  self.color = dn.colors.white
 
   self.background = ''
 
@@ -43,7 +43,7 @@ function GuiItem:init(kind)
   self.wrap = 0
   self.precise = false
 
-  self.position = doublenickel.vec2()
+  self.position = dn.vec2()
 end
 
 function GuiItem:add_offset(offset)
@@ -63,8 +63,8 @@ end
 -- I want to share the generic initialization and defaults between the two functions, so I put it here.
 local function make_quad(sx, sy, color)
   local item = GuiItem:new(GuiItem.kinds.quad)
-  item.color = color or doublenickel.colors.red
-  item.size = doublenickel.vec2(sx, sy)
+  item.color = color or dn.colors.red
+  item.size = dn.vec2(sx, sy)
 
   return item
 end
@@ -73,8 +73,8 @@ local function make_line(thickness, color)
   local item = GuiItem:new(GuiItem.kinds.line)
   item.color = color
   item.thickness = thickness
-  item.a = doublenickel.vec2()
-  item.b = doublenickel.vec2()
+  item.a = dn.vec2()
+  item.b = dn.vec2()
 
   return item
 end
@@ -84,9 +84,9 @@ local function make_image(image, sx, sy)
   item.image = image
 
   if sx == 0 or sy == 0 or not sx or not sy then
-    sx, sy = doublenickel.sprite_size(image)
+    sx, sy = dn.sprite_size(image)
   end
-  item.size = doublenickel.vec2(sx, sy)
+  item.size = dn.vec2(sx, sy)
 
   return item
 end
@@ -95,15 +95,15 @@ local function make_text(text, font, color, wrap, precise)
   local item = GuiItem:new(GuiItem.kinds.text)
   item.text = text
   item.font = font or 'game'
-  item.color = color or doublenickel.colors.white
+  item.color = color or dn.colors.white
   item.wrap = wrap or 0
   item.precise = ternary(precise, true, false)
   item.prepared = dn.ffi.prepare_text_ex(item.text, 0, 0, item.font, item.wrap, item.color:to_vec4(), item.precise)
 
   if item.precise then
-    item.size = doublenickel.vec2(item.prepared.width, item.prepared.height)
+    item.size = dn.vec2(item.prepared.width, item.prepared.height)
   else
-    item.size = doublenickel.vec2(item.prepared.width, item.prepared.height_imprecise)
+    item.size = dn.vec2(item.prepared.width, item.prepared.height_imprecise)
   end
 
   return item
@@ -111,30 +111,30 @@ end
 
 
 local function setup_animation_interpolation(interpolator, direction)
-  local native_resolution = doublenickel.window.dn_window_get_native_resolution()
+  local native_resolution = dn.window.dn_window_get_native_resolution()
 
-  local start = doublenickel.vec2()
-  if direction == doublenickel.gui.animation_direction.left then
+  local start = dn.vec2()
+  if direction == dn.gui.animation_direction.left then
     start.x = native_resolution.x * -1
-  elseif direction == doublenickel.gui.animation_direction.right then
+  elseif direction == dn.gui.animation_direction.right then
     start.x = native_resolution.x
-  elseif direction == doublenickel.gui.animation_direction.bottom then
+  elseif direction == dn.gui.animation_direction.bottom then
     start.y = native_resolution.y * -1
-  elseif direction == doublenickel.gui.animation_direction.top then
+  elseif direction == dn.gui.animation_direction.top then
     start.y = native_resolution.y
   end
 
   interpolator:set_start(start)
-  interpolator:set_target(doublenickel.vec2())
+  interpolator:set_target(dn.vec2())
   interpolator:reset()
 end
 
 ----------------
 -- GUI REGION --
 ----------------
-local GuiRegion = doublenickel.class.define('GuiRegion')
+local GuiRegion = dn.class.define('GuiRegion')
 
-doublenickel.gui.style_fields = {
+dn.gui.style_fields = {
   padding_h = 'padding_h',
   padding_v = 'padding_v',
   padding_button = 'padding_button',
@@ -144,22 +144,22 @@ doublenickel.gui.style_fields = {
 }
 
 GuiRegion.default_style = {
-  [doublenickel.gui.style_fields.padding_h] = 10,
-  [doublenickel.gui.style_fields.padding_v] = 10,
-  [doublenickel.gui.style_fields.padding_button] = 8,
-  [doublenickel.gui.style_fields.scroll_area_width] = 20,
-  [doublenickel.gui.style_fields.scroll_bar_size] = 4,
-  [doublenickel.gui.style_fields.scroller_min_height] = 40,
+  [dn.gui.style_fields.padding_h] = 10,
+  [dn.gui.style_fields.padding_v] = 10,
+  [dn.gui.style_fields.padding_button] = 8,
+  [dn.gui.style_fields.scroll_area_width] = 20,
+  [dn.gui.style_fields.scroll_bar_size] = 4,
+  [dn.gui.style_fields.scroller_min_height] = 40,
 }
 
-doublenickel.gui.animation_direction = {
+dn.gui.animation_direction = {
   left = 'left',
   right = 'right',
   bottom = 'bottom',
   top = 'top',
 }
 
-doublenickel.enum.define(
+dn.enum.define(
   'MenuDirection',
   {
     Vertical = 0,
@@ -180,21 +180,21 @@ function GuiRegion:init(position, size)
 
   self.label = ''
 
-  self.point_stack = doublenickel.data_types.stack:new()
-  self.last_item = doublenickel.vec2()
+  self.point_stack = dn.data_types.stack:new()
+  self.last_item = dn.vec2()
 
   self.center_next_item = false
   self.scroll_speed = 200
 
   self.cache_draw_calls = false
-  self.cached_draw_list = doublenickel.data_types.array:new()
+  self.cached_draw_list = dn.data_types.array:new()
 end
 
 function GuiRegion:set_position(position)
   self.position = position:copy()
   self.point = position:copy()
   self.default_point = position:copy()
-  self.last_point = doublenickel.vec2()
+  self.last_point = dn.vec2()
 end
 
 function GuiRegion:reset_flags()
@@ -211,9 +211,9 @@ function GuiRegion:advance_point(size)
   self.point.x = self.default_point.x
 
   if self.flipped then
-    self.point.y = self.point.y + size.y + self.style[doublenickel.gui.style_fields.padding_v]
+    self.point.y = self.point.y + size.y + self.style[dn.gui.style_fields.padding_v]
   else
-    self.point.y = self.point.y - size.y - self.style[doublenickel.gui.style_fields.padding_v]
+    self.point.y = self.point.y - size.y - self.style[dn.gui.style_fields.padding_v]
   end
 end
 
@@ -229,7 +229,7 @@ function GuiRegion:calc_item_position(item_size)
   end
 
   if item_size.y == -1 then
-    item_size.y = self.content_area.y - self.style[doublenickel.gui.style_fields.padding_v] * 2
+    item_size.y = self.content_area.y - self.style[dn.gui.style_fields.padding_v] * 2
   end
 
   self:apply_formatting(position, item_size)
@@ -261,29 +261,29 @@ function GuiRegion:apply_formatting(position, item_size)
       self.point.x = self.point.x + offset
     end
   else
-    position.x = self.point.x + self.style[doublenickel.gui.style_fields.padding_h]
+    position.x = self.point.x + self.style[dn.gui.style_fields.padding_h]
   end
 
 
   if self.center_next_item_vertically then
     position.y = self.point.y - (self.content_area.y / 2) + (item_size.y / 2)
   else
-    position.y = position.y - self.style[doublenickel.gui.style_fields.padding_v]
+    position.y = position.y - self.style[dn.gui.style_fields.padding_v]
   end
 
   if self.flipped then
-    position.y = position.y + item_size.y + self.style[doublenickel.gui.style_fields.padding_v]
+    position.y = position.y + item_size.y + self.style[dn.gui.style_fields.padding_v]
   end
 end
 
 function GuiRegion:apply_camera(position)
   if self.is_scroll then
-    local scroll_data = doublenickel.gui.scroll[self.label]
+    local scroll_data = dn.gui.scroll[self.label]
     position.y = position.y + scroll_data.offset
   end
 
   if self.is_drag then
-    local drag = doublenickel.gui.find_drag_data(self.label)
+    local drag = dn.gui.find_drag_data(self.label)
     position.x = position.x + drag.offset.x
     position.y = position.y + drag.offset.y
   end
@@ -291,13 +291,13 @@ end
 
 function GuiRegion:find_size_remaining()
   local size_used = self:find_size_used()
-  local size_remaining = doublenickel.vec2(self.content_area.x - size_used.x,
-    self.content_area.y - size_used.y - self.style[doublenickel.gui.style_fields.padding_v])
+  local size_remaining = dn.vec2(self.content_area.x - size_used.x,
+    self.content_area.y - size_used.y - self.style[dn.gui.style_fields.padding_v])
   return size_remaining
 end
 
 function GuiRegion:find_size_used()
-  local size_used = doublenickel.vec2()
+  local size_used = dn.vec2()
   size_used.x = self.point.x - self.position.x
   if self.flipped then
     size_used.y = self.point.y - (self.position.y - self.size.y)
@@ -309,8 +309,8 @@ function GuiRegion:find_size_used()
 end
 
 function GuiRegion:is_mouse_inside()
-  if not doublenickel.input.is_mkb_mode() then return false end
-  return doublenickel.physics.is_point_inside(self.input:mouse(), self.position, self.size)
+  if not dn.input.is_mkb_mode() then return false end
+  return dn.physics.is_point_inside(self.input:mouse(), self.position, self.size)
 end
 
 --
@@ -324,8 +324,8 @@ end
 -- I think I prefer (1), but I wrote them both while experimenting, so I'm keeping them around. I think there are
 -- strengths for both.
 --
-local Gui = doublenickel.class.define('Gui')
-doublenickel.gui.Gui = Gui
+local Gui = dn.class.define('Gui')
+dn.gui.Gui = Gui
 
 Gui.mouse_state = {
   idle = 'idle',
@@ -335,23 +335,23 @@ Gui.mouse_state = {
 }
 
 function Gui:init()
-  self.native_resolution = doublenickel.window.dn_window_get_native_resolution()
+  self.native_resolution = dn.window.dn_window_get_native_resolution()
   self.scale = table.deep_copy(self.native_resolution)
 
-  self.active_regions = doublenickel.data_types.stack:new()
-  self.finished_regions = doublenickel.data_types.stack:new()
-  self.regions = doublenickel.data_types.queue:new()
+  self.active_regions = dn.data_types.stack:new()
+  self.finished_regions = dn.data_types.stack:new()
+  self.regions = dn.data_types.queue:new()
 
-  self.draw_list = doublenickel.data_types.array:new()
-  self.scissor = doublenickel.data_types.stack:new()
-  self.layer = doublenickel.layers.ui
+  self.draw_list = dn.data_types.array:new()
+  self.scissor = dn.data_types.stack:new()
+  self.layer = dn.layers.ui
 
   -- To animate hiding regions, we cache all draw calls submitted between begin_region()
   -- and end_region()
   self.cache_draw_calls = false
   self.cache_region = nil
 
-  self.input = ContextualInput:new(doublenickel.enums.InputContext.Game, doublenickel.enums.CoordinateSystem.Game)
+  self.input = ContextualInput:new(dn.enums.InputContext.Game, dn.enums.CoordinateSystem.Game)
 
   self.precise_text = true
 end
@@ -360,7 +360,7 @@ end
 -- REGIONS
 --
 function Gui:begin_frame()
-  local position = doublenickel.vec2(0, 1080)
+  local position = dn.vec2(0, 1080)
   local size = self.native_resolution:copy()
   self:begin_region_impl(position, size)
 
@@ -378,9 +378,9 @@ function Gui:begin_region_px(px, py, sx, sy)
 
   local parent = self.active_regions:peek()
 
-  local child_position = doublenickel.vec2(px, py)
+  local child_position = dn.vec2(px, py)
   child_position = child_position:add(parent.position)
-  local child_size = doublenickel.vec2(sx, sy)
+  local child_size = dn.vec2(sx, sy)
 
   return self:begin_region_impl(child_position, child_size)
 end
@@ -398,13 +398,13 @@ function Gui:begin_region_rel(px, py, sx, sy)
 
 
   -- The child's position is just the parent's position, plus whatever fraction of the parent's size given by px and py
-  local relative_position = doublenickel.vec2(px, py)
+  local relative_position = dn.vec2(px, py)
   local offset = parent.size:pairwise_mult(relative_position)
   offset.y = offset.y * -1
   local child_position = parent.position:add(offset)
 
   -- The child's size is the fraction of the parent's size given by sx and sy
-  local relative_size = doublenickel.vec2(sx, sy)
+  local relative_size = dn.vec2(sx, sy)
   local child_size = parent.size:pairwise_mult(relative_size)
 
   return self:begin_region_impl(child_position, child_size)
@@ -425,8 +425,8 @@ function Gui:begin_region_shrink_px(sx, sy)
 
   local parent = self.active_regions:peek()
 
-  local child_size = doublenickel.vec2(sx, sy)
-  local child_position = doublenickel.vec2(
+  local child_size = dn.vec2(sx, sy)
+  local child_position = dn.vec2(
     parent.position.x + (parent.size.x - child_size.x) / 2,
     parent.position.y - (parent.size.y - child_size.y) / 2
   )
@@ -442,16 +442,16 @@ function Gui:begin_region_widget(sx, sy)
   local parent = self.active_regions:peek()
   local size_remaining = parent:find_size_remaining()
 
-  local child_size = doublenickel.vec2(
+  local child_size = dn.vec2(
     size_remaining.x * sx,
-    size_remaining.y * sy - parent.style[doublenickel.gui.style_fields.padding_v]
+    size_remaining.y * sy - parent.style[dn.gui.style_fields.padding_v]
   )
 
   local child_position = parent:calc_item_position(child_size)
 
-  -- local child_position = doublenickel.vec2(
+  -- local child_position = dn.vec2(
   --   parent.point.x,
-  --   parent.point.y - parent.style[doublenickel.gui.style_fields.padding_v]
+  --   parent.point.y - parent.style[dn.gui.style_fields.padding_v]
   -- )
 
   parent:advance_point(child_size)
@@ -463,8 +463,8 @@ function Gui:begin_region_offset(px, py, sx, sy)
   -- Begin a region at an arbitrary offset and size within the parent region
   local parent = self.active_regions:peek()
 
-  local size = doublenickel.vec2(sx, sy)
-  local position = doublenickel.vec2(px, py)
+  local size = dn.vec2(sx, sy)
+  local position = dn.vec2(px, py)
   position = parent:calc_canvas_item_position(position, size)
 
   return self:begin_region_impl(position, size, true)
@@ -485,7 +485,7 @@ function Gui:begin_region_impl(absolute_position, absolute_size)
   local region = GuiRegion:new(absolute_position, absolute_size)
   self.active_regions:push(region)
   self.regions:push(region)
-  --self:draw_region(doublenickel.color(0.00, 1.00, 1.00, 0.05))
+  --self:draw_region(dn.color(0.00, 1.00, 1.00, 0.05))
 
   return true
 end
@@ -539,7 +539,7 @@ function Gui:draw_region_force(color)
   local item = GuiItem:new(GuiItem.kinds.quad)
   item.position = region.position:copy()
   item.size = region.size:copy()
-  item.color = color or doublenickel.colors.red_light_trans
+  item.color = color or dn.colors.red_light_trans
   self:push_draw_command(item)
 end
 
@@ -564,14 +564,14 @@ function Gui:animate_region(interpolator, direction)
   animation.active = true
   if not animation.was_active then
     -- This is the first frame the animation has played; set everything up
-    animation.time_begin = doublenickel.elapsed_time
+    animation.time_begin = dn.elapsed_time
     region.unanimated_position = region.position
     setup_animation_interpolation(animation.interpolator, direction)
   end
 
   animation.interpolator:update()
   local interp = animation.interpolator:get_value()
-  local position = doublenickel.vec2(
+  local position = dn.vec2(
     region.unanimated_position.x + interp.x,
     region.unanimated_position.y + interp.y)
   region:set_position(position)
@@ -604,7 +604,7 @@ function Gui:scroll_region()
   -- because as is this will incorrectly adjust for the scroll bar even when we don't need one.
   region.content_area.x = region.content_area.x - region.style.scroll_area_width
   region.is_scroll = true
-  doublenickel.gui.find_scroll_data(region.label)
+  dn.gui.find_scroll_data(region.label)
 
   -- Scrolling always implies scissoring, so the extra material isn't visible
   self:scissor_region()
@@ -620,7 +620,7 @@ function Gui:interpolate_scroll_to_percent(percent)
   if not region.is_scroll then return end
   if not region.label then return end
 
-  local scroll = doublenickel.gui.find_scroll_data(region.label)
+  local scroll = dn.gui.find_scroll_data(region.label)
   scroll.need_init_interpolate = true
   scroll.interpolate_percent = percent
 end
@@ -631,7 +631,7 @@ function Gui:show_scroller_at_bottom(percent)
   if not region.is_scroll then return end
   if not region.label then return end
 
-  local scroll = doublenickel.gui.find_scroll_data(region.label)
+  local scroll = dn.gui.find_scroll_data(region.label)
   scroll.display_at_bottom = true
 end
 
@@ -668,7 +668,7 @@ end
 
 function Gui:set_point(px, py)
   local region = self.active_regions:peek()
-  region.default_point = doublenickel.vec2(px, py)
+  region.default_point = dn.vec2(px, py)
   region.point = region.default_point:copy()
 end
 
@@ -705,14 +705,14 @@ function Gui:get_style_field(field)
 end
 
 function Gui:disable_padding()
-  self:set_style_field(doublenickel.gui.style_fields.padding_h, 0)
-  self:set_style_field(doublenickel.gui.style_fields.padding_v, 0)
+  self:set_style_field(dn.gui.style_fields.padding_h, 0)
+  self:set_style_field(dn.gui.style_fields.padding_v, 0)
 end
 
 function Gui:same_line()
   local region = self.active_regions:peek()
   region.point = region.last_point:copy()
-  region.point.x = region.point.x + region.style[doublenickel.gui.style_fields.padding_h]
+  region.point.x = region.point.x + region.style[dn.gui.style_fields.padding_h]
   region.point.y = region.point.y
 end
 
@@ -727,17 +727,17 @@ function Gui:center_next_item_vertically()
 end
 
 function Gui:is_item_controller_hovered()
-  local menu = doublenickel.gui.find_last_menu()
-  return doublenickel.input.is_controller_mode() and menu.current == menu.items_this_frame - 1
+  local menu = dn.gui.find_last_menu()
+  return dn.input.is_controller_mode() and menu.current == menu.items_this_frame - 1
 end
 
 function Gui:is_next_item_controller_hovered()
-  local menu = doublenickel.gui.find_last_menu()
-  return doublenickel.input.is_controller_mode() and menu.current == menu.items_this_frame
+  local menu = dn.gui.find_last_menu()
+  return dn.input.is_controller_mode() and menu.current == menu.items_this_frame
 end
 
 function Gui:is_item_hovered()
-  if doublenickel.input.is_controller_mode() then
+  if dn.input.is_controller_mode() then
     return self:is_item_controller_hovered()
   else
     local item = self.draw_list:back()
@@ -755,9 +755,9 @@ end
 
 function Gui:get_region_drag()
   local region = self.active_regions:peek()
-  if not region.is_drag then return doublenickel.vec2() end
+  if not region.is_drag then return dn.vec2() end
 
-  local drag = doublenickel.gui.find_drag_data(region.label)
+  local drag = dn.gui.find_drag_data(region.label)
   return drag.offset
 end
 
@@ -773,9 +773,9 @@ end
 
 function Gui:get_region_available()
   local region = self.active_regions:peek()
-  return doublenickel.vec2(
-    region.content_area.x - region.style[doublenickel.gui.style_fields.padding_h] * 2,
-    region.content_area.y - region.style[doublenickel.gui.style_fields.padding_v] * 2
+  return dn.vec2(
+    region.content_area.x - region.style[dn.gui.style_fields.padding_h] * 2,
+    region.content_area.y - region.style[dn.gui.style_fields.padding_v] * 2
   )
 end
 
@@ -802,7 +802,7 @@ function Gui:canvas_quad(px, py, sx, sy, color)
   local region = self.active_regions:peek()
 
   local item = make_quad(sx, sy, color)
-  item.position = region:calc_canvas_item_position(doublenickel.vec2(px, py))
+  item.position = region:calc_canvas_item_position(dn.vec2(px, py))
 
   self:add_canvas_item(item)
 end
@@ -811,8 +811,8 @@ function Gui:canvas_line(ax, ay, bx, by, thickness, color, debg)
   local region = self.active_regions:peek()
 
   local item = make_line(thickness, color)
-  item.a = region:calc_canvas_item_position(doublenickel.vec2(ax, ay))
-  item.b = region:calc_canvas_item_position(doublenickel.vec2(bx, by))
+  item.a = region:calc_canvas_item_position(dn.vec2(ax, ay))
+  item.b = region:calc_canvas_item_position(dn.vec2(bx, by))
   item.dbg = true
 
   self:add_canvas_item(item)
@@ -832,7 +832,7 @@ function Gui:canvas_image(image, px, py, sx, sy)
   local region = self.active_regions:peek()
 
   local item = make_image(image, sx, sy)
-  item.position = region:calc_canvas_item_position(doublenickel.vec2(px, py))
+  item.position = region:calc_canvas_item_position(dn.vec2(px, py))
 
   self:add_canvas_item(item)
 end
@@ -842,7 +842,7 @@ function Gui:text(text, font, color, wrap)
   local region = self.active_regions:peek()
 
   wrap = wrap or
-      region.content_area.x - region:find_size_used().x - (region.style[doublenickel.gui.style_fields.padding_h] * 2)
+      region.content_area.x - region:find_size_used().x - (region.style[dn.gui.style_fields.padding_h] * 2)
   local item = make_text(text, font, color, wrap, self.precise_text)
   item.position = region:calc_item_position(item.size)
 
@@ -852,9 +852,9 @@ end
 function Gui:canvas_text(text, px, py, font, color, wrap)
   local region = self.active_regions:peek()
 
-  wrap = wrap or region.size.x - (region.style[doublenickel.gui.style_fields.padding_h] * 2)
+  wrap = wrap or region.size.x - (region.style[dn.gui.style_fields.padding_h] * 2)
   local item = make_text(text, font, color, wrap, self.precise_text)
-  item.position = region:calc_canvas_item_position(doublenickel.vec2(px, py))
+  item.position = region:calc_canvas_item_position(dn.vec2(px, py))
 
   self:add_canvas_item(item)
 end
@@ -864,7 +864,7 @@ function Gui:image_button(label, button_info, sx, sy, font)
   local region = self.active_regions:peek()
 
   local image = GuiItem:new(GuiItem.kinds.image)
-  image.size = doublenickel.vec2(sx, sy)
+  image.size = dn.vec2(sx, sy)
   image.position = region:calc_item_position(image.size)
 
   return self:image_button_ex(label, button_info, sx, sy, font, image)
@@ -874,8 +874,8 @@ function Gui:canvas_image_button(label, button_info, px, py, sx, sy, font)
   local region = self.active_regions:peek()
 
   local image = GuiItem:new(GuiItem.kinds.image)
-  image.size = doublenickel.vec2(sx, sy)
-  image.position = region:calc_canvas_item_position(doublenickel.vec2(px, py))
+  image.size = dn.vec2(sx, sy)
+  image.position = region:calc_canvas_item_position(dn.vec2(px, py))
 
   return self:image_button_ex(label, button_info, sx, sy, font, image)
 end
@@ -895,7 +895,7 @@ end
 
 -- TEXT BUTTON
 function Gui:button(text, font)
-  return self:button_ex(text, doublenickel.gui.ButtonInfo:new(), font)
+  return self:button_ex(text, dn.gui.ButtonInfo:new(), font)
 end
 
 function Gui:button_ex(label, button_info, font, sx, sy)
@@ -923,27 +923,27 @@ function Gui:begin_menu()
   end
   if not region then return end
 
-  local menu = doublenickel.gui.find_menu_data(region.label)
+  local menu = dn.gui.find_menu_data(region.label)
   menu.label = region.label
-  doublenickel.gui.last_menu = menu
+  dn.gui.last_menu = menu
 
   local is_menu_stacked = false
-  for _, stacked_menu in doublenickel.gui.menu_stack:iterate() do
+  for _, stacked_menu in dn.gui.menu_stack:iterate() do
     is_menu_stacked = is_menu_stacked or stacked_menu == menu.label
   end
 
   if not is_menu_stacked then
-    for id, other in pairs(doublenickel.gui.menu) do
+    for id, other in pairs(dn.gui.menu) do
       other.active = false
     end
     menu.active = true
-    doublenickel.gui.menu_stack:add(menu.label)
+    dn.gui.menu_stack:add(menu.label)
   end
 end
 
 function Gui:end_menu()
   local region = self.active_regions:peek()
-  local menu = doublenickel.gui.find_menu_data(region.label)
+  local menu = dn.gui.find_menu_data(region.label)
 
   -- Assign like this so the
   menu.size_last_frame:assign(menu.size_this_frame)
@@ -952,40 +952,36 @@ end
 
 function Gui:scroll_menu()
   local region = self.active_regions:peek()
-  local menu = doublenickel.gui.find_menu_data(region.label)
+  local menu = dn.gui.find_menu_data(region.label)
 
   self:scroll_region()
 
-  if doublenickel.input.is_controller_mode() then
+  if dn.input.is_controller_mode() then
     region.scroll_locked_to_menu = true
 
     -- Normally, we update scrolling at the end of the frame, since we need to know the size drawn into the region
     -- to determine the size of the scrollbar. However, when we lock the scroll to the menu, the scroll is entirely
     -- dependent on the selected menu item. We need to synchronize those before we issue draw commands, or there
     -- will be a one frame delay (and therefore popping) when we move through the menu.
-    local scroll = doublenickel.gui.find_scroll_data(region.label)
+    local scroll = dn.gui.find_scroll_data(region.label)
     scroll.percent = menu.current / menu.items_last_frame
     scroll.offset = menu.size_last_frame.y * scroll.percent
-
-    if scroll.offset == 26 then
-      print(menu.current, menu.items_last_frame, menu.size_last_frame.y)
-    end
   end
 end
 
 function Gui:set_menu_direction(direction)
-  local menu = doublenickel.gui.find_last_menu()
+  local menu = dn.gui.find_last_menu()
   menu.direction = direction
 end
 
 function Gui:clear_menu_item()
-  local menu = doublenickel.gui.find_last_menu()
+  local menu = dn.gui.find_last_menu()
   menu.current = 0
 end
 
 function Gui:menu_item(label, button_info, font, sx, sy)
   local region = self.active_regions:peek()
-  local menu = doublenickel.gui.find_last_menu()
+  local menu = dn.gui.find_last_menu()
   if not menu then return self:button_ex(label, button_info, font, sx, sy) end
 
   local item_index = menu.items_this_frame
@@ -995,8 +991,8 @@ function Gui:menu_item(label, button_info, font, sx, sy)
   local frame = self:build_button_frame(text.prepared.width, text.prepared.height, sx, sy)
 
   local state = self.mouse_state.idle
-  if doublenickel.input.get_input_device() == InputDevice.Controller then
-    local selected = menu.active and doublenickel.input.was_digital_pressed('Action_MenuSelect')
+  if dn.input.get_input_device() == InputDevice.Controller then
+    local selected = menu.active and dn.input.was_digital_pressed('Action_MenuSelect')
     local hovered = menu.active and (item_index == menu.current)
 
     if hovered and not selected then
@@ -1009,7 +1005,7 @@ function Gui:menu_item(label, button_info, font, sx, sy)
     state = self:item_mouse_state(frame)
   end
 
-  button_info = button_info or doublenickel.gui.ButtonInfo:new()
+  button_info = button_info or dn.gui.ButtonInfo:new()
   self:check_button_state(frame, text, button_info, state)
 
   self:center_button_text(frame, text)
@@ -1020,7 +1016,7 @@ end
 
 function Gui:image_menu_item(label, button_info, font, sx, sy)
   local region = self.active_regions:peek()
-  local menu = doublenickel.gui.find_last_menu()
+  local menu = dn.gui.find_last_menu()
 
   local item_index = menu.items_this_frame
   menu.items_this_frame = menu.items_this_frame + 1
@@ -1032,8 +1028,8 @@ function Gui:image_menu_item(label, button_info, font, sx, sy)
   image.position = frame.position
 
   local state = self.mouse_state.idle
-  if doublenickel.input.get_input_device() == InputDevice.Controller then
-    local selected = menu.active and doublenickel.input.was_digital_pressed('Action_MenuSelect')
+  if dn.input.get_input_device() == InputDevice.Controller then
+    local selected = menu.active and dn.input.was_digital_pressed('Action_MenuSelect')
     local hovered = menu.active and (item_index == menu.current)
 
     if hovered and not selected then
@@ -1046,7 +1042,7 @@ function Gui:image_menu_item(label, button_info, font, sx, sy)
     state = self:item_mouse_state(image)
   end
 
-  button_info = button_info or doublenickel.gui.ButtonInfo:new()
+  button_info = button_info or dn.gui.ButtonInfo:new()
   self:check_button_state(image, text, button_info, state)
 
   self:center_button_text(image, text)
@@ -1070,7 +1066,7 @@ end
 
 function Gui:dummy(sx, sy)
   local region = self.active_regions:peek()
-  local size = doublenickel.vec2(sx, sy)
+  local size = dn.vec2(sx, sy)
   region:advance_point(size)
   region:reset_flags()
 end
@@ -1092,24 +1088,24 @@ function Gui:draw_item(item)
   elseif item.kind == GuiItem.kinds.line then
     dn.unported.draw_line(item.a.x, item.a.y, item.b.x, item.b.y, item.thickness, item.color)
   elseif item.kind == GuiItem.kinds.circle then
-    doublenickel.draw_circle_l(item.position, item.radius, item.color)
+    dn.draw_circle_l(item.position, item.radius, item.color)
   elseif item.kind == GuiItem.kinds.image then
     dn.unported.draw_image_l(item.image, item.position, item)
-    --dn.unported.draw_quad_l(item.position, item.size, doublenickel.colors.red_light_trans)
+    --dn.unported.draw_quad_l(item.position, item.size, dn.colors.red_light_trans)
   elseif item.kind == GuiItem.kinds.text then
-    local highlight_color = doublenickel.color(1.00, 0.00, 0.00, 0.50)
+    local highlight_color = dn.color(1.00, 0.00, 0.00, 0.50)
 
     local draw_bounding_box = false
     if draw_bounding_box then
       if item.precise then
-        dn.unported.draw_quad_l(item.position, doublenickel.vec2(item.prepared.width, item.prepared.height), highlight_color)
+        dn.unported.draw_quad_l(item.position, dn.vec2(item.prepared.width, item.prepared.height), highlight_color)
       else
-        dn.unported.draw_quad_l(item.position, doublenickel.vec2(item.prepared.width, item.prepared.height_imprecise),
+        dn.unported.draw_quad_l(item.position, dn.vec2(item.prepared.width, item.prepared.height_imprecise),
           highlight_color)
       end
     end
 
-    item.prepared.color = doublenickel.color_to_vec4(item.color)
+    item.prepared.color = dn.color_to_vec4(item.color)
     item.prepared.position.x = item.position.x
     item.prepared.position.y = item.position.y
     dn.unported.draw_prepared_text(item.prepared)
@@ -1172,7 +1168,7 @@ function Gui:item_mouse_state(item)
 
   if not item then item = region end
 
-  local inside = doublenickel.physics.is_point_inside(self.input:mouse(), item.position, item.size)
+  local inside = dn.physics.is_point_inside(self.input:mouse(), item.position, item.size)
   local pressed = self.input:pressed(glfw.keys.MOUSE_BUTTON_1)
   local down = self.input:down(glfw.keys.MOUSE_BUTTON_1)
 
@@ -1192,8 +1188,8 @@ end
 --------------------------------
 function Gui:prepare_button_text(label, font)
   local region = self.active_regions:peek()
-  local wrap = region.content_area.x - region.style[doublenickel.gui.style_fields.padding_h] * 2
-  return make_text(label, font, doublenickel.colors.white, wrap, self.precise_text)
+  local wrap = region.content_area.x - region.style[dn.gui.style_fields.padding_h] * 2
+  return make_text(label, font, dn.colors.white, wrap, self.precise_text)
 end
 
 function Gui:check_button_state(frame, text, button_info, state)
@@ -1224,7 +1220,7 @@ end
 function Gui:center_button_text(frame, text)
   local height = text.prepared.height
   if not text.precise then height = text.prepared.height_imprecise end
-  text.position = doublenickel.vec2(
+  text.position = dn.vec2(
     frame.position.x + (frame.size.x - text.prepared.width) / 2,
     frame.position.y - (frame.size.y - height) / 2
   )
@@ -1237,16 +1233,16 @@ function Gui:build_button_frame(contents_x, contents_y, sx, sy)
   -- Frame size can be specified by the size parameter; if it isn't, just make the frame as large as needed to
   -- hold the contents. -1 signals to use up all space in the respective axis.
   if not sx then
-    frame.size.x = contents_x + region.style[doublenickel.gui.style_fields.padding_h] * 2
+    frame.size.x = contents_x + region.style[dn.gui.style_fields.padding_h] * 2
   elseif sx == -1 then
-    frame.size.x = region.content_area.x - region.style[doublenickel.gui.style_fields.padding_h] * 2
+    frame.size.x = region.content_area.x - region.style[dn.gui.style_fields.padding_h] * 2
   else
     frame.size.x = sx
   end
 
   -- I don't support -1 for y because I've never had a use for it yet.
   if not sy then
-    frame.size.y = contents_y + region.style[doublenickel.gui.style_fields.padding_button] * 2
+    frame.size.y = contents_y + region.style[dn.gui.style_fields.padding_button] * 2
   else
     frame.size.y = sy
   end
@@ -1263,7 +1259,7 @@ function Gui:update_scroll(region)
   if not region.is_scroll then return end
   if not region.label then return end
 
-  local scroll = doublenickel.gui.find_scroll_data(region.label)
+  local scroll = dn.gui.find_scroll_data(region.label)
 
   -- Figure out how much spaced we used rendering widgets, and compare that to the size of the region to
   -- find how much we went over. This is how we calculate the size and offset of the scrollbar.
@@ -1272,7 +1268,7 @@ function Gui:update_scroll(region)
   -- the "how much size did we use" equation. That just means the bottommost widget will have padding below it
   -- when we're scrolled all the way down
   local size_used = region:find_size_used()
-  size_used.y = size_used.y + region.style[doublenickel.gui.style_fields.padding_v]
+  size_used.y = size_used.y + region.style[dn.gui.style_fields.padding_v]
   scroll.overage = size_used.y - region.size.y
   scroll.overage = math.max(scroll.overage, 0)
 
@@ -1280,12 +1276,12 @@ function Gui:update_scroll(region)
   -- the menu item you have selected, or when it's interpolating.
   if region.scroll_locked_to_menu then
     -- CASE: Scrolling is locked to the currently selected menu item
-    local menu = doublenickel.gui.find_menu_data(region.label)
+    local menu = dn.gui.find_menu_data(region.label)
     scroll.percent = menu.current / menu.items_this_frame
     scroll.offset = scroll.percent * menu.size_this_frame.y
   elseif scroll.need_init_interpolate then
     -- CASE: During the frame, we were told to interpolate the scroll to some value. Set it up.
-    scroll.interpolator = doublenickel.interpolation.SmoothDamp:new({
+    scroll.interpolator = dn.interpolation.SmoothDamp:new({
       start = scroll.offset,
       target = scroll.overage * scroll.interpolate_percent,
       epsilon = 1,
@@ -1314,17 +1310,17 @@ function Gui:update_scroll(region)
     -- Calculate a frame offset based on the inputs; this is slightly different per input mode, but we're
     -- calculating the same number in both cases.
     local frame_offset = 0
-    if doublenickel.input.is_controller_mode() then
+    if dn.input.is_controller_mode() then
       -- CASE: CONTROLLER
       -- @hack: You can see that in the mouse and keyboard code, we actually check to see whether the mouse is inside the
       -- region. I don't have an easy way to ask if a region is active in controller mode. There is no current situation in
       -- the game where I need more than two scroll regions on screen at once, so I'm just leaving it for now.
-      if doublenickel.input.is_digital_active('Action_MenuScrollDown') then
+      if dn.input.is_digital_active('Action_MenuScrollDown') then
         frame_offset = region.scroll_speed
-      elseif doublenickel.input.is_digital_active('Action_MenuScrollUp') then
+      elseif dn.input.is_digital_active('Action_MenuScrollUp') then
         frame_offset = region.scroll_speed * -1
       end
-    elseif doublenickel.input.is_mkb_mode() then
+    elseif dn.input.is_mkb_mode() then
       -- CASE: MKB
       if region:is_mouse_inside() then
         frame_offset = self.input:scroll().y * region.scroll_speed * -1
@@ -1335,7 +1331,7 @@ function Gui:update_scroll(region)
     -- if we're already interpolating or if we need to start fresh.
     if math.abs(frame_offset) > 0 then
       -- You shouldn't be able to scroll beyond the farthest rendered widget, which is given by the overage
-      local offset = doublenickel.math.clamp(scroll.offset + frame_offset, 0, scroll.overage)
+      local offset = dn.math.clamp(scroll.offset + frame_offset, 0, scroll.overage)
       local interpolate_percent = scroll.overage > 0 and offset / scroll.overage or 0
 
       if scroll.interpolating then
@@ -1353,8 +1349,8 @@ function Gui:update_scroll(region)
     -- The bar itself is directly to the right of the content area, and is as tall as the entire region
     local scroll_bar = GuiItem:new(GuiItem.kinds.image)
     scroll_bar.image = 'scroll_bar_long.png'
-    scroll_bar.size = doublenickel.vec2(region.style.scroll_bar_size, region.size.y)
-    scroll_bar.position = doublenickel.vec2(
+    scroll_bar.size = dn.vec2(region.style.scroll_bar_size, region.size.y)
+    scroll_bar.position = dn.vec2(
       region.position.x + region.content_area.x + ((region.style.scroll_area_width - region.style.scroll_bar_size) / 2),
       region.position.y
     )
@@ -1363,12 +1359,12 @@ function Gui:update_scroll(region)
 
     local scroller = GuiItem:new(GuiItem.kinds.image)
     scroller.image = 'circle-16.png'
-    scroller.size = doublenickel.vec2(16, 16)
+    scroller.size = dn.vec2(16, 16)
 
     -- All we're doing is taking the percentage we're scrolled (scroll.offset / overage) and projecting that
     -- onto the range of values the scroll bar position can take i.e. [0, scroll_bar.size.y - scroller.size.y]
     local max_scroller_offset = scroll_bar.size.y - scroller.size.y
-    scroller.position = doublenickel.vec2(
+    scroller.position = dn.vec2(
       scroll_bar.position.x - (scroller.size.x / 2) + (region.style.scroll_bar_size / 2),
       scroll_bar.position.y - scroll.percent * max_scroller_offset
     )
@@ -1386,23 +1382,23 @@ function Gui:update_drag(region)
   if not region.is_drag then return end
   if not region.label then return end
 
-  local data = doublenickel.gui.find_drag_data(region.label)
+  local data = dn.gui.find_drag_data(region.label)
 
-  local delta = doublenickel.vec2()
-  if doublenickel.input.is_controller_mode() then
-    if doublenickel.input.is_digital_active('Action_MenuScrollDown') then
+  local delta = dn.vec2()
+  if dn.input.is_controller_mode() then
+    if dn.input.is_digital_active('Action_MenuScrollDown') then
       delta.y = region.scroll_speed + 4
-    elseif doublenickel.input.is_digital_active('Action_MenuScrollUp') then
+    elseif dn.input.is_digital_active('Action_MenuScrollUp') then
       delta.y = (region.scroll_speed + 4) * -1
     end
 
-    if doublenickel.input.is_digital_active('Action_MenuScrollLeft') then
+    if dn.input.is_digital_active('Action_MenuScrollLeft') then
       delta.x = region.scroll_speed + 4
-    elseif doublenickel.input.is_digital_active('Action_MenuScrollRight') then
+    elseif dn.input.is_digital_active('Action_MenuScrollRight') then
       delta.x = (region.scroll_speed + 4) * -1
     end
-  elseif doublenickel.input.is_mkb_mode() then
-    local inside = doublenickel.physics.is_point_inside(self.input:mouse(), region.position, region.size)
+  elseif dn.input.is_mkb_mode() then
+    local inside = dn.physics.is_point_inside(self.input:mouse(), region.position, region.size)
     local mouse_down = self.input:down(glfw.keys.MOUSE_BUTTON_1)
     if inside and mouse_down then
       delta = self.input:mouse_delta()
@@ -1419,7 +1415,7 @@ function Gui:update_scissor(region)
 end
 
 local function update_animations()
-  for label, animation in pairs(doublenickel.gui.animation) do
+  for label, animation in pairs(dn.gui.animation) do
     local stopped_this_frame = animation.was_active and not animation.active
     local animate_hide = not animation.active and animation.hide_data
 
@@ -1452,7 +1448,7 @@ local function update_animations()
       for index, item in animation.hide_data.draw_list:iterate() do
         if item.kind == GuiItem.kinds.text then
           item.prepared = dn.ffi.prepare_text_ex(item.text, 0, 0, item.font, item.wrap,
-            doublenickel.color_to_vec4(item.color), item.precise)
+            dn.color_to_vec4(item.color), item.precise)
         end
       end
 
@@ -1463,11 +1459,11 @@ local function update_animations()
 
       -- Rendering a draw list requires a little state for scissor regions, so make a dummy layout instance. Otherwise,
       -- this is copy and pasted from Gui:render() (except applying the offset)
-      local layout = doublenickel.gui.Gui:new()
+      local layout = dn.gui.Gui:new()
 
       dn.unported.end_world_space(true)()
       for index, item in animation.hide_data.draw_list:iterate() do
-        dn.unported.set_layer(doublenickel.layers.ui + index)
+        dn.unported.set_layer(dn.layers.ui + index)
 
         item:add_offset(offset)
         layout:draw_item(item)
@@ -1479,10 +1475,10 @@ end
 
 local function update_menus()
   -- Reset the menu state for each region
-  for id, menu in pairs(doublenickel.gui.menu) do
+  for id, menu in pairs(dn.gui.menu) do
     if menu.items_this_frame == 0 then
       menu.active = false
-      doublenickel.gui.menu_stack:remove_value(menu.label)
+      dn.gui.menu_stack:remove_value(menu.label)
     end
 
     menu.items_last_frame = menu.items_this_frame
@@ -1491,29 +1487,29 @@ local function update_menus()
 
 
   -- Update the menu state based on this frame's inputs
-  local menu = doublenickel.gui.find_active_menu()
+  local menu = dn.gui.find_active_menu()
 
   if menu and menu.items_last_frame > 0 then
     local menu_item_forward = function() menu.current = (menu.current + 1) % menu.items_last_frame end
     local menu_item_backward = function() menu.current = (menu.current - 1) % menu.items_last_frame end
 
-    local direction = menu.direction or doublenickel.enums.MenuDirection.Vertical
-    local is_vertical = direction == doublenickel.enums.MenuDirection.Vertical or
-        direction == doublenickel.enums.MenuDirection.Any
-    local is_horizontal = direction == doublenickel.enums.MenuDirection.Horizontal or
-        direction == doublenickel.enums.MenuDirection.Any
+    local direction = menu.direction or dn.enums.MenuDirection.Vertical
+    local is_vertical = direction == dn.enums.MenuDirection.Vertical or
+        direction == dn.enums.MenuDirection.Any
+    local is_horizontal = direction == dn.enums.MenuDirection.Horizontal or
+        direction == dn.enums.MenuDirection.Any
 
     if is_vertical then
-      if doublenickel.input.was_digital_pressed('Action_MenuUp') then
+      if dn.input.was_digital_pressed('Action_MenuUp') then
         menu_item_backward()
-      elseif doublenickel.input.was_digital_pressed('Action_MenuDown') then
+      elseif dn.input.was_digital_pressed('Action_MenuDown') then
         menu_item_forward()
       end
     end
     if is_horizontal then
-      if doublenickel.input.was_digital_pressed('Action_MenuLeft') then
+      if dn.input.was_digital_pressed('Action_MenuLeft') then
         menu_item_backward()
-      elseif doublenickel.input.was_digital_pressed('Action_MenuRight') then
+      elseif dn.input.was_digital_pressed('Action_MenuRight') then
         menu_item_forward()
       end
     end
@@ -1532,14 +1528,14 @@ function Gui:find_or_add_animation_data(region, interpolator)
     return
   end
 
-  local data = doublenickel.gui.animation[region.label]
+  local data = dn.gui.animation[region.label]
 
   -- If there is no entry, add one
   if not data or not data.interpolator then
-    interpolator = interpolator or doublenickel.interpolation.SmoothDamp2:new()
+    interpolator = interpolator or dn.interpolation.SmoothDamp2:new()
 
-    doublenickel.gui.animation[region.label] = {
-      time_begin = doublenickel.elapsed_time,
+    dn.gui.animation[region.label] = {
+      time_begin = dn.elapsed_time,
       active = false,
       was_active = false,
       interpolator = interpolator
@@ -1547,64 +1543,64 @@ function Gui:find_or_add_animation_data(region, interpolator)
   end
 
 
-  return doublenickel.gui.animation[region.label]
+  return dn.gui.animation[region.label]
 end
 
 function Gui:find_animation_data(region)
   if region.label == '' then return end
 
-  return doublenickel.gui.animation[region.label]
+  return dn.gui.animation[region.label]
 end
 
-function doublenickel.gui.find_drag_data(label)
-  local data = doublenickel.gui.drag[label]
+function dn.gui.find_drag_data(label)
+  local data = dn.gui.drag[label]
   if not data then
-    doublenickel.gui.drag[label] = {
-      offset = doublenickel.vec2()
+    dn.gui.drag[label] = {
+      offset = dn.vec2()
     }
   end
 
-  return doublenickel.gui.drag[label]
+  return dn.gui.drag[label]
 end
 
-function doublenickel.gui.find_scroll_data(label)
-  local data = doublenickel.gui.scroll[label]
+function dn.gui.find_scroll_data(label)
+  local data = dn.gui.scroll[label]
   if not data then
-    doublenickel.gui.scroll[label] = {
+    dn.gui.scroll[label] = {
       percent = 0,
       offset = 0
     }
   end
 
-  return doublenickel.gui.scroll[label]
+  return dn.gui.scroll[label]
 end
 
-function doublenickel.gui.find_menu_data(label)
-  local data = doublenickel.gui.menu[label]
+function dn.gui.find_menu_data(label)
+  local data = dn.gui.menu[label]
   if not data then
-    doublenickel.gui.menu[label] = {
-      size_this_frame = doublenickel.vec2(),
-      size_last_frame = doublenickel.vec2(),
+    dn.gui.menu[label] = {
+      size_this_frame = dn.vec2(),
+      size_last_frame = dn.vec2(),
       current = 0,
       items_this_frame = 0,
       items_last_frame = 0,
     }
   end
 
-  return doublenickel.gui.menu[label]
+  return dn.gui.menu[label]
 end
 
-function doublenickel.gui.find_last_menu()
-  return doublenickel.gui.last_menu
-  --return doublenickel.gui.menu[doublenickel.gui.menu_stack:back()]
+function dn.gui.find_last_menu()
+  return dn.gui.last_menu
+  --return dn.gui.menu[dn.gui.menu_stack:back()]
 end
 
-function doublenickel.gui.find_active_menu()
-  for id, menu in pairs(doublenickel.gui.menu) do
+function dn.gui.find_active_menu()
+  for id, menu in pairs(dn.gui.menu) do
     if menu.active then return menu end
   end
 
-  local menu = doublenickel.gui.find_last_menu()
+  local menu = dn.gui.find_last_menu()
   if menu then
     menu.active = true
     return menu
@@ -1616,19 +1612,19 @@ end
 --------------------------
 -- INTERNAL: HIGH LEVEL --
 --------------------------
-function doublenickel.gui.init()
-  doublenickel.gui.menu_stack = doublenickel.data_types.array:new()
+function dn.gui.init()
+  dn.gui.menu_stack = dn.data_types.array:new()
 end
 
-function doublenickel.gui.update()
+function dn.gui.update()
   update_animations()
   update_menus()
 end
 
-function doublenickel.gui.reset()
-  table.clear(doublenickel.gui.animation)
-  table.clear(doublenickel.gui.menu)
-  table.clear(doublenickel.gui.drag)
-  table.clear(doublenickel.gui.scroll)
-  doublenickel.gui.menu_stack = doublenickel.data_types.array:new()
+function dn.gui.reset()
+  table.clear(dn.gui.animation)
+  table.clear(dn.gui.menu)
+  table.clear(dn.gui.drag)
+  table.clear(dn.gui.scroll)
+  dn.gui.menu_stack = dn.data_types.array:new()
 end

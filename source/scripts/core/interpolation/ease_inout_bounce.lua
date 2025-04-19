@@ -1,5 +1,5 @@
-local EaseInOutBounce = doublenickel.class.define('EaseInOutBounce')
-doublenickel.interpolation.EaseInOutBounce = EaseInOutBounce
+local EaseInOutBounce = dn.class.define('EaseInOutBounce')
+dn.interpolation.EaseInOutBounce = EaseInOutBounce
 
 local function ease(t)
   local c1 = 1.70158
@@ -11,13 +11,13 @@ local function ease(t)
   end
 end
 
-doublenickel.add_class_metamethod(
+dn.add_class_metamethod(
   EaseInOutBounce,
   '__call',
   function(_, a, b, t, exp)
     exp = exp or 2
     t = ease(t, exp)
-    return doublenickel.interpolation.Lerp(a, b, t)
+    return dn.interpolation.Lerp(a, b, t)
   end)
 
 
@@ -34,7 +34,7 @@ function EaseInOutBounce:init(params)
 end
 
 function EaseInOutBounce:update(dt)
-  dt = dt or doublenickel.dt
+  dt = dt or dn.dt
   dt = dt / self.speed
   self.accumulated = math.min(self.accumulated + dt, self.time)
   self.t = self.accumulated / self.time
@@ -46,7 +46,7 @@ function EaseInOutBounce:is_done()
 end
 
 function EaseInOutBounce:get_value()
-  return doublenickel.interpolation.EaseInOutBounce(self.start, self.target, self.t)
+  return dn.interpolation.EaseInOutBounce(self.start, self.target, self.t)
 end
 
 function EaseInOutBounce:reset()
@@ -68,23 +68,23 @@ function EaseInOutBounce:set_start(start)
   self.start = start
 end
 
-local EaseInOutBounce2 = doublenickel.class.define('EaseInOutBounce2')
-doublenickel.interpolation.EaseInOutBounce2 = EaseInOutBounce2
+local EaseInOutBounce2 = dn.class.define('EaseInOutBounce2')
+dn.interpolation.EaseInOutBounce2 = EaseInOutBounce2
 
-doublenickel.add_class_metamethod(
+dn.add_class_metamethod(
   EaseInOutBounce2,
   '__call',
   function(_, a, b, t, exp)
-    return doublenickel.vec2(
-      doublenickel.interpolation.EaseInOutBounce(a.x, b.x, t),
-      doublenickel.interpolation.EaseInOutBounce(a.y, b.y, t)
+    return dn.vec2(
+      dn.interpolation.EaseInOutBounce(a.x, b.x, t),
+      dn.interpolation.EaseInOutBounce(a.y, b.y, t)
     )
   end)
 
 function EaseInOutBounce2:init(params)
   params = params or {}
-  self.start = doublenickel.vec2(params.start)
-  self.target = doublenickel.vec2(params.target)
+  self.start = dn.vec2(params.start)
+  self.target = dn.vec2(params.target)
   self.time = params.time or 1
   self.speed = params.speed or 1
   self.t = 0
@@ -93,7 +93,7 @@ function EaseInOutBounce2:init(params)
 end
 
 function EaseInOutBounce2:update()
-  local dt = doublenickel.dt / self.speed
+  local dt = dn.dt / self.speed
   self.accumulated = math.min(self.accumulated + dt, self.time)
   self.t = self.accumulated / self.time
   return self:is_done()
@@ -104,7 +104,7 @@ function EaseInOutBounce2:is_done()
 end
 
 function EaseInOutBounce2:get_value()
-  return doublenickel.interpolation.EaseInOutBounce2(self.start, self.target, self.t)
+  return dn.interpolation.EaseInOutBounce2(self.start, self.target, self.t)
 end
 
 function EaseInOutBounce2:reset()

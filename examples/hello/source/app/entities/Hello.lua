@@ -1,4 +1,4 @@
-Hello = doublenickel.entity.define('Hello')
+Hello = dn.entity.define('Hello')
 function Hello:init()
   dn.ffi.log('Hello:init()')
 end

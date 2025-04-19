@@ -1,4 +1,4 @@
-local Label = doublenickel.node('Label')
+local Label = dn.node('Label')
 
 Label.editor_fields = {
   'label',

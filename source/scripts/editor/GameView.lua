@@ -1,6 +1,6 @@
-GameView = doublenickel.class.define('GameView')
+GameView = dn.class.define('GameView')
 
-GameViewSize = doublenickel.enum.define(
+GameViewSize = dn.enum.define(
   'GameViewSize',
   {
     Force_16_9 = 0,
@@ -8,7 +8,7 @@ GameViewSize = doublenickel.enum.define(
   }
 )
 
-GameViewPriority = doublenickel.enum.define(
+GameViewPriority = dn.enum.define(
   'GameViewPriority',
   {
     Standard = 0,
@@ -24,23 +24,23 @@ function GameView:init(name, render_target, size_calculation, size, priority)
   self.size = size:copy()
   self.priority = priority or GameViewPriority.Main
 
-  self.position = doublenickel.vec2()
+  self.position = dn.vec2()
 end
 
 function GameView:update()
   imgui.PushStyleVar_2(ffi.C.ImGuiStyleVar_WindowPadding, 0, 0)
-  doublenickel.editor.begin_window(self.name)
+  dn.editor.begin_window(self.name)
 
   self.focus = imgui.IsWindowFocused()
   self.hover = imgui.IsWindowHovered()
 
-  if self.priority == doublenickel.enums.GameViewPriority.Main then
-    if self.size_calculation == doublenickel.enums.GameViewSize.ExactSize then
-      doublenickel.window.set_game_area_size(self.size)
+  if self.priority == dn.enums.GameViewPriority.Main then
+    if self.size_calculation == dn.enums.GameViewSize.ExactSize then
+      dn.window.set_game_area_size(self.size)
 
       self.position.x, self.position.y = imgui.GetCursorScreenPos()
-      doublenickel.window.set_game_area_position(self.position)
-    elseif self.size_calculation == doublenickel.enums.GameViewSize.Force_16_9 then
+      dn.window.set_game_area_position(self.position)
+    elseif self.size_calculation == dn.enums.GameViewSize.Force_16_9 then
 
     end
 
@@ -52,7 +52,7 @@ function GameView:update()
     imgui.ImVec2(self.size.x, self.size.y),
     imgui.ImVec2(0, 1), imgui.ImVec2(1, 0))
 
-  doublenickel.editor.end_window()
+  dn.editor.end_window()
   imgui.PopStyleVar()
 end
 
@@ -60,26 +60,26 @@ end
 -----------------------
 -- GAME VIEW MANAGER --
 -----------------------
-local GameViewManager = doublenickel.editor.define('GameViewManager')
+local GameViewManager = dn.editor.define('GameViewManager')
 
 function GameViewManager:init()
-  self.game_views = doublenickel.data_types.Array:new()
+  self.game_views = dn.data_types.Array:new()
 end
 
 function GameViewManager:find_main_view()
   for game_view in self.game_views:iterate_values() do
-    if game_view.priority == doublenickel.enums.GameViewPriority.Main then
+    if game_view.priority == dn.enums.GameViewPriority.Main then
       return game_view
     end
   end
 end
 
 function GameViewManager:add_view(view)
-  if view.priority == doublenickel.enums.GameViewPriority.Main then
+  if view.priority == dn.enums.GameViewPriority.Main then
     local main_view = self:find_main_view()
     if main_view then
       log.info('Setting main game view to %s', view.name)
-      main_view.priority = doublenickel.enums.GameViewPriority.Standard
+      main_view.priority = dn.enums.GameViewPriority.Standard
     end
   end
 

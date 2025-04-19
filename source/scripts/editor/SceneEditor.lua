@@ -1,6 +1,6 @@
-local EntityList = doublenickel.class.define('EntityList')
+local EntityList = dn.class.define('EntityList')
 
-doublenickel.enum.define(
+dn.enum.define(
   'EntityListKind',
   {
     Game = 0,
@@ -31,25 +31,25 @@ end
 
 function EntityList:on_context_menu()
   if imgui.BeginPopup(self.ids.context_menu) then
-    local selection = doublenickel.find_entity_editor('EntitySelection').context_selection
+    local selection = dn.find_entity_editor('EntitySelection').context_selection
    
-    if self.kind == doublenickel.enums.EntityListKind.Game then
+    if self.kind == dn.enums.EntityListKind.Game then
       if imgui.MenuItem('Copy') then
-        doublenickel.entity.copy(selection)
+        dn.entity.copy(selection)
       end
       if imgui.MenuItem('Delete') then
-        doublenickel.entity.destroy(selection.id)
+        dn.entity.destroy(selection.id)
       end
       if imgui.MenuItem('Make Persistent') then
-        doublenickel.entity.entities[selection.id] = nil
-        doublenickel.entity.persistent_entities[selection.id] = selection
+        dn.entity.entities[selection.id] = nil
+        dn.entity.persistent_entities[selection.id] = selection
       end
-    elseif self.kind == doublenickel.enums.EntityListKind.Persistent then
+    elseif self.kind == dn.enums.EntityListKind.Persistent then
       if imgui.MenuItem('Delete') then
-        doublenickel.entity.persistent_entities[selection.id] = nil
+        dn.entity.persistent_entities[selection.id] = nil
       end
 
-    elseif self.kind == doublenickel.enums.EntityListKind.Editor then
+    elseif self.kind == dn.enums.EntityListKind.Editor then
     end
 
     imgui.EndPopup()
@@ -59,25 +59,25 @@ end
 function EntityList:draw()
   self.popup:update()
 
-  doublenickel.editor.begin_window(self.name)
+  dn.editor.begin_window(self.name)
   self:draw_add_entity()
   self:draw_entities()
-  doublenickel.editor.end_window()
+  dn.editor.end_window()
 end
 
 function EntityList:draw_add_entity()
-  if self.kind == doublenickel.enums.EntityListKind.Dynamic then
+  if self.kind == dn.enums.EntityListKind.Dynamic then
     imgui.extensions.ComboBox(
       self.ids.combo_box,
       self.selected_type,
-      doublenickel.entity.sorted_types,
+      dn.entity.sorted_types,
       function(entity_type) self.selected_type = entity_type end
     )
 
     imgui.SameLine()
 
     if imgui.Button('Add') then
-      local entity = doublenickel.entity.create(self.selected_type)
+      local entity = dn.entity.create(self.selected_type)
       self.entities[entity.id] = entity
     end
   end
@@ -104,9 +104,9 @@ end
 function EntityList:draw_entity(id)
   local entity = self.entities[id]
 
-  local header_color = doublenickel.colors.white
-  if doublenickel.find_entity_editor('EntitySelection'):is_entity_selected(entity) then
-    header_color = doublenickel.colors.spring_green
+  local header_color = dn.colors.white
+  if dn.find_entity_editor('EntitySelection'):is_entity_selected(entity) then
+    header_color = dn.colors.spring_green
   end
   imgui.PushStyleColor(ffi.C.ImGuiCol_Text, header_color:to_u32())
 
@@ -123,7 +123,7 @@ end
 function EntityList:check_context_menu(entity)
   if imgui.IsItemClicked(1) then
     self.popup:open_popup(self.ids.context_menu)
-    doublenickel.find_entity_editor('EntitySelection'):context_select_entity(entity)
+    dn.find_entity_editor('EntitySelection'):context_select_entity(entity)
   end
 end
 
@@ -149,9 +149,9 @@ end
 --
 -- SCENE EDITOR
 --
-local SceneEditor = doublenickel.editor.define('SceneEditor')
+local SceneEditor = dn.editor.define('SceneEditor')
 
-SceneEditor.states = doublenickel.enum.define(
+SceneEditor.states = dn.enum.define(
   'SceneEditorState',
   {
     Idle = 0,
@@ -166,44 +166,44 @@ function SceneEditor:init()
 
   self.state = self.states.Idle
 
-  self.input = ContextualInput:new(doublenickel.enums.InputContext.Game, doublenickel.enums.CoordinateSystem.World)
+  self.input = ContextualInput:new(dn.enums.InputContext.Game, dn.enums.CoordinateSystem.World)
 
   self.drag_state = {}
 
   self.entity_lists = {
-    game = EntityList:new('Entities', doublenickel.entity.entities, doublenickel.enums.EntityListKind.Dynamic),
-    persistent = EntityList:new('Persistent', doublenickel.entity.persistent_entities, doublenickel.enums.EntityListKind.Static),
-    editor = EntityList:new('Editor', doublenickel.editor.entities, doublenickel.enums.EntityListKind.Static),
+    game = EntityList:new('Entities', dn.entity.entities, dn.enums.EntityListKind.Dynamic),
+    persistent = EntityList:new('Persistent', dn.entity.persistent_entities, dn.enums.EntityListKind.Static),
+    editor = EntityList:new('Editor', dn.editor.entities, dn.enums.EntityListKind.Static),
   }
 end
   
 function SceneEditor:on_editor_play()
-  doublenickel.find_entity_editor('EditorCamera').enabled = false
+  dn.find_entity_editor('EditorCamera').enabled = false
 
-  doublenickel.gui.reset()
-  doublenickel.audio.stop_all()
+  dn.gui.reset()
+  dn.audio.stop_all()
 
-  doublenickel.input.push_context(doublenickel.enums.InputContext.Game)
+  dn.input.push_context(dn.enums.InputContext.Game)
 
 end
 
 function SceneEditor:on_editor_stop()
-  local camera = doublenickel.find_entity_editor('EditorCamera')
+  local camera = dn.find_entity_editor('EditorCamera')
   camera.enabled = true
-  camera:set_offset(doublenickel.vec2())
+  camera:set_offset(dn.vec2())
 
-  doublenickel.gui.reset()
-  doublenickel.audio.stop_all()
+  dn.gui.reset()
+  dn.audio.stop_all()
 end
 
 function SceneEditor:on_begin_frame()
   if self.state == self.states.drag_position then
-    if not doublenickel.input.down(glfw.keys.MOUSE_BUTTON_1) then
+    if not dn.input.down(glfw.keys.MOUSE_BUTTON_1) then
       self.state = self.states.idle
     end
 
     local delta = self.input:mouse_delta():scale(-1)
-    local camera = doublenickel.find_entity_editor('EditorCamera')
+    local camera = dn.find_entity_editor('EditorCamera')
     camera:move(delta)
   end
 end
@@ -215,9 +215,9 @@ function SceneEditor:draw()
 end
 
 function SceneEditor:update()
-  if doublenickel.tick then return end
+  if dn.tick then return end
 
-  local game_view = doublenickel.find_entity_editor('GameViewManager')
+  local game_view = dn.find_entity_editor('GameViewManager')
   if not game_view.hover then return end
 
   self:update_state()
@@ -227,7 +227,7 @@ end
 function SceneEditor:update_state()
   if self.state == self.states.Idle then
     if self.input:left_click() then
-      local collider_editor = doublenickel.find_entity_editor('ColliderEditor')
+      local collider_editor = dn.find_entity_editor('ColliderEditor')
       if collider_editor:try_consume() then
         self.state = self.states.ColliderEditor
       else
@@ -236,7 +236,7 @@ function SceneEditor:update_state()
     end
 
   elseif self.state == self.states.ColliderEditor then
-    local collider_editor = doublenickel.find_entity_editor('ColliderEditor')
+    local collider_editor = dn.find_entity_editor('ColliderEditor')
     if not collider_editor:is_consuming_input() then
       self.state = self.states.Idle
     end
@@ -246,7 +246,7 @@ function SceneEditor:update_state()
       self.state = self.states.Idle
     end
 
-    local camera = doublenickel.find_entity_editor('EditorCamera')
+    local camera = dn.find_entity_editor('EditorCamera')
     local delta = self.input:mouse_delta():scale(-1)
     camera:move(delta)
 
@@ -264,11 +264,11 @@ end
 function SceneEditor:save()
   if #self.scene_name == 0 then return end
 
-  doublenickel.scene.write(doublenickel.entity.entities, self.scene_name)
+  dn.scene.write(dn.entity.entities, self.scene_name)
 end
 
 function SceneEditor:toggle_play_mode()
-  if doublenickel.tick then
+  if dn.tick then
     self:disable_play_mode()
   else
     self:enable_play_mode()
@@ -276,11 +276,11 @@ function SceneEditor:toggle_play_mode()
 end
 
 function SceneEditor:enable_play_mode()
-  doublenickel.scene.set_tick(true)
-  doublenickel.scene.load(self.scene_name)
+  dn.scene.set_tick(true)
+  dn.scene.load(self.scene_name)
 end
 
 function SceneEditor:disable_play_mode()
-  doublenickel.scene.set_tick(false)
-  doublenickel.scene.load(self.scene_name)
+  dn.scene.set_tick(false)
+  dn.scene.load(self.scene_name)
 end

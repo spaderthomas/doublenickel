@@ -1,4 +1,4 @@
-Animation = doublenickel.component.define('Animation')
+Animation = dn.component.define('Animation')
 
 Animation.editor_fields = {
   'default',
@@ -22,18 +22,18 @@ function Animation:init(params)
   params = params or {}
   self.default = params.default or 'default'
   self.animation = self.default
-  self.layer = params.layer or doublenickel.layers.foreground
+  self.layer = params.layer or dn.layers.foreground
   self.scale = params.scale or 1
   self.opacity = params.opacity or 1
-  self.enabled = doublenickel.math.ternary(params.enabled, true, false)
-  self.offset = doublenickel.vec2(params.offset)
-  self.center = doublenickel.math.ternary(params.center, true, false)
-  self.size = doublenickel.vec2(params.size) 
+  self.enabled = dn.math.ternary(params.enabled, true, false)
+  self.offset = dn.vec2(params.offset)
+  self.center = dn.math.ternary(params.center, true, false)
+  self.size = dn.vec2(params.size) 
   self.static_image = params.static_image or nil
   self.color = params.color or nil
 
   self.loop = true
-  self.queued_animations = doublenickel.data_types.queue:new()
+  self.queued_animations = dn.data_types.queue:new()
 
   -- In the editor, when we're editing animations, we don't want to lookup the animation from the
   -- canonical list. We want to use the copy we're editing and watch it change live.
@@ -51,9 +51,9 @@ function Animation:update()
   self.changed_frame = false
 
   -- Otherwise, find the animation data and see if we're done with the current frame
-  self.accumulated = self.accumulated + doublenickel.dt
+  self.accumulated = self.accumulated + dn.dt
 
-  local data = self.data or doublenickel.animation.find(self.animation)
+  local data = self.data or dn.animation.find(self.animation)
 
   local current = data.frames[self.current]
   if not current then return end
@@ -93,7 +93,7 @@ function Animation:draw()
   local position = self:get_position()
   local size = self.size:copy()
   if size.x == 0 or size.y == 0 then
-    size.x, size.y = doublenickel.sprite_size(image)
+    size.x, size.y = dn.sprite_size(image)
   end
 
   dn.unported.set_layer(self.layer)
@@ -147,7 +147,7 @@ function Animation:get_image()
   end
 
   -- Otherwise, look up the current frame of the current animation
-  local data = self.data or doublenickel.animation.find(self.animation)
+  local data = self.data or dn.animation.find(self.animation)
   local frame = data.frames[self.current]
   frame = frame or { image = 'debug.png', time = .25 }
   return frame.image
@@ -155,9 +155,9 @@ end
 
 function Animation:get_size()
   local image = self:get_image()
-  if not image then return doublenickel.vec2() end
+  if not image then return dn.vec2() end
 
-  return doublenickel.vec2(doublenickel.sprite_size(image)):scale(self.scale)
+  return dn.vec2(dn.sprite_size(image)):scale(self.scale)
 end
 
 function Animation:disable()
@@ -173,6 +173,6 @@ function Animation:is_playing(name)
 end
 
 function Animation:is_done()
-  local data = self.data or doublenickel.animation.find(self.animation)
+  local data = self.data or dn.animation.find(self.animation)
   return self.current == #data.frames and not self.loop
 end

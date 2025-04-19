@@ -1,4 +1,4 @@
-EditorUtility = doublenickel.editor.define('EditorUtility')
+EditorUtility = dn.editor.define('EditorUtility')
 
 function EditorUtility:init()
   self.enabled = {
@@ -21,12 +21,12 @@ function EditorUtility:init()
   }
 
   self.colors = {
-    grid = doublenickel.colors.grid_bg:copy(),
+    grid = dn.colors.grid_bg:copy(),
     axis = {
-      x = doublenickel.colors.indian_red:copy(),
-      y = doublenickel.colors.spring_green:copy(),
+      x = dn.colors.indian_red:copy(),
+      y = dn.colors.spring_green:copy(),
     },
-    plot = doublenickel.colors.white:alpha(.25),
+    plot = dn.colors.white:alpha(.25),
   }
 
   self.layers = {
@@ -34,7 +34,7 @@ function EditorUtility:init()
     plot = 120
   }
 
-  self.input = ContextualInput:new(doublenickel.enums.InputContext.Game, doublenickel.enums.CoordinateSystem.World)
+  self.input = ContextualInput:new(dn.enums.InputContext.Game, dn.enums.CoordinateSystem.World)
 end
 
 
@@ -50,24 +50,24 @@ end
 function EditorUtility:draw_pallette()
   if not self.enabled.pallette then return end
 
-  local grid_cell = doublenickel.vec2(0, 1)
+  local grid_cell = dn.vec2(0, 1)
 
   dn.unported.set_world_space(true)
   dn.unported.set_layer(self.layers.pallette)
 
-  for category, color_names in pairs(doublenickel.colors.pallette) do
+  for category, color_names in pairs(dn.colors.pallette) do
     for _, color_name in pairs(color_names) do
-      local color = doublenickel.colors[color_name]
+      local color = dn.colors[color_name]
       local position = self:grid_to_world2(grid_cell)
 
       grid_cell.y = grid_cell.y + 1
 
-      local text_color = doublenickel.colors.white
+      local text_color = dn.colors.white
       local readable = color:readable_color()
-      if readable == doublenickel.enums.ReadableTextColor.Light then
-        text_color = doublenickel.colors.white
+      if readable == dn.enums.ReadableTextColor.Light then
+        text_color = dn.colors.white
       else
-        text_color = doublenickel.colors.black
+        text_color = dn.colors.black
       end
 
       local label = dn.ffi.prepare_text_ex(color_name,
@@ -94,29 +94,29 @@ function EditorUtility:draw_grid()
   local line_thickness = 8
   local edge_thickness = 0
 
-  -- doublenickel.editor.find
-  local sdf = doublenickel.editor.sdf
-  -- local render_target = doublenickel.asset.find(DnRenderTargets.Editor)
+  -- dn.editor.find
+  local sdf = dn.editor.sdf
+  -- local render_target = dn.asset.find(DnRenderTargets.Editor)
   local render_target = { size = Vector2:new(1280, 960) }
   local size = render_target.size
-  local camera = doublenickel.editor.find('EditorCamera')
-  if doublenickel.tick then
-    local game_camera = doublenickel.entity.find('Camera')
+  local camera = dn.editor.find('EditorCamera')
+  if dn.tick then
+    local game_camera = dn.entity.find('Camera')
     camera = game_camera or camera
   end
 
   local slop = 300
 
-  local min = doublenickel.vec2(
+  local min = dn.vec2(
     camera.offset.x - slop,
     camera.offset.y - slop
   )
-  min.x = min.x - doublenickel.math.fmod(min.x, grid_size)
-  min.y = min.y - doublenickel.math.fmod(min.y, grid_size)
+  min.x = min.x - dn.math.fmod(min.x, grid_size)
+  min.y = min.y - dn.math.fmod(min.y, grid_size)
 
-  local max = doublenickel.vec2(
-    camera.offset.x + size.x + doublenickel.math.fmod(size.x, grid_size) + slop,
-    camera.offset.y + size.y + doublenickel.math.fmod(size.y, grid_size) + slop
+  local max = dn.vec2(
+    camera.offset.x + size.x + dn.math.fmod(size.x, grid_size) + slop,
+    camera.offset.y + size.y + dn.math.fmod(size.y, grid_size) + slop
   )
 
   local center = Vector2:new(
@@ -138,7 +138,7 @@ function EditorUtility:draw_grid()
       sdf:oriented_box({
         position = Vector2:new(x, center.y),
         color = self.colors.grid,
-        rotation = doublenickel.math.pi / 2,
+        rotation = dn.math.pi / 2,
         edge_thickness = edge_thickness,
         length = render_target.size.y,
         thickness = line_thickness
@@ -186,7 +186,7 @@ function EditorUtility:mouse_to_grid()
 end
 
 function EditorUtility:grid_to_world(x, y)
-  return doublenickel.vec2(x, y):scale(self.style.grid.size)
+  return dn.vec2(x, y):scale(self.style.grid.size)
 end
 
 function EditorUtility:grid_to_world2(grid_cell)
@@ -198,45 +198,45 @@ function EditorUtility:draw_plot()
 
   local radius = 1
 
-  local lague_spiky_volume = doublenickel.math.pi * math.pow(radius, 4.0) / 6.0;
+  local lague_spiky_volume = dn.math.pi * math.pow(radius, 4.0) / 6.0;
   local lague_spiky = function(x)
     return math.pow(radius - math.abs(x), 2.0) / lague_spiky_volume
   end
 
-  local lague_smooth_volume = doublenickel.math.pi * math.pow(radius, 8.0) / 4.0
+  local lague_smooth_volume = dn.math.pi * math.pow(radius, 8.0) / 4.0
   local lague_smooth = function(x)
     return math.pow(radius * radius - x * x, 3) / lague_smooth_volume
   end
 
   local lague_smooth_derivative = function(x)
     local f = radius * radius - x * x
-    local scale = -24 / (doublenickel.math.pi * math.pow(radius, 8))
+    local scale = -24 / (dn.math.pi * math.pow(radius, 8))
     return scale * x * f * f
   end
 
-  local muller_spiky_volume = 15.0 / (doublenickel.math.pi * math.pow(radius, 6));
+  local muller_spiky_volume = 15.0 / (dn.math.pi * math.pow(radius, 6));
   local muller_spiky = function(x)
     return math.pow(radius - math.abs(x), 3) / muller_spiky_volume
   end
 
-  local muller_smooth_volume = 315 / (64 * doublenickel.math.pi * math.pow(radius, 9))
+  local muller_smooth_volume = 315 / (64 * dn.math.pi * math.pow(radius, 9))
   local muller_smooth = function(x)
     return math.pow(math.pow(radius, 2) - math.pow(math.abs(x), 2), 3) / muller_smooth_volume
   end
 
   local muller_viscosity = function(x)
-    local scale = 45.0 / (doublenickel.math.pi * math.pow(radius, 6))
+    local scale = 45.0 / (dn.math.pi * math.pow(radius, 6))
     return scale * (radius - math.abs(x))
   end
 
   local step = .025
-  self:plot_function(lague_spiky, -1, 1, step, 500, doublenickel.colors.mindaro)
-  self:plot_function(lague_smooth, -1, 1, step, 500, doublenickel.colors.cadet_gray)
-  self:plot_function(muller_spiky, -1, 1, step, 500, doublenickel.colors.indian_red)
-  self:plot_function(muller_smooth, -1, 1, step, 500, doublenickel.colors.spring_green)
-  self:plot_function(muller_viscosity, -1, 1, step, 50, doublenickel.colors.spring_green)
+  self:plot_function(lague_spiky, -1, 1, step, 500, dn.colors.mindaro)
+  self:plot_function(lague_smooth, -1, 1, step, 500, dn.colors.cadet_gray)
+  self:plot_function(muller_spiky, -1, 1, step, 500, dn.colors.indian_red)
+  self:plot_function(muller_smooth, -1, 1, step, 500, dn.colors.spring_green)
+  self:plot_function(muller_viscosity, -1, 1, step, 50, dn.colors.spring_green)
 
-  self:plot_derivative(lague_smooth, lague_smooth_derivative, -1, 1, 500, doublenickel.colors.indian_red:copy())
+  self:plot_derivative(lague_smooth, lague_smooth_derivative, -1, 1, 500, dn.colors.indian_red:copy())
 end
 
 function EditorUtility:plot_function(f, xmin, xmax, step, scale, color)
@@ -253,14 +253,14 @@ function EditorUtility:plot_function(f, xmin, xmax, step, scale, color)
 
   dn.unported.set_layer(self.layers.plot + 1)
 
-  local x = doublenickel.math.clamp(self.input:mouse().x / scale, xmin, xmax)
+  local x = dn.math.clamp(self.input:mouse().x / scale, xmin, xmax)
   dn.unported.draw_text_ex(
     string.format('%.3f -> %.3f', x, f(x)), 
     x * scale, f(x) * scale, 
-    doublenickel.colors.white:to_vec4(), 
+    dn.colors.white:to_vec4(), 
     'editor-16', 
     0)
-  dn.unported.draw_circle_sdf(x * scale, f(x) * scale, self.style.plot.point_size * 1.5, doublenickel.colors.cardinal:to_vec4(), 2)
+  dn.unported.draw_circle_sdf(x * scale, f(x) * scale, self.style.plot.point_size * 1.5, dn.colors.cardinal:to_vec4(), 2)
 
 end
 
@@ -271,11 +271,11 @@ function EditorUtility:plot_derivative(f, df, xmin, xmax, scale, color)
   -- Calculate f(x) and df(x), using the mouse as the input point
   local mouse = self.input:mouse()
 
-  local point = doublenickel.vec2()
-  point.x = doublenickel.math.clamp(mouse.x / scale, xmin, xmax)
+  local point = dn.vec2()
+  point.x = dn.math.clamp(mouse.x / scale, xmin, xmax)
   point.y = f(point.x)
   
-  local delta = doublenickel.vec2(1, df(point.x))
+  local delta = dn.vec2(1, df(point.x))
 
   -- Scale everything to screen coordinates
   local scaled_point = point:scale(scale)
@@ -297,7 +297,7 @@ function EditorUtility:plot_derivative(f, df, xmin, xmax, scale, color)
     scaled_point.x, scaled_point.y,
     'merriweather-bold-48',
     0,
-    doublenickel.colors.white:to_vec4(), 
+    dn.colors.white:to_vec4(), 
     true)
   dn.unported.draw_prepared_text(label)
 end

@@ -1,6 +1,6 @@
-local EntitySelection = doublenickel.editor.define('EntitySelection')
+local EntitySelection = dn.editor.define('EntitySelection')
 
-doublenickel.enum.define(
+dn.enum.define(
 	'EntitySelection',
 	{
 		None = 0,
@@ -9,11 +9,11 @@ doublenickel.enum.define(
 )
 
 function EntitySelection:init()
-  self.state = doublenickel.enums.EntitySelection.None
+  self.state = dn.enums.EntitySelection.None
   self.selection = nil
   self.context_selection = nil
 
-  self.input = ContextualInput:new(doublenickel.enums.InputContext.Game, doublenickel.enums.CoordinateSystem.World)
+  self.input = ContextualInput:new(dn.enums.InputContext.Game, dn.enums.CoordinateSystem.World)
 
   self.hotkeys = {
     deselect = glfw.keys.ESCAPE,
@@ -33,9 +33,9 @@ function EntitySelection:update()
 end
 
 function EntitySelection:delete()
-  if not self.state == doublenickel.enums.EntitySelection.Some then return end
+  if not self.state == dn.enums.EntitySelection.Some then return end
 
-  doublenickel.entity.destroy(self.selection.id)
+  dn.entity.destroy(self.selection.id)
   self:deselect()
 end
 
@@ -47,12 +47,12 @@ function EntitySelection:select_collider(collider)
   if not collider then return self:deselect() end
 
   self.selection = collider:get_entity()
-  self.state = doublenickel.enums.EntitySelection.Some
+  self.state = dn.enums.EntitySelection.Some
 end
 
 function EntitySelection:deselect()
   self.selection = nil
-  self.state = doublenickel.enums.EntitySelection.None
+  self.state = dn.enums.EntitySelection.None
 end
 
 function EntitySelection:is_entity_selected(entity)

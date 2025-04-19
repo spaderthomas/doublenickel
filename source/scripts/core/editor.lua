@@ -1,9 +1,9 @@
-local self = doublenickel.editor
+local self = dn.editor
 
 ----------------
 -- PUBLIC API --
 ----------------
-EditorConfig = doublenickel.class.define('EditorConfig')
+EditorConfig = dn.class.define('EditorConfig')
 function EditorConfig:init(params)
   self.grid_enabled = params.grid_enabled
   self.grid_size = params.grid_size or 12
@@ -40,7 +40,7 @@ function EditorConfig:init(params)
     ))
   end
 
-  doublenickel.asset.register_cast(DnRenderTargets, 'dn_gpu_render_target_t')
+  dn.asset.register_cast(DnRenderTargets, 'dn_gpu_render_target_t')
 
   self.fonts = {
     regular = params.fonts and params.fonts.regular or 'inconsolata',
@@ -49,10 +49,10 @@ function EditorConfig:init(params)
   }
 end
 
-function doublenickel.editor.init()
-  doublenickel.dn_log('doublenickel.editor.init')
+function dn.editor.init()
+  dn.ffi.log('dn.editor.init')
 
-  EditorFonts = doublenickel.enum.define(
+  EditorFonts = dn.enum.define(
     'EditorFonts',
     {
       Regular = 0,
@@ -60,7 +60,7 @@ function doublenickel.editor.init()
     }
   )
 
-  DnRenderTargets = doublenickel.enum.define(
+  DnRenderTargets = dn.enum.define(
     'DnRenderTargets',
     {
       Editor = 0
@@ -69,26 +69,26 @@ function doublenickel.editor.init()
 
   self.focus_state = {}
   self.hover_state = {}
-  self.window_stack = doublenickel.data_types.stack:new()
+  self.window_stack = dn.data_types.stack:new()
 
-  doublenickel.editor.entities = {}
-  for name, class in pairs(doublenickel.editor.types) do
-    doublenickel.editor.entities[name] = class:new()
+  dn.editor.entities = {}
+  for name, class in pairs(dn.editor.types) do
+    dn.editor.entities[name] = class:new()
   end
 
-  doublenickel.editor.colors = {
-    main_list = doublenickel.colors.white:copy(),
-    cdata_member = doublenickel.colors.red:copy(),
-    lua_member = doublenickel.colors.green:copy(),
-    scalar = doublenickel.colors.zomp:copy(),
+  dn.editor.colors = {
+    main_list = dn.colors.white:copy(),
+    cdata_member = dn.colors.red:copy(),
+    lua_member = dn.colors.green:copy(),
+    scalar = dn.colors.zomp:copy(),
   }
 end
 
-function doublenickel.editor.update()
+function dn.editor.update()
   dn.ffi.trace('dn.ffi.editor.update')
 
   dn.ffi.gpu_begin_render_pass(self.config.command_buffer, self.config.render_pass)
-  for name, editor in doublenickel.iterator.pairs(doublenickel.editor.entities) do
+  for name, editor in dn.iterator.pairs(dn.editor.entities) do
     dn.ffi.trace('dn.ffi.editor.update_entity', name)
     editor:update()
     editor:draw()
@@ -106,7 +106,7 @@ function doublenickel.editor.update()
   dn.ffi.gpu_command_buffer_submit(self.config.command_buffer)
 end
 
-function doublenickel.editor.configure(config)
+function dn.editor.configure(config)
   dn.ffi.trace('dn.ffi.editor.configure')
 
   self.config = config
@@ -114,33 +114,33 @@ function doublenickel.editor.configure(config)
   -- self.sdf = ffi.new('dn_sdf_renderer_t [1]');
   self.sdf = dn.ffi.sdf_renderer_create(1024 * 1024)
 
-  doublenickel.editor.find('EditorUtility').enabled.grid = config.grid_enabled
-  doublenickel.editor.find('EditorUtility').style.grid.size = config.grid_size
-  doublenickel.editor.find('DialogueEditor').hidden = config.hide_dialogue_editor
+  dn.editor.find('EditorUtility').enabled.grid = config.grid_enabled
+  dn.editor.find('EditorUtility').style.grid.size = config.grid_size
+  dn.editor.find('DialogueEditor').hidden = config.hide_dialogue_editor
 
-  for view in doublenickel.iterator.values(config.game_views) do
-    doublenickel.editor.find('GameViewManager'):add_view(view)
+  for view in dn.iterator.values(config.game_views) do
+    dn.editor.find('GameViewManager'):add_view(view)
   end
 
-  doublenickel.editor.find('SceneEditor'):load(config.scene)
+  dn.editor.find('SceneEditor'):load(config.scene)
   dn.ffi.imgui_load_layout(config.layout)
 end
 
-function doublenickel.editor.define(name)
-  local class = doublenickel.class.define(name)
+function dn.editor.define(name)
+  local class = dn.class.define(name)
   class:include_lifecycle()
   class:include_update()
 
-  doublenickel.editor.types[name] = class
+  dn.editor.types[name] = class
 
   return class
 end
 
-function doublenickel.editor.find(name)
-  return doublenickel.editor.entities[name]
+function dn.editor.find(name)
+  return dn.editor.entities[name]
 end
 
-function doublenickel.editor.begin_window(name, flags)
+function dn.editor.begin_window(name, flags)
   flags = flags or 0
   imgui.Begin(name)
   self:set_window_focus(name, imgui.IsWindowFocused())
@@ -148,12 +148,12 @@ function doublenickel.editor.begin_window(name, flags)
   self.window_stack:push(name)
 end
 
-function doublenickel.editor.end_window()
+function dn.editor.end_window()
   self.window_stack:pop()
   imgui.End()
 end
 
-function doublenickel.editor.push_font(font)
+function dn.editor.push_font(font)
   if EditorFonts.Regular:match(font) then
     imgui.PushFont(self.config.fonts.regular, self.config.fonts.size)
   elseif EditorFonts.Bold:match(font) then
@@ -161,7 +161,7 @@ function doublenickel.editor.push_font(font)
   end
 end
 
-function doublenickel.editor.begin_child(name, x, y, flags)
+function dn.editor.begin_child(name, x, y, flags)
   imgui.BeginChild(name, imgui.ImVec2(x, y), true, flags)
 
   -- If a child window is focused (or hovered), it will mark the parent (i.e. the part of the parent window
@@ -180,31 +180,31 @@ function doublenickel.editor.begin_child(name, x, y, flags)
   self:set_window_hover(parent, current_hover or imgui.IsWindowHovered())
 end
 
-function doublenickel.editor.end_child()
+function dn.editor.end_child()
   imgui.EndChild()
 end
 
-function doublenickel.editor.is_window_focused(name)
+function dn.editor.is_window_focused(name)
   name = name or self.window_stack:peek()
   return self.focus_state[name]
 end
 
-function doublenickel.editor.set_window_focus(name, focus)
+function dn.editor.set_window_focus(name, focus)
   self.focus_state[name] = focus
 end
 
-function doublenickel.editor.is_window_hovered(name)
+function dn.editor.is_window_hovered(name)
   name = name or self.window_stack:peek()
   return self.hover_state[name]
 end
 
-function doublenickel.editor.set_window_hover(name, hover)
+function dn.editor.set_window_hover(name, hover)
   self.hover_state[name] = hover
 end
 
 
-function doublenickel.editor.center_next_window(size)
-  local screen = doublenickel.vec2(dn.ffi.window_get_content_area())
+function dn.editor.center_next_window(size)
+  local screen = dn.vec2(dn.ffi.window_get_content_area())
   local position = screen:scale(.5):subtract(size:scale(.5))
   imgui.SetNextWindowPos(position:unpack())
   imgui.SetNextWindowSize(size:unpack())
@@ -214,7 +214,7 @@ end
 ---------------------
 -- EDITOR METADATA --
 ---------------------
-doublenickel.editor.MetadataKind = doublenickel.enum.define(
+dn.editor.MetadataKind = dn.enum.define(
   'EditorMetadata',
   {
     Ignore = 0,
@@ -223,7 +223,7 @@ doublenickel.editor.MetadataKind = doublenickel.enum.define(
   }
 )
 
-FieldMetadata = doublenickel.class.define('FieldMetadata')
+FieldMetadata = dn.class.define('FieldMetadata')
 
 function FieldMetadata:init(field, metadata)
   metadata = metadata or {}
@@ -244,85 +244,85 @@ FieldMetadata.Presets = {
   }
 }
 
-doublenickel.editor.FieldMetadata = FieldMetadata
-doublenickel.editor.default_metadata = FieldMetadata:new()
+dn.editor.FieldMetadata = FieldMetadata
+dn.editor.default_metadata = FieldMetadata:new()
 
 
 local function ensure_editor_sentinel(t)
-  if not t[doublenickel.editor.sentinel] then
-    t[doublenickel.editor.sentinel] = {}
+  if not t[dn.editor.sentinel] then
+    t[dn.editor.sentinel] = {}
   end
 end
 
 local function ensure_editor_metadata(t, metadata_kind)
   ensure_editor_sentinel(t)
-  if not t[doublenickel.editor.sentinel][metadata_kind:to_string()] then
-    t[doublenickel.editor.sentinel][metadata_kind:to_string()] = {}
+  if not t[dn.editor.sentinel][metadata_kind:to_string()] then
+    t[dn.editor.sentinel][metadata_kind:to_string()] = {}
   end
 end
 
 local function find_metadata(t, metadata_kind) 
   ensure_editor_metadata(t, metadata_kind)
-  return t[doublenickel.editor.sentinel][metadata_kind:to_string()]
+  return t[dn.editor.sentinel][metadata_kind:to_string()]
 end
 
-function doublenickel.editor.ignore_field(t, field)
-  ensure_editor_metadata(t, doublenickel.editor.MetadataKind.Ignore)
-  local metadata = find_metadata(t, doublenickel.editor.MetadataKind.Ignore)
+function dn.editor.ignore_field(t, field)
+  ensure_editor_metadata(t, dn.editor.MetadataKind.Ignore)
+  local metadata = find_metadata(t, dn.editor.MetadataKind.Ignore)
   metadata[field] = true
 end
 
-function doublenickel.editor.is_ignoring_field(t, field)
+function dn.editor.is_ignoring_field(t, field)
   -- Globally ignore the intrusive editor table
-  if field == doublenickel.editor.sentinel then return true end
+  if field == dn.editor.sentinel then return true end
 
-  if not t[doublenickel.editor.sentinel] then return false end
-  if not t[doublenickel.editor.sentinel].ignore then return false end
+  if not t[dn.editor.sentinel] then return false end
+  if not t[dn.editor.sentinel].ignore then return false end
 
-  return t[doublenickel.editor.sentinel].ignore[field]
+  return t[dn.editor.sentinel].ignore[field]
 end
 
-function doublenickel.editor.set_field_metadata(t, field, metadata)
-  local table_metadata = find_metadata(t, doublenickel.editor.MetadataKind.Field)
+function dn.editor.set_field_metadata(t, field, metadata)
+  local table_metadata = find_metadata(t, dn.editor.MetadataKind.Field)
   table_metadata[field] = FieldMetadata:new(field, metadata)
 end
 
-function doublenickel.editor.set_field_metadatas(t, metadatas)
+function dn.editor.set_field_metadatas(t, metadatas)
   for field, metadata in pairs(metadatas) do
-    doublenickel.editor.set_field_metadata(t, field, metadata)
+    dn.editor.set_field_metadata(t, field, metadata)
   end
 end
 
 
-function doublenickel.editor.get_field_metadata(t, field)
-  local metadata = table.get_or_nil(t, doublenickel.editor.sentinel, doublenickel.editor.MetadataKind.Field:to_string(), field)
+function dn.editor.get_field_metadata(t, field)
+  local metadata = table.get_or_nil(t, dn.editor.sentinel, dn.editor.MetadataKind.Field:to_string(), field)
   if metadata then 
     return metadata, true
   end
  
-  return doublenickel.editor.default_metadata, false
+  return dn.editor.default_metadata, false
 end
 
 
 ----------------------
 -- EDITOR CALLBACKS --
 ----------------------
-function doublenickel.editor.set_editor_callbacks(t, callbacks)
+function dn.editor.set_editor_callbacks(t, callbacks)
   ensure_editor_sentinel(t)
-  t[doublenickel.editor.sentinel].callbacks = callbacks
+  t[dn.editor.sentinel].callbacks = callbacks
 end
 
-function doublenickel.editor.run_editor_callback(t, callback, ...)
-  if not t[doublenickel.editor.sentinel] then return end
-  if not t[doublenickel.editor.sentinel].callbacks then return end
+function dn.editor.run_editor_callback(t, callback, ...)
+  if not t[dn.editor.sentinel] then return end
+  if not t[dn.editor.sentinel].callbacks then return end
 
-  local callback = t[doublenickel.editor.sentinel].callbacks[callback]
+  local callback = t[dn.editor.sentinel].callbacks[callback]
   if not callback then return end
 
   return callback(...)
 end
 
-doublenickel.editor.layers = {
+dn.editor.layers = {
   grid = 90,
   colliders = 110,
   collider_overlay = 120,

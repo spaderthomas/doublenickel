@@ -1,4 +1,4 @@
-DialogueBoxItem = doublenickel.class.define('DialogueBoxItem')
+DialogueBoxItem = dn.class.define('DialogueBoxItem')
 
 function DialogueBoxItem:init()
 end
@@ -7,14 +7,14 @@ function DialogueBoxItem:init_from_node(node)
   self.text = node.text or ''
   self:set_character(node.who)
 
-  if node.color_id and #node.color_id > 0 and doublenickel.colors[node.color_id] then
-    self.color = doublenickel.colors[node.color_id]:copy()
+  if node.color_id and #node.color_id > 0 and dn.colors[node.color_id] then
+    self.color = dn.colors[node.color_id]:copy()
   elseif self.character and self.character.body_color then
-    self.color = doublenickel.color(self.character.body_color)
+    self.color = dn.color(self.character.body_color)
   elseif node.color then
-    self.color = doublenickel.color(node.color)
+    self.color = dn.color(node.color)
   else
-    self.color = doublenickel.colors.white:copy()
+    self.color = dn.colors.white:copy()
   end
 end
 
@@ -30,7 +30,7 @@ function DialogueBoxItem:set_character(character_name)
     self:hide_character(); return
   end
 
-  local character = doublenickel.dialogue.characters[character_name] or doublenickel.dialogue.characters.unknown
+  local character = dn.dialogue.characters[character_name] or dn.dialogue.characters.unknown
   self.character = character
   self.font = self.character.font or 'game'
 end
@@ -48,7 +48,7 @@ function DialogueBoxItem:build_body_options()
   local options = {
     world = false,
     font = 'merriweather-24',
-    color = doublenickel.color(self.color),
+    color = dn.color(self.color),
   }
 
   return options
@@ -60,14 +60,14 @@ function DialogueBoxItem:build_speaker_options()
   return {
     text = self.character.display_name,
     font = 'merriweather-bold-32',
-    color = doublenickel.color(self.character.color),
+    color = dn.color(self.character.color),
   }
 end
 
 -----------------
 -- CHOICE ITEM --
 -----------------
-ChoiceItem = doublenickel.class.define('ChoiceItem')
+ChoiceItem = dn.class.define('ChoiceItem')
 
 function ChoiceItem:init()
 end

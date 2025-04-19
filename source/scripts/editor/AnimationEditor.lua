@@ -1,4 +1,4 @@
-AnimationEditor = doublenickel.editor.define('AnimationEditor')
+AnimationEditor = dn.editor.define('AnimationEditor')
 
 AnimationEditor.popup_kind = {
 	edit = 'edit##animation_editor'
@@ -20,12 +20,12 @@ function AnimationEditor:init()
 	self.popups = Popups:new(popups)
 
 	self.colors = {
-		delete = doublenickel.color32(150, 0, 25, 255),
-		disabled = doublenickel.color32(100, 100, 100, 255),
+		delete = dn.color32(150, 0, 25, 255),
+		disabled = dn.color32(100, 100, 100, 255),
 	}
 
 	self.sizes = {
-		preview = doublenickel.vec2(100, 200)
+		preview = dn.vec2(100, 200)
 	}
 
 	self.old_name = ''
@@ -54,14 +54,14 @@ function AnimationEditor:reinit_animation_component()
 end
 
 function AnimationEditor:create(name)
-	local data = doublenickel.animation.find('default')
+	local data = dn.animation.find('default')
 	data = table.deep_copy(data)
-	doublenickel.animation.add(name, data)
+	dn.animation.add(name, data)
 end
 
 function AnimationEditor:edit(name)
 	-- Fetch the animation from our current canonical animation data
-	local animation = doublenickel.animation.find(name)
+	local animation = dn.animation.find(name)
 
 	-- Update our names to match
 	self.original_name = name
@@ -86,7 +86,7 @@ function AnimationEditor:draw_delete_frame_button(index)
 
 	if imgui.Button('Delete') then
 		if not disabled then
-			doublenickel.array.remove(self.data.frames, index)
+			dn.array.remove(self.data.frames, index)
 			self.animation:restart()
 		end
 	end
@@ -97,15 +97,15 @@ end
 function AnimationEditor:popup()
 	local done = false
 
-	local window = doublenickel.vec2(450, 600)
+	local window = dn.vec2(450, 600)
 	local wx = dn.ffi.window_get_content_area().x
 	imgui.SetCursorPosX((wx / 2) - (window.x / 2))
 	imgui.SetNextWindowSize(window:unpack())
 
 	local flags = 0
-	flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiWindowFlags_NoMove)
-	flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiWindowFlags_NoResize)
-	flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiWindowFlags_NoCollapse)
+	flags = bitwise(dn.op_or, flags, ffi.C.ImGuiWindowFlags_NoMove)
+	flags = bitwise(dn.op_or, flags, ffi.C.ImGuiWindowFlags_NoResize)
+	flags = bitwise(dn.op_or, flags, ffi.C.ImGuiWindowFlags_NoCollapse)
 
 	if imgui.BeginPopupModal(self.popup_kind.edit, nil, flags) then
 		local sprite = self:calc_preview_size()
@@ -157,7 +157,7 @@ function AnimationEditor:popup()
 
 		if imgui.Button('Import') then
 			-- It's a directory, not a filename, but this function still just grabs the part after the final path separator.
-			local name = doublenickel.extract_filename(import_path)
+			local name = dn.extract_filename(import_path)
 			self.current_name = name
 
 			self.data.speed = .25
@@ -165,12 +165,12 @@ function AnimationEditor:popup()
 			table.clear(self.data.frames)
 			
 			local files = {}
-			for entry in doublenickel.filesystem.iterate_directory(import_path) do
+			for entry in dn.filesystem.iterate_directory(import_path) do
 				table.insert(files, entry.file_path)
 			end
 			table.sort(files)
 
-			for file in doublenickel.iterator.values(files) do
+			for file in dn.iterator.values(files) do
 				local frame = {
 					image = file,
 					time = 0
@@ -196,8 +196,8 @@ Import a folder as one animation. The folder is a relative path from the /assets
 
 		-- Save
 		if imgui.Button('Save', imgui.ImVec2(100, 25)) then
-			doublenickel.animation.add(self.current_name, self.data)
-			doublenickel.animation.save()
+			dn.animation.add(self.current_name, self.data)
+			dn.animation.save()
 		end
 
 		imgui.SameLine()
@@ -217,10 +217,10 @@ end
 
 function AnimationEditor:calc_preview_size()
 	local image = self.animation:get_image()
-	local size = doublenickel.vec2(doublenickel.sprite_size(image))
+	local size = dn.vec2(dn.sprite_size(image))
 
 	if size.y == 0 then
-		return doublenickel.vec2(doublenickel.sprite_size('debug.png'))
+		return dn.vec2(dn.sprite_size('debug.png'))
 	end
 
 	-- @hack: Now that I have larger assets, they don't fit in the window. This flat doesn't work

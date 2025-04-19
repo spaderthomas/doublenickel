@@ -1,5 +1,5 @@
-local Stack = doublenickel.class.define('Stack')
-doublenickel.data_types.stack = Stack
+local Stack = dn.class.define('Stack')
+dn.data_types.stack = Stack
 
 function Stack:init()
   self.stack = {}

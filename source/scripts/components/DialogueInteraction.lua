@@ -1,4 +1,4 @@
-local DialogueInteraction = doublenickel.component.define('DialogueInteraction')
+local DialogueInteraction = dn.component.define('DialogueInteraction')
 
 DialogueInteraction.editor_fields = {
   'dialogue'
@@ -11,7 +11,7 @@ end
 function DialogueInteraction:play()
   local interaction = self:get_entity():find_component('Interaction')
   interaction:add_callback(function()
-    doublenickel.dialogue.play(self.dialogue)
+    dn.dialogue.play(self.dialogue)
   end)
 end
 

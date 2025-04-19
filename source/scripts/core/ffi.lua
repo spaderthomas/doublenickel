@@ -35,7 +35,7 @@ function dn.ffi.init()
     }
   )
 
-  CType = doublenickel.enum.define(
+  CType = dn.enum.define(
     'ctype',
     {
       void = 0,
@@ -54,7 +54,7 @@ function dn.ffi.init()
     }
   )
 
-  Sdf = doublenickel.enum.define(
+  Sdf = dn.enum.define(
     'Sdf',
     {
       Circle = ffi.C.DN_SDF_SHAPE_CIRCLE,
@@ -65,7 +65,7 @@ function dn.ffi.init()
     }
   )
 
-  SdfCombineOp = doublenickel.enum.define(
+  SdfCombineOp = dn.enum.define(
     'SdfCombineOp',
     {
       Union = ffi.C.DN_SDF_COMBINE_OP_UNION,
@@ -74,7 +74,7 @@ function dn.ffi.init()
     }
   )
 
-  SdfSmoothingKernel = doublenickel.enum.define(
+  SdfSmoothingKernel = dn.enum.define(
     'SdfSmoothingKernel',
     {
       None = ffi.C.DN_SDF_SMOOTH_KERNEL_NONE,
@@ -83,7 +83,7 @@ function dn.ffi.init()
   )
 
 
-  CoordinateSystem = doublenickel.enum.define(
+  CoordinateSystem = dn.enum.define(
     'CoordinateSystem',
     {
       World = ffi.C.DN_COORD_UNIT_WORLD,
@@ -93,7 +93,7 @@ function dn.ffi.init()
     }
   )
 
-  InputDevice = doublenickel.enum.define(
+  InputDevice = dn.enum.define(
     'InputDevice',
     {
       MouseAndKeyboard = 0,
@@ -101,7 +101,7 @@ function dn.ffi.init()
     }
   )
 
-  WindowFlags = doublenickel.enum.define(
+  WindowFlags = dn.enum.define(
     'WindowFlags',
     {
       None = ffi.C.DN_WINDOW_FLAG_NONE,
@@ -111,7 +111,7 @@ function dn.ffi.init()
     }
   )
 
-  GpuResourceId = doublenickel.enum.define(
+  GpuResourceId = dn.enum.define(
     'GpuResourceId',
     {
       Framebuffer = ffi.C.DN_GPU_RESOURCE_FRAMEBUFFER,
@@ -120,7 +120,7 @@ function dn.ffi.init()
     }
   )
 
-  GpuShaderKind = doublenickel.enum.define(
+  GpuShaderKind = dn.enum.define(
     'GpuShaderKind',
     {
       Graphics = ffi.C.DN_GPU_SHADER_GRAPHICS,
@@ -128,7 +128,7 @@ function dn.ffi.init()
     }
   )
 
-  GpuDrawMode = doublenickel.enum.define(
+  GpuDrawMode = dn.enum.define(
     'GpuDrawMode',
     {
       Arrays = ffi.C.DN_GPU_DRAW_MODE_ARRAYS,
@@ -136,14 +136,14 @@ function dn.ffi.init()
     }
   )
 
-  GpuDrawPrimitive = doublenickel.enum.define(
+  GpuDrawPrimitive = dn.enum.define(
     'GpuDrawPrimitive',
     {
       Triangles = ffi.C.DN_GPU_PRIMITIVE_TRIANGLES,
     }
   )
 
-  GpuVertexAttributeKind = doublenickel.enum.define(
+  GpuVertexAttributeKind = dn.enum.define(
     'GpuVertexAttributeKind',
     {
       Float = ffi.C.DN_GPU_VERTEX_ATTRIBUTE_FLOAT,
@@ -151,7 +151,7 @@ function dn.ffi.init()
     }
   )
 
-  GpuBlendFunction = doublenickel.enum.define(
+  GpuBlendFunction = dn.enum.define(
     'GpuBlendFunction',
     {
       Add = ffi.C.DN_GPU_BLEND_FUNC_ADD,
@@ -163,7 +163,7 @@ function dn.ffi.init()
     }
   )
 
-  GpuUniformKind = doublenickel.enum.define(
+  GpuUniformKind = dn.enum.define(
     'GpuUniformKind',
     {
       None =    ffi.C.DN_GPU_UNIFORM_NONE,
@@ -181,7 +181,7 @@ function dn.ffi.init()
   )
 
 
-  GpuBufferUsage = doublenickel.enum.define(
+  GpuBufferUsage = dn.enum.define(
     'GpuBufferUsage',
     {
       Static =  ffi.C.DN_GPU_BUFFER_USAGE_STATIC,
@@ -190,7 +190,7 @@ function dn.ffi.init()
     }
   )
 
-  GpuBufferKind = doublenickel.enum.define(
+  GpuBufferKind = dn.enum.define(
     'GpuBufferKind',
     {
       Storage = ffi.C.DN_GPU_BUFFER_KIND_STORAGE,
@@ -198,7 +198,7 @@ function dn.ffi.init()
     }
   )
 
-  UniformKind = doublenickel.enum.define(
+  UniformKind = dn.enum.define(
     'UniformKind',
     {
       Matrix4        = ffi.C.DN_GPU_UNIFORM_MATRIX4,
@@ -214,7 +214,7 @@ function dn.ffi.init()
     }
   )
 
-  GpuMemoryBarrier = doublenickel.enum.define(
+  GpuMemoryBarrier = dn.enum.define(
     'GpuMemoryBarrier',
     {
       ShaderStorage = ffi.C.DN_GPU_MEMORY_BARRIER_STORAGE,
@@ -222,7 +222,7 @@ function dn.ffi.init()
     }
   )
 
-  DisplayMode = doublenickel.enum.define(
+  DisplayMode = dn.enum.define(
     'DisplayMode',
     {
       p480 = ffi.C.DN_DISPLAY_MODE_480,
@@ -235,7 +235,7 @@ function dn.ffi.init()
     }
   )
 
-  GpuLoadOp = doublenickel.enum.define(
+  GpuLoadOp = dn.enum.define(
     'GpuLoadOp',
     {
       None = ffi.C.DN_GPU_LOAD_OP_NONE,
@@ -267,7 +267,7 @@ function dn.reflection.field_ptr(cdata, member)
 end
 
 function dn.reflection.type_name(inner_type)
-  local ctype = doublenickel.enums.ctype
+  local ctype = dn.enums.ctype
 
   local type_name = inner_type.what
   if ctype.float:match(inner_type.what) then
@@ -306,7 +306,7 @@ function dn.reflection.type_name(inner_type)
 end
 
 function dn.reflection.imgui_datatype(inner_type)
-  local ctype = doublenickel.enums.ctype
+  local ctype = dn.enums.ctype
 
   local type_name = inner_type.what
   if ctype.float:match(inner_type.what) then
@@ -347,7 +347,7 @@ function dn.reflection.imgui_datatypeof(cdata)
 end
 
 function dn.reflection.pretty_type(type_info)
-  local ctype = doublenickel.enums.ctype
+  local ctype = dn.enums.ctype
 
   local inner_type = dn.reflection.inner_type(type_info)
 
@@ -420,8 +420,8 @@ end
 
 function dn.reflection.is_composite_type(type_info)
   return
-    doublenickel.enums.ctype.struct:match(type_info.what) or
-    doublenickel.enums.ctype.array:match(type_info.what)
+    dn.enums.ctype.struct:match(type_info.what) or
+    dn.enums.ctype.array:match(type_info.what)
 end
 
 function dn.reflection.sorted_members(type_info)
@@ -446,7 +446,7 @@ function dn.reflection.sorted_members(type_info)
     end
   end)
 
-  return doublenickel.iterator.values(members)
+  return dn.iterator.values(members)
 end
 
 function dn.reflection.typeof(cdata)
@@ -458,7 +458,7 @@ function dn.reflection.inner_typeof(cdata)
 end
 
 function dn.reflection.inner_type(type_info)
-  local ctype = doublenickel.enums.ctype
+  local ctype = dn.enums.ctype
 
   if ctype.ref:match(type_info.what) then
     type_info = type_info.element_type
@@ -493,7 +493,7 @@ end
 ------------
 -- STRING --
 ------------
-String = doublenickel.class.metatype('dn_string_t')
+String = dn.class.metatype('dn_string_t')
 function String:init(path)
   self.data = ffi.cast('u8*', path)
   self.len = #path
@@ -507,7 +507,7 @@ end
 ----------------------
 -- MEMORY ALLOCATOR --
 ----------------------
-dn_allocator_t = doublenickel.class.metatype('dn_allocator_t')
+dn_allocator_t = dn.class.metatype('dn_allocator_t')
 
 function dn_allocator_t:find(name)
   return dn.ffi.allocator_find(name)
@@ -536,9 +536,8 @@ end
 ------------
 -- MATRIX --
 ------------
-Matrix3 = doublenickel.class.metatype('dn_matrix3_t')
+Matrix3 = dn.class.metatype('dn_matrix3_t')
 Matrix3:set_metamethod('__index', function(self, key)
-  print('x')
   if type(key) == 'number' then
     return self.data[key]
   end
@@ -574,7 +573,7 @@ function Matrix3:serialize()
   return serialized
 end
 
-Matrix4 = doublenickel.class.metatype('dn_matrix4_t')
+Matrix4 = dn.class.metatype('dn_matrix4_t')
 
 function Matrix4:init(data)
   if data then
@@ -602,7 +601,7 @@ end
 ------------
 -- VECTOR --
 ------------
-Vector2 = doublenickel.class.metatype('dn_vector2_t')
+Vector2 = dn.class.metatype('dn_vector2_t')
 function Vector2:init(x, y)
   self.x = x or self.x
   self.y = y or self.y
@@ -616,7 +615,7 @@ function Vector2:copy()
   return Vector2:new(self.x, self.y)
 end
 
-Vector3 = doublenickel.class.metatype('dn_vector3_t')
+Vector3 = dn.class.metatype('dn_vector3_t')
 function  Vector3:init(x, y, z)
   self.x = x or self.x
   self.y = y or self.y
@@ -624,7 +623,7 @@ function  Vector3:init(x, y, z)
 end
 
 
-Vector4 = doublenickel.class.metatype('dn_vector4_t')
+Vector4 = dn.class.metatype('dn_vector4_t')
 function Vector4:init(x, y, z, w)
   self.x = x or self.x
   self.y = y or self.y
@@ -636,7 +635,7 @@ end
 ---------------
 -- CPU BUFFER --
 ---------------
-CpuBuffer = doublenickel.class.define('CpuBuffer')
+CpuBuffer = dn.class.define('CpuBuffer')
 
 function CpuBuffer:init(ctype, capacity)
   self.size = 0
@@ -646,7 +645,7 @@ function CpuBuffer:init(ctype, capacity)
 end
 
 function CpuBuffer:push(element)
-  -- doublenickel.debug.assert(self.size < self.capacity)
+  -- dn.debug.assert(self.size < self.capacity)
 
   if element then self.data[self.size] = element end
   self.size = self.size + 1
@@ -663,7 +662,7 @@ function CpuBuffer:fast_push(value)
   self.size = self.size + 1
 end
 
-function doublenickel.class.define_fast(name)
+function dn.class.define_fast(name)
 
 end
 
@@ -681,7 +680,7 @@ setmetatable(FastCpuBuffer, {
 -----------------------
 -- BACKED GPU BUFFER --
 -----------------------
-BackedGpuBuffer = doublenickel.class.define('BackedGpuBuffer')
+BackedGpuBuffer = dn.class.define('BackedGpuBuffer')
 function BackedGpuBuffer:init(ctype, capacity, gpu_buffer)
   self.ctype = ctype
   self.cpu_buffer = CpuBuffer:new(ctype, capacity)
@@ -716,7 +715,7 @@ end
 ----------------
 -- GPU BUFFER --
 ----------------
-GpuBuffer = doublenickel.class.define('GpuBuffer')
+GpuBuffer = dn.class.define('GpuBuffer')
 
 function GpuBuffer:init(ctype, capacity, gpu_buffer)
   self.ctype = ctype
@@ -744,9 +743,9 @@ end
 ---------------------
 -- GPU DESCRIPTORS --
 ---------------------
-GpuShaderDescriptor = doublenickel.class.metatype('dn_gpu_shader_descriptor_t')
+GpuShaderDescriptor = dn.class.metatype('dn_gpu_shader_descriptor_t')
 function GpuShaderDescriptor:init(params)
-  if doublenickel.enum.is_enum(params.name) then
+  if dn.enum.is_enum(params.name) then
     self.name = params.name:to_qualified_string()
   else
     self.name = params.name
@@ -756,15 +755,16 @@ function GpuShaderDescriptor:init(params)
     self.kind = GpuShaderKind.Graphics:to_number()
     self.vertex_shader = params.vertex_shader
     self.fragment_shader = params.fragment_shader
+    dbg()
   elseif GpuShaderKind.Compute:match(params.kind) then
     self.kind = GpuShaderKind.Compute:to_number()
     self.compute_shader = params.compute_shader
   end
 end
 
-GpuRenderTargetDescriptor = doublenickel.class.metatype('dn_gpu_render_target_descriptor_t')
+GpuRenderTargetDescriptor = dn.class.metatype('dn_gpu_render_target_descriptor_t')
 function GpuRenderTargetDescriptor:init(params)
-  if doublenickel.enum.is_enum(params.name) then
+  if dn.enum.is_enum(params.name) then
     self.name = params.name:to_qualified_string()
   else
     self.name = params.name
@@ -773,33 +773,33 @@ function GpuRenderTargetDescriptor:init(params)
   self.size = params.size
 end
 
-GpuBufferDescriptor = doublenickel.class.metatype('dn_gpu_buffer_descriptor_t')
+GpuBufferDescriptor = dn.class.metatype('dn_gpu_buffer_descriptor_t')
 function GpuBufferDescriptor:init(params)
-  self.kind = doublenickel.enum.load(params.kind):to_number()
-  self.usage = doublenickel.enum.load(params.usage):to_number()
+  self.kind = dn.enum.load(params.kind):to_number()
+  self.usage = dn.enum.load(params.usage):to_number()
   self.capacity = params.size
   self.element_size = 1
 end
 
-GpuUniformDescriptor = doublenickel.class.metatype('dn_gpu_uniform_descriptor_t')
+GpuUniformDescriptor = dn.class.metatype('dn_gpu_uniform_descriptor_t')
 function GpuUniformDescriptor:init(params)
   self.name = params.name
-  self.kind = doublenickel.enum.load(params.kind):to_number()
+  self.kind = dn.enum.load(params.kind):to_number()
 end
 
-GpuCommandBufferDescriptor = doublenickel.class.metatype('dn_gpu_command_buffer_descriptor_t')
+GpuCommandBufferDescriptor = dn.class.metatype('dn_gpu_command_buffer_descriptor_t')
 function GpuCommandBufferDescriptor:init(params)
   self.max_commands = params.max_commands
 end
 
-GpuVertexAttribute = doublenickel.class.metatype('dn_gpu_vertex_attribute_t')
+GpuVertexAttribute = dn.class.metatype('dn_gpu_vertex_attribute_t')
 function GpuVertexAttribute:init(params)
-  self.kind = doublenickel.enum.load(params.kind):to_number()
+  self.kind = dn.enum.load(params.kind):to_number()
   self.count = params.count
   self.divisor = params.divisor or 0
 end
 
-GpuBufferLayout = doublenickel.class.metatype('dn_gpu_buffer_layout_t')
+GpuBufferLayout = dn.class.metatype('dn_gpu_buffer_layout_t')
 function GpuBufferLayout:init(params)
   local allocator = dn.ffi.allocator_find('standard')
 
@@ -810,13 +810,13 @@ function GpuBufferLayout:init(params)
   end
 end
 
-GpuRasterState = doublenickel.class.metatype('dn_gpu_raster_state_t')
+GpuRasterState = dn.class.metatype('dn_gpu_raster_state_t')
 function GpuRasterState:init(params)
-  self.shader = doublenickel.gpu.find(params.shader)
-  self.primitive = doublenickel.enum.load(params.primitive):to_number()
+  self.shader = dn.gpu.find(params.shader)
+  self.primitive = dn.enum.load(params.primitive):to_number()
 end
 
-GpuPipelineDescriptor = doublenickel.class.metatype('dn_gpu_pipeline_descriptor_t')
+GpuPipelineDescriptor = dn.class.metatype('dn_gpu_pipeline_descriptor_t')
 function GpuPipelineDescriptor:init(params)
   local allocator = dn.ffi.allocator_find('standard')
 
@@ -829,18 +829,18 @@ function GpuPipelineDescriptor:init(params)
   end
 end
 
-GpuRenderPass = doublenickel.class.metatype('dn_gpu_render_pass_t')
+GpuRenderPass = dn.class.metatype('dn_gpu_render_pass_t')
 function GpuRenderPass:init(params)
   if params.color then
-    params.color.attachment = doublenickel.enum.load(params.color.attachment)
-    self.color.attachment = doublenickel.asset.find(params.color.attachment)
-    self.color.load = doublenickel.enum.load(params.color.load):to_number()
+    params.color.attachment = dn.enum.load(params.color.attachment)
+    self.color.attachment = dn.asset.find(params.color.attachment)
+    self.color.load = dn.enum.load(params.color.load):to_number()
 
-    doublenickel.debug.assert(not dn.reflection.is_nil(self.color.attachment))
+    dn.debug.assert(not dn.reflection.is_nil(self.color.attachment))
   end
 end
 
-GpuUniformBinding = doublenickel.class.metatype('dn_gpu_uniform_binding_t')
+GpuUniformBinding = dn.class.metatype('dn_gpu_uniform_binding_t')
 function GpuUniformBinding:init(params)
   self.uniform = params.uniform
   self.binding_index = params.binding_index or 0
@@ -853,32 +853,32 @@ function GpuUniformBinding:init(params)
   elseif GpuUniformKind.Vector2:match(self.uniform.kind) then self.data.vec2 = params.value
   elseif GpuUniformKind.F32:match(self.uniform.kind)     then self.data.f32 = params.value
   elseif GpuUniformKind.I32:match(self.uniform.kind)     then self.data.i32 = params.value
-  elseif GpuUniformKind.Enum:match(self.uniform.kind)    then self.data.i32 = doublenickel.enum.load(params.value):to_number()
+  elseif GpuUniformKind.Enum:match(self.uniform.kind)    then self.data.i32 = dn.enum.load(params.value):to_number()
   elseif GpuUniformKind.Texture:match(self.uniform.kind) then self.data.texture = params.value
-  else   doublenickel.debug.assert(false) end
+  else   dn.debug.assert(false) end
 end
 
-GpuVertexBufferBinding = doublenickel.class.metatype('dn_gpu_vertex_buffer_binding_t')
+GpuVertexBufferBinding = dn.class.metatype('dn_gpu_vertex_buffer_binding_t')
 function GpuVertexBufferBinding:init(buffer)
   if type(buffer) == 'cdata' then
     self.buffer = buffer
   else
-    self.buffer = doublenickel.gpu.find(buffer)
+    self.buffer = dn.gpu.find(buffer)
   end
 end
 
-GpuStorageBufferBinding = doublenickel.class.metatype('dn_gpu_storage_buffer_binding_t')
+GpuStorageBufferBinding = dn.class.metatype('dn_gpu_storage_buffer_binding_t')
 function GpuStorageBufferBinding:init(params)
   if type(params.buffer) == 'cdata' then
     self.buffer = params.buffer
   else
-    self.buffer = doublenickel.gpu.find(params.buffer)
+    self.buffer = dn.gpu.find(params.buffer)
   end
 
   self.base = params.base
 end
 
-GpuBufferBinding = doublenickel.class.metatype('dn_gpu_buffer_binding_t')
+GpuBufferBinding = dn.class.metatype('dn_gpu_buffer_binding_t')
 function GpuBufferBinding:init(params)
   local allocator = dn.ffi.allocator_find('standard')
 
@@ -1001,7 +1001,7 @@ function dn.ffi.os_file_mod_time(path)
 end
 
 function dn.ffi.window_get_display_mode()
-  return doublenickel.enums.DisplayMode(ffi.C.dn_window_get_display_mode())
+  return dn.enums.DisplayMode(ffi.C.dn_window_get_display_mode())
 end
 
 function dn.ffi.imgui_load_layout(name)

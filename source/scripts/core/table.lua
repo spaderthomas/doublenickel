@@ -7,7 +7,7 @@ function table.shallow_copy(t)
 end
 
 function table.merge(source, dest)
-	for k in doublenickel.iterator.keys(source) do
+	for k in dn.iterator.keys(source) do
 		if type(source[k]) == 'table' then
 			-- If the child table doesn't exist, create it
 			dest[k] = dest[k] or {}
@@ -118,7 +118,7 @@ end
 
 function table.collect_keys(t)
 	local keys = {}
-	for key in doublenickel.iterator.keys(t) do
+	for key in dn.iterator.keys(t) do
 		table.insert(keys, key)
 	end
 	return keys
@@ -126,7 +126,7 @@ end
 
 function table.random_key(t)
 	local keys = {}
-  for key in doublenickel.iterator.keys(t) do 
+  for key in dn.iterator.keys(t) do 
 		table.insert(keys, key) 
 	end
 
@@ -216,12 +216,12 @@ end
 -- source. In other words, source is the canonical form, make dest comply.
 function make_keys_match(source, dest)
 	if source == nil then
-		doublenickel.dn_log('make_keys_match: nil source table')
+		dn.ffi.log('make_keys_match: nil source table')
 		return
 	end
 
 	if dest == nil then
-		doublenickel.dn_log('make_keys_match: nil dest table')
+		dn.ffi.log('make_keys_match: nil dest table')
 		return
 	end
 

@@ -1,4 +1,4 @@
-DefaultEditor = doublenickel.editor.define('DefaultEditor')
+DefaultEditor = dn.editor.define('DefaultEditor')
 
 DefaultEditor.popup_kind = {
 	edit = 'edit##default_editor'
@@ -33,7 +33,7 @@ function DefaultEditor:reset()
 end
 
 function DefaultEditor:edit(name)
-	local animation = doublenickel.animation.find(name)
+	local animation = dn.animation.find(name)
 
 	self:reset()
 	self.animation.name = name

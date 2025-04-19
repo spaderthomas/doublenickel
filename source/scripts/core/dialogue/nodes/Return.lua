@@ -1,13 +1,13 @@
-local Return = doublenickel.node('Return')
+local Return = dn.node('Return')
 
 function Return:init()
 end
 
 function Return:advance(graph)
-  local stack = doublenickel.dialogue.stack
+  local stack = dn.dialogue.stack
   local target = stack:pop()
 
-  local controller = doublenickel.dialogue.controller
+  local controller = dn.dialogue.controller
   local need_dialogue_change = false
   need_dialogue_change = need_dialogue_change or #target.dialogue > 0
   need_dialogue_change = need_dialogue_change and target.dialogue ~= controller.current_dialogue
@@ -15,10 +15,10 @@ function Return:advance(graph)
     -- Ask the controller to load the target dialogue, then return the
     -- target node within as the current node
     controller:change_dialogue(target.dialogue)
-    return doublenickel.dialogue.find_node(controller.nodes, target.node_uuid)
+    return dn.dialogue.find_node(controller.nodes, target.node_uuid)
   else
     -- We've already got the graph, so find the node in it
-    return doublenickel.dialogue.find_node(graph, target.node_uuid)
+    return dn.dialogue.find_node(graph, target.node_uuid)
   end
 end
 

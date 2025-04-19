@@ -1,9 +1,9 @@
-ColliderPoints = doublenickel.component.define('ColliderPoints')
+ColliderPoints = dn.component.define('ColliderPoints')
 
 function ColliderPoints:init(params)
   params = params or {}
 
-  self.points = doublenickel.data_types.array:new()
+  self.points = dn.data_types.array:new()
 
   local points = params.points or {}
   for _, point in pairs(points) do
@@ -129,5 +129,5 @@ end
 
 function ColliderPoints:center_image(image)
   log.warn('unimplemented: ColliderPoints:center_image')
-  return doublenickel.vec2()
+  return dn.vec2()
 end

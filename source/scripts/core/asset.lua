@@ -1,16 +1,16 @@
-local self = doublenickel.asset
+local self = dn.asset
 
-function doublenickel.asset.init()
+function dn.asset.init()
   self.casts = {}
 end
 
-function doublenickel.asset.register_cast(enum, ctype)
+function dn.asset.register_cast(enum, ctype)
   self.casts[enum.name] = dn.reflection.ptr_type(ctype)
 end
 
-function doublenickel.asset.find(id)
+function dn.asset.find(id)
   local ctype = 'dn_asset_data_t'
-  if doublenickel.enum.is_enum(id) then
+  if dn.enum.is_enum(id) then
     ctype = self.casts[id.__enum] or ctype
     id = id:to_qualified_string()
   end

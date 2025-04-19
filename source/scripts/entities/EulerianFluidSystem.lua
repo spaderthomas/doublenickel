@@ -1,4 +1,4 @@
-EulerianFluidSystem = doublenickel.entity.define('EulerianFluidSystem')
+EulerianFluidSystem = dn.entity.define('EulerianFluidSystem')
 
 EulerianFluidSystem.editor_fields = {
   'grid_size',
@@ -48,7 +48,7 @@ function EulerianFluidSystem:update()
   if not self.handle then return end
 
   dn.unported.set_active_shader('fluid_eulerian')
-  dn.unported.set_draw_mode(doublenickel.enums.DrawMode.Triangles)
+  dn.unported.set_draw_mode(dn.enums.DrawMode.Triangles)
   dn.unported.set_world_space(true)
   dn.unported.set_layer(10000)
   dn.unported.ef_bind(self.handle)

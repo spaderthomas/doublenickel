@@ -3,7 +3,7 @@
 
 
 
-doublenickel.input.channels = {
+dn.input.channels = {
 	editor = 'editor',
 	game = 'game',
 	gui = 'gui',
@@ -12,61 +12,61 @@ doublenickel.input.channels = {
 	any = 'any'
 }
 
-doublenickel.input.device_kinds = {
+dn.input.device_kinds = {
 	mkb = 0,
 	controller = 1,
 }
 
-function doublenickel.input.pressed(key, channel)
-	if not doublenickel.input.is_channel_active(channel) then
+function dn.input.pressed(key, channel)
+	if not dn.input.is_channel_active(channel) then
 		return false
 	end
 
 	return dn.ffi.input_pressed(key)
 end
 
-function doublenickel.input.released(key, channel)
-	if not doublenickel.input.is_channel_active(channel) then
+function dn.input.released(key, channel)
+	if not dn.input.is_channel_active(channel) then
 		return false
 	end
 
 	return dn.ffi.input_released(key)
 end
 
-function doublenickel.input.down(key, channel)
-	if not doublenickel.input.is_channel_active(channel) then
+function dn.input.down(key, channel)
+	if not dn.input.is_channel_active(channel) then
 		return false
 	end
 
 	return dn.ffi.input_down(key)
 end
 
-function doublenickel.input.mod_down(key, channel)
-	if not doublenickel.input.is_channel_active(channel) then
+function dn.input.mod_down(key, channel)
+	if not dn.input.is_channel_active(channel) then
 		return false
 	end
 
 	return dn.ffi.input_mod_down(key)
 end
 
-function doublenickel.input.chord_pressed(mod, key, channel)
-	if not doublenickel.input.is_channel_active(channel) then
+function dn.input.chord_pressed(mod, key, channel)
+	if not dn.input.is_channel_active(channel) then
 		return false
 	end
 
 	return dn.ffi.input_chord_pressed(mod, key)
 end
 
-function doublenickel.input.scroll()
+function dn.input.scroll()
 	return dn.ffi.input_scroll()
 end
 
-function doublenickel.input.mouse(coordinate)
+function dn.input.mouse(coordinate)
 	coordinate = coordinate or CoordinateSystem.World
 	return dn.ffi.input_mouse(coordinate:to_number())
 end
 
-function doublenickel.input.mouse_delta(coordinate)
+function dn.input.mouse_delta(coordinate)
 	coordinate = coordinate or CoordinateSystem.World
 	return dn.ffi.input_mouse_delta(coordinate:to_number())
 end
@@ -75,33 +75,33 @@ end
 --------------
 -- CHANNELS --
 --------------
-function doublenickel.input.enable_channel(channel)
-	doublenickel.input.data.channels[channel] = true
+function dn.input.enable_channel(channel)
+	dn.input.data.channels[channel] = true
 end
 
-function doublenickel.input.disable_channel(channel)
-	doublenickel.input.data.channels[channel] = false
+function dn.input.disable_channel(channel)
+	dn.input.data.channels[channel] = false
 end
 
-function doublenickel.input.solo_channel(channel)
-	for channel, _ in pairs(doublenickel.input.data.channels) do
-		doublenickel.input.disable_channel(channel)
+function dn.input.solo_channel(channel)
+	for channel, _ in pairs(dn.input.data.channels) do
+		dn.input.disable_channel(channel)
 	end
 
-	doublenickel.input.enable_channel(channel)
+	dn.input.enable_channel(channel)
 end
 
-function doublenickel.input.is_channel_active(channel)
+function dn.input.is_channel_active(channel)
 	return true
 end
 
 ---------------
 -- INTERNALS --
 ---------------
-local self = doublenickel.input
+local self = dn.input
 
 
-doublenickel.enum.define(
+dn.enum.define(
 	'InputContext',
 	{
 		Editor = 0,
@@ -110,76 +110,76 @@ doublenickel.enum.define(
 )
 
 
-function doublenickel.input.init()
+function dn.input.init()
 	self.internal = {}
-	self.internal.context_stack = doublenickel.data_types.stack:new()
+	self.internal.context_stack = dn.data_types.stack:new()
 end
 
-function doublenickel.input.update()
-	if not doublenickel.tick then
+function dn.input.update()
+	if not dn.tick then
 		self.internal.context_stack:clear()
 
-		local view = doublenickel.find_entity_editor('GameViewManager')
+		local view = dn.find_entity_editor('GameViewManager')
 		if view.hover then
-			self.push_context(doublenickel.enums.InputContext.Game)
+			self.push_context(dn.enums.InputContext.Game)
 		else
-			self.push_context(doublenickel.enums.InputContext.Editor)
+			self.push_context(dn.enums.InputContext.Editor)
 		end
 	end
 end
 
 
-function doublenickel.input.push_context(context)
+function dn.input.push_context(context)
 	self.internal.context_stack:push(context)
 end
 
-function doublenickel.input.pop_context()
+function dn.input.pop_context()
 	self.internal.context_stack:pop()
 end
 
  
-function doublenickel.input.active_context()
+function dn.input.active_context()
 	return self.internal.context_stack:peek()
 end
 
-function doublenickel.input.is_context_active(context)
+function dn.input.is_context_active(context)
 	return self.internal.context_stack:peek() == context
 end
 
-function doublenickel.input.get_input_device()
+function dn.input.get_input_device()
 	return InputDevice:new(dn.ffi.input_get_device())
 end
 
-function doublenickel.input.is_controller_mode()
-	return doublenickel.input.get_input_device() == InputDevice.Controller
+function dn.input.is_controller_mode()
+	return dn.input.get_input_device() == InputDevice.Controller
 end
 
-function doublenickel.input.is_mkb_mode()
-	return doublenickel.input.get_input_device() == InputDevice.MouseAndKeyboard
+function dn.input.is_mkb_mode()
+	return dn.input.get_input_device() == InputDevice.MouseAndKeyboard
 end
 
 -- @refactor: This is action specific. Maybe it's OK here...?
-function doublenickel.input.is_digital_active(name)
+function dn.input.is_digital_active(name)
 	return dn.unported.is_digital_active(name)
 end
 
-function doublenickel.input.was_digital_active(name)
+function dn.input.was_digital_active(name)
 	return dn.unported.was_digital_active(name)
 end
 
-function doublenickel.input.was_digital_pressed(name)
+function dn.input.was_digital_pressed(name)
 	return dn.unported.was_digital_pressed(name)
 end
 
-ContextualInput = doublenickel.class.define('ContextualInput')
+ContextualInput = dn.class.define('ContextualInput')
 
 function ContextualInput:init(context, coordinate)
-	self.context = context or doublenickel.enums.InputContext.Game
-	self.coordinate = coordinate or doublenickel.enums.CoordinateSystem.World
+	self.context = context or dn.enums.InputContext.Game
+	self.coordinate = coordinate or dn.enums.CoordinateSystem.World
 end
 
 function ContextualInput:pressed(key)
-	if doublenickel.input.is_context_active(self.context) then
+	if dn.input.is_context_active(self.context) then
 		return dn.ffi.input_pressed(key)
 	end
 
@@ -187,7 +187,7 @@ function ContextualInput:pressed(key)
 end
 
 function ContextualInput:released(key)
-	if doublenickel.input.is_context_active(self.context) then
+	if dn.input.is_context_active(self.context) then
 		return dn.ffi.input_released(key)
 	end
 
@@ -195,7 +195,7 @@ function ContextualInput:released(key)
 end
 
 function ContextualInput:down(key)
-	if doublenickel.input.is_context_active(self.context) then
+	if dn.input.is_context_active(self.context) then
 		return dn.ffi.input_down(key)
 	end
 
@@ -203,7 +203,7 @@ function ContextualInput:down(key)
 end
 
 function ContextualInput:mod_down(key)
-	if doublenickel.input.is_context_active(self.context) then
+	if dn.input.is_context_active(self.context) then
 		return dn.ffi.input_mod_down(key)
 	end
 
@@ -211,7 +211,7 @@ function ContextualInput:mod_down(key)
 end
 
 function ContextualInput:chord_pressed(mod, key)
-	if doublenickel.input.is_context_active(self.context) then
+	if dn.input.is_context_active(self.context) then
 		return dn.ffi.input_chord_pressed(mod, key)
 	end
 
@@ -219,16 +219,16 @@ function ContextualInput:chord_pressed(mod, key)
 end
 
 function ContextualInput:scroll()
-	if doublenickel.input.is_context_active(self.context) then
-		return doublenickel.vec2(dn.ffi.input_scroll())
+	if dn.input.is_context_active(self.context) then
+		return dn.vec2(dn.ffi.input_scroll())
 	end
 
-	return doublenickel.vec2()
+	return dn.vec2()
 end
 
 function ContextualInput:mouse(coordinate)
 	coordinate = coordinate or self.coordinate
-	return doublenickel.vec2(dn.ffi.input_mouse(coordinate:to_number()))
+	return dn.vec2(dn.ffi.input_mouse(coordinate:to_number()))
 end
 
 function ContextualInput:mouse_delta(coordinate)

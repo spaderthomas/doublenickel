@@ -1,5 +1,5 @@
 -- Assets can be referred to by string or by enum 
-RenderTarget = doublenickel.enum.define(
+RenderTarget = dn.enum.define(
   'RenderTarget',
   {
     Native = 0,
@@ -7,7 +7,7 @@ RenderTarget = doublenickel.enum.define(
 )
 
 -- This is your application's entry point
-local App = doublenickel.define_app()
+local App = dn.define_app()
 
 -- This is the first user code to be called. You provide parameters to initialize the framework's core subsystems. Mostly,
 -- this involves specifying paths and telling the framework what resources to create (e.g. shaders)
@@ -17,13 +17,13 @@ function App:on_init_game()
   -----------------------
   -- APP CONFIGURATION --
   -----------------------
-  doublenickel.paths.load(dn.ffi.paths_resolve_format('dn_app_file', 'data/paths.lua'))
+  dn.paths.load(dn.ffi.paths_resolve_format('dn_app_file', 'data/paths.lua'))
 
   -- The main configuration struct for the framework
   dn.ffi.app_configure(AppConfig:new({
     -- WINDOW
     --
-    -- This is the first time that dn.ffi.paths_resolve_*() shows up. This subsystem of doublenickel is how you should deal
+    -- This is the first time that dn.ffi.paths_resolve_*() shows up. This subsystem of dn is how you should deal
     -- with all paths in your game. It builds absolute paths to resources at runtime. It can also handle format strings,
     -- for e.g. a specific audio file in the well-known audio directory.
     --
@@ -33,7 +33,7 @@ function App:on_init_game()
     window = WindowConfig:new({
       title = 'Hello, DN!',
       native_resolution = self.native_resolution,
-      flags = doublenickel.enum.bitwise_or(
+      flags = dn.enum.bitwise_or(
         WindowFlags.Windowed,
         WindowFlags.Border
       ),
@@ -77,7 +77,7 @@ function App:on_init_game()
   -- you can tell the framework which enums correspond to which types, and it will call ffi.cast() before returning the pointer.
   --
   -- This is entirely optional, inconsequential, and only works if you use enums instead of strings to identify resources.
-  doublenickel.asset.register_cast(RenderTarget, 'dn_gpu_render_target_t')
+  dn.asset.register_cast(RenderTarget, 'dn_gpu_render_target_t')
   
   -- Every app needs a command buffer to write GPU commands into.
   self.command_buffer = dn.ffi.gpu_command_buffer_create(GpuCommandBufferDescriptor:new({
@@ -96,8 +96,8 @@ end
 -- App:on_init_game()'s purpose is to initialize the framework. App:on_start_game()'s purpose is to initialize the game itself. Now that
 -- the framework is fully initialized, and all resources have been loaded, you can do whatever you'd like.
 function App:on_start_game()
-  -- doublenickel opens your game in a framebuffer within an editor window. You can configure that editor window here.
-  doublenickel.editor.configure(EditorConfig:new({
+  -- dn opens your game in a framebuffer within an editor window. You can configure that editor window here.
+  dn.editor.configure(EditorConfig:new({
     grid_enabled = true,
     grid_size = 12,
 
@@ -132,14 +132,14 @@ end
 function App:on_scene_rendered()
   -- dn.ffi.gpu_begin_render_pass(self.command_buffer, self.render_pass)
   -- dn.ffi.gpu_set_world_space(self.command_buffer, true)
-  -- dn.ffi.gpu_set_camera(self.command_buffer, doublenickel.editor.find('EditorCamera').offset:to_ctype())
+  -- dn.ffi.gpu_set_camera(self.command_buffer, dn.editor.find('EditorCamera').offset:to_ctype())
   -- dn.ffi.sdf_renderer_draw(self.sdf_renderer, self.command_buffer)
   -- dn.ffi.gpu_end_render_pass(self.command_buffer)
   -- dn.ffi.gpu_command_buffer_submit(self.command_buffer)
 
   -- dn.ffi.gpu_render_target_blit(
-  --   doublenickel.asset.find(RenderTarget.Native),
-  --   doublenickel.asset.find(RenderTarget.Upscaled)
+  --   dn.asset.find(RenderTarget.Native),
+  --   dn.asset.find(RenderTarget.Upscaled)
   -- )
 end
 

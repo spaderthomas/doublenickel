@@ -1,4 +1,4 @@
-Selectable = doublenickel.component.define('Selectable')
+Selectable = dn.component.define('Selectable')
 
 function Selectable:init()
   self.on_hover = function() end

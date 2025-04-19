@@ -1,4 +1,4 @@
-local Increment = doublenickel.node('Increment')
+local Increment = dn.node('Increment')
 
 Increment.editor_fields = {
   'variable',
@@ -11,7 +11,7 @@ function Increment:init()
 end
 
 function Increment:enter(graph)
-  doublenickel.state.increment(self.variable, self.step)
+  dn.state.increment(self.variable, self.step)
   return dialogue_state.advancing
 end
 

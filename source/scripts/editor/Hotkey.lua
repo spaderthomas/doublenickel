@@ -1,6 +1,6 @@
-local Hotkey = doublenickel.editor.define('Hotkey')
+local Hotkey = dn.editor.define('Hotkey')
 function Hotkey:init()
-	self.input = ContextualInput:new(doublenickel.enums.InputContext.Editor, doublenickel.enums.CoordinateSystem.Game)
+	self.input = ContextualInput:new(dn.enums.InputContext.Editor, dn.enums.CoordinateSystem.Game)
 
   self.game_hotkeys = {
     control = {
@@ -25,21 +25,21 @@ function Hotkey:init()
 end
 
 function Hotkey:update()
-  if doublenickel.is_packaged_build then return end
+  if dn.is_packaged_build then return end
 
   self:check_game_hotkeys()
   self:check_editor_hotkeys()
 end
 
 function Hotkey:check_game_hotkeys()
-  self.input.context = doublenickel.enums.InputContext.Game
+  self.input.context = dn.enums.InputContext.Game
   
   self:check_control_hotkeys(self.game_hotkeys.control)
   self:check_single_hotkeys(self.game_hotkeys.single)
 end
 
 function Hotkey:check_editor_hotkeys()
-  self.input.context = doublenickel.enums.InputContext.Editor
+  self.input.context = dn.enums.InputContext.Editor
 
   self:check_control_hotkeys(self.editor_hotkeys.control)
   self:check_single_hotkeys(self.editor_hotkeys.single)
@@ -62,12 +62,12 @@ function Hotkey:check_single_hotkeys(hotkeys, channel)
 end
 
 function Hotkey:save_dialogue()
-  local dialogue_editor = doublenickel.editor.find('DialogueEditor')
+  local dialogue_editor = dn.editor.find('DialogueEditor')
   dialogue_editor:save(dialogue_editor.loaded)
 end
 
 function Hotkey:new_dialogue()
-  doublenickel.editor.find('MainMenu').open_new_dialogue_modal = true
+  dn.editor.find('MainMenu').open_new_dialogue_modal = true
 end
 
 function Hotkey:open_dialogue()
@@ -77,7 +77,7 @@ function Hotkey:open_dialogue()
 
   -- @hack: I wanted to move the hoykey code out of the main menu, but I forgot that it was
   -- doing more than just drawing a menu. Not a hard fix, just not right now.
-  local main_menu = doublenickel.find_entity_editor('MainMenu')
+  local main_menu = dn.find_entity_editor('MainMenu')
   main_menu.state = 'choosing_dialogue'
 end
 
@@ -85,11 +85,11 @@ end
 -- GAME WINDOW --
 -----------------
 function Hotkey:save_scene()
-  doublenickel.find_entity_editor('SceneEditor'):save()
+  dn.find_entity_editor('SceneEditor'):save()
 end
 
 function Hotkey:toggle_play_mode()
-  doublenickel.find_entity_editor('SceneEditor'):toggle_play_mode()
+  dn.find_entity_editor('SceneEditor'):toggle_play_mode()
 end
 
 function Hotkey:open_scene()
@@ -99,10 +99,10 @@ function Hotkey:open_scene()
 
   -- @hack: I wanted to move the hoykey code out of the main menu, but I forgot that it was
   -- doing more than just drawing a menu. Not a hard fix, just not right now.
-  local main_menu = doublenickel.editor.find('MainMenu')
+  local main_menu = dn.editor.find('MainMenu')
   main_menu.state = 'choosing_scene'
 end
 
 function Hotkey:reset_state()
-  doublenickel.state.load_file('default')
+  dn.state.load_file('default')
 end

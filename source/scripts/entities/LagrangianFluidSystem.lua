@@ -1,4 +1,4 @@
-LagrangianFluidSystem = doublenickel.entity.define('LagrangianFluidSystem')
+LagrangianFluidSystem = dn.entity.define('LagrangianFluidSystem')
 
 LagrangianFluidSystem.editor_fields = {
   'bounding_volume',
@@ -21,10 +21,10 @@ function LagrangianFluidSystem:init(params)
     dt = 1.0 / 60.0
   }
 
-  self.velocity = doublenickel.vec2()
+  self.velocity = dn.vec2()
 
   self.colors = {
-    bounding_volume = doublenickel.colors.paynes_gray:copy()
+    bounding_volume = dn.colors.paynes_gray:copy()
   }
   self.layers = {
     bounding_volume = 100

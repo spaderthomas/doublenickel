@@ -1,13 +1,13 @@
-function doublenickel.callback.register(name, fn)
-  doublenickel.callback.data[name] = fn
+function dn.callback.register(name, fn)
+  dn.callback.data[name] = fn
 end
 
-function doublenickel.callback.find(name)
-  return doublenickel.callback.data[name]
+function dn.callback.find(name)
+  return dn.callback.data[name]
 end
 
-function doublenickel.callback.run(name, ...)
-  local fn = doublenickel.callback.data[name]
+function dn.callback.run(name, ...)
+  local fn = dn.callback.data[name]
   if fn then
     local value = fn(...)
     return value

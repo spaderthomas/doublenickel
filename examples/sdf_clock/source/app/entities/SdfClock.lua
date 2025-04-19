@@ -1,25 +1,25 @@
-SdfClockBubble = doublenickel.class.define('SdfClockBubble')
+SdfClockBubble = dn.class.define('SdfClockBubble')
 function SdfClockBubble:init(params)
   self.sdf = SdfCircle:new({
-    color = doublenickel.colors.indian_red,
+    color = dn.colors.indian_red,
     position = Vector2:new(
-      doublenickel.math.random_float(-params.face_size, params.face_size),
+      dn.math.random_float(-params.face_size, params.face_size),
       -params.face_size
     ),
     rotation = 0,
     radius = 3
   })
 
-  self.speed = doublenickel.math.random_float(0.04, 0.1)
-  self.interpolation = doublenickel.interpolation.SmoothDamp:new({
-    start = self.sdf.radius * doublenickel.math.random_float(0.5, 1.0),
-    target = self.sdf.radius * doublenickel.math.random_float(1.0, 1.5),
+  self.speed = dn.math.random_float(0.04, 0.1)
+  self.interpolation = dn.interpolation.SmoothDamp:new({
+    start = self.sdf.radius * dn.math.random_float(0.5, 1.0),
+    target = self.sdf.radius * dn.math.random_float(1.0, 1.5),
     velocity = 0.05
   })
 end
 
 
-SdfClock = doublenickel.entity.define('SdfClock')
+SdfClock = dn.entity.define('SdfClock')
 function SdfClock:init()
   self.speed = 1
 
@@ -40,18 +40,18 @@ function SdfClock:init()
   }
 
   self.colors = {
-    face = doublenickel.colors.white,
-    border = doublenickel.colors.white,
+    face = dn.colors.white,
+    border = dn.colors.white,
   }
 
-  self.hand_interpolation = doublenickel.interpolation.EaseInOut:new({
+  self.hand_interpolation = dn.interpolation.EaseInOut:new({
     start = 0,
     target = 1,
     exponent = 2,
     time = 0.5
   })
 
-  self.sdf = doublenickel.app.sdf_renderer
+  self.sdf = dn.app.sdf_renderer
 
   self:init_bubbles()
 end
@@ -69,11 +69,11 @@ end
 function SdfClock:draw()
 
   self.colors = {
-    face = doublenickel.colors.white,
-    border = doublenickel.colors.white,
+    face = dn.colors.white,
+    border = dn.colors.white,
   }
 
-  self.accumulated = self.accumulated + doublenickel.dt * self.speed
+  self.accumulated = self.accumulated + dn.dt * self.speed
   while self.accumulated >= 1.0 do
     self.accumulated = self.accumulated - 1.0
     self.time.second = self.time.second + 1
@@ -140,8 +140,8 @@ function SdfClock:draw()
 end
 
 function SdfClock:draw_hand(turns, hand_size, color)
-  local angle = -doublenickel.math.turns_to_rads(turns)
-  local hand_angle = angle + doublenickel.math.pi / 2
+  local angle = -dn.math.turns_to_rads(turns)
+  local hand_angle = angle + dn.math.pi / 2
   local hand_direction = Vector2:new(math.cos(hand_angle), math.sin(hand_angle))
   local hand_center = hand_direction:scale(hand_size.y / 2)
   
@@ -164,8 +164,8 @@ end
 function SdfClock:update_bubbles()
   for bubble in self.bubbles:iterate_values() do
     bubble.sdf.header.position.y = bubble.sdf.header.position.y + bubble.speed
-    if (bubble.sdf.header.position.y - bubble.sdf.radius) > doublenickel.app.native_resolution.y / 2 then
-      bubble.sdf.header.position.y = -doublenickel.app.native_resolution.y / 2 - bubble.sdf.radius
+    if (bubble.sdf.header.position.y - bubble.sdf.radius) > dn.app.native_resolution.y / 2 then
+      bubble.sdf.header.position.y = -dn.app.native_resolution.y / 2 - bubble.sdf.radius
     end
 
     if bubble.interpolation:update() then

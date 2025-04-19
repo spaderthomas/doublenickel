@@ -1,4 +1,4 @@
-local Text = doublenickel.node('Text')
+local Text = dn.node('Text')
 Text.editor_fields = {
   'text',
   'who',
@@ -16,12 +16,12 @@ Text.imgui_ignore = {
 function Text:init()
   self.text = ''
   self.who = ''
-  self.color = doublenickel.colors.white:copy()
+  self.color = dn.colors.white:copy()
   self.color_id = ''
 end
 
 function Text:enter(graph)
-  local history = doublenickel.dialogue.history
+  local history = dn.dialogue.history
   history:add_node(self)
 
   return dialogue_state.advancing

@@ -1,4 +1,4 @@
-function doublenickel.iterator.values(t, filter)
+function dn.iterator.values(t, filter)
   local function iterator()
     if not t then coroutine.yield(nil) end
 
@@ -14,7 +14,7 @@ function doublenickel.iterator.values(t, filter)
   return coroutine.wrap(iterator)
 end
 
-function doublenickel.iterator.keys(t, filter)
+function dn.iterator.keys(t, filter)
   local function iterator()
     if not t then coroutine.yield(nil) end
     
@@ -30,7 +30,7 @@ function doublenickel.iterator.keys(t, filter)
   return coroutine.wrap(iterator)
 end
 
-function doublenickel.iterator.pairs(t, filter)
+function dn.iterator.pairs(t, filter)
   local function iterator()
     if not t then coroutine.yield(nil) end
     
@@ -46,7 +46,7 @@ function doublenickel.iterator.pairs(t, filter)
   return coroutine.wrap(iterator)
 end
 
-function doublenickel.iterator.carray(array, length)
+function dn.iterator.carray(array, length)
   local function iterator()
     for i = 0, length - 1 do
       coroutine.yield(array[i])

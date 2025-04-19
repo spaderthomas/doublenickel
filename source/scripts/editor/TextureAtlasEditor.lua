@@ -1,4 +1,4 @@
-TextureAtlasEditor = doublenickel.editor.define('TextureAtlasEditor')
+TextureAtlasEditor = dn.editor.define('TextureAtlasEditor')
 
 TextureAtlasEditor.popup_kind = {
 	edit = 'edit##texture_atlas_editor'
@@ -17,7 +17,7 @@ function TextureAtlasEditor:init()
 		}
 	})
 
-	self.directories = doublenickel.data_types.array:new()
+	self.directories = dn.data_types.array:new()
 
 	self.atlas_name = ''
 	self.folder = ''
@@ -29,39 +29,39 @@ end
 
 function TextureAtlasEditor:create()
 	self.atlas_name = ''
-	self.directories = doublenickel.data_types.array:new()
+	self.directories = dn.data_types.array:new()
 end
 
 function TextureAtlasEditor:edit(name)
 	self.atlas_name = name
-	self.directories = doublenickel.data_types.array:new()
+	self.directories = dn.data_types.array:new()
 	
-	local atlas = doublenickel.texture.find(self.atlas_name)
+	local atlas = dn.texture.find(self.atlas_name)
 	for index, directory in pairs(atlas.directories) do
 		self.directories:add(directory)
 	end
 end
 
-InputTextField = doublenickel.class.define('InputTextField')
+InputTextField = dn.class.define('InputTextField')
 
 function TextureAtlasEditor:create_popup()
 	if imgui.BeginPopupModal(self.popup_kind.edit) then
 		imgui.InputText(self.ids.name, self, 'atlas_name')
 		local name_empty = #self.atlas_name == 0
-		local name_valid = doublenickel.is_extension(self.atlas_name, '.png')
+		local name_valid = dn.is_extension(self.atlas_name, '.png')
 
 		imgui.SameLine()
-		imgui.PushStyleColor(ffi.C.ImGuiCol_Button, doublenickel.colors32.button_red_dark)
+		imgui.PushStyleColor(ffi.C.ImGuiCol_Button, dn.colors32.button_red_dark)
 		if imgui.Button('Delete Atlas') then
-			doublenickel.texture.delete(self.atlas_name)
-			doublenickel.texture.save()
+			dn.texture.delete(self.atlas_name)
+			dn.texture.save()
 			imgui.CloseCurrentPopup()
 		end
 		imgui.PopStyleColor()
 
 		-- List all current directories in the atlas, with a button to remove
 		local dirs_valid = true
-		local remove = doublenickel.data_types.array:new()
+		local remove = dn.data_types.array:new()
 		for index, directory in self.directories:iterate() do
 			local label = string.format('%s:%s', directory, index)
 
@@ -70,7 +70,7 @@ function TextureAtlasEditor:create_popup()
 			imgui.Text(directory)
 
 			imgui.SameLine()
-			imgui.PushStyleColor(ffi.C.ImGuiCol_Button, doublenickel.colors32.button_red)
+			imgui.PushStyleColor(ffi.C.ImGuiCol_Button, dn.colors32.button_red)
 			local delete_label = string.format('Remove##%s', label)
 			if imgui.Button(delete_label) then
 				remove:add(index)
@@ -79,11 +79,11 @@ function TextureAtlasEditor:create_popup()
 
 			imgui.SameLine()
 			if dn.ffi.os_does_path_exist(full_path) then
-				imgui.PushStyleColor(ffi.C.ImGuiCol_Text, doublenickel.colors32.button_green)
+				imgui.PushStyleColor(ffi.C.ImGuiCol_Text, dn.colors32.button_green)
 				imgui.Text('(OK)')
 				imgui.PopStyleColor()
 			else
-				imgui.PushStyleColor(ffi.C.ImGuiCol_Text, doublenickel.colors32.button_red)
+				imgui.PushStyleColor(ffi.C.ImGuiCol_Text, dn.colors32.button_red)
 				imgui.Text('(BAD)')
 				imgui.PopStyleColor()
 
@@ -104,14 +104,14 @@ function TextureAtlasEditor:create_popup()
 		imgui.SameLine()
 
 		if folder_valid and not folder_empty then
-			imgui.PushStyleColor(ffi.C.ImGuiCol_Button, doublenickel.colors32.button_green)
+			imgui.PushStyleColor(ffi.C.ImGuiCol_Button, dn.colors32.button_green)
 			folder_entered = imgui.Button('Add Folder') or folder_entered
 			if folder_entered then
 				self.directories:add(self.folder)
 			end
 			imgui.PopStyleColor()
 		else
-			imgui.PushStyleColor(ffi.C.ImGuiCol_Text, doublenickel.colors32.button_red)
+			imgui.PushStyleColor(ffi.C.ImGuiCol_Text, dn.colors32.button_red)
 			imgui.Text('Invalid folder')
 			imgui.PopStyleColor()
 		end
@@ -133,28 +133,28 @@ function TextureAtlasEditor:create_popup()
 
 		local valid = name_valid and dirs_valid and not name_empty
 		if valid then
-			imgui.PushStyleColor(ffi.C.ImGuiCol_Button, doublenickel.colors32.button_green)
+			imgui.PushStyleColor(ffi.C.ImGuiCol_Button, dn.colors32.button_green)
 			if imgui.Button('Save') then
-				local atlas = doublenickel.texture.find(self.atlas_name)
+				local atlas = dn.texture.find(self.atlas_name)
 				atlas.directories = table.deep_copy(self.directories.data)
 				atlas.hash = 0
 				atlas.mod_time = 0
 				atlas.name = self.atlas_name
 
-				doublenickel.texture.save()
+				dn.texture.save()
 
 				self.directories:clear()
 			end
 			imgui.PopStyleColor()
 		else
-			imgui.PushStyleColor(ffi.C.ImGuiCol_Button, doublenickel.colors32.button_gray)
+			imgui.PushStyleColor(ffi.C.ImGuiCol_Button, dn.colors32.button_gray)
 			imgui.Button('Save')
 			imgui.PopStyleColor()
 		end
 
 
 		imgui.SameLine()
-		imgui.PushStyleColor(ffi.C.ImGuiCol_Button, doublenickel.colors32.button_red)
+		imgui.PushStyleColor(ffi.C.ImGuiCol_Button, dn.colors32.button_red)
 		if imgui.Button('Cancel') then
 			imgui.CloseCurrentPopup()
 		end

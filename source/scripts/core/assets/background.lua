@@ -1,23 +1,23 @@
-function doublenickel.background.init()
-  doublenickel.background.data = {}
+function dn.background.init()
+  dn.background.data = {}
 	-- local info = dn.ffi.paths_resolve('background_info')
   -- if dn.ffi.os_does_path_exist(info) then
-	-- 	doublenickel.background.data = doublenickel.module.read_from_named_path('background_info')
+	-- 	dn.background.data = dn.module.read_from_named_path('background_info')
 	-- else
-	-- 	doublenickel.background.data = {}
+	-- 	dn.background.data = {}
   -- end
 end
 
-function doublenickel.background.save()
-	doublenickel.module.write_to_named_path('background_info', doublenickel.background.data, doublenickel.module.WriteOptions.Pretty)
+function dn.background.save()
+	dn.module.write_to_named_path('background_info', dn.background.data, dn.module.WriteOptions.Pretty)
 end
 
-function doublenickel.background.find(name)
-	return doublenickel.background.data[name]
+function dn.background.find(name)
+	return dn.background.data[name]
 end
 
-function doublenickel.background.add(name, file)
-	doublenickel.background.data[name] = {
+function dn.background.add(name, file)
+	dn.background.data[name] = {
 		mod_time = 0,
 		size = {
 			x = 0,
@@ -28,6 +28,6 @@ function doublenickel.background.add(name, file)
 	}
 end
 
-function doublenickel.background.remove(name)
-	doublenickel.background.data[name] = nil
+function dn.background.remove(name)
+	dn.background.data[name] = nil
 end

@@ -21,7 +21,7 @@
 -- IMGUI_LAYER_1
 function imgui.internal.init_c_api()
   imgui.internal.dll = ffi.load('cimgui.dll')
-	local header = doublenickel.module.read_from_named_path('cimgui_header')
+	local header = dn.module.read_from_named_path('cimgui_header')
 	ffi.cdef(header)
 end
 
@@ -188,7 +188,7 @@ function imgui.internal.init_lua_api_overwrites()
 		dn.ffi.cstr_copy_to_n(value, len, buffer, buffer_len)
 	
 		flags = flags or 0
-		flags = bitwise(doublenickel.op_or, flags, ffi.C.ImGuiInputTextFlags_CallbackResize)
+		flags = bitwise(dn.op_or, flags, ffi.C.ImGuiInputTextFlags_CallbackResize)
 		local callback = empty_resize_callback
 		local userdata = nil
 		local changed = imgui.internal.dll.igInputText(label, buffer, buffer_len, flags, callback, userdata)
@@ -218,7 +218,7 @@ function imgui.internal.init_lua_api_overwrites()
 		local ref_col = nil
 		local changed = imgui.internal.dll.igColorPicker4(label, value, flags, ref_col)
 	
-		t[k] = doublenickel.color(value)
+		t[k] = dn.color(value)
 	
 		return changed
 	end

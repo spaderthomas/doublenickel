@@ -1,5 +1,5 @@
 
-SdfRenderer = doublenickel.class.metatype('dn_sdf_renderer_t', 'dn_sdf')
+SdfRenderer = dn.class.metatype('dn_sdf_renderer_t', 'dn_sdf')
 function SdfRenderer:init(params)
 	self = dn.unported.sdf_renderer_create(params.buffer_size)
 end
@@ -30,18 +30,18 @@ function SdfRenderer:circle(params)
 	)
 end
 
-SdfInstance = doublenickel.class.metatype('dn_sdf_instance_t')
+SdfInstance = dn.class.metatype('dn_sdf_instance_t')
 function SdfInstance:init(params)
 	self.buffer_index = params.buffer_index or 0
-	self.kind = doublenickel.enum.is_enum(params.kind) and params.kind:to_number() or params.kind
+	self.kind = dn.enum.is_enum(params.kind) and params.kind:to_number() or params.kind
 end
 
-SdfCombineHeader = doublenickel.class.metatype('dn_sdf_combine_header_t')
+SdfCombineHeader = dn.class.metatype('dn_sdf_combine_header_t')
 function SdfCombineHeader:init(params)
 	self.num_sdfs = params.num_sdfs
 end
 
-SdfCombineEntry = doublenickel.class.metatype('dn_sdf_combine_entry_t')
+SdfCombineEntry = dn.class.metatype('dn_sdf_combine_entry_t')
 function SdfCombineEntry:init(params)
 	self.kind = params.kind
 	self.buffer_index = params.buffer_index
@@ -49,10 +49,10 @@ function SdfCombineEntry:init(params)
 	self.kernel = params.kernel:to_number()
 end
 
-SdfHeader = doublenickel.class.metatype('dn_sdf_header_t')
+SdfHeader = dn.class.metatype('dn_sdf_header_t')
 function SdfHeader:init(params)
 	self.shape = params.shape:to_number()
-	self.color = doublenickel.color(params.color):to_vec3()
+	self.color = dn.color(params.color):to_vec3()
   self.position = Vector2:new(params.position.x or 0, params.position.y or 0)
   self.rotation = params.rotation or 0
 	self.edge_thickness = params.edge_thickness or 1
@@ -68,14 +68,14 @@ function SdfHeader:init_raw(params)
 	return header
 end
 
-SdfCircle = doublenickel.class.metatype('dn_sdf_circle_t')
+SdfCircle = dn.class.metatype('dn_sdf_circle_t')
 function SdfCircle:init(params)
 	params.shape = Sdf.Circle
 	self.header = SdfHeader:new(params)
   self.radius = params.radius or 10
 end
 
-SdfRing = doublenickel.class.metatype('dn_sdf_ring_t')
+SdfRing = dn.class.metatype('dn_sdf_ring_t')
 function SdfRing:init(params)
 	params.shape = Sdf.Ring
 	self.header = SdfHeader:new(params)
@@ -83,7 +83,7 @@ function SdfRing:init(params)
   self.outer_radius = params.outer_radius or 20
 end
 
-SdfOrientedBox = doublenickel.class.metatype('dn_sdf_oriented_box_t')
+SdfOrientedBox = dn.class.metatype('dn_sdf_oriented_box_t')
 function SdfOrientedBox:init(params)
 	params.shape = Sdf.OrientedBox
 	self.header = SdfHeader:new(params)

@@ -1,6 +1,6 @@
-local self = doublenickel.window
+local self = dn.window
 
-doublenickel.window.states = doublenickel.enum.define(
+dn.window.states = dn.enum.define(
   'WindowAnimationState',
   {
     Idle = 0,
@@ -8,17 +8,17 @@ doublenickel.window.states = doublenickel.enum.define(
   }
 )
 
-function doublenickel.window.init()
-  doublenickel.dn_log('doublenickel.window.init')
+function dn.window.init()
+  dn.ffi.log('dn.window.init')
   self.state = self.states.Idle
 
   self.display_mode = dn.ffi.window_get_display_mode()
   self.interpolation = {
-    window_size = doublenickel.interpolation.EaseInOut2:new({ time = 1, exponent = 3 })
+    window_size = dn.interpolation.EaseInOut2:new({ time = 1, exponent = 3 })
   }
 end
 
-function doublenickel.window.update()
+function dn.window.update()
   if self.state == self.states.Idle then
 
   elseif self.state == self.states.Interpolate then
@@ -33,9 +33,9 @@ function doublenickel.window.update()
   end
 end
 
-function doublenickel.window.animate_display_mode(display_mode)
-  local was_full_screen = self.display_mode == doublenickel.enums.DisplayMode.Fullscreen
-  local is_full_screen = display_mode == doublenickel.enums.DisplayMode.Fullscreen
+function dn.window.animate_display_mode(display_mode)
+  local was_full_screen = self.display_mode == dn.enums.DisplayMode.Fullscreen
+  local is_full_screen = display_mode == dn.enums.DisplayMode.Fullscreen
   if was_full_screen or is_full_screen or dn.ffi.steam_is_deck() then
     dn.ffi.window_set_display_mode(display_mode)
     self.display_mode = display_mode
@@ -47,25 +47,25 @@ function doublenickel.window.animate_display_mode(display_mode)
 
 
   local current_size = dn.ffi.window_get_content_area()
-  current_size = doublenickel.vec2(current_size.x, current_size.y)
-  local target_size = doublenickel.vec2()
+  current_size = dn.vec2(current_size.x, current_size.y)
+  local target_size = dn.vec2()
 
-  if self.display_mode == doublenickel.enums.DisplayMode.p480 then
+  if self.display_mode == dn.enums.DisplayMode.p480 then
     target_size.x = 854
     target_size.y = 480
-  elseif self.display_mode == doublenickel.enums.DisplayMode.p720 then
+  elseif self.display_mode == dn.enums.DisplayMode.p720 then
     target_size.x = 1280
     target_size.y = 720
-  elseif self.display_mode == doublenickel.enums.DisplayMode.p1280_800 then
+  elseif self.display_mode == dn.enums.DisplayMode.p1280_800 then
     target_size.x = 1280
     target_size.y = 800
-  elseif self.display_mode == doublenickel.enums.DisplayMode.p1080 then
+  elseif self.display_mode == dn.enums.DisplayMode.p1080 then
     target_size.x = 1920
     target_size.y = 1080
-  elseif self.display_mode == doublenickel.enums.DisplayMode.p1440 then
+  elseif self.display_mode == dn.enums.DisplayMode.p1440 then
     target_size.x = 2560
     target_size.y = 1440
-  elseif self.display_mode == doublenickel.enums.DisplayMode.p2160 then
+  elseif self.display_mode == dn.enums.DisplayMode.p2160 then
     target_size.x = 3840
     target_size.y = 2160
   end
@@ -77,19 +77,19 @@ function doublenickel.window.animate_display_mode(display_mode)
 end
 
 
-function doublenickel.window.get_game_area_size()
+function dn.window.get_game_area_size()
   local data = dn.ffi.coord_get()
-  return doublenickel.vec2(data.framebuffer_size.x, data.framebuffer_size.y)
+  return dn.vec2(data.framebuffer_size.x, data.framebuffer_size.y)
 end
 
-function doublenickel.window.set_game_area_size(size)
+function dn.window.set_game_area_size(size)
   dn.ffi.coord_set_framebuffer_size(size.x, size.y)
 end
 
-function doublenickel.window.set_game_area_position(position)
+function dn.window.set_game_area_position(position)
   dn.ffi.coord_set_framebuffer_position(position.x, position.y)
 end
 
-function doublenickel.window.dn_window_get_native_resolution()
-	return doublenickel.vec2(dn.ffi.window_get_native_resolution())
+function dn.window.dn_window_get_native_resolution()
+	return dn.vec2(dn.ffi.window_get_native_resolution())
 end

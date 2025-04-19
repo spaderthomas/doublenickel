@@ -1,4 +1,4 @@
-DialogueController = doublenickel.class.define('DialogueController')
+DialogueController = dn.class.define('DialogueController')
 
 dialogue_state = {
   err            = 'err',
@@ -21,37 +21,37 @@ function DialogueController:play_dialogue(dialogue)
   self:load_dialogue(dialogue)
 
   -- AUDIO
-  doublenickel.audio.play(self.data.metadata.sound_begin)
+  dn.audio.play(self.data.metadata.sound_begin)
 
   -- INPUT
-  doublenickel.find_entity('GameState'):enter_state(doublenickel.enums.GameMode.Dialogue) -- @refactor
+  dn.find_entity('GameState'):enter_state(dn.enums.GameMode.Dialogue) -- @refactor
 
   -- HISTORY
-  local history = doublenickel.dialogue.history
+  local history = dn.dialogue.history
   history:clear()
 
   -- UI
-  local layout = doublenickel.find_entity('DialogueLayout') -- @refactor
+  local layout = dn.find_entity('DialogueLayout') -- @refactor
   layout:show()
 
   -- CAMERA
-  local camera = doublenickel.find_entity('Camera') -- @refactor
+  local camera = dn.find_entity('Camera') -- @refactor
   camera:interpolate_to_dialogue()
   camera:stop_after_interpolate()
 end
 
 function DialogueController:stop_dialogue()
   -- AUDIO
-  doublenickel.audio.play(self.data.metadata.sound_end)
+  dn.audio.play(self.data.metadata.sound_end)
 
   -- INPUT
-  doublenickel.find_entity('GameState'):enter_state(doublenickel.enums.GameMode.Game) -- @refactor
+  dn.find_entity('GameState'):enter_state(dn.enums.GameMode.Game) -- @refactor
 
   -- UI
-  doublenickel.find_entity('DialogueLayout'):hide() -- @refactor
+  dn.find_entity('DialogueLayout'):hide() -- @refactor
 
   -- CAMERA
-  local camera = doublenickel.find_entity('Camera')
+  local camera = dn.find_entity('Camera')
   camera:interpolate_to_player()
 
   self:mark_for_unload()
@@ -59,7 +59,7 @@ end
 
 function DialogueController:load_dialogue(dialogue)
   if not dialogue then
-    doublenickel.dn_log(string.format('controller got bad dialogue param, dialogue = %s', dialogue))
+    dn.ffi.log(string.format('controller got bad dialogue param, dialogue = %s', dialogue))
     self:update_state(dialogue_state.err)
     return
   end
@@ -67,7 +67,7 @@ function DialogueController:load_dialogue(dialogue)
   self.current_dialogue = dialogue
 
   -- Load the dialogue
-  self.data = doublenickel.dialogue.load(self.current_dialogue)
+  self.data = dn.dialogue.load(self.current_dialogue)
   if not self.data then
     self:update_state(dialogue_state.err)
     return
@@ -99,14 +99,14 @@ function DialogueController:change_dialogue(dialogue)
   -- Load a new dialogue, but without totally reinitializing ourselves. This is used when switching between dialogues in
   -- one interaction (like for a Call)
   if not dialogue then
-    doublenickel.dn_log(string.format('DialogueController::change_dialogue(): bad dialogue, name = %s', dialogue))
+    dn.ffi.log(string.format('DialogueController::change_dialogue(): bad dialogue, name = %s', dialogue))
     self:update_state(dialogue_state.err)
     return
   end
 
   self.current_dialogue = dialogue
 
-  self.data = doublenickel.dialogue.load(self.current_dialogue)
+  self.data = dn.dialogue.load(self.current_dialogue)
   if not self.data then
     self:update_state(dialogue_state.err)
     return
@@ -141,7 +141,7 @@ function DialogueController:update()
   elseif self.state == dialogue_state.advancing then
     self:try_advance_until_processing()
   elseif self.state == dialogue_state.processing then
-    self:process(doublenickel.dt)
+    self:process(dn.dt)
     self:try_advance_until_processing()
   elseif self.state == dialogue_state.done then
     self.state = dialogue_state.idle
@@ -167,7 +167,7 @@ end
 
 function DialogueController:advance_single()
   local next_node = self.current:advance(self.data.nodes)
-  if not next_node then doublenickel.debug.open_debugger() end
+  if not next_node then dn.debug.open_debugger() end
 
   self.current = next_node
 end
@@ -175,7 +175,7 @@ end
 function DialogueController:enter_current()
   if not self.current then return end
 
-  --doublenickel.analytics.add_node(self.current.uuid) -- @refactor
+  --dn.analytics.add_node(self.current.uuid) -- @refactor
   local state = self.current:enter(self.data.nodes)
   self:update_state(state)
 end
@@ -207,9 +207,9 @@ end
 
 function DialogueController:is_choice()
   if not self.current then return end
-  if self.current.kind == doublenickel.dialogue.node_kind.ChoiceList then return true end
-  if self.current.kind == doublenickel.dialogue.node_kind.Tithonus then return true end -- @refactor
-  if self.current.kind == doublenickel.dialogue.node_kind.ItemList then return true end
+  if self.current.kind == dn.dialogue.node_kind.ChoiceList then return true end
+  if self.current.kind == dn.dialogue.node_kind.Tithonus then return true end -- @refactor
+  if self.current.kind == dn.dialogue.node_kind.ItemList then return true end
 
   return false
 end
@@ -223,12 +223,12 @@ end
 
 function DialogueController:is_continue()
   if not self.current then return end
-  return self.current.kind == doublenickel.dialogue.node_kind.Continue
+  return self.current.kind == dn.dialogue.node_kind.Continue
 end
 
 function DialogueController:is_end()
   if not self.current then return end
-  if self.current.kind == doublenickel.dialogue.node_kind.End then return true end
+  if self.current.kind == dn.dialogue.node_kind.End then return true end
   return false
 end
 

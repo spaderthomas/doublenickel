@@ -1,4 +1,4 @@
-Popups = doublenickel.class.define('Popups')
+Popups = dn.class.define('Popups')
 
 function Popups:init(popups)
   self.popups = popups

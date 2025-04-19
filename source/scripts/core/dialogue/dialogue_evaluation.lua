@@ -1,45 +1,45 @@
 ------------
 -- ENUMS  --
 ------------
-doublenickel.branch_ops = {
+dn.branch_ops = {
   eq = 1,
   geq = 2,
   leq = 3,
 }
 
-doublenickel.branch_op_names = {
-  [doublenickel.branch_ops.eq] = '==',
-  [doublenickel.branch_ops.geq] = '>=',
-  [doublenickel.branch_ops.leq] = '<=',
+dn.branch_op_names = {
+  [dn.branch_ops.eq] = '==',
+  [dn.branch_ops.geq] = '>=',
+  [dn.branch_ops.leq] = '<=',
 }
 
-doublenickel.branch_op_symbols = {
-  [doublenickel.branch_ops.eq] = '==',
-  [doublenickel.branch_ops.geq] = '>=',
-  [doublenickel.branch_ops.leq] = '<=',
+dn.branch_op_symbols = {
+  [dn.branch_ops.eq] = '==',
+  [dn.branch_ops.geq] = '>=',
+  [dn.branch_ops.leq] = '<=',
 }
 
-doublenickel.branch_combinators = {
+dn.branch_combinators = {
   op_and = 1,
   op_or  = 2
 }
 
-doublenickel.branch_combinator_names = {
-  [doublenickel.branch_combinators.op_and] = 'and',
-  [doublenickel.branch_combinators.op_or]  = 'or',
+dn.branch_combinator_names = {
+  [dn.branch_combinators.op_and] = 'and',
+  [dn.branch_combinators.op_or]  = 'or',
 }
 
-doublenickel.branch_compatibility = {
+dn.branch_compatibility = {
   ['number'] = {
-    doublenickel.branch_ops.eq,
-    doublenickel.branch_ops.geq,
-    doublenickel.branch_ops.leq,
+    dn.branch_ops.eq,
+    dn.branch_ops.geq,
+    dn.branch_ops.leq,
   },
   ['boolean'] = {
-    doublenickel.branch_ops.eq,
+    dn.branch_ops.eq,
   },
   ['string'] = {
-    doublenickel.branch_ops.eq,
+    dn.branch_ops.eq,
   }
 }
 
@@ -50,7 +50,7 @@ doublenickel.branch_compatibility = {
 function make_default_branch()
   local default = {
     variable = 'Fallback.FallbackState',
-    op = doublenickel.branch_ops.eq,
+    op = dn.branch_ops.eq,
     value = true
   }
   return default
@@ -61,7 +61,7 @@ end
 -- BRANCH COMPATIBILITY --
 --------------------------
 function get_valid_ops_for_value(value)
-  return doublenickel.branch_compatibility[type(value)]
+  return dn.branch_compatibility[type(value)]
 end
 
 
@@ -114,9 +114,9 @@ function evaluate_branches(branches, combinator)
     if outcome.pass == true then has_true = true end
   end
 
-  if combinator == doublenickel.branch_combinators.op_and then
+  if combinator == dn.branch_combinators.op_and then
     return (not has_false), outcomes
-  elseif combinator == doublenickel.branch_combinators.op_or then
+  elseif combinator == dn.branch_combinators.op_or then
     return has_true, outcomes
   end
 end
@@ -126,15 +126,15 @@ function evaluate_single_branch(branch)
   local outcome = nil
   local roll = 0
   local stat = 0
-  if branch.op == doublenickel.branch_ops.eq then
-    --local outcome = doublenickel.state.find(branch.variable)
-    outcome = index_string(doublenickel.state.data, branch.variable)
+  if branch.op == dn.branch_ops.eq then
+    --local outcome = dn.state.find(branch.variable)
+    outcome = index_string(dn.state.data, branch.variable)
     pass = branch.value == outcome
-  elseif branch.op == doublenickel.branch_ops.geq then
-    outcome = index_string(doublenickel.state.data, branch.variable)
+  elseif branch.op == dn.branch_ops.geq then
+    outcome = index_string(dn.state.data, branch.variable)
     pass = outcome >= branch.value
-  elseif branch.op == doublenickel.branch_ops.leq then
-    outcome = index_string(doublenickel.state.data, branch.variable)
+  elseif branch.op == dn.branch_ops.leq then
+    outcome = index_string(dn.state.data, branch.variable)
     pass = outcome < branch.value
   end
 

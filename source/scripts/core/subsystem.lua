@@ -1,27 +1,27 @@
-local module = doublenickel.subsystem
+local module = dn.subsystem
 
-function doublenickel.subsystem.init()
-  dn.ffi.log('doublenickel.subsystem.init')
+function dn.subsystem.init()
+  dn.ffi.log('dn.subsystem.init')
   module.subsystems = {}
-  for name, class in pairs(doublenickel.subsystem.types) do
+  for name, class in pairs(dn.subsystem.types) do
     module.subsystems[name] = class:new()
   end
 end
 
-function doublenickel.subsystem.define(name)
-  local class = doublenickel.class.define(name)
+function dn.subsystem.define(name)
+  local class = dn.class.define(name)
   class:include_lifecycle()
   class:include_update()
 
-  doublenickel.subsystem.types[name] = class
+  dn.subsystem.types[name] = class
   return class
 end
 
-function doublenickel.subsystem.find(name)
+function dn.subsystem.find(name)
   return module.subsystems[name]
 end
 
-function doublenickel.subsystem.update()
+function dn.subsystem.update()
   for _, subsystem in pairs(module.subsystems) do
     subsystem:update()
   end

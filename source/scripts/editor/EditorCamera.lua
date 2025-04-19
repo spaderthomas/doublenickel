@@ -1,12 +1,12 @@
-EditorCamera = doublenickel.editor.define('EditorCamera')
+EditorCamera = dn.editor.define('EditorCamera')
 
 function EditorCamera:init()
-  self.offset = doublenickel.vec2()
+  self.offset = dn.vec2()
   self.enabled = true
 end
 
 function EditorCamera:update()
-  if doublenickel.tick then return end
+  if dn.tick then return end
   dn.unported.set_camera(self.offset:floor():unpack())
 end
 

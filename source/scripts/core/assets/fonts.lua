@@ -1,6 +1,6 @@
 
-function doublenickel.fonts.build(data)
-  doublenickel.fonts.data = data
+function dn.fonts.build(data)
+  dn.fonts.data = data
 
   local allocator = dn.ffi.allocator_find('bump')
   local descriptors = allocator:alloc_array('dn_font_descriptor_t', #data)

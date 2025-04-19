@@ -5,7 +5,7 @@ of some poor choices, all the component classes get their virtual methods assign
 not where the instance is defined. So, I hack around this by instantiating the component in the
 usual code path.
 
-Better would be to make doublenickel.component() which assigns directly to the class
+Better would be to make dn.component() which assigns directly to the class
 
 
 ORPHAN_COLLIDERS

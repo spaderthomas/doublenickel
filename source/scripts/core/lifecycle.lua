@@ -1,4 +1,4 @@
-doublenickel.lifecycle.callbacks = doublenickel.enum.define(
+dn.lifecycle.callbacks = dn.enum.define(
   'LifecycleCallback',
   {
     on_begin_frame = 0,
@@ -15,7 +15,7 @@ doublenickel.lifecycle.callbacks = doublenickel.enum.define(
   }
 )
 
-doublenickel.lifecycle.update_callbacks = doublenickel.enum.define(
+dn.lifecycle.update_callbacks = dn.enum.define(
   'UpdateCallback',
   {
     update = 0,
@@ -29,7 +29,7 @@ doublenickel.lifecycle.update_callbacks = doublenickel.enum.define(
 )
 
 
-function doublenickel.lifecycle.run_callback(callback_id)
+function dn.lifecycle.run_callback(callback_id)
   dn.ffi.trace('dn.ffi.lifecycle.run_callback', callback_id.to_string())
 
   local function run_callback(objects)
@@ -39,6 +39,6 @@ function doublenickel.lifecycle.run_callback(callback_id)
     end
   end
 
-  run_callback(doublenickel.editor.entities)
-  run_callback(doublenickel.subsystem.subsystems)
+  run_callback(dn.editor.entities)
+  run_callback(dn.subsystem.subsystems)
 end

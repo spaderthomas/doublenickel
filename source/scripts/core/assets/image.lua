@@ -1,4 +1,4 @@
-doublenickel.layers = {
+dn.layers = {
   editor = 5,
   background = 5,
   foreground = 25,
@@ -14,23 +14,23 @@ doublenickel.layers = {
   ui = 100,
 }
 
-function doublenickel.animation.init()
-  doublenickel.animation.data = {}
+function dn.animation.init()
+  dn.animation.data = {}
   -- local info = dn.ffi.paths_resolve('animation_info')
   -- if dn.ffi.os_does_path_exist(info) then
-  --   doublenickel.animation.data = doublenickel.module.read_from_named_path('animation_info')
+  --   dn.animation.data = dn.module.read_from_named_path('animation_info')
   -- else
-  --   doublenickel.animation.data = {}
+  --   dn.animation.data = {}
   -- end
 
 end
 
-function doublenickel.animation.save()
-  doublenickel.module.write_to_named_path('animation_info', doublenickel.animation.data, doublenickel.module.WriteOptions.Pretty)
+function dn.animation.save()
+  dn.module.write_to_named_path('animation_info', dn.animation.data, dn.module.WriteOptions.Pretty)
 end
 
-function doublenickel.animation.find(animation)
-  for name, data in doublenickel.animation.iterate() do
+function dn.animation.find(animation)
+  for name, data in dn.animation.iterate() do
     if name == animation then return data end
   end
 
@@ -43,14 +43,14 @@ function doublenickel.animation.find(animation)
   }
 end
 
-function doublenickel.animation.add(name, data)
-  doublenickel.animation.data[name] = table.deep_copy(data)
+function dn.animation.add(name, data)
+  dn.animation.data[name] = table.deep_copy(data)
 end
 
-function doublenickel.animation.remove(name)
-  doublenickel.animation.data[name] = nil
+function dn.animation.remove(name)
+  dn.animation.data[name] = nil
 end
 
-function doublenickel.animation.iterate()
-  return pairs(doublenickel.animation.data)
+function dn.animation.iterate()
+  return pairs(dn.animation.data)
 end

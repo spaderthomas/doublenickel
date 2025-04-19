@@ -1,6 +1,6 @@
-Collider = doublenickel.component.define('Collider')
+Collider = dn.component.define('Collider')
 
-doublenickel.enum.define(
+dn.enum.define(
 	'ColliderShape',
 	{
 		Box = 0,
@@ -9,7 +9,7 @@ doublenickel.enum.define(
 	}
 )
 
-Collider.kinds = doublenickel.enum.define(
+Collider.kinds = dn.enum.define(
 	'ColliderKind',
 	{
 		Static = 0,
@@ -27,12 +27,12 @@ Collider.editor_fields = {
 }
 
 function Collider:init(params)
-	local shape = doublenickel.enum.load(params.shape) or doublenickel.enums.ColliderShape.Box
+	local shape = dn.enum.load(params.shape) or dn.enums.ColliderShape.Box
 	self:set_shape(shape, params.impl)
 
-	self.kind = doublenickel.enum.load(params.kind) or doublenickel.enums.ColliderKind.Static
+	self.kind = dn.enum.load(params.kind) or dn.enums.ColliderKind.Static
 	self.attached = params.attached or ''
-	self.attach_offset = params.attach_offset or doublenickel.vec2()
+	self.attach_offset = params.attach_offset or dn.vec2()
 
 	if params.world_space ~= nil then
 		self.world_space = params.world_space
@@ -43,7 +43,7 @@ function Collider:init(params)
 	local editor_callbacks = {
     on_change_field = function(field) self:on_change_field(field) end,
   }
-  doublenickel.editor.set_editor_callbacks(self, editor_callbacks)
+  dn.editor.set_editor_callbacks(self, editor_callbacks)
 end
 
 function Collider:on_change_field(field)
@@ -56,19 +56,19 @@ function Collider:is_attached() return #self.attached > 0 end
 
 function Collider:attach(entity_uuid, attach_offset)
 	self.attached = entity_uuid
-	self.attach_offset = attach_offset or doublenickel.vec2()
+	self.attach_offset = attach_offset or dn.vec2()
 	self:update()
 end
 
 function Collider:unattach()
 	self.attached = nil
-	self.attach_offset = doublenickel.vec2()
+	self.attach_offset = dn.vec2()
 	self:update()
 end
 
 function Collider:update()
 	if self.attached and #self.attached > 0 then
-		local entity = doublenickel.find_entity_by_uuid(self.attached)
+		local entity = dn.find_entity_by_uuid(self.attached)
 		if not entity then return end
 
 		local collider = entity:find_component('Collider')
@@ -101,11 +101,11 @@ function Collider:set_shape(shape, params)
 	params.position = params.position or self.impl and self.impl.position
 
 	self.shape = shape
-	if self.shape == doublenickel.enums.ColliderShape.Box then
+	if self.shape == dn.enums.ColliderShape.Box then
 		self.impl = ColliderBox:new(params)
-	elseif self.shape == doublenickel.enums.ColliderShape.Circle then
+	elseif self.shape == dn.enums.ColliderShape.Circle then
 		self.impl = ColliderCircle:new(params)
-	elseif self.shape == doublenickel.enums.ColliderShape.Capsule then
+	elseif self.shape == dn.enums.ColliderShape.Capsule then
 		self.impl = ColliderCapsule:new(params)
 	end
 
@@ -127,9 +127,9 @@ end
 function Collider:make(data)
 	local collider = add_component(
 		nil, 'Collider', data or {
-			shape = doublenickel.enums.ColliderShape.Circle,
+			shape = dn.enums.ColliderShape.Circle,
 			world_space = false,
-			impl = { position = doublenickel.vec2(100, 100), radius = 100 }
+			impl = { position = dn.vec2(100, 100), radius = 100 }
 		})
 	return collider
 end
@@ -156,7 +156,7 @@ function Collider:get_height() return self.impl:get_height() end
 function Collider:get_width() return self.impl:get_width() end
 
 function Collider:get_dimension()
-	return doublenickel.vec2(self.impl:get_width(), self.impl:get_height())
+	return dn.vec2(self.impl:get_width(), self.impl:get_height())
 end
 
 function Collider:get_center() return self.impl:get_center() end
@@ -197,8 +197,8 @@ function Collider:is_point_inside(point) return self.impl:is_point_inside(point)
 
 function Collider:is_cursor_inside()
 	local coord = ternary(
-		self:is_world_space(), doublenickel.coordinate.world,
-		doublenickel.coordinate.game)
-	local mouse = doublenickel.vec2(doublenickel.cursor(coord))
+		self:is_world_space(), dn.coordinate.world,
+		dn.coordinate.game)
+	local mouse = dn.vec2(dn.cursor(coord))
 	return self.impl:is_point_inside(mouse)
 end

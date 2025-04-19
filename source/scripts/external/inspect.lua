@@ -306,7 +306,7 @@ function Inspector:putValue(v)
   elseif tv == 'number' or tv == 'boolean' or tv == 'nil' or
       tv == 'cdata' or tv == 'ctype' then
     self:puts(tostring(v))
-  elseif doublenickel.enum.is_enum(v) then
+  elseif dn.enum.is_enum(v) then
     self:puts(v:to_qualified_string())
   elseif tv == 'table' then
     self:putTable(v)

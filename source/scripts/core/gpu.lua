@@ -1,5 +1,5 @@
-local self = doublenickel.gpu
-function doublenickel.gpu.init()
+local self = dn.gpu
+function dn.gpu.init()
   self.render_targets = {}
   self.buffers = {}
   self.shaders = {}
@@ -7,23 +7,23 @@ function doublenickel.gpu.init()
   self.assets = {}
 end
 
-function doublenickel.gpu.render()
-  doublenickel.time_metric.begin('render')
+function dn.gpu.render()
+  dn.time_metric.begin('render')
 
-  doublenickel.lifecycle.run_callback(doublenickel.lifecycle.callbacks.on_render_scene)
-  doublenickel.lifecycle.run_callback(doublenickel.lifecycle.callbacks.on_scene_rendered)
+  dn.lifecycle.run_callback(dn.lifecycle.callbacks.on_render_scene)
+  dn.lifecycle.run_callback(dn.lifecycle.callbacks.on_scene_rendered)
 
   local swapchain = dn.ffi.gpu_acquire_swapchain()
   dn.ffi.gpu_render_target_bind(swapchain)
   dn.ffi.gpu_render_target_clear(swapchain)
-  doublenickel.app:on_swapchain_ready()
+  dn.app:on_swapchain_ready()
   dn.ffi.gpu_swap_buffers()
 
-  doublenickel.time_metric.stop('render')
+  dn.time_metric.stop('render')
 end
 
 
-function doublenickel.gpu.build(gpu_info)
+function dn.gpu.build(gpu_info)
   self.add_resolutions(gpu_info.resolutions)
   self.add_render_targets(gpu_info.render_targets)
   self.add_buffers(gpu_info.buffers)
@@ -31,6 +31,6 @@ function doublenickel.gpu.build(gpu_info)
 end
 
 
-function doublenickel.gpu.find(id)
+function dn.gpu.find(id)
   return self.assets[id:to_qualified_string()]
 end

@@ -350,6 +350,17 @@ DN_API f64 dn_noise_chaotic_scaled(f64 x, f64 y, f64 vmin, f64 vmax);
 //  ██║     ██║   ██║██║     ██║   ██║██╔══██╗╚════██║
 //  ╚██████╗╚██████╔╝███████╗╚██████╔╝██║  ██║███████║
 //   ╚═════╝ ╚═════╝ ╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝
+#define DN_ANSI_FORE_BOLD "\033[1m"
+#define DN_ANSI_FORE_RESET "\033[0m"
+#define DN_ANSI_FORE_BLACK "\033[30m"
+#define DN_ANSI_FORE_RED "\033[31m"
+#define DN_ANSI_FORE_GREEN "\033[32m"
+#define DN_ANSI_FORE_YELLOW "\033[33m"
+#define DN_ANSI_FORE_BLUE "\033[34m"
+#define DN_ANSI_FORE_PURPLE "\033[35m"
+#define DN_ANSI_FORE_CYAN "\033[36m"
+#define DN_ANSI_FORE_WHITE "\033[37m"
+
 typedef dn_vector4_t dn_color_t;
 #define dn_rgb_255(red, green, blue) { .r = (red) / 255.f, .g = (green) / 255.f, .b = (blue) / 255.f, .a = 1.0 }
 #define dn_rgb_01(red, green, blue) { .r = red, .g = green, .b = blue, .a = 1.0 }
@@ -1694,11 +1705,13 @@ DN_IMP void         dn_imgui_update();
 #define DN_LUA_ERROR_FILE_LOAD_ERROR 3
 #define DN_LUA_ERROR_FILE_RUN_ERROR 4
 
+#define DN_LUA_MAX_DIRECTORIES 32
+#define DN_LUA_MASTER_TABLE "dn"
+
 typedef struct {
   dn_string_t scripts;
 } dn_lua_config_t;
 
-#define DN_LUA_MAX_DIRECTORIES 32
 typedef struct {
   dn_string_t scripts;
   dn_lua_interpreter_t state;
@@ -4126,6 +4139,7 @@ void dn_time_metric_end(dn_string_t name) {
 // LOG //
 /////////
 void dn_log_init() {
+  setvbuf(stdout, NULL, _IONBF, 0);
   dn_os_zero_memory(&dn_logger, sizeof(dn_log_t));
 }
 
@@ -4171,22 +4185,26 @@ void dn_log_build_preamble() {
   time_t sec_since_epoch = (time_t)(ms_since_epoch / 1000);
   struct tm* time_info = localtime(&sec_since_epoch);
 
-  snprintf(dn_logger.preamble_buffer, DN_LOGGER_PREAMBLE_BUFFER_SIZE, "[%04d-%02d-%02d %02d:%02d:%02d.%03" DN_FMT_U64 "]",
-       1900 + time_info->tm_year, 1 + time_info->tm_mon, time_info->tm_mday,
-       time_info->tm_hour, time_info->tm_min, time_info->tm_sec, ms_since_epoch % 1000);
+  snprintf(dn_logger.preamble_buffer, DN_LOGGER_PREAMBLE_BUFFER_SIZE, 
+    DN_ANSI_FORE_CYAN "[%04d-%02d-%02d %02d:%02d:%02d.%03" DN_FMT_U64 "]" DN_ANSI_FORE_RESET,
+    time_info->tm_year + 1900, 
+    time_info->tm_mon + 1, 
+    time_info->tm_mday,
+    time_info->tm_hour, time_info->tm_min, time_info->tm_sec, ms_since_epoch % 1000);
 }
 
 void dn_log_flush(dn_log_flags_t flags) {
   if (flags & DN_LOG_FLAG_CONSOLE) {
     printf("%s %s\n", dn_logger.preamble_buffer, dn_logger.message_buffer);
+    fflush(stdout);
   }
 
   dn_log_zero();
 }
 
 void dn_log_zero() {
-  memset(&dn_logger.preamble_buffer[0], 0, DN_LOGGER_PREAMBLE_BUFFER_SIZE);
-  memset(&dn_logger.message_buffer[0], 0, DN_LOGGER_MESSAGE_BUFFER_SIZE);
+  dn_os_zero_memory(dn_logger.preamble_buffer, DN_LOGGER_PREAMBLE_BUFFER_SIZE);
+  dn_os_zero_memory(dn_logger.message_buffer, DN_LOGGER_MESSAGE_BUFFER_SIZE);
 }
 
 /////////////////
@@ -5676,10 +5694,10 @@ void dn_lua_init(dn_lua_config_t config) {
   // PHASE BOOTSTRAP:
   // Define the main table where all game data and functions go
   lua_newtable(dn_lua.state);
-  lua_setglobal(dn_lua.state, "doublenickel");
+  lua_setglobal(dn_lua.state, DN_LUA_MASTER_TABLE);
 
   // Define a variable so we can ~ifdef in Lua
-  lua_getglobal(dn_lua.state, "doublenickel");
+  lua_getglobal(dn_lua.state, DN_LUA_MASTER_TABLE);
   defer_pop++;
   lua_pushstring(dn_lua.state, "is_packaged_build");
 #if defined(DN_EDITOR)
@@ -5759,7 +5777,7 @@ void dn_lua_update() {
   lua_pushcfunction(l, &dn_lua_format_file_load_error_l);
   defer_pop++;
   
-  lua_getglobal(l, "doublenickel");
+  lua_getglobal(l, DN_LUA_MASTER_TABLE);
   defer_pop++;
   lua_pushstring(l, "update_game");
   lua_gettable(l, -2);

@@ -2,15 +2,15 @@ local function ease(t, exp)
   return math.pow(t, exp)
 end
 
-local EaseIn = doublenickel.class.define('EaseIn')
-doublenickel.interpolation.EaseIn = EaseIn
-doublenickel.add_class_metamethod(
+local EaseIn = dn.class.define('EaseIn')
+dn.interpolation.EaseIn = EaseIn
+dn.add_class_metamethod(
   EaseIn,
   '__call',
   function(_, a, b, t, exp)
     exp = exp or 2
     t = ease(t, exp)
-    return doublenickel.interpolation.Lerp(a, b, t)
+    return dn.interpolation.Lerp(a, b, t)
   end)
 
 
@@ -27,7 +27,7 @@ function EaseIn:init(params)
 end
 
 function EaseIn:update(dt)
-  dt = dt or doublenickel.dt
+  dt = dt or dn.dt
   dt = dt / self.speed
   self.accumulated = math.min(self.accumulated + dt, self.time)
   self.t = self.accumulated / self.time
@@ -39,7 +39,7 @@ function EaseIn:is_done()
 end
 
 function EaseIn:get_value()
-  return doublenickel.interpolation.EaseIn(self.start, self.target, self.t, self.exponent)
+  return dn.interpolation.EaseIn(self.start, self.target, self.t, self.exponent)
 end
 
 function EaseIn:reset()
@@ -61,19 +61,19 @@ function EaseIn:set_target(target)
   self.target = target
 end
 
-local EaseIn2 = doublenickel.class.define('EaseIn2')
-doublenickel.interpolation.EaseIn2 = EaseIn2
-doublenickel.add_class_metamethod(EaseIn2, '__call', function(_, a, b, t, exp)
-  return doublenickel.vec2(
-    doublenickel.interpolation.EaseIn(a.x, b.x, t, exp),
-    doublenickel.interpolation.EaseIn(a.y, b.y, t, exp)
+local EaseIn2 = dn.class.define('EaseIn2')
+dn.interpolation.EaseIn2 = EaseIn2
+dn.add_class_metamethod(EaseIn2, '__call', function(_, a, b, t, exp)
+  return dn.vec2(
+    dn.interpolation.EaseIn(a.x, b.x, t, exp),
+    dn.interpolation.EaseIn(a.y, b.y, t, exp)
   )
 end)
 
 function EaseIn2:init(params)
   params = params or {}
-  self.start = doublenickel.vec2(params.start)
-  self.target = doublenickel.vec2(params.target)
+  self.start = dn.vec2(params.start)
+  self.target = dn.vec2(params.target)
   self.time = params.time or 1
   self.speed = params.speed or 1
   self.exponent = params.exponent or 2
@@ -83,7 +83,7 @@ function EaseIn2:init(params)
 end
 
 function EaseIn2:update(dt)
-  dt = dt or doublenickel.dt
+  dt = dt or dn.dt
   dt = dt / self.speed
   self.accumulated = math.min(self.accumulated + dt, self.time)
   self.t = self.accumulated / self.time
@@ -95,7 +95,7 @@ function EaseIn2:is_done()
 end
 
 function EaseIn2:get_value()
-  return doublenickel.interpolation.EaseInOut2(self.start, self.target, self.t, self.exponent)
+  return dn.interpolation.EaseInOut2(self.start, self.target, self.t, self.exponent)
 end
 
 function EaseIn2:reset()

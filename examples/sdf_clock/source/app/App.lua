@@ -1,6 +1,4 @@
--- First, I'll define enums for most resources in the game. You can refer to things by string constants, but I much prefer
--- to use enums. There's nothing special about the names of the enums or their values.
-Shader = doublenickel.enum.define(
+Shader = dn.enum.define(
   'Shader',
   {
     Sample = 0,
@@ -14,7 +12,7 @@ Shader = doublenickel.enum.define(
   }
 )
 
-Font = doublenickel.enum.define(
+Font = dn.enum.define(
   'Font',
   {
     Tiny5 = 0,
@@ -22,7 +20,7 @@ Font = doublenickel.enum.define(
 )
 
 
-RenderTarget = doublenickel.enum.define(
+RenderTarget = dn.enum.define(
   'RenderTarget',
   {
     Native = 0,
@@ -30,65 +28,36 @@ RenderTarget = doublenickel.enum.define(
   }
 )
 
-Buffer = doublenickel.enum.define(
-  'Buffer',
-  {
-    Lights = 0,
-  }
-)
+local App = dn.define_app()
 
--- Then, tell doublenickel what the app class will be for your program
-local App = doublenickel.define_app()
-
--- After all of the framework scripts have been loaded, this is the first user code to be called. The framework is not
--- initialized yet; there is no window, and therefore no GPU context, and therefore very few subsystems we can properly
--- initialize.
---
--- It's the job of the app to configure each framework subsystem, pointing it at directories it should find data and specifying
--- which resources to create. That's what we'll do in App:on_init_game()
 function App:on_init_game()
-  self.native_resolution = doublenickel.vec2(320, 180)
-  self.output_resolution = doublenickel.vec2(1024, 576)
+  self.native_resolution = dn.vec2(320, 180)
+  self.output_resolution = dn.vec2(1024, 576)
 
   -----------------------
   -- APP CONFIGURATION --
   -----------------------
   
-  -- The main configuration struct for the framework
+  dn.paths.load(dn.ffi.paths_resolve_format('dn_app_file', 'data/paths.lua'))
+
   local dn_config = AppConfig:new({
-    target_fps = 144,
-    -- WINDOW
-    --
-    -- This is the first time that dn.ffi.paths_resolve_*() shows up. This subsystem of doublenickel is how you should deal
-    -- with all paths in your game. It builds absolute paths to resources at runtime. It can also handle format strings,
-    -- for e.g. a specific audio file in the well-known audio directory.
-    --
-    -- The way this system works is by providing named paths. The framework is hardcoded to look for a file called 
-    -- "paths.lua" in your app's data directory. That file will provide a hierarchy of paths, and names for those paths.
-    -- The framework will build the corresponding absolute paths, which you can then refer to by name.
     window = WindowConfig:new({
       title = 'SDF Clock',
       native_resolution = Vector2:new(320, 180),
-      flags = doublenickel.enum.bitwise_or(
-        doublenickel.enums.WindowFlags.Windowed,
-        doublenickel.enums.WindowFlags.Border
+      flags = dn.enum.bitwise_or(
+        WindowFlags.Windowed,
+        WindowFlags.Border
       ),
       icon = dn.ffi.paths_resolve_format('dn_image', 'logo/icon.png'),
+      target_fps = 144,
     }),
 
-    -- AUDIO
-    --
-    -- Just provide a list of directories as Lua strings, and the framework will scan them for audio files and load 
-    -- them into memory.
     audio = AudioConfig:new({
       dirs = {
         dn.ffi.paths_resolve('audio')
       },
     }),
 
-    -- FONT
-    --
-    -- Fonts are baked at startup, so if you'd like to use a font size, you need to declare it here.
     font = FontConfig:new({
       fonts = {
         {
@@ -100,11 +69,6 @@ function App:on_init_game()
       }
     }),
 
-    -- GPU
-    --
-    -- Shaders are preprocessed to allow for #includes. Add your include directories here. The shader search path
-    -- isn't used to locate shaders (since, remember, everything is an absolute path). Rather, it's a directory for
-    -- a file monitor to watch. When files change in this directory, your shaders will be hotloaded.
     gpu = GpuConfig:new({
       shader_path = dn.ffi.paths_resolve('shaders'),
       search_paths = {
@@ -129,22 +93,6 @@ function App:on_init_game()
         }
       }
     }),
-
-    -- STEAM
-    -- 
-    -- Steam support is mostly unported, but this is a placeholder.
-    steam = SteamConfig:new({
-      app_id = 480
-    }),
-
-    -- IMAGE
-    --
-    -- A list of directories from which images will be loaded and packed into texture atlases.
-    image = ImageConfig:new({
-      dirs = {
-        dn.ffi.paths_resolve('images')
-      },
-    }),
   })
 
   -- With our configuration done, we can call into C to initialize the framework. This is the thrust of initialization.
@@ -160,8 +108,8 @@ function App:on_init_game()
   -- you can tell the framework which enums correspond to which types, and it will call ffi.cast() before returning the pointer.
   --
   -- This is entirely optional, inconsequential, and only works if you use enums instead of strings to identify resources.
-  doublenickel.asset.register_cast(RenderTarget, 'dn_gpu_render_target_t')
-  doublenickel.asset.register_cast(Shader, 'dn_gpu_shader_t')
+  dn.asset.register_cast(RenderTarget, 'dn_gpu_render_target_t')
+  dn.asset.register_cast(Shader, 'dn_gpu_shader_t')
   
   -- The framework provides a pre-configured SDF renderer for drawing primitives. It works immediate mode; it owns a CPU buffer,
   -- which it syncs to the GPU every frame, and it builds a dn_gpu_pipeline_t with default shaders.
@@ -186,8 +134,8 @@ end
 -- App:on_init_game()'s purpose is to initialize the framework. App:on_start_game()'s purpose is to initialize the game itself. Now that
 -- the framework is fully initialized, and all resources have been loaded, you can do whatever you'd like.
 function App:on_start_game()
-  -- doublenickel opens your game in a framebuffer within an editor window. You can configure that editor window here.
-  doublenickel.editor.configure(EditorConfig:new({
+  -- dn opens your game in a framebuffer within an editor window. You can configure that editor window here.
+  dn.editor.configure(EditorConfig:new({
     grid_enabled = false,
     grid_size = 12,
 
@@ -199,13 +147,13 @@ function App:on_start_game()
       GameView:new(
         'Native View',
         RenderTarget.Native,
-        doublenickel.enums.GameViewSize.ExactSize, self.native_resolution,
-        doublenickel.enums.GameViewPriority.Main),
+        dn.enums.GameViewSize.ExactSize, self.native_resolution,
+        dn.enums.GameViewPriority.Main),
       GameView:new(
         'Upscaled View',
         RenderTarget.Upscaled,
-        doublenickel.enums.GameViewSize.ExactSize, self.output_resolution,
-        doublenickel.enums.GameViewPriority.Standard)
+        dn.enums.GameViewSize.ExactSize, self.output_resolution,
+        dn.enums.GameViewPriority.Standard)
     },
 
     -- What scene should be opened by default?
@@ -227,14 +175,14 @@ end
 function App:on_scene_rendered()
   -- dn.ffi.gpu_begin_render_pass(self.command_buffer, self.render_pass)
   -- dn.ffi.gpu_set_world_space(self.command_buffer, true)
-  -- dn.ffi.gpu_set_camera(self.command_buffer, doublenickel.editor.find('EditorCamera').offset:to_ctype())
+  -- dn.ffi.gpu_set_camera(self.command_buffer, dn.editor.find('EditorCamera').offset:to_ctype())
   -- dn.ffi.sdf_renderer_draw(self.sdf_renderer, self.command_buffer)
   -- dn.ffi.gpu_end_render_pass(self.command_buffer)
   -- dn.ffi.gpu_command_buffer_submit(self.command_buffer)
 
   -- dn.ffi.gpu_render_target_blit(
-  --   doublenickel.asset.find(RenderTarget.Native),
-  --   doublenickel.asset.find(RenderTarget.Upscaled)
+  --   dn.asset.find(RenderTarget.Native),
+  --   dn.asset.find(RenderTarget.Upscaled)
   -- )
 end
 
