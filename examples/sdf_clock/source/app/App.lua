@@ -37,7 +37,6 @@ function App:on_init_game()
   -----------------------
   -- APP CONFIGURATION --
   -----------------------
-  
   dn.paths.load(dn.ffi.paths_resolve_format('dn_app_file', 'data/paths.lua'))
 
   local dn_config = AppConfig:new({
@@ -102,26 +101,15 @@ function App:on_init_game()
   -----------------------
   -- GPU CONFIGURATION --
   -----------------------
-
-  -- Any named resources we create are placed into a big table. You can get a pointer to any asset by giving its name to the table.
-  -- However, since it returns a void*, you end up needing to do a lot of ugly casting. For a minor and purely aesthetic convenience,
-  -- you can tell the framework which enums correspond to which types, and it will call ffi.cast() before returning the pointer.
-  --
-  -- This is entirely optional, inconsequential, and only works if you use enums instead of strings to identify resources.
   dn.asset.register_cast(RenderTarget, 'dn_gpu_render_target_t')
   dn.asset.register_cast(Shader, 'dn_gpu_shader_t')
   
-  -- The framework provides a pre-configured SDF renderer for drawing primitives. It works immediate mode; it owns a CPU buffer,
-  -- which it syncs to the GPU every frame, and it builds a dn_gpu_pipeline_t with default shaders.
-  self.sdf_renderer = ffi.new('dn_sdf_renderer_t [1]');
   self.sdf_renderer = dn.ffi.sdf_renderer_create(1024 * 1024)
 
-  -- Every app needs a command buffer to write GPU commands into.
   self.command_buffer = dn.ffi.gpu_command_buffer_create(GpuCommandBufferDescriptor:new({
     max_commands = 1024
   }))
 
-  -- A render pass defines the attachments your draw calls will write to.
   self.render_pass = GpuRenderPass:new({
     color = {
       attachment = RenderTarget.Native,
@@ -173,17 +161,17 @@ end
 --
 -- This is where I do post processing and compositing.
 function App:on_scene_rendered()
-  -- dn.ffi.gpu_begin_render_pass(self.command_buffer, self.render_pass)
-  -- dn.ffi.gpu_set_world_space(self.command_buffer, true)
-  -- dn.ffi.gpu_set_camera(self.command_buffer, dn.editor.find('EditorCamera').offset:to_ctype())
-  -- dn.ffi.sdf_renderer_draw(self.sdf_renderer, self.command_buffer)
-  -- dn.ffi.gpu_end_render_pass(self.command_buffer)
-  -- dn.ffi.gpu_command_buffer_submit(self.command_buffer)
+  dn.ffi.gpu_begin_render_pass(self.command_buffer, self.render_pass)
+  dn.ffi.gpu_set_world_space(self.command_buffer, true)
+  dn.ffi.gpu_set_camera(self.command_buffer, dn.editor.find('EditorCamera').offset:to_ctype())
+  dn.ffi.sdf_renderer_draw(self.sdf_renderer, self.command_buffer)
+  dn.ffi.gpu_end_render_pass(self.command_buffer)
+  dn.ffi.gpu_command_buffer_submit(self.command_buffer)
 
-  -- dn.ffi.gpu_render_target_blit(
-  --   dn.asset.find(RenderTarget.Native),
-  --   dn.asset.find(RenderTarget.Upscaled)
-  -- )
+  dn.ffi.gpu_render_target_blit(
+    dn.asset.find(RenderTarget.Native),
+    dn.asset.find(RenderTarget.Upscaled)
+  )
 end
 
 -- Finally, once the framework has the swapchain ready, you can draw to it. In an editor build, everything is rendered

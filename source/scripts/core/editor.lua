@@ -94,7 +94,6 @@ function dn.editor.update()
     editor:draw()
   end
 
-  dn.ffi.sdf_circle_ex(self.sdf, 0, 0, 1.0, 0.0, 0.0, 0.0, 1.0, 100.0)
   dn.ffi.trace('dn.ffi.editor.update', 'Rendering the editor')
 
   local camera = self.find('EditorCamera').offset:to_ctype()

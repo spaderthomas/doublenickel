@@ -11,7 +11,7 @@ function dn.update_game(dt)
 
   dn.editor.update()
   -- dn.scene.update()
-  -- dn.entity.update()
+  dn.entity.update()
   -- dn.subsystem.update()
   -- dn.gui.update()
   -- dn.audio.update()

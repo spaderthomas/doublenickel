@@ -258,7 +258,7 @@ end
 -------------------
 function SceneEditor:load(name)
   self.scene_name = name
-self:disable_play_mode()
+  self:disable_play_mode()
 end
 
 function SceneEditor:save()

@@ -67,7 +67,6 @@ function SdfClock:init_bubbles()
 end
 
 function SdfClock:draw()
-
   self.colors = {
     face = dn.colors.white,
     border = dn.colors.white,

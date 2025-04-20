@@ -30,6 +30,7 @@ function dn.ffi.init()
     {
       __index = function(self, fn_name)
         dn.ffi.log('dn.unported.%s', fn_name)
+        dbg()
         return function() end
       end
     }
@@ -755,7 +756,6 @@ function GpuShaderDescriptor:init(params)
     self.kind = GpuShaderKind.Graphics:to_number()
     self.vertex_shader = params.vertex_shader
     self.fragment_shader = params.fragment_shader
-    dbg()
   elseif GpuShaderKind.Compute:match(params.kind) then
     self.kind = GpuShaderKind.Compute:to_number()
     self.compute_shader = params.compute_shader

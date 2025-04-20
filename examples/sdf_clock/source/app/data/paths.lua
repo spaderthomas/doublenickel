@@ -44,7 +44,12 @@ return {
             image = '%s'
           }
         },
-
+        layouts = {
+          path = 'layouts',
+          children = {
+            layout = '%s.ini'
+          }
+        },
       }
     }
   },

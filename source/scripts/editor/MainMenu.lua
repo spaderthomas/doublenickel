@@ -410,20 +410,20 @@ function MainMenu:Scene()
 		local collider_editor = dn.find_entity_editor('ColliderEditor').collider_editor
 		local scene_editor = dn.find_entity_editor('SceneEditor')
 
-		if imgui.BeginMenu('Open') then
-			local scenes = dn.filesystem.collect_named_directory('scenes')
-			for index, name in pairs(scenes) do
-				scenes[index] = string.gsub(name, '.lua', '')
-			end
-			table.sort(scenes)
+		-- if imgui.BeginMenu('Open') then
+		-- 	local scenes = dn.filesystem.collect_named_directory('scenes')
+		-- 	for index, name in pairs(scenes) do
+		-- 		scenes[index] = string.gsub(name, '.lua', '')
+		-- 	end
+		-- 	table.sort(scenes)
 
-			for index, scene in pairs(scenes) do
-				if imgui.MenuItem(scene) then
-					scene_editor:load(scene)
-				end
-			end
-			imgui.EndMenu()
-		end
+		-- 	for index, scene in pairs(scenes) do
+		-- 		if imgui.MenuItem(scene) then
+		-- 			scene_editor:load(scene)
+		-- 		end
+		-- 	end
+		-- 	imgui.EndMenu()
+		-- end
 
 		if imgui.MenuItem('Save', 'Ctrl+S') then
 			scene_editor:save()

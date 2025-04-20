@@ -7,7 +7,7 @@ end
 
 function EditorCamera:update()
   if dn.tick then return end
-  dn.unported.set_camera(self.offset:floor():unpack())
+  -- dn.unported.set_camera(self.offset:floor():unpack())
 end
 
 function EditorCamera:set(position)
