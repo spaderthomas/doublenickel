@@ -50,36 +50,7 @@ function App:configure()
       target_fps = 144,
     }),
 
-    audio = AudioConfig:new({
-      dirs = {
-        dn.ffi.paths_resolve('audio')
-      },
-    }),
-
-    font = FontConfig:new({
-      fonts = {
-        {
-          id = Font.Tiny5,
-          file_path = dn.ffi.paths_resolve_format('font', 'Tiny5-Regular.ttf'),
-          sizes = { 16, 24, 32 },
-          imgui = false
-        },
-      }
-    }),
-
     gpu = GpuConfig:new({
-      shader_path = dn.ffi.paths_resolve('shaders'),
-      search_paths = {
-          dn.ffi.paths_resolve('shader_includes')
-      },
-      shaders = {
-        {
-          name = Shader.Sample,
-          kind = GpuShaderKind.Graphics,
-          vertex_shader = dn.ffi.paths_resolve_format('shader', 'shader.vertex'),
-          fragment_shader = dn.ffi.paths_resolve_format('shader', 'shader.fragment'),
-        }
-      },
       render_targets = {
         {
           name = RenderTarget.Native,

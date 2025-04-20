@@ -19,11 +19,11 @@ int main(int num_args, char** args) {
     .mode = DN_MODE_APP,
     .path = (dn_path_config_t) {
       .engine  = dn_string_literal("../../.."),
-      .install = dn_string_literal("../../sdf_clock"),
-      .write   = dn_string_literal("../../sdf_clock/data"),
+      .install = dn_string_literal("../../sdf"),
+      .write   = dn_string_literal("../../sdf/data"),
     },
     .lua = (dn_lua_config_t) {
-      .scripts = dn_string_literal("../../sdf_clock/source")
+      .scripts = dn_string_literal("../../sdf/source")
     },
   });
 
