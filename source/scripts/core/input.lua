@@ -119,7 +119,7 @@ function dn.input.update()
 	if not dn.tick then
 		self.internal.context_stack:clear()
 
-		local view = dn.find_entity_editor('GameViewManager')
+		local view = dn.editor.find('GameViewManager')
 		if view.hover then
 			self.push_context(dn.enums.InputContext.Game)
 		else

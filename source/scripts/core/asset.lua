@@ -1,7 +1,22 @@
 local self = dn.asset
 
 function dn.asset.init()
+  dn.ffi.trace('dn.asset.init')
+
   self.casts = {}
+end
+
+function dn.asset.configure(config)
+  if not config then
+    dn.ffi.warn('dn.save.configure', 'No configuration was provided for assets')
+    return
+  end
+
+  if config.casts then
+    for cast in dn.iterator.values(config) do
+      self.register_cast(cast.enum, cast.ctype)
+    end
+  end
 end
 
 function dn.asset.register_cast(enum, ctype)

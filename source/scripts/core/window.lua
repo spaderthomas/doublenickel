@@ -9,10 +9,10 @@ dn.window.states = dn.enum.define(
 )
 
 function dn.window.init()
-  dn.ffi.log('dn.window.init')
+  dn.ffi.trace('dn.window.init')
+
   self.state = self.states.Idle
 
-  self.display_mode = dn.ffi.window_get_display_mode()
   self.interpolation = {
     window_size = dn.interpolation.EaseInOut2:new({ time = 1, exponent = 3 })
   }
@@ -27,45 +27,43 @@ function dn.window.update()
 
     self.interpolation.window_size:update()
     if self.interpolation.window_size:is_done() then
-      dn.ffi.window_set_display_mode(self.display_mode)
+      dn.ffi.window_set_display_mode(self.target_mode)
       self.state = self.states.Idle
     end
   end
 end
 
-function dn.window.animate_display_mode(display_mode)
-  local was_full_screen = self.display_mode == dn.enums.DisplayMode.Fullscreen
-  local is_full_screen = display_mode == dn.enums.DisplayMode.Fullscreen
+function dn.window.animate_display_mode(target_mode)
+  current_mode = dn.ffi.window_get_display_mode()
+  local was_full_screen = current_mode == dn.enums.DisplayMode.Fullscreen
+  local is_full_screen = target_mode == dn.enums.DisplayMode.Fullscreen
   if was_full_screen or is_full_screen or dn.ffi.steam_is_deck() then
-    dn.ffi.window_set_display_mode(display_mode)
-    self.display_mode = display_mode
+    dn.ffi.window_set_display_mode(target_mode)
+    self.target_mode = target_mode
     self.state = self.states.Idle
     return
   end
-
-  self.display_mode = display_mode
-
 
   local current_size = dn.ffi.window_get_content_area()
   current_size = dn.vec2(current_size.x, current_size.y)
   local target_size = dn.vec2()
 
-  if self.display_mode == dn.enums.DisplayMode.p480 then
+  if target_mode == dn.enums.DisplayMode.p480 then
     target_size.x = 854
     target_size.y = 480
-  elseif self.display_mode == dn.enums.DisplayMode.p720 then
+  elseif target_mode == dn.enums.DisplayMode.p720 then
     target_size.x = 1280
     target_size.y = 720
-  elseif self.display_mode == dn.enums.DisplayMode.p1280_800 then
+  elseif target_mode == dn.enums.DisplayMode.p1280_800 then
     target_size.x = 1280
     target_size.y = 800
-  elseif self.display_mode == dn.enums.DisplayMode.p1080 then
+  elseif target_mode == dn.enums.DisplayMode.p1080 then
     target_size.x = 1920
     target_size.y = 1080
-  elseif self.display_mode == dn.enums.DisplayMode.p1440 then
+  elseif target_mode == dn.enums.DisplayMode.p1440 then
     target_size.x = 2560
     target_size.y = 1440
-  elseif self.display_mode == dn.enums.DisplayMode.p2160 then
+  elseif target_mode == dn.enums.DisplayMode.p2160 then
     target_size.x = 3840
     target_size.y = 2160
   end

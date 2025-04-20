@@ -9,7 +9,6 @@ dn.lifecycle.callbacks = dn.enum.define(
     on_editor_stop = 5,
     on_main_menu = 6,
     on_init_game = 7,
-    on_start_game = 8,
     on_swapchain_ready = 9,
     on_engine_viewer = 10,
   }

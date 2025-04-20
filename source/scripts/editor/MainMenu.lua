@@ -93,7 +93,7 @@ function MainMenu:show_modals(dt)
 		imgui.Dummy(5, 5)
 
 		if imgui.Button('Save') then
-			dn.ffi.imgui_save_layout(self.saved_layout_name)
+			dn.layout.save(self.saved_layout_name)
 			self.saved_layout_name = ''
 			imgui.CloseCurrentPopup()
 		end
@@ -242,10 +242,10 @@ function MainMenu:Window()
 			if imgui.BeginMenu('Open') then
 				local layout_dir = dn.ffi.paths_resolve('layouts')
 				for entry in dn.filesystem.iterate_directory(layout_dir) do
-					local layout = ffi.string(dn.ffi.string_to_cstr(entry.file_path))
+					local layout = ffi.string(dn.ffi.string_to_cstr(entry.file_name))
 					if imgui.MenuItem(dn.strip_extension(layout)) then
 						local file_name = dn.strip_extension(layout)
-						dn.ffi.imgui_load_layout(file_name)
+						dn.layout.load(file_name)
 					end
 				end
 
@@ -439,10 +439,10 @@ function MainMenu:Scene()
 
 		if imgui.BeginMenu('Persistent Entities') then
 			if imgui.MenuItem('Save') then
-				dn.persistent.write()
+        dn.scene.save_persistent_entities()
 			end
 			if imgui.MenuItem('Reload') then
-				dn.persistent.init()
+        dn.scene.reload_persistent_entities()
 			end
 			imgui.EndMenu()
 		end

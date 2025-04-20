@@ -28,21 +28,20 @@ RenderTarget = dn.enum.define(
   }
 )
 
-local App = dn.define_app()
+local App = dn.app.define()
 
-function App:on_init_game()
-  self.native_resolution = dn.vec2(320, 180)
-  self.output_resolution = dn.vec2(1024, 576)
+function App:init()
+  self.native_resolution = Vector2:new(320, 180)
+  self.output_resolution = Vector2:new(1024, 576)
+end
 
-  -----------------------
-  -- APP CONFIGURATION --
-  -----------------------
-  dn.paths.load(dn.ffi.paths_resolve_format('dn_app_file', 'data/paths.lua'))
+function App:configure()
+  dn.paths.load(dn.ffi.paths_resolve_format('dn_install_file', 'data/paths.lua'))
 
-  local dn_config = AppConfig:new({
+  dn.app.configure(AppConfig:new({
     window = WindowConfig:new({
       title = 'SDF Clock',
-      native_resolution = Vector2:new(320, 180),
+      native_resolution = self.native_resolution,
       flags = dn.enum.bitwise_or(
         WindowFlags.Windowed,
         WindowFlags.Border
@@ -92,17 +91,23 @@ function App:on_init_game()
         }
       }
     }),
-  })
 
-  -- With our configuration done, we can call into C to initialize the framework. This is the thrust of initialization.
-  dn.ffi.app_configure(dn_config)
+    scene = SceneConfig:new({
+      directory = dn.ffi.paths_resolve('scenes'),
+      persistent = 'persistent'
+    }),
 
+    layout = LayoutConfig:new({
+      directory = dn.ffi.paths_resolve('layouts')
+    }),
 
-  -----------------------
-  -- GPU CONFIGURATION --
-  -----------------------
-  dn.asset.register_cast(RenderTarget, 'dn_gpu_render_target_t')
-  dn.asset.register_cast(Shader, 'dn_gpu_shader_t')
+    asset = AssetConfig:new({
+      casts = {
+        { enum = RenderTarget, ctype = 'dn_gpu_render_target_t' },
+        { enum = Shader,       ctype = 'dn_gpu_shader_t' },
+      }
+    }),
+  }))
   
   self.sdf_renderer = dn.ffi.sdf_renderer_create(1024 * 1024)
 
@@ -117,49 +122,28 @@ function App:on_init_game()
     }
   })
 
-end
-
--- App:on_init_game()'s purpose is to initialize the framework. App:on_start_game()'s purpose is to initialize the game itself. Now that
--- the framework is fully initialized, and all resources have been loaded, you can do whatever you'd like.
-function App:on_start_game()
-  -- dn opens your game in a framebuffer within an editor window. You can configure that editor window here.
   dn.editor.configure(EditorConfig:new({
-    grid_enabled = false,
-    grid_size = 12,
-
-    -- There's a full featured dialogue editor, but if you don't plan to use it, hide it.
-    hide_dialogue_editor = true,
-
-    -- What framebuffers should be drawn in the editor, and at what size?
-    game_views = {
+    views = {
       GameView:new(
         'Native View',
         RenderTarget.Native,
         dn.enums.GameViewSize.ExactSize, self.native_resolution,
-        dn.enums.GameViewPriority.Main),
+        dn.enums.GameViewPriority.Main
+      ),
       GameView:new(
         'Upscaled View',
         RenderTarget.Upscaled,
         dn.enums.GameViewSize.ExactSize, self.output_resolution,
-        dn.enums.GameViewPriority.Standard)
+        dn.enums.GameViewPriority.Standard
+      )
     },
-
-    -- What scene should be opened by default?
     scene = 'sdf_clock',
-
-    -- What editor layout should be opened by default?
     layout = 'sdf_clock',
-
-    -- What GPU resources should the editor use to draw widgets?
-    render_pass = self.render_pass,
-    command_buffer = self.command_buffer
+    -- render_pass = self.render_pass,
+    -- command_buffer = self.command_buffer
   }))
 end
 
--- First, the framework calls `on_render_scene()` for anything which has that lifecycle method. Then, once everything
--- has rendered to the appropriate framebuffers, we call `on_scene_rendered()`. 
---
--- This is where I do post processing and compositing.
 function App:on_scene_rendered()
   dn.ffi.gpu_begin_render_pass(self.command_buffer, self.render_pass)
   dn.ffi.gpu_set_world_space(self.command_buffer, true)
@@ -174,8 +158,6 @@ function App:on_scene_rendered()
   )
 end
 
--- Finally, once the framework has the swapchain ready, you can draw to it. In an editor build, everything is rendered
--- to editor windows via ImGui
 function App:on_swapchain_ready()
   imgui.Imgui_Impl_glfw_opengl3:Render()
 end

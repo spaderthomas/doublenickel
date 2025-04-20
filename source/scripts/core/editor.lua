@@ -1,14 +1,30 @@
 local self = dn.editor
 
-----------------
--- PUBLIC API --
-----------------
+EditorFonts = dn.enum.define(
+  'EditorFonts',
+  {
+    Regular = 0,
+    Bold = 1,
+  }
+)
+
+DnRenderTargets = dn.enum.define(
+  'DnRenderTargets',
+  {
+    Editor = 0
+  }
+)
+
 EditorConfig = dn.class.define('EditorConfig')
 function EditorConfig:init(params)
-  self.grid_enabled = params.grid_enabled
-  self.grid_size = params.grid_size or 12
-  self.hide_dialogue_editor = params.hide_dialogue_editor
-  self.game_views = params.game_views or {}
+  self.grid = params.grid or {
+    enabled = true,
+    spacing = 128
+  }
+  self.dialogue_editor = params.dialogue_editor or {
+    enabled = false
+  }
+  self.views = params.views or {}
   self.scene = params.scene or 'default'
   self.layout = params.layout or 'default'
 
@@ -18,29 +34,32 @@ function EditorConfig:init(params)
     self.command_buffer = params.command_buffer
   else
     dn.ffi.trace('dn.ffi.editor.configure', 'Creating the editor to use its own render pass and command buffer')
+
+    dn.asset.register_cast(DnRenderTargets, 'dn_gpu_render_target_t')
+
     dn.ffi.gpu_render_target_create(GpuRenderTargetDescriptor:new({
       name = DnRenderTargets.Editor,
       size = Vector2:new(1024, 576)
     }))
+
     self.render_pass = GpuRenderPass:new({
       color = {
         attachment = DnRenderTargets.Editor,
         load = GpuLoadOp.Clear
       }
     })
+
     self.command_buffer = dn.ffi.gpu_command_buffer_create(GpuCommandBufferDescriptor:new({
       max_commands = 1024
     }))
 
-    table.insert(self.game_views, GameView:new(
+    table.insert(self.views, GameView:new(
       'Editor View',
       DnRenderTargets.Editor,
       GameViewSize.ExactSize, Vector2:new(1024, 576),
       GameViewPriority.Main
     ))
   end
-
-  dn.asset.register_cast(DnRenderTargets, 'dn_gpu_render_target_t')
 
   self.fonts = {
     regular = params.fonts and params.fonts.regular or 'inconsolata',
@@ -52,31 +71,13 @@ end
 function dn.editor.init()
   dn.ffi.log('dn.editor.init')
 
-  EditorFonts = dn.enum.define(
-    'EditorFonts',
-    {
-      Regular = 0,
-      Bold = 1,
-    }
-  )
-
-  DnRenderTargets = dn.enum.define(
-    'DnRenderTargets',
-    {
-      Editor = 0
-    }
-  )
-
   self.focus_state = {}
   self.hover_state = {}
   self.window_stack = dn.data_types.stack:new()
 
-  dn.editor.entities = {}
-  for name, class in pairs(dn.editor.types) do
-    dn.editor.entities[name] = class:new()
-  end
+  self.entities = {}
 
-  dn.editor.colors = {
+  self.colors = {
     main_list = dn.colors.white:copy(),
     cdata_member = dn.colors.red:copy(),
     lua_member = dn.colors.green:copy(),
@@ -108,21 +109,31 @@ end
 function dn.editor.configure(config)
   dn.ffi.trace('dn.ffi.editor.configure')
 
-  self.config = config
+  dn.editor.config = config
 
-  -- self.sdf = ffi.new('dn_sdf_renderer_t [1]');
+  for name, class in pairs(dn.editor.types) do
+    dn.editor.entities[name] = class:new()
+  end
+
   self.sdf = dn.ffi.sdf_renderer_create(1024 * 1024)
 
-  dn.editor.find('EditorUtility').enabled.grid = config.grid_enabled
-  dn.editor.find('EditorUtility').style.grid.size = config.grid_size
-  dn.editor.find('DialogueEditor').hidden = config.hide_dialogue_editor
+  if config.grid then
+    dn.editor.find('EditorUtility').enabled.grid = config.grid.enabled
+    dn.editor.find('EditorUtility').style.grid.size = config.grid.spacing
+  end
 
-  for view in dn.iterator.values(config.game_views) do
-    dn.editor.find('GameViewManager'):add_view(view)
+  if config.dialogue_editor then
+    dn.editor.find('DialogueEditor').hidden = not config.dialogue_editor.enabled
+  end
+
+  if config.views then
+    for view in dn.iterator.values(config.views) do
+      dn.editor.find('GameViewManager'):add_view(view)
+    end
   end
 
   dn.editor.find('SceneEditor'):load(config.scene)
-  dn.ffi.imgui_load_layout(config.layout)
+  dn.layout.load(config.layout)
 end
 
 function dn.editor.define(name)

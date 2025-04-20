@@ -78,12 +78,18 @@ function GameViewManager:add_view(view)
   if view.priority == dn.enums.GameViewPriority.Main then
     local main_view = self:find_main_view()
     if main_view then
-      log.info('Setting main game view to %s', view.name)
       main_view.priority = dn.enums.GameViewPriority.Standard
     end
   end
 
   self.game_views:add(view)
+  dn.ffi.info('GameViewManager:add_view', '%s [%s, %s (%d, %d)]',
+    view.name,
+    view.priority:to_qualified_string(),
+    view.render_target:to_qualified_string(),
+    view.size.x, view.size.y
+  )
+
 end
 
 function GameViewManager:update()

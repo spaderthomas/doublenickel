@@ -124,6 +124,7 @@ function dn.math.rotate_point(point, center, angle)
 end
 
 function dn.math.fmod(x, y)
+  if not y then dbg() end
   local fx = x * 1.0
   local fy = y * 1.0
   return fx - (math.floor(fx / fy) * fy)

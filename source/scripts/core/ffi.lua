@@ -496,6 +496,7 @@ end
 ------------
 String = dn.class.metatype('dn_string_t')
 function String:init(path)
+  if not path then dbg() end
   self.data = ffi.cast('u8*', path)
   self.len = #path
 end
@@ -918,6 +919,7 @@ function dn.ffi.log(fmt, ...)
   return ffi.C.dn_log_str(String:new(string.format(fmt, ...)))
 end
 
+local DN_COLOR_GREEN = string.char(27) .. "[34m"
 local DN_COLOR_GRAY = string.char(27) .. "[90m"
 local DN_COLOR_RED = string.char(27) .. "[91m"
 local DN_COLOR_BLUE = string.char(27) .. "[94m"
@@ -926,6 +928,10 @@ local DN_COLOR_RESET = string.char(27) .. "[0m"
 
 function dn.ffi.warn(tag, fmt, ...)
   dn.ffi.log_colored(DN_COLOR_YELLOW, tag, fmt, ...)
+end
+
+function dn.ffi.info(tag, fmt, ...)
+  dn.ffi.log_colored(DN_COLOR_GREEN, tag, fmt, ...)
 end
 
 function dn.ffi.trace(tag, fmt, ...)
@@ -958,6 +964,14 @@ end
 
 function dn.ffi.paths_add_subpath(name, parent_name, relative_path)
   return ffi.C.dn_paths_add_subpath(String:new(name), String:new(parent_name), String:new(relative_path))
+end
+
+function dn.ffi.paths_add_ex(name, absolute_path)
+  return ffi.C.dn_paths_add_ex(String:new(name), String:new(absolute_path))
+end
+
+function dn.ffi.paths_is_registered(name)
+  return ffi.C.dn_paths_is_registered(String:new(name))
 end
 
 function dn.ffi.os_scan_directory(path)
@@ -1002,18 +1016,6 @@ end
 
 function dn.ffi.window_get_display_mode()
   return dn.enums.DisplayMode(ffi.C.dn_window_get_display_mode())
-end
-
-function dn.ffi.imgui_load_layout(name)
-  ffi.C.dn_imgui_load_layout(String:new(name))
-end
-
-function dn.ffi.imgui_save_layout(name)
-  ffi.C.dn_imgui_save_layout(String:new(name))
-end
-
-function dn.ffi.app_configure(config)
-  config:apply()
 end
 
 function dn.ffi.asset_registry_find(name)

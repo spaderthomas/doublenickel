@@ -11,6 +11,17 @@ return {
           }
         }
       }
+    },
+    data = {
+      path = 'data',
+      children = {
+        scenes = {
+          path = 'scenes',
+          children = {
+            scene = '%s.lua'
+          }
+        }
+      }
     }
   },
   app_paths = {}

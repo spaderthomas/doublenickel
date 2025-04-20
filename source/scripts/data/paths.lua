@@ -1,7 +1,7 @@
 return {
 	write_paths = {
 	},
-	dn_install = {
+	dn_engine = {
 		dn_assets = {
 			path = 'asset',
 			children = {
@@ -60,35 +60,35 @@ return {
 	},
 	dn_app = {
     dn_app_file = '%s',
-		components = 'components',
-		core = 'core',
-		data = {
-			path = 'data',
-			children = {
-				dialogues = {
-					path = 'dialogue',
-					children = {
-						dialogue_folder = '%s',
-						dialogue_source = '%s/dialogue.lua',
-						dialogue_metadata = '%s/editor.lua',
-					}
-				},
-				scenes = 'scenes',
-				scene = 'scenes/%s.lua',
-				states = 'states',
-				state = 'states/%s.lua',
-				path_info = 'paths.lua',
-				action_info = 'actions.lua',
-				animation_info = 'animations.lua',
-				background_info = 'backgrounds.lua',
-				character_info = 'characters.lua',
-				font_info = 'fonts.lua',
-				texture_info = 'textures.lua',
-			}
-		},
-		dialogue = 'dialogue',
-		editor = 'editor',
-		entities = 'entities',
-		subsystems = 'subsystems',
+		-- components = 'components',
+		-- core = 'core',
+		-- data = {
+		-- 	path = 'data',
+		-- 	children = {
+		-- 		dialogues = {
+		-- 			path = 'dialogue',
+		-- 			children = {
+		-- 				dialogue_folder = '%s',
+		-- 				dialogue_source = '%s/dialogue.lua',
+		-- 				dialogue_metadata = '%s/editor.lua',
+		-- 			}
+		-- 		},
+		-- 		scenes = 'scenes',
+		-- 		scene = 'scenes/%s.lua',
+		-- 		states = 'states',
+		-- 		state = 'states/%s.lua',
+		-- 		path_info = 'paths.lua',
+		-- 		action_info = 'actions.lua',
+		-- 		animation_info = 'animations.lua',
+		-- 		background_info = 'backgrounds.lua',
+		-- 		character_info = 'characters.lua',
+		-- 		font_info = 'fonts.lua',
+		-- 		texture_info = 'textures.lua',
+		-- 	}
+		-- },
+		-- dialogue = 'dialogue',
+		-- editor = 'editor',
+		-- entities = 'entities',
+		-- subsystems = 'subsystems',
 	},
 }

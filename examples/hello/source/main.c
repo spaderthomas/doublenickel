@@ -20,10 +20,10 @@ int main(int num_args, char** args) {
     .path = (dn_path_config_t) {
       .engine  = dn_string_literal("../../.."),
       .install = dn_string_literal("../../hello"),
-      .write   = dn_string_literal("../../hello/source/app/data"),
+      .write   = dn_string_literal("../../hello/data"),
     },
     .lua = (dn_lua_config_t) {
-      .scripts = dn_string_literal("../../hello/source/app")
+      .scripts = dn_string_literal("../../hello/source")
     },
   });
 

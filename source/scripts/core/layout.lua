@@ -1,15 +1,19 @@
-function dn.resolution_aware_layout(name)
-	local display_mode = dn.ffi.window_get_display_mode()
+local self = dn.layout
 
-	if mode == dn.enums.DisplayMode.p1080 then
-		local aware_name = string.format('%s-1080', name)
-		dn.ffi.imgui_load_layout(aware_name)
-	elseif mode == dn.enums.DisplayMode.p1440 then
-		dn.ffi.imgui_load_layout(name)
-	else
-		-- I don't bother making editor layouts for other resolutions. Theoretically, if someone
-		-- had a 4K monitor then they'd want that, but the way that the editor scales (or rather
-		-- does not scale) is kind of fucked anyway, so who cares?
-		dn.ffi.imgui_load_layout(name)
-	end
+function dn.layout.init()
+end
+
+function dn.layout.configure(config)
+  if config.directory then
+    dn.ffi.paths_add_ex(dn.paths.USER_LAYOUTS, config.directory)
+    dn.ffi.paths_add_ex(dn.paths.USER_LAYOUT, config.directory .. '/%s.ini')
+  end
+end
+
+function dn.layout.load(name)
+  ffi.C.dn_imgui_load_layout(String:new(name))
+end
+
+function dn.layout.save(name)
+  ffi.C.dn_imgui_save_layout(String:new(name))
 end

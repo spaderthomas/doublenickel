@@ -16,7 +16,7 @@ typedef uint64_t u64;
 typedef float f32;
 typedef double f64;
 typedef u64 dn_hash_t;
-typedef u32 dn_error_t;
+typedef s32 dn_error_t;
 typedef char dn_asset_name_t [64];
   
   typedef void* dn_win32_handle_t;
@@ -428,6 +428,7 @@ dn_paths_t dn_paths;
  dn_string_t            dn_paths_resolve_ex(dn_string_t name, dn_allocator_t* allocator);
  dn_string_t            dn_paths_resolve_format_cstr(const char* name, const char* file_name);
  dn_string_t            dn_paths_resolve_format_ex(dn_string_t name, dn_string_t file_name, dn_allocator_t* allocator);
+ bool                   dn_paths_is_registered(dn_string_t name);
  dn_string_t            dn_paths_strip(dn_string_t name, dn_string_t absolute_path);
  void                   dn_paths_add_ex(dn_string_t name, dn_string_t absolute_path);
 typedef enum {
@@ -941,9 +942,13 @@ typedef struct {
   dn_string_t scripts;
 } dn_lua_config_t;
 typedef struct {
+  s32 count;
+} dn_lua_pop_t;
+typedef struct {
   dn_string_t scripts;
   dn_lua_interpreter_t state;
   dn_fixed_array_t directories;
+  dn_lua_pop_t pop;
 } dn_lua_t;
 dn_lua_t dn_lua;
 typedef enum {

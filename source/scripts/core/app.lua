@@ -1,6 +1,16 @@
-function dn.define_app()
+local self = dn.app
+
+function dn.app.define()
   local class = dn.subsystem.define('App')
   return class
+end
+
+function dn.app.configure(config)
+  ffi.C.dn_app_configure(config.framework)
+  dn.layout.configure(config.layout)
+  dn.scene.configure(config.scene)
+  dn.save.configure(config.save)
+  dn.asset.configure(config.asset)
 end
 
 ----------------------
@@ -120,13 +130,27 @@ function LayoutConfig:init(params)
   self.directory = params.directory
 end
 
+SceneConfig = dn.class.define('SceneConfig')
+function SceneConfig:init(params)
+  params = params or {}
+  self.directory = params.directory
+end
+
+SaveConfig = dn.class.define('SaveConfig')
+function SaveConfig:init(params)
+  params = params or {}
+  self.directory = params.directory
+end
+
+AssetConfig = dn.class.define('AssetConfig')
+function AssetConfig:init(params)
+  params = params or {}
+  self.casts = params.casts
+end
 
 AppConfig = dn.class.define('AppConfig')
 function AppConfig:init(params)
   self.framework = FrameworkConfig:new(params)
   self.layout = LayoutConfig:new(params.layout)
-end
-
-function AppConfig:apply()
-  ffi.C.dn_app_configure(self.framework)
+  self.scene = SceneConfig:new(params.scene)
 end

@@ -3,8 +3,6 @@
 // fluid.hpp
 // interpolation.hpp
 // particle.hpp
-// preprocessor.hpp
-// sdf.hpp
 // text.hpp
 
 // dn_asset_registry
@@ -13,7 +11,6 @@
 // dn_backgrounds
 // dn_screenshots
 // dn_atlases
-// dn_gpu
 // dn_font
 // dn_noise
 // dn_steam
@@ -132,7 +129,7 @@ typedef double f64;
 #define DN_F64_MAX DBL_MAX
 
 typedef u64 dn_hash_t;
-typedef u32 dn_error_t;
+typedef s32 dn_error_t;
 
 #define DN_ASSET_NAME_LEN 64
 typedef char dn_asset_name_t [DN_ASSET_NAME_LEN];
@@ -175,7 +172,8 @@ typedef char dn_asset_name_t [DN_ASSET_NAME_LEN];
 #define dn_for(it, n) for (u32 it = 0; it < (n); it++)
 #define dn_for_arr(arr, it) for (u32 it = 0; it < dn_arr_len(arr); it++)
 
-#define dn_macro_str(x) #x
+#define _dn_macro_str(x) #x
+#define dn_macro_str(x) _dn_macro_str(x)
 #define _dn_macro_cat(x, y) x##y
 #define dn_macro_cat(x, y) _dn_macro_cat(x, y)
 #define dn_unique_name() dn_macro_cat(__dn_unique_name__, __LINE__)
@@ -209,6 +207,10 @@ typedef char dn_asset_name_t [DN_ASSET_NAME_LEN];
 #define DN_QSORT_A_FIRST -1
 #define DN_QSORT_B_FIRST 1
 #define DN_QSORT_EQUAL 0
+
+#define DN_CONSTANT_TO_STRING_CASE(NAME) case NAME: { return dn_string_literal(#NAME); }
+#define DN_CONSTANT_TO_STRING_DEFAULT(VALUE) default: { return dn_string_literal(dn_macro_str(VALUE)); }
+#define DN_CONSTANT_TO_STRING_NO_DEFAULT default: { DN_UNREACHABLE(); return dn_string_literal("DN_UNKNOWN"); }
 
 #define gs_hash_table_for(_HT, it) for (gs_hash_table_iter it = 0; gs_hash_table_iter_valid((_HT), it); gs_hash_table_iter_advance((_HT), it))
 
@@ -516,8 +518,9 @@ typedef struct {
   dn_allocator_t* allocator;
 } dn_string_builder_t;
 
-#define dn_string_cstr(s) (dn_string_t){ .data = (u8*)(s), .len = strlen(s)}
-#define dn_string_literal(s) (dn_string_t){ .data = (u8*)(s), .len = sizeof(s) - 1}
+#define dn_string_cstr(s) (dn_string_t)    { .data = (u8*)(s), .len = strlen(s) }
+#define dn_string_literal(s) (dn_string_t) { .data = (u8*)(s), .len = sizeof(s) - 1 }
+#define dn_constexpr_string_literal(s)     { .data = (u8*)(s), .len = sizeof(s) - 1 }
 #define dn_tstring_builder() (dn_string_builder_t){ .buffer = dn_zero_initialize(), .allocator = &dn_allocators.bump.allocator }
 
 DN_API void        dn_string_builder_grow(dn_string_builder_t* builder, u32 requested_capacity);
@@ -914,6 +917,19 @@ DN_IMP void dn_log_init();
 //  ██╔═══╝ ██╔══██║   ██║   ██╔══██║╚════██║
 //  ██║     ██║  ██║   ██║   ██║  ██║███████║
 //  ╚═╝     ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚══════╝
+
+#define DN_NAMED_PATH_BOOTSTRAP    dn_string_literal("dn_bootstrap")
+#define DN_NAMED_PATH_USER_LAYOUTS dn_string_literal("dn_user_layouts")
+#define DN_NAMED_PATH_USER_LAYOUT  dn_string_literal("dn_user_layout")
+#define DN_NAMED_PATH_LAYOUTS      dn_string_literal("dn_layouts")
+#define DN_NAMED_PATH_LAYOUT       dn_string_literal("dn_layout")
+#define DN_NAMED_PATH_USER_SCENES  dn_string_literal("dn_user_scenes")
+#define DN_NAMED_PATH_USER_SCENE   dn_string_literal("dn_user_scene")
+#define DN_NAMED_PATH_SCENES       dn_string_literal("dn_scenes")
+#define DN_NAMED_PATH_SCENE        dn_string_literal("dn_scene")
+#define DN_NAMED_PATH_USER_SAVES   dn_string_literal("dn_user_saves")
+#define DN_NAMED_PATH_USER_SAVE    dn_string_literal("dn_user_save")
+
 typedef struct {
   dn_string_t name;
   dn_string_t path;
@@ -935,11 +951,6 @@ typedef struct {
 } dn_paths_t;
 dn_paths_t dn_paths;
 
-#define DN_USER_PATH_LAYOUTS dn_string_literal("layouts")
-#define DN_USER_PATH_LAYOUT  dn_string_literal("layout")
-#define DN_PATH_LAYOUTS      dn_string_literal("dn_layouts")
-#define DN_PATH_LAYOUT       dn_string_literal("dn_layout")
-
 DN_API dn_named_path_result_t dn_paths_find_all();
 DN_API void                   dn_paths_add_install_subpath(dn_string_t name, dn_string_t relative_path);
 DN_API void                   dn_paths_add_write_subpath(dn_string_t name, dn_string_t relative_path);
@@ -953,6 +964,7 @@ DN_API const char*            dn_paths_resolve_bootstrap(const char* name);
 DN_API dn_string_t            dn_paths_resolve_ex(dn_string_t name, dn_allocator_t* allocator);
 DN_API dn_string_t            dn_paths_resolve_format_cstr(const char* name, const char* file_name);
 DN_API dn_string_t            dn_paths_resolve_format_ex(dn_string_t name, dn_string_t file_name, dn_allocator_t* allocator);
+DN_API bool                   dn_paths_is_registered(dn_string_t name);
 DN_API dn_string_t            dn_paths_strip(dn_string_t name, dn_string_t absolute_path);
 DN_API void                   dn_paths_add_ex(dn_string_t name, dn_string_t absolute_path);
 DN_IMP void                   dn_paths_init();
@@ -1713,19 +1725,34 @@ typedef struct {
 } dn_lua_config_t;
 
 typedef struct {
+  s32 count;
+} dn_lua_pop_t;
+
+typedef struct {
   dn_string_t scripts;
   dn_lua_interpreter_t state;
   dn_fixed_array(dn_string_t, DN_LUA_MAX_DIRECTORIES) directories;
+  dn_lua_pop_t pop;
 } dn_lua_t;
 dn_lua_t dn_lua;
 
 DN_IMP void        dn_lua_init(dn_lua_config_t config);
+DN_IMP void        dn_lua_init_bootstrap();
+DN_IMP void        dn_lua_init_phase_0();
+DN_IMP void        dn_lua_init_phase_1();
+DN_IMP void        dn_lua_init_phase_2();
+DN_IMP dn_error_t  dn_lua_pcall(dn_string_t fn);
+DN_IMP void        dn_lua_check_load_error(dn_error_t error);
+DN_IMP void        dn_lua_check_run_error(s32 error);
 DN_IMP dn_error_t  dn_lua_script_file(dn_string_t file_path);
 DN_IMP dn_error_t  dn_lua_script_dir(dn_string_t path);
 DN_IMP dn_error_t  dn_lua_script_named_dir(dn_string_t name);
 DN_IMP s32         dn_lua_directory_sort_kernel(const void* va, const void* vb);
 DN_IMP const char* dn_lua_format_file_load_error(const char* error);
 DN_IMP s32         dn_lua_format_file_load_error_l(dn_lua_interpreter_t lua);
+DN_IMP dn_string_t dn_lua_error_to_string(dn_error_t error);
+DN_IMP void        dn_lua_pop_add(dn_lua_pop_t* pop);
+DN_IMP void        dn_lua_pop_process(dn_lua_pop_t* pop);
 
 
 // ███████╗ ██████╗ ███╗   ██╗████████╗███████╗
@@ -5237,6 +5264,11 @@ void dn_paths_add_write_subpath(dn_string_t name, dn_string_t relative_path) {
   dn_paths_add_subpath(name, dn_string_literal("dn_write"), relative_path);
 }
 
+bool dn_paths_is_registered(dn_string_t name) {
+  dn_hash_t hash = dn_hash_string(name);
+  return gs_hash_table_exists(dn_paths.entries, hash);
+}
+
 dn_string_t dn_paths_strip(dn_string_t name, dn_string_t absolute_path) {
   dn_string_t named_path = dn_paths_resolve_ex(name, &dn_allocators.bump.allocator);
   dn_string_t stripped_path = dn_string_copy(absolute_path, &dn_allocators.bump.allocator);
@@ -5385,6 +5417,7 @@ void dn_paths_init(dn_path_config_t config) {
   _dn_paths_set_write_path(config);
 
   dn_paths_add_install_subpath(dn_string_literal("dn_log"), dn_string_literal("doublenickel.log"));
+  dn_paths_add_install_subpath(dn_string_literal("dn_install_file"), dn_string_literal("%s"));
   dn_paths_add_engine_subpath(dn_string_literal("dn_bootstrap"), dn_string_literal("source/scripts/core/bootstrap.lua"));
   dn_paths_add_engine_subpath(dn_string_literal("dn_paths"), dn_string_literal("source/scripts/data/paths.lua"));
   dn_paths_add_engine_subpath(dn_string_literal("dn_ffi_h"), dn_string_literal("source/scripts/data/dn_ffi.h"));
@@ -5681,16 +5714,19 @@ void dn_lua_init(dn_lua_config_t config) {
   // dn_lua.scripts = dn_string_builder_write(&builder);
   dn_paths_add_ex(dn_string_literal("dn_app"), _dn_paths_build_root_path(config.scripts));
   dn_lua.scripts = dn_paths_resolve_ex(dn_string_literal("dn_app"), &dn_allocators.standard.allocator);
-
-  s32 defer_pop = 0;
+  dn_fixed_array_init(&dn_lua.directories, DN_LUA_MAX_DIRECTORIES, sizeof(dn_string_t), &dn_allocators.standard.allocator);
 
   dn_lua.state = luaL_newstate();
   luaL_openlibs(dn_lua.state);
 
-  dn_fixed_array_init(&dn_lua.directories, DN_LUA_MAX_DIRECTORIES, sizeof(dn_string_t), &dn_allocators.standard.allocator);
+  dn_lua_init_bootstrap();
+  dn_lua_init_phase_0();
+  dn_lua_init_phase_1();
+  dn_lua_init_phase_2();
+  dn_lua_pop_process(&dn_lua.pop);
+}
 
-  luaL_openlibs(dn_lua.state);
-
+void dn_lua_init_bootstrap() {
   // PHASE BOOTSTRAP:
   // Define the main table where all game data and functions go
   lua_newtable(dn_lua.state);
@@ -5698,7 +5734,8 @@ void dn_lua_init(dn_lua_config_t config) {
 
   // Define a variable so we can ~ifdef in Lua
   lua_getglobal(dn_lua.state, DN_LUA_MASTER_TABLE);
-  defer_pop++;
+  dn_lua_pop_add(&dn_lua.pop);
+
   lua_pushstring(dn_lua.state, "is_packaged_build");
 #if defined(DN_EDITOR)
   lua_pushboolean(dn_lua.state, false);
@@ -5707,111 +5744,106 @@ void dn_lua_init(dn_lua_config_t config) {
 #endif
   lua_settable(dn_lua.state, -3);
 
-  // PHASE 0:
-  // Load the bootstrap file, which creates tables for each module and loads the
-  // most basic packages needed to load the rest of the code (e.g. classes and enums)
-  dn_string_t bootstrap = dn_paths_resolve(dn_string_literal("dn_bootstrap"));
+  dn_string_t bootstrap = dn_paths_resolve(DN_NAMED_PATH_BOOTSTRAP);
   dn_lua_script_file(bootstrap);
+}
 
-  lua_pushstring(dn_lua.state, "init_phase_0");
-  lua_gettable(dn_lua.state, -2);
-  s32 lresult = lua_pcall(dn_lua.state, 0, 0, 0);
-  if (lresult) {
-    const char* error = lua_tostring(dn_lua.state, -1);
-    DN_LOG("error = %s", error);
-    DN_BREAK();
-  }
-  
+void dn_lua_init_phase_0() {
+  // PHASE 0:
+  // Create a table for each module, load the FFI, load our internal named paths. Then, load a few fundamental files which we need 
+  // to bootstrap the environment.
+  dn_lua_pcall(dn_string_literal("init_phase_0"));  
+}
+
+void dn_lua_init_phase_1() {
   // PHASE 1:
-  // With the base tables created, we can now do things like define classes
-  // and entity types. In this phase, load the core engine packages and then
-  // any static engine data
-  dn_error_t result;
-  result = dn_lua_script_named_dir(dn_string_literal("dn_libs"));
-  if (result)  DN_BREAK();
-  result = dn_lua_script_named_dir(dn_string_literal("dn_core"));
-  if (result)  DN_BREAK();
-  result = dn_lua_script_named_dir(dn_string_literal("dn_editor"));
-  if (result)  DN_BREAK();
+  // Load the core modules and initialize them
+  dn_string_t phase_1 [] = {
+    dn_string_literal("dn_libs"),
+    dn_string_literal("dn_core"),
+    dn_string_literal("dn_editor"),
+  };
 
-  lua_pushstring(dn_lua.state, "init_phase_1");
-  lua_gettable(dn_lua.state, -2);
-  lresult = lua_pcall(dn_lua.state, 0, 0, 0);
-  if (lresult) {
-    const char* error = lua_tostring(dn_lua.state, -1);
-    DN_LOG("error = %s", error);
-    DN_BREAK();
+  dn_for_arr(phase_1, i) {
+    dn_lua_check_load_error(dn_lua_script_named_dir(phase_1[i]));
   }
 
+  dn_lua_pcall(dn_string_literal("init_phase_1"));
+}
+
+void dn_lua_init_phase_2() {
   // PHASE 2:
-  // Lua itself has been initialized, and we've loaded in other assets our scripts
-  // may use (shaders, fonts, etc). The last step is to load the game scripts and
-  // configure the game itself through Lua
-  result = dn_lua_script_named_dir(dn_string_literal("dn_components"));
-  if (result)  DN_BREAK();
-  result = dn_lua_script_named_dir(dn_string_literal("dn_editor"));
-  if (result)  DN_BREAK();
-  result = dn_lua_script_named_dir(dn_string_literal("dn_entities"));
-  if (result)  DN_BREAK();
-  result = dn_lua_script_named_dir(dn_string_literal("dn_app"));
-  if (result)  DN_BREAK();
-  
-  lua_pushstring(dn_lua.state, "init_phase_2");
-  lua_gettable(dn_lua.state, -2);
-  lresult = lua_pcall(dn_lua.state, 0, 0, 0);
-  if (lresult) {
-    const char* error = lua_tostring(dn_lua.state, -1);
-    DN_LOG("error = %s", error);
-    DN_BREAK();
+  // Load game and editor scripts and call into user code
+  dn_string_t phase_2 [] = {
+    dn_string_literal("dn_components"),
+    dn_string_literal("dn_editor"),
+    dn_string_literal("dn_entities"),
+    dn_string_literal("dn_app"),
+  };
+
+  dn_for_arr(phase_2, i) {
+    dn_lua_check_load_error(dn_lua_script_named_dir(phase_2[i]));
   }
 
-  dn_for(it, defer_pop) {
-    lua_pop(dn_lua.state, 1);
-  }
+  dn_lua_pcall(dn_string_literal("init_phase_2"));
 }
 
 void dn_lua_update() {
   dn_lua_interpreter_t l = dn_lua.state;
-  u32 defer_pop = 0;
-  
+
   lua_pushcfunction(l, &dn_lua_format_file_load_error_l);
-  defer_pop++;
+  dn_lua_pop_add(&dn_lua.pop);
   
   lua_getglobal(l, DN_LUA_MASTER_TABLE);
-  defer_pop++;
+  dn_lua_pop_add(&dn_lua.pop);
+
   lua_pushstring(l, "update_game");
   lua_gettable(l, -2);
 
   lua_pushnumber(l, dn_app.dt);
 
-  u32 result = lua_pcall(dn_lua.state, 1, 0, -4);
-  if (result) {
-    const char* error = lua_tostring(dn_lua.state, -1);
-    DN_LOG("error = %s", error);
-    DN_BREAK();
-  }
+  s32 result = lua_pcall(dn_lua.state, 1, 0, -4);
+  dn_lua_check_run_error(result);
 
-  dn_for(it, defer_pop) {
-    lua_pop(dn_lua.state, 1);
-  }
+  dn_lua_pop_process(&dn_lua.pop);
 }
 
-void dn_lua_pcall(dn_string_t fn) {
+dn_error_t dn_lua_pcall(dn_string_t fn) {
   lua_pushstring(dn_lua.state, dn_string_to_cstr(fn));
   lua_gettable(dn_lua.state, -2);
-  
-  bool result = lua_pcall(dn_lua.state, 0, 0, 0);
-  if (result) {
-    dn_string_builder_t builder = dn_tstring_builder();
-    dn_string_builder_append_fmt(&builder, dn_string_literal("%.*s() failed; error = %s"),
-      fn.len, fn.data,
-      lua_tostring(dn_lua.state, -1)
-    );
+  s32 result = lua_pcall(dn_lua.state, 0, 0, 0);
+  dn_lua_check_run_error(result);
+  return result;
+}
 
-    dn_log_builder(builder);
-    exit(0);
+void dn_lua_check_load_error(dn_error_t result) {
+  if (result) {
+    const char* error = lua_tostring(dn_lua.state, -1);
+    DN_LOG("%s", dn_string_to_cstr(dn_lua_error_to_string(result)));
+    DN_LOG("%s", error);
+    DN_BREAK();
   }
 }
+
+void dn_lua_check_run_error(dn_error_t result) {
+  if (result) {
+    const char* error = lua_tostring(dn_lua.state, -1);
+    DN_LOG("\n%s", error);
+    DN_BREAK();
+  }
+}
+
+dn_string_t dn_lua_error_to_string(dn_error_t error) {
+  switch (error) {
+    DN_CONSTANT_TO_STRING_CASE(DN_LUA_OK)
+    DN_CONSTANT_TO_STRING_CASE(DN_LUA_ERROR_PATH_DOES_NOT_EXIST)
+    DN_CONSTANT_TO_STRING_CASE(DN_LUA_ERROR_PATH_IS_NOT_DIRECTORY)
+    DN_CONSTANT_TO_STRING_CASE(DN_LUA_ERROR_FILE_LOAD_ERROR)
+    DN_CONSTANT_TO_STRING_CASE(DN_LUA_ERROR_FILE_RUN_ERROR)
+    DN_CONSTANT_TO_STRING_NO_DEFAULT
+  }
+}
+
 
 dn_error_t dn_lua_script_file(dn_string_t file_path) {
   dn_string_t extension = dn_os_path_extension(file_path);
@@ -5933,6 +5965,15 @@ s32 dn_lua_format_file_load_error_l(dn_lua_interpreter_t l) {
   return 1;
 }
 
+void dn_lua_pop_add(dn_lua_pop_t* pop) {
+  pop->count++;
+}
+
+void dn_lua_pop_process(dn_lua_pop_t* pop) {
+  lua_pop(dn_lua.state, pop->count);
+  pop->count = 0;
+}
+
 
 void dn_imgui_init() {
   DN_LOG_FN();
@@ -5964,7 +6005,7 @@ void dn_imgui_init() {
   // Engine will pick this up on the first tick (before ImGui renders, so no flickering)
   dn_imgui_load_layout(dn_string_literal("default"));
 
-  dn_os_create_directory(dn_paths_resolve(DN_USER_PATH_LAYOUTS));
+  dn_os_create_directory(dn_paths_resolve(DN_NAMED_PATH_USER_LAYOUTS));
 
   DN_LOG_2("Initializing ImGui backend");
   ImGui_ImplGlfw_InitForOpenGL(dn_app.window.handle, true);
@@ -5998,14 +6039,24 @@ void dn_imgui_load_layout(dn_string_t file_name) {
     dn_allocator_free(&dn_allocators.standard.allocator, dn_imgui.queued_layout.data);
   }
 
-  dn_imgui.queued_layout = dn_paths_resolve_format_ex(DN_PATH_LAYOUT, file_name, &dn_allocators.standard.allocator);
-  if (!dn_os_does_path_exist(dn_imgui.queued_layout)) {
-    dn_imgui.queued_layout = dn_paths_resolve_format_ex(DN_USER_PATH_LAYOUT, file_name, &dn_allocators.standard.allocator);
+  if (dn_paths_is_registered(DN_NAMED_PATH_USER_LAYOUT)) {
+    dn_imgui.queued_layout = dn_paths_resolve_format_ex(DN_NAMED_PATH_USER_LAYOUT, file_name, &dn_allocators.standard.allocator);
+
+    if (dn_os_does_path_exist(dn_imgui.queued_layout)) {
+      return;
+    }
   }
+
+  dn_imgui.queued_layout = dn_paths_resolve_format_ex(DN_NAMED_PATH_LAYOUT, file_name, &dn_allocators.standard.allocator);
 }
 
 void dn_imgui_save_layout(dn_string_t file_name) {
-  dn_string_t file_path = dn_paths_resolve_format(DN_USER_PATH_LAYOUT, file_name);  
+  if (!dn_paths_is_registered(DN_NAMED_PATH_USER_LAYOUT)) {
+    DN_LOG("Tried to save layout %.*s, but no path for user layouts was registered at app configuration.", file_name.len, file_name.data);
+    return;
+  }
+
+  dn_string_t file_path = dn_paths_resolve_format(DN_NAMED_PATH_USER_LAYOUT, file_name);  
   igSaveIniSettingsToDisk(dn_string_to_cstr(file_path));
 }
 

@@ -38,7 +38,6 @@ function dn.init_phase_0()
   dn.entity.persistent_entities = {}
   dn.entity.types = {}
   dn.entity.next_id = 1
-  dn.persistent = {}
 
   dn.component = {}
   dn.component.types = {}
@@ -153,6 +152,8 @@ function dn.init_phase_0()
   dn.draw = {}
   dn.draw.internal = {}
 
+  dn.layout = {}
+
   dn.dt = 0
   dn.elapsed_time = 0
   dn.frame = 0
@@ -167,7 +168,16 @@ function dn.init_phase_0()
   dn.ffi = {}
   dn.unported = {}
   dn.reflection = {}
-
+  dn.paths.USER_LAYOUTS = "dn_user_layouts"
+  dn.paths.USER_LAYOUT = "dn_user_layout"
+  dn.paths.LAYOUTS = "dn_layouts"
+  dn.paths.LAYOUT = "dn_layout"
+  dn.paths.USER_SCENES = "dn_user_scenes"
+  dn.paths.USER_SCENE = "dn_user_scene"
+  dn.paths.SCENES = "dn_scenes"
+  dn.paths.SCENE = "dn_scene"
+  dn.paths.USER_SAVES = "dn_user_saves"
+  dn.paths.USER_SAVE = "dn_user_save"
 
   -- Bootstrap the FFI, so that we can resolve paths
   ffi.cdef([[const char* dn_paths_resolve_bootstrap(const char* name);]])
@@ -240,7 +250,7 @@ function dn.init_phase_0()
   local file_path = ffi.string(file_path.data, file_path.len)
   local path_info = dofile(file_path)
 
-  local dn_install_paths = collect_paths(path_info.dn_install)
+  local dn_install_paths = collect_paths(path_info.dn_engine)
   for index, path in pairs(dn_install_paths) do
     ffi.C.dn_paths_add_engine_subpath(
       ffi.new('dn_string_t', #path.name, ffi.cast('u8*', path.name)),
@@ -292,28 +302,24 @@ function dn.init_phase_1()
   dn.time_metric.init()
   dn.input.init()
   dn.gpu.init()
+  dn.asset.init()
+  dn.scene.init()
+  dn.save.init()
+  dn.layout.init()
+
   dn.state.init()
   dn.animation.init()
   dn.texture.init()
   dn.background.init()
   dn.dialogue.init()
   -- dn.audio.init()
-  -- dn.gui.init()
-  dn.scene.init()
-  dn.asset.init()
+  dn.gui.init()
+  dn.editor.init()
+  dn.window.init()
 end
 
 function dn.init_phase_2()
   dn.subsystem.init()
-  dn.app = dn.subsystem.find('App')
-
-  dn.ffi.log('App:on_init_game')
-  dn.app:on_init_game()
-
-  dn.window.init()
-  -- dn.save.init()
-  dn.editor.init()
-  dn.persistent.init()
-
-  dn.lifecycle.run_callback(dn.lifecycle.callbacks.on_start_game)
+  app = dn.subsystem.find('App')
+  app:configure()
 end

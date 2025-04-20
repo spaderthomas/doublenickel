@@ -51,7 +51,7 @@ function SdfClock:init()
     time = 0.5
   })
 
-  self.sdf = dn.app.sdf_renderer
+  self.sdf = app.sdf_renderer
 
   self:init_bubbles()
 end
@@ -163,8 +163,8 @@ end
 function SdfClock:update_bubbles()
   for bubble in self.bubbles:iterate_values() do
     bubble.sdf.header.position.y = bubble.sdf.header.position.y + bubble.speed
-    if (bubble.sdf.header.position.y - bubble.sdf.radius) > dn.app.native_resolution.y / 2 then
-      bubble.sdf.header.position.y = -dn.app.native_resolution.y / 2 - bubble.sdf.radius
+    if (bubble.sdf.header.position.y - bubble.sdf.radius) > app.native_resolution.y / 2 then
+      bubble.sdf.header.position.y = -app.native_resolution.y / 2 - bubble.sdf.radius
     end
 
     if bubble.interpolation:update() then

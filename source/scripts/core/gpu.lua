@@ -16,7 +16,7 @@ function dn.gpu.render()
   local swapchain = dn.ffi.gpu_acquire_swapchain()
   dn.ffi.gpu_render_target_bind(swapchain)
   dn.ffi.gpu_render_target_clear(swapchain)
-  dn.app:on_swapchain_ready()
+  app:on_swapchain_ready()
   dn.ffi.gpu_swap_buffers()
 
   dn.time_metric.stop('render')
