@@ -1,3 +1,11 @@
+function dn.image.init()
+
+end
+
+function dn.image.configure(config)
+
+end
+
 dn.layers = {
   editor = 5,
   background = 5,
